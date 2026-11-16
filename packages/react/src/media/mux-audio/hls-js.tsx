@@ -1,7 +1,7 @@
 'use client';
 
 import type { HlsJsAdapterProps } from '@videojs/hlsjs-video';
-import { MuxAudioAdapter, type MuxAudioAdapterProps } from '@videojs/mux-audio';
+import { MuxAudioAdapter, type MuxAudioAdapterProps } from '@videojs/mux-audio/hls-js';
 import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -11,7 +11,7 @@ import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 import { type MediaFallbackProps, audioFallback } from '../fallback';
 
-export type { MuxAudioAdapter, MuxAudioAdapterProps, MuxSource } from '@videojs/mux-audio';
+export type { MuxAudioAdapter, MuxAudioAdapterProps, MuxSource } from '@videojs/mux-audio/hls-js';
 
 // `source` comes from `MuxAudioAdapterProps` only: `MuxSource` extends `HlsSource` with
 // Mux identity fields, so the narrower type has to win.

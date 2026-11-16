@@ -1,7 +1,7 @@
 # @videojs/hlsjs-video
 
 The Video.js playback adapter for [hls.js](https://github.com/video-dev/hls.js). It owns the supported hls.js runtime,
-browser playback implementation, and compatibility tests. `@videojs/mux-video` builds on it.
+browser playback implementation, and compatibility tests. `@videojs/mux-video/hls-js` builds on it.
 
 Install the adapter with the framework façade your player uses:
 

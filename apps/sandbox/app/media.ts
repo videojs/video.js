@@ -146,37 +146,39 @@ const MEDIA_MAP = {
     sources: HLS_SOURCE_IDS,
     cdnSources: NON_DASH_SOURCE_IDS,
   },
+  // The Mux media default to the SPF-backed flavor, as the bare import path does; the `-hls-js` presets are the same
+  // tags over hls.js.
   'mux-video': {
     label: 'Mux Video',
     player: 'video',
     tag: 'mux-video',
     live: true,
-    sources: MUX_SOURCE_IDS,
-    cdnSources: NON_DASH_SOURCE_IDS,
+    sources: MUX_SPF_SOURCE_IDS,
+    cdnSources: SPF_HLS_SOURCE_IDS,
   },
-  'mux-video-spf': {
-    label: 'Mux Video (SPF)',
+  'mux-video-hls-js': {
+    label: 'Mux Video (hls.js)',
     player: 'video',
     tag: 'mux-video',
     live: true,
-    sources: MUX_SPF_SOURCE_IDS,
-    cdnSources: SPF_HLS_SOURCE_IDS,
+    sources: MUX_SOURCE_IDS,
+    cdnSources: NON_DASH_SOURCE_IDS,
   },
   'mux-audio': {
     label: 'Mux Audio',
     player: 'audio',
     tag: 'mux-audio',
     live: true,
-    sources: MUX_SOURCE_IDS,
-    cdnSources: NON_DASH_SOURCE_IDS,
+    sources: MUX_SPF_SOURCE_IDS,
+    cdnSources: SPF_HLS_SOURCE_IDS,
   },
-  'mux-audio-spf': {
-    label: 'Mux Audio (SPF)',
+  'mux-audio-hls-js': {
+    label: 'Mux Audio (hls.js)',
     player: 'audio',
     tag: 'mux-audio',
     live: true,
-    sources: MUX_SPF_SOURCE_IDS,
-    cdnSources: SPF_HLS_SOURCE_IDS,
+    sources: MUX_SOURCE_IDS,
+    cdnSources: NON_DASH_SOURCE_IDS,
   },
   'hls-video': {
     label: 'HLS Video',

@@ -6,21 +6,19 @@ import { useSandbox } from '@app/shared/react/use-sandbox';
 import { isLiveSource, SOURCES } from '@app/shared/sources';
 import { GoogleCast } from '@videojs/react/extensions/google-cast';
 import { MuxData } from '@videojs/react/extensions/mux-data';
-import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
+import { MuxAudio } from '@videojs/react/media/mux-audio/hls-js';
 import { createRoot } from 'react-dom/client';
 
-// The SPF-backed counterpart to `react-mux-audio`. See that page's HTML sibling
-// for what differs: the audio-only engine fetches only audio renditions, and this
-// flavor transmuxes Mux's MPEG-TS packaging, so an audio-only TS playback ID
-// plays while a plus-tier video asset's muxed audio does not.
+// The hls.js-backed counterpart to `react-mux-audio`, which is the default
+// SPF-backed component. See that page's HTML sibling for what differs.
 
 function App() {
   const { source, mediaProps } = useSandbox();
   const live = isLiveSource(source);
   const Player = live ? LiveAudioPlayer : AudioPlayer;
 
-  // A source carrying signed tokens has no room in a plain `src`. A `drm.token`
-  // is accepted but inert on this flavor.
+  // A source carrying signed tokens has no room in a plain `src`, so it is passed
+  // structured instead — the same way `react-mux-video-hls-js` does.
   const { source: muxSource, url } = SOURCES[source];
 
   return (
@@ -28,11 +26,7 @@ function App() {
       <Player>
         <AudioSkinComponent live={live}>
           <MuxAudio {...(muxSource ? { source: muxSource } : { src: url ?? '' })} {...mediaProps} crossOrigin="" />
-          {/*
-            Both are opt-in media components, and no env key is needed for Mux-hosted sources.
-            Mux Data monitors this flavor from the media element alone: its engine integrations are
-            hls.js and dash.js, so an SPF engine gets element-level data and says so in dev.
-          */}
+          {/* Mux Data and Cast are opt-in media components; no env key is needed for Mux-hosted sources. */}
           <MuxData playerSoftwareName="mux-audio" />
           <GoogleCast />
         </AudioSkinComponent>

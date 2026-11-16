@@ -1,22 +1,17 @@
 import '@app/styles.css';
+import { Chapters } from '@app/shared/react/chapters';
 import { LiveVideoPlayer, VideoPlayer } from '@app/shared/react/players';
 import { SandboxI18nProvider } from '@app/shared/react/sandbox-i18n';
 import { VideoSkinComponent } from '@app/shared/react/skins';
 import { useSandbox } from '@app/shared/react/use-sandbox';
-import { getPlaceholderSrc, getPosterSrc, isLiveSource, SOURCES } from '@app/shared/sources';
+import { getChapters, getPlaceholderSrc, getPosterSrc, isLiveSource, SOURCES } from '@app/shared/sources';
 import { GoogleCast } from '@videojs/react/extensions/google-cast';
 import { MuxData } from '@videojs/react/extensions/mux-data';
-import { MuxVideo } from '@videojs/react/media/mux-video/spf';
+import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
 import { createRoot } from 'react-dom/client';
 
-// The SPF-backed counterpart to `react-mux-video`. See that page's HTML sibling
-// for what differs: this flavor transmuxes Mux's MPEG-TS packaging to fMP4, so
-// plus- and basic-tier playback IDs play. DRM plays here, licensed from
-// `source.drm`, apart from the unlicensed asset.
-//
-// Mux Data and Cast both work here, as on the hls.js-backed page — Mux Data
-// monitors this flavor from the media element alone, since its engine
-// integrations are hls.js and dash.js.
+// The hls.js-backed counterpart to `react-mux-video`, which is the default
+// SPF-backed component. See that page's HTML sibling for what differs.
 
 function App() {
   const { source, mediaProps } = useSandbox();
@@ -24,8 +19,8 @@ function App() {
   const live = isLiveSource(source);
   const Player = live ? LiveVideoPlayer : VideoPlayer;
 
-  // A source carrying signed tokens has no room in a plain `src`. A `drm.token`
-  // licenses the protected assets: the Media derives Mux's license servers from it.
+  // A source carrying signed tokens has no room in a plain `src`. A Mux
+  // `drm.token` becomes the FairPlay / Widevine / PlayReady license servers.
   const { source: muxSource, url } = SOURCES[source];
 
   return (
@@ -46,6 +41,8 @@ function App() {
               />
             ) : undefined
           }
+          // Replaces the skin's preview image so it can carry its own loading hints; the skin still fills in the frame.
+          renderThumbnail={<img alt="" decoding="async" fetchPriority="low" />}
           live={live}
         >
           {/* The storyboard track is derived automatically from the Mux src. */}
@@ -54,8 +51,10 @@ function App() {
             {...mediaProps}
             playsInline
             crossOrigin=""
-          />
-          {/* Opt-in media components; no env key is needed for Mux-hosted sources. */}
+          >
+            <Chapters tracks={getChapters(source)} />
+          </MuxVideo>
+          {/* Mux Data and Cast are opt-in media components; no env key is needed for Mux-hosted sources. */}
           <MuxData playerSoftwareName="mux-video" />
           <GoogleCast />
         </VideoSkinComponent>

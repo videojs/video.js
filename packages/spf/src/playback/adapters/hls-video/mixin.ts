@@ -15,6 +15,7 @@ import {
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   type SvtaError,
 } from '../../../media/errors';
@@ -156,8 +157,13 @@ function deriveTargetLiveWindow(
  * An allow-list, deliberately: only _verdicts_ are here. The per-rendition causes `resolve-track` reports (unsupported
  * format, unsupported DRM) stay in the sequence as context — one unplayable rendition doesn't fail the source, and
  * promoting a cause would put a dialog over a mixed source that goes on to play.
+ *
+ * A failed primary manifest load is a verdict too: the source never resolved, so there is no rendition left to play and
+ * nothing later in the sequence can recover it. Without it here a missing or unauthorized manifest (a 404, an expired
+ * playback token) would leave the media silently idle.
  */
 const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
 ]);
@@ -203,9 +209,9 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     /**
      * A complete sentence naming the Media to reach for when this one can't play a source — `Try the hls.js-backed Mux
-     * media instead: import the hls-js flavor in place of the spf one.` Appended to the copy this adapter surfaces, and
-     * to the notices it logs. Name the flavor, not an import path: a Media is reached through several packages, each
-     * with its own counterpart.
+     * media instead: import the hls-js flavor in place of the default one.` Appended to the copy this adapter surfaces,
+     * and to the notices it logs. Name the flavor, not an import path: a Media is reached through several packages,
+     * each with its own counterpart.
      *
      * Empty here: `hls-video` has no better-equipped sibling to point at. A Media that does (a Mux Video built on this
      * engine, whose hls.js-backed counterpart plays MPEG-TS and DRM) overrides this static, and its copy gains the

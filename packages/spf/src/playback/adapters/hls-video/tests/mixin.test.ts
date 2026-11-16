@@ -18,6 +18,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_AUDIO_FORMAT,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   SVTA_UNSUPPORTED_ENCRYPTION_METHOD,
@@ -1152,6 +1153,24 @@ https://example.com/video-360p.m3u8`;
       // No message: viewer-facing copy is the consumer's to localize from the
       // code, so the engine ships none.
       expect(media.error).toEqual({ code: SVTA_NO_SUPPORTED_VIDEO_TRACK, message: '' });
+      expect(fired).toHaveLength(1);
+      media.destroy();
+    });
+
+    it('surfaces a failed primary manifest load as fatal', async () => {
+      const media = new TestAdapter();
+      const fired: Event[] = [];
+
+      media.addEventListener('error', (event) => fired.push(event));
+
+      // What `resolvePresentation` reports for a manifest that 404s or fails to
+      // parse: the source never resolved, so nothing later can play it.
+      const data = { url: 'https://example.com/missing.m3u8', cause: new Error('404') };
+
+      media.engine.state.errors.set([{ code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR, data }]);
+      await flush();
+
+      expect(media.error).toEqual({ code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR, message: '', data });
       expect(fired).toHaveLength(1);
       media.destroy();
     });

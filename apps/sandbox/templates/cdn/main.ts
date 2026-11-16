@@ -197,17 +197,17 @@ async function loadCdnMedia(media: MediaId) {
     case 'mux-video':
       await import('@videojs/cdn/media/mux-video');
       break;
-    // One media loads one flavor, so the SPF-backed element is the only claimant
+    // One media loads one flavor, so the hls.js-backed element is the only claimant
     // and registers as `<mux-video>` — the CDN page is where that rule is visible,
     // since a page picks bundles at runtime rather than by import path.
-    case 'mux-video-spf':
-      await import('@videojs/cdn/media/mux-video/spf');
+    case 'mux-video-hls-js':
+      await import('@videojs/cdn/media/mux-video/hls-js');
       break;
     case 'mux-audio':
       await import('@videojs/cdn/media/mux-audio');
       break;
-    case 'mux-audio-spf':
-      await import('@videojs/cdn/media/mux-audio/spf');
+    case 'mux-audio-hls-js':
+      await import('@videojs/cdn/media/mux-audio/hls-js');
       break;
     // `<background-video>` rides along inside the `background` bundle above; the
     // SPF-backed tags are their own bundles, so the page loads them the way it

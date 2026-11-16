@@ -78,7 +78,7 @@ describe('summarizeSelection', () => {
     expect(
       summarizeSelection({
         platform: 'react',
-        media: 'mux-video-spf',
+        media: 'mux-video-hls-js',
         skin: 'neutral',
         skinless: false,
         styling: 'tailwind',
@@ -86,7 +86,7 @@ describe('summarizeSelection', () => {
         width: 672,
         source: 'mp4-1',
       })
-    ).toBe('React · Mux Video (SPF) · Neutral · Tailwind · from the registry · 672px · MP4 - Dancing Dude');
+    ).toBe('React · Mux Video (hls.js) · Neutral · Tailwind · from the registry · 672px · MP4 - Dancing Dude');
   });
 
   it('leaves the skin out for a background media', () => {

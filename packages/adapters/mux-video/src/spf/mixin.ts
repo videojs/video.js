@@ -55,11 +55,11 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * both `<mux-video>` and `<mux-audio>`.
      *
      * Names the flavor rather than an import path, because one Media is reached through three of them —
-     * `@videojs/html`, `@videojs/react`, and this package — and each has a different counterpart. The flavor suffix is
-     * the one thing common to the layers a consumer imports elements and components from.
+     * `@videojs/html`, `@videojs/react`, and this package — and each has a different counterpart. The `hls-js` suffix
+     * is the one thing common to the layers a consumer imports elements and components from.
      */
     static get alternativeMediaSuggestion(): string | undefined {
-      return 'Try the hls.js-backed Mux media instead: import the `hls-js` flavor in place of the `spf` one.';
+      return 'Try the hls.js-backed Mux media instead: import the `hls-js` flavor in place of the default one.';
     }
 
     #source: MuxSourceBase | null = MuxImpl.defaultProps.source;

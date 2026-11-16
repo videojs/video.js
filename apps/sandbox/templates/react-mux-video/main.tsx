@@ -10,6 +10,10 @@ import { MuxData } from '@videojs/react/extensions/mux-data';
 import { MuxVideo } from '@videojs/react/media/mux-video';
 import { createRoot } from 'react-dom/client';
 
+// `MuxVideo` as it is imported by default: the SPF-backed flavor. The
+// hls.js-backed one is in `react-mux-video-hls-js`. See this page's HTML sibling
+// for what differs.
+
 function App() {
   const { source, mediaProps } = useSandbox();
   const placeholder = getPlaceholderSrc(source);

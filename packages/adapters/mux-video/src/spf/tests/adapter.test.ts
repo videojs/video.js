@@ -4,8 +4,8 @@ import type { DrmSystemsConfig } from '@videojs/spf/hls';
  * SPF-backed MuxVideoAdapter tests.
  *
  * Mirrors the coverage of the hls.js-backed `MuxVideoAdapter`
- * (`packages/adapters/mux-video/src/tests/adapter.test.ts`), minus everything that flavor's `engine` / `preferPlayback`
- * options carry — this source is Mux identity and nothing else.
+ * (`packages/adapters/mux-video/src/hls-js/tests/adapter.test.ts`), minus everything that flavor's `engine` /
+ * `preferPlayback` options carry — this source is Mux identity and nothing else.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 

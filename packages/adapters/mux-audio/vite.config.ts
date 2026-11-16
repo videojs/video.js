@@ -6,7 +6,7 @@ import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '..
 
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'browser'),
-  entry: { index: './src/index.ts', spf: './src/spf/index.ts' },
+  entry: { index: './src/index.ts', 'hls-js': './src/hls-js/index.ts', spf: './src/spf/index.ts' },
 });
 
 export default defineConfig({

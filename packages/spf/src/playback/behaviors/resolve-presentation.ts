@@ -107,7 +107,13 @@ function resolvePresentationSetup({
           const ac = new AbortController();
 
           fetchResolvable(presentation, { signal: ac.signal })
-            .then((response) => getResponseText(response))
+            .then((response) => {
+              // An HTTP failure (a missing asset, an expired playback token) carries a body too, and parsing an
+              // error page as a playlist yields an empty presentation that reports nothing.
+              if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${presentation.url}`);
+
+              return getResponseText(response);
+            })
             .then((text) => {
               if (ac.signal.aborted || state.presentation.get() !== presentation) return;
 
