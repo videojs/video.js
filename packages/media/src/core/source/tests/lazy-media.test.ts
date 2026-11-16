@@ -101,6 +101,14 @@ describe('resolveLazySource', () => {
     expect(source.source).toBe(structured);
   });
 
+  it('lets type say an extensionless URL on a service host is a file or manifest', () => {
+    expect(adapterTypeOf('https://embed-ssl.wistia.com/deliveries/abc.bin', 'video/mp4')).toBe('video');
+    expect(adapterTypeOf('https://player.vimeo.com/play/123/hls?s=abc', 'application/x-mpegurl')).toBe('hls');
+    // A Mux URL is already a stream, so a `type` naming its manifest keeps it on the Mux media.
+    expect(adapterTypeOf('https://stream.mux.com/abc', 'application/x-mpegurl')).toBe('mux');
+    expect(adapterTypeOf('https://vimeo.com/76979871')).toBe('vimeo');
+  });
+
   it('resolves a structured source by the id of the media that plays it', () => {
     const resolve = (source: LazyMediaSource) =>
       resolveLazySource('', { nativeHls: 'unsupported', source })?.adapterType;

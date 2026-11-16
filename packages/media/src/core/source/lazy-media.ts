@@ -89,6 +89,7 @@ export function resolveLazySource(src: string, options: ResolveLazySourceOptions
   const url = source ? parseSourceUrl(source) : null;
   const service = source ? matchService(source, url) : null;
   const mimeType = resolveMimeType(source);
+  const typeAdapter = adapterTypeForMimeType(type);
 
   return {
     src: source,
@@ -97,10 +98,12 @@ export function resolveLazySource(src: string, options: ResolveLazySourceOptions
     adapterType:
       // An id names the media that plays it, the way a Mux stream derives its URL from `playbackId`.
       idType ??
-      // A media file on a service host plays as that file; Mux and Cloudflare streams are manifests, and a player.js
-      // marker is explicit.
-      (!mimeType || service === 'mux' || service === 'cloudflare' || service === 'playerjs' ? service : null) ??
-      adapterTypeForMimeType(type) ??
+      // A media file on a service host plays as that file, whether its extension or its `type` says so; Mux and
+      // Cloudflare streams are manifests, and a player.js marker is explicit.
+      ((!mimeType && !typeAdapter) || service === 'mux' || service === 'cloudflare' || service === 'playerjs'
+        ? service
+        : null) ??
+      typeAdapter ??
       adapterTypeForMimeType(mimeType),
     playback: resolvePlayback(options),
     source: structured,
