@@ -12,11 +12,11 @@ import {
 } from '@videojs/core/dom';
 import { useSnapshot } from '@videojs/store/react';
 import { applyStyles } from '@videojs/utils/dom';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { useOptionalPlayer } from '../../player/context';
-import { useDestroy } from '../../utils/use-destroy';
 import { useForceRender } from '../../utils/use-force-render';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 
 export interface UseSliderOptions<State extends SliderState = SliderState> extends Pick<
@@ -81,7 +81,7 @@ export function useSlider<State extends SliderState = SliderState>(
   const forceRender = useForceRender();
 
   // Lazy-init the slider handle. Stable across re-renders.
-  const [slider] = useState<SliderApi>(() => {
+  const slider = useInstance<SliderApi>(() => {
     const stableOptions: SliderOptions = {
       getElement: () => rootElementRef.current!,
       getThumbElement: () => thumbElementRef.current,
@@ -108,8 +108,6 @@ export function useSlider<State extends SliderState = SliderState>(
 
     return createSlider(stableOptions);
   });
-
-  useDestroy(slider);
 
   // Percentage changes are rendered directly below. React only needs to
   // re-render when interaction state changes.

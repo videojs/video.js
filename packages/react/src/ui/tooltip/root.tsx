@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 import { useOptionalContainer } from '../../player/context';
 import { useOptionalPopupGroup } from '../../player/popup-group-context';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { useSafeId } from '../../utils/use-safe-id';
 import { useOptionalControlsContext } from '../controls/context';
@@ -46,6 +46,9 @@ export function TooltipRoot({
   children,
   ...coreProps
 }: TooltipRootProps): ReactNode {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   const container = useOptionalContainer();
   const popupGroup = useOptionalPopupGroup();
   const controls = useOptionalControlsContext();
@@ -69,7 +72,7 @@ export function TooltipRoot({
   const groupRef = useLatestRef(groupFromContext);
   const popupGroupRef = useLatestRef(popupGroup);
 
-  const [tooltip] = useState(() => {
+  const tooltip = useInstance(() => {
     const instance = createTooltip({
       transition: createTransition(),
       onOpenChange: (nextOpen: boolean, details: TooltipChangeDetails) => {
@@ -121,8 +124,6 @@ export function TooltipRoot({
 
     tooltip.close('imperative-action');
   }, [controls?.state.visible, tooltip]);
-
-  useDestroy(tooltip);
 
   const input = useSnapshot(tooltip.input);
 

@@ -2,9 +2,9 @@
 
 import { getRenderedIndicatorState, type IndicatorLifecycleState, isIndicatorPresent } from '@videojs/core';
 import { createTransition } from '@videojs/core/dom';
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 
 export interface RenderedIndicatorOptions {
   replayOnUpdate?: boolean | undefined;
@@ -17,9 +17,8 @@ export function useRenderedIndicatorState<State extends IndicatorLifecycleState>
   const elementRef = useRef<HTMLElement>(null);
   const currentStateRef = useRef(currentState);
   const snapshotRef = useRef(currentState);
-  const [transition] = useState(() => createTransition());
+  const transition = useInstance(() => createTransition());
 
-  useDestroy(transition);
   currentStateRef.current = currentState;
 
   const transitionState = useSyncExternalStore(
