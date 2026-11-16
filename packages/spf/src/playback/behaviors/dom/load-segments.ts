@@ -46,9 +46,8 @@ import {
   findResolvedVideoTrack,
 } from '../../../media/utils/tracks';
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
-import type { SourceBufferActor } from '../../actors/dom/source-buffer';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
-import type { BufferActorKey, CreateLoadStart } from '../../primitives/load-start';
+import type { CreateLoadStart } from '../../primitives/load-start';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
 
 // Re-export buffer state types for consumers that import them from this module.
@@ -93,13 +92,6 @@ export interface SegmentLoadingState {
 
 /** Context shape for segment loading. Each variant only consumes its own type's loader actor. */
 export interface SegmentLoadingContext {
-  /**
-   * The SourceBuffer actors, handed to `createLoadStart` for what is buffered. **Observed, never declared**, like
-   * `loadingSuspended`: the buffer-actor setup behaviors write them, and a load-start factory must handle their
-   * absence.
-   */
-  videoBufferActor?: SourceBufferActor;
-  audioBufferActor?: SourceBufferActor;
   videoSegmentLoaderActor?: SegmentLoaderActor;
   audioSegmentLoaderActor?: SegmentLoaderActor;
   textTrackSegmentLoaderActor?: TextTrackSegmentLoaderActor;
@@ -164,16 +156,10 @@ function setupSegmentLoading<
     loadingSuspended?: ReadonlySignal<SegmentLoadingState['loadingSuspended']>;
     segmentLoadingBlocked?: ReadonlySignal<SegmentLoadingState['segmentLoadingBlocked']>;
   };
-  // The SourceBuffer actor is observed, never declared, exactly like the gates above: optional here so variant maps
-  // omit it, while compositions that set up buffer actors expose the live signal. Text has none.
-  context: { [P in L]: ReadonlySignal<SegmentLoaderLike<Track> | undefined> } & Partial<
-    Record<BufferActorKey, ReadonlySignal<SourceBufferActor | undefined>>
-  >;
+  context: { [P in L]: ReadonlySignal<SegmentLoaderLike<Track> | undefined> };
   config: {
     selectedKey: K;
     loaderKey: L;
-    /** The context key of the SourceBuffer actor handed to `createLoadStart`; absent for text. */
-    bufferActorKey?: BufferActorKey;
     findResolvedTrack: (
       presentation: MaybeResolvedPresentation | undefined,
       trackId: string | undefined
@@ -314,13 +300,11 @@ function setupSegmentLoading<
 
 const VIDEO_SEGMENT_LOADING_CONFIG = {
   ...VIDEO_TYPE_CONFIG,
-  bufferActorKey: VIDEO_TYPE_CONFIG.actorKey,
   findResolvedTrack: findResolvedVideoTrack,
 } as const;
 
 const AUDIO_SEGMENT_LOADING_CONFIG = {
   ...AUDIO_TYPE_CONFIG,
-  bufferActorKey: AUDIO_TYPE_CONFIG.actorKey,
   findResolvedTrack: findResolvedAudioTrack,
 } as const;
 

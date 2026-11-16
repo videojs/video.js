@@ -10,23 +10,24 @@ import type { SourceBufferActor } from '../actors/dom/source-buffer';
 
 type SelectedTrackKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedTextTrackId';
 
-/** The context keys of the per-type SourceBuffer actors. */
-export type BufferActorKey = 'videoBufferActor' | 'audioBufferActor';
+type BufferActorKey = 'videoBufferActor' | 'audioBufferActor';
 
-/** A dispatcher's own setup arguments — the same `{ state, context, config }` a behavior's setup receives. */
+/**
+ * A dispatcher's own setup arguments — the same `{ state, context, config }` a behavior's setup receives, passed
+ * straight through. Like a track-switching rule, this declares what it reads beyond the dispatcher's own signals as
+ * optional on its own view, so the dispatcher never assumes it exists.
+ */
 export interface LoadStartDeps {
   state: {
     presentation: ReadonlySignal<MaybeResolvedPresentation | undefined>;
     currentTime: ReadonlySignal<number | undefined>;
   } & Partial<Record<SelectedTrackKey, ReadonlySignal<string | undefined>>>;
-  /**
-   * The SourceBuffer actors are observed, never declared: absent for text, or in a composition without them, and a load
-   * start must handle that by leaving the load at the playhead.
-   */
+  /** The SourceBuffer actors, absent for text or in a composition without them (the load then stays at the playhead). */
   context: Partial<Record<BufferActorKey, ReadonlySignal<SourceBufferActor | undefined>>>;
   config: {
     selectedKey: SelectedTrackKey;
-    bufferActorKey?: BufferActorKey;
+    /** The per-type `actorKey` the dispatcher's type config carries; text has none. */
+    actorKey?: BufferActorKey;
     findResolvedTrack: (
       presentation: MaybeResolvedPresentation | undefined,
       trackId: string | undefined
@@ -48,7 +49,7 @@ export type CreateLoadStart = (deps: LoadStartDeps) => ReadonlySignal<number | u
 export const coveringSegmentLoadStart: CreateLoadStart = ({ state, context, config }) =>
   computed(() => {
     const track = config.findResolvedTrack(state.presentation.get(), state[config.selectedKey]?.get());
-    const bufferActor = config.bufferActorKey && context[config.bufferActorKey]?.get();
+    const bufferActor = config.actorKey && context[config.actorKey]?.get();
     if (!track || !bufferActor) return undefined;
 
     const { bufferedRanges } = bufferActor.snapshot.get().context;
