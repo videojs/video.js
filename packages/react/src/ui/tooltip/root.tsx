@@ -122,7 +122,6 @@ export function TooltipRoot({
     tooltip.close('imperative-action');
   }, [controls?.state.visible, tooltip]);
 
-
   const input = useSnapshot(tooltip.input);
 
   core.setInput(input);

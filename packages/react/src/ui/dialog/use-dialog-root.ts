@@ -73,7 +73,6 @@ export function useDialogRoot({
     dialog.setInteractionRoot(interactionRoot);
   }, [dialog, interactionRoot]);
 
-
   const input = useSnapshot(dialog.input);
   const modality = useSnapshot(dialog.modality);
 

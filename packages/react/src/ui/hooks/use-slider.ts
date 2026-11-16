@@ -15,8 +15,8 @@ import { applyStyles } from '@videojs/utils/dom';
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { useOptionalPlayer } from '../../player/context';
-import { useInstance } from '../../utils/use-instance';
 import { useForceRender } from '../../utils/use-force-render';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 
 export interface UseSliderOptions<State extends SliderState = SliderState> extends Pick<
@@ -108,7 +108,6 @@ export function useSlider<State extends SliderState = SliderState>(
 
     return createSlider(stableOptions);
   });
-
 
   // Percentage changes are rendered directly below. React only needs to
   // re-render when interaction state changes.

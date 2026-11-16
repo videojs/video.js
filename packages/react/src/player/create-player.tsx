@@ -123,7 +123,6 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     const [extensions] = useState(() => new PlayerExtensionCoordinator(() => reattach.current?.()));
     const registerExtension = useCallback((extension: PlayerExtension) => extensions.register(extension), [extensions]);
 
-
     // Sync committed configuration props to the existing store.
     useLayoutEffect(() => {
       const previous = syncedValues.current;
