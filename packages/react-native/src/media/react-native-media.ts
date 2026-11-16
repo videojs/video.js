@@ -14,16 +14,6 @@ export const reactNativeMediaDefaultProps: ReactNativeMediaProps = {
   src: '',
 };
 
-/** The mirrored slice of playback state an incoming native event resolves to. */
-export interface NativePlaybackState {
-  paused: boolean;
-  ended: boolean;
-  currentTime: number;
-  duration: number;
-  buffered: TimeRangeLike;
-  error: MediaError | null;
-}
-
 function toTimeRanges(ranges: readonly PlayerTimeRange[]): TimeRangeLike {
   return {
     length: ranges.length,
@@ -42,118 +32,49 @@ function rangeAt(ranges: readonly PlayerTimeRange[], index: number): PlayerTimeR
 
 const EMPTY_TIME_RANGES = toTimeRanges([]);
 
-/** What a media element reports before, or between, sources. */
-const initialSourceState = {
-  ended: false,
-  currentTime: 0,
-  duration: Number.NaN,
-  buffered: EMPTY_TIME_RANGES,
-  error: null,
-} satisfies Partial<NativePlaybackState>;
+type PlayerEventType = PlayerEvent['type'];
 
-export const initialNativePlaybackState: NativePlaybackState = { paused: true, ...initialSourceState };
+const PLAYER_EVENT_TYPES: readonly PlayerEventType[] = [
+  'loadstart',
+  'emptied',
+  'loadedmetadata',
+  'durationchange',
+  'progress',
+  'canplay',
+  'canplaythrough',
+  'error',
+  'play',
+  'pause',
+  'playing',
+  'waiting',
+  'ended',
+  'seeking',
+  'seeked',
+  'timeupdate',
+  'ratechange',
+  'contentdatachange',
+];
 
-/**
- * Compile-time proof that every `PlayerEvent['type']` is handled. Adding a member to the native union without a
- * matching case makes this call fail to typecheck, so a new native event can't become a silently dropped one.
- */
-function assertHandled(_type: never): void {}
-
-/**
- * Translate one native event into the mirrored state it implies and the contract events to emit, given the state it
- * arrived in.
- *
- * Split out from the class so the mapping is inspectable and testable on its own. The `switch` is exhaustive over
- * `PlayerEvent['type']`, so adding a native event type without handling it here is a compile error rather than a
- * silently dropped event.
- */
-export function resolveNativeEvent(
-  event: PlayerEvent,
-  previous: NativePlaybackState
-): { state: NativePlaybackState; emit: (keyof NativeEvents & string)[] } | null {
-  const { type } = event;
-
-  switch (type) {
-    case 'play':
-    case 'playing':
-      return { state: { ...previous, paused: false, ended: false }, emit: [type] };
-
-    case 'pause':
-      return { state: { ...previous, paused: true }, emit: [type] };
-
-    case 'ended':
-      return { state: { ...previous, paused: true, ended: true }, emit: [type] };
-
-    // A new source starts over. Native keeps playing across the swap and
-    // reports that through its own `play`/`pause`, so `paused` is left alone.
-    // `emptied` only fires when replacing a source, so `loadstart` resets too.
-    case 'emptied':
-    case 'loadstart':
-      return { state: { ...previous, ...initialSourceState }, emit: [type] };
-
-    // A missing value means native broke the contract; keeping the previous
-    // one beats mirroring `undefined`.
-    case 'timeupdate':
-      return { state: { ...previous, currentTime: event.currentTime ?? previous.currentTime }, emit: [type] };
-
-    case 'durationchange':
-      return { state: { ...previous, duration: event.duration ?? previous.duration }, emit: [type] };
-
-    case 'progress':
-      return {
-        state: { ...previous, buffered: event.buffered ? toTimeRanges(event.buffered) : previous.buffered },
-        emit: [type],
-      };
-
-    // An empty message falls back to `MediaError`'s default for the code.
-    case 'error':
-      return {
-        state: {
-          ...previous,
-          error: new MediaError(event.error?.message, event.error?.code ?? MediaError.MEDIA_ERR_CUSTOM),
-        },
-        emit: [type],
-      };
-
-    // Native emits these under the same conditions as the media element, and
-    // none of them touch the mirrored state yet.
-    case 'loadedmetadata':
-    case 'canplay':
-    case 'canplaythrough':
-    case 'waiting':
-    case 'seeking':
-    case 'seeked':
-    case 'ratechange':
-    case 'contentdatachange':
-      return { state: previous, emit: [type] };
-
-    default:
-      // Statically unreachable. Still returns null at runtime, because the
-      // codegen payload carries `type` as a plain string and native could emit
-      // one outside the union.
-      assertHandled(type);
-      return null;
-  }
-}
+const isPlayerEventType = (type: string): type is PlayerEventType =>
+  PLAYER_EVENT_TYPES.includes(type as PlayerEventType);
 
 /**
  * Media adapter over a native player addressed by a {@link NativeEngineHandle}.
  *
- * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is mirrored from the handle-tagged
- * `onPlayerEvent` channel. See `PlayerSurfaceHost` for why state is mirrored rather than delegated.
+ * Commands forward to the `VideoJSEngineStore` TurboModule, and every readable property reads its synchronous getters,
+ * which return the native state snapshot without waiting on the player's thread. Commands write their effect into that
+ * snapshot before returning, so `paused` reads `false` straight after `play()`, as on the web. Events from the
+ * handle-tagged `onPlayerEvent` channel are re-emitted; their payloads are left to listeners that want a value without
+ * a round trip, since an in-flight payload can be older than the snapshot.
  *
- * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` and `MediaErrorCapability` — which is the whole
- * capability surface today.
+ * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` and `MediaErrorCapability` — and, at runtime, the
+ * `isMediaSeekCapable` and `isMediaSourceCapable` checks, though not their full types: `currentTime` is still
+ * read-only.
  *
  * # Reusing existing playerFeatures
  *
- * Would be possible in a fully-realized implementation. The TurboModule has the commands and queries; the adapter needs
- * to surface them:
- *
- * 1. Seek and source capability. `isMediaSeekCapable` wants a writable `currentTime` (`setCurrentTime`) and `seeking`
- *    (`isSeeking`); `isMediaSourceCapable` wants `currentSrc` (`getSource`), `readyState` (`getReadyState`) and
- *    `load()`.
- * 2. `seekable` (`getSeekable`) alongside `buffered`, so the adapter satisfies `isMediaBufferCapable`.
+ * Remaining gaps: a writable `currentTime` (`setCurrentTime`), and `seekable` (`getSeekable`) alongside `buffered` so
+ * the adapter satisfies `isMediaBufferCapable`.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>
@@ -163,7 +84,7 @@ export class ReactNativeMedia
   #ownsHandle: boolean;
   #subscription: { remove(): void } | null = null;
   #src = reactNativeMediaDefaultProps.src;
-  #state: NativePlaybackState = initialNativePlaybackState;
+  #error: { code: number; message: string; value: MediaError } | null = null;
 
   /**
    * @param options - Pass `handle` to adopt an externally owned native player; it will not be destroyed with this
@@ -181,7 +102,7 @@ export class ReactNativeMedia
     this.#subscription = store.onPlayerEvent((event) => {
       if (event.handle !== this.#handle) return;
 
-      this.#handleNativeEvent(event);
+      this.#handleNativeEvent(event.type);
     });
   }
 
@@ -234,30 +155,61 @@ export class ReactNativeMedia
     requireEngineStore().pause(this.#handle);
   }
 
+  /** Reloads the current source from scratch. */
+  load(): void {
+    if (isNull(this.#handle)) return;
+
+    requireEngineStore().load(this.#handle);
+  }
+
   get paused(): boolean {
-    return this.#state.paused;
+    return isNull(this.#handle) ? true : requireEngineStore().isPaused(this.#handle);
   }
 
   get ended(): boolean {
-    return this.#state.ended;
+    return isNull(this.#handle) ? false : requireEngineStore().isEnded(this.#handle);
   }
 
-  /** Seconds, as of the last `timeupdate`. Read-only until native has a seek command. */
+  /** Seconds. Read-only until the adapter exposes `setCurrentTime`. */
   get currentTime(): number {
-    return this.#state.currentTime;
+    return isNull(this.#handle) ? 0 : requireEngineStore().getCurrentTime(this.#handle);
   }
 
   /** Seconds; `NaN` until known and `Infinity` for live. */
   get duration(): number {
-    return this.#state.duration;
+    return isNull(this.#handle) ? Number.NaN : requireEngineStore().getDuration(this.#handle);
   }
 
   get buffered(): TimeRangeLike {
-    return this.#state.buffered;
+    return isNull(this.#handle) ? EMPTY_TIME_RANGES : toTimeRanges(requireEngineStore().getBuffered(this.#handle));
   }
 
+  /**
+   * Stable while native reports the same error, so readers comparing by identity see one error rather than a new one
+   * per read. An empty message falls back to `MediaError`'s default for the code.
+   */
   get error(): MediaError | null {
-    return this.#state.error;
+    const native = isNull(this.#handle) ? null : requireEngineStore().getError(this.#handle);
+
+    if (isNull(native)) {
+      this.#error = null;
+      return null;
+    }
+
+    if (this.#error?.code !== native.code || this.#error.message !== native.message) {
+      this.#error = { ...native, value: new MediaError(native.message, native.code) };
+    }
+
+    return this.#error.value;
+  }
+
+  get seeking(): boolean {
+    return isNull(this.#handle) ? false : requireEngineStore().isSeeking(this.#handle);
+  }
+
+  /** An `HTMLMediaElement.readyState` value, `0`–`4`. */
+  get readyState(): number {
+    return isNull(this.#handle) ? 0 : requireEngineStore().getReadyState(this.#handle);
   }
 
   override destroy(): void {
@@ -274,21 +226,15 @@ export class ReactNativeMedia
     super.destroy();
   }
 
-  #handleNativeEvent(event: PlayerEvent): void {
-    const resolved = resolveNativeEvent(event, this.#state);
-
-    if (isNull(resolved)) {
+  #handleNativeEvent(type: string): void {
+    if (!isPlayerEventType(type)) {
       if (__DEV__) {
-        console.warn(`@videojs/react-native: unrecognized native player event '${event.type}'.`);
+        console.warn(`@videojs/react-native: unrecognized native player event '${type}'.`);
       }
 
       return;
     }
 
-    this.#state = resolved.state;
-
-    for (const event of resolved.emit) {
-      this.emit(event);
-    }
+    this.emit(type);
   }
 }
