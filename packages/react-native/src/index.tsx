@@ -19,8 +19,22 @@ export {
 } from './player/create-player';
 // `usePlayer` and `useMedia` come from the preset, not `./player/context` — the factory's are typed
 // against the composed features, while the context pair is untyped and stays internal.
-export { nativeVideoFeatures, useMedia, usePlayer, VideoPlayer, type VideoPlayerProps } from './player/video-player';
+export {
+  nativeVideoFeatures,
+  type NativeVideoFeatures,
+  useMedia,
+  usePlayer,
+  VideoPlayer,
+  type VideoPlayerProps,
+} from './player/video-player';
 export { VideoSkin, type VideoSkinProps } from './skins/video-skin';
 export type { NativePlayerTarget } from './store/native-player-target';
-export { selectPlayback } from './store/selectors';
+export {
+  selectBuffer,
+  selectError,
+  selectMetadata,
+  selectPlayback,
+  selectPlaybackRate,
+  selectTime,
+} from './store/selectors';
 export { PlayButton, type PlayButtonProps } from './ui/play-button';

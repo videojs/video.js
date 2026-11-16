@@ -1,4 +1,4 @@
-import { type EngineAdapter, MediaError, type TimeRangeLike } from '@videojs/media';
+import { type EngineAdapter, type MediaContentData, MediaError, type TimeRangeLike } from '@videojs/media';
 import { isNull, isUndefined } from '@videojs/utils/predicate';
 
 import { type NativeEngineHandle, requireEngineStore, toEngineHandle } from './engine-store';
@@ -67,14 +67,9 @@ const isPlayerEventType = (type: string): type is PlayerEventType =>
  * handle-tagged `onPlayerEvent` channel are re-emitted; their payloads are left to listeners that want a value without
  * a round trip, since an in-flight payload can be older than the snapshot.
  *
- * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` and `MediaErrorCapability` — and, at runtime, the
- * `isMediaSeekCapable` and `isMediaSourceCapable` checks, though not their full types: `currentTime` is still
- * read-only.
- *
- * # Reusing existing playerFeatures
- *
- * Remaining gaps: a writable `currentTime` (`setCurrentTime`), and `seekable` (`getSeekable`) alongside `buffered` so
- * the adapter satisfies `isMediaBufferCapable`.
+ * Satisfies `NativeMedia`, and at runtime `isMediaSourceCapable` too, which is what core's platform-neutral `playback`,
+ * `time`, `buffer`, `error`, `metadata` and `playbackRate` features check for. `src` and `loop` are the adapter's own,
+ * as attributes are an element's: it forwards them to native but doesn't read them back.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>
@@ -84,7 +79,10 @@ export class ReactNativeMedia
   #ownsHandle: boolean;
   #subscription: { remove(): void } | null = null;
   #src = reactNativeMediaDefaultProps.src;
+  #loop = false;
+  #defaultPlaybackRate = 1;
   #error: { code: number; message: string; value: MediaError } | null = null;
+  #contentData: MediaContentData | null = null;
 
   /**
    * @param options - Pass `handle` to adopt an externally owned native player; it will not be destroyed with this
@@ -138,6 +136,21 @@ export class ReactNativeMedia
     if (isNull(this.#handle) || value === '') return;
 
     requireEngineStore().setSource(this.#handle, value);
+    this.#resetPlaybackRate();
+  }
+
+  get loop(): boolean {
+    return this.#loop;
+  }
+
+  set loop(value: boolean) {
+    if (this.#loop === value) return;
+
+    this.#loop = value;
+
+    if (isNull(this.#handle)) return;
+
+    requireEngineStore().setLoop(this.#handle, value);
   }
 
   play(): Promise<void> {
@@ -160,6 +173,7 @@ export class ReactNativeMedia
     if (isNull(this.#handle)) return;
 
     requireEngineStore().load(this.#handle);
+    this.#resetPlaybackRate();
   }
 
   get paused(): boolean {
@@ -170,9 +184,15 @@ export class ReactNativeMedia
     return isNull(this.#handle) ? false : requireEngineStore().isEnded(this.#handle);
   }
 
-  /** Seconds. Read-only until the adapter exposes `setCurrentTime`. */
+  /** Seconds. Setting it seeks, and reads back the target straight away while `seeking`. */
   get currentTime(): number {
     return isNull(this.#handle) ? 0 : requireEngineStore().getCurrentTime(this.#handle);
+  }
+
+  set currentTime(value: number) {
+    if (isNull(this.#handle)) return;
+
+    requireEngineStore().setCurrentTime(this.#handle, value);
   }
 
   /** Seconds; `NaN` until known and `Infinity` for live. */
@@ -182,6 +202,44 @@ export class ReactNativeMedia
 
   get buffered(): TimeRangeLike {
     return isNull(this.#handle) ? EMPTY_TIME_RANGES : toTimeRanges(requireEngineStore().getBuffered(this.#handle));
+  }
+
+  get seekable(): TimeRangeLike {
+    return isNull(this.#handle) ? EMPTY_TIME_RANGES : toTimeRanges(requireEngineStore().getSeekable(this.#handle));
+  }
+
+  get playbackRate(): number {
+    return isNull(this.#handle) ? this.#defaultPlaybackRate : requireEngineStore().getPlaybackRate(this.#handle);
+  }
+
+  /** Must be positive; native ignores anything else. */
+  set playbackRate(value: number) {
+    if (isNull(this.#handle)) return;
+
+    requireEngineStore().setPlaybackRate(this.#handle, value);
+  }
+
+  /** The rate a new source starts at. */
+  get defaultPlaybackRate(): number {
+    return this.#defaultPlaybackRate;
+  }
+
+  set defaultPlaybackRate(value: number) {
+    this.#defaultPlaybackRate = value;
+  }
+
+  /**
+   * What the content itself names: `title` and `poster` when it carries them. Nothing native can supply a `storyboard`,
+   * so it reads `null` until something else provides one. Stable while native reports the same values, so the metadata
+   * feature sees one bag rather than a new one per read.
+   */
+  get contentData(): MediaContentData {
+    const native = isNull(this.#handle) ? {} : requireEngineStore().getContentData(this.#handle);
+    const cached = this.#contentData;
+    if (!isNull(cached) && cached.title === native.title && cached.poster === native.poster) return cached;
+
+    this.#contentData = { ...native, storyboard: null };
+    return this.#contentData;
   }
 
   /**
@@ -224,6 +282,13 @@ export class ReactNativeMedia
 
     this.#handle = null;
     super.destroy();
+  }
+
+  // A media element's load starts the new source at `defaultPlaybackRate`.
+  #resetPlaybackRate(): void {
+    if (isNull(this.#handle) || this.playbackRate === this.#defaultPlaybackRate) return;
+
+    requireEngineStore().setPlaybackRate(this.#handle, this.#defaultPlaybackRate);
   }
 
   #handleNativeEvent(type: string): void {
