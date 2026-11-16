@@ -65,6 +65,13 @@ describe('roundToStep', () => {
     expect(roundToStep(0.27, 0.1, 0.05)).toBe(0.25);
   });
 
+  it('counts the decimals of steps and mins in exponential notation', () => {
+    expect(roundToStep(3.4e-7, 1e-7, 2.5e-7)).toBe(3.5e-7);
+    expect(roundToStep(2.6e-7, 1e-7, 2.5e-7)).toBe(2.5e-7);
+    expect(roundToStep(1.3e-7, 2.5e-7, 0)).toBe(2.5e-7);
+    expect(roundToStep(4e21, 1e21, 0)).toBe(4e21);
+  });
+
   it('returns min when value equals min', () => {
     expect(roundToStep(0, 1, 0)).toBe(0);
     expect(roundToStep(5, 10, 5)).toBe(5);

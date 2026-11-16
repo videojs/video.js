@@ -36,7 +36,11 @@ export function roundToStep(value: number, step: number, min: number): number {
 }
 
 function countDecimals(value: number): number {
-  const dot = `${value}`.indexOf('.');
+  // Small and large numbers print in exponential notation: 2.5e-7 has 8 decimals.
+  const [mantissa = '', exponent = '0'] = `${value}`.split('e');
+  const dot = mantissa.indexOf('.');
+  const fraction = dot === -1 ? 0 : mantissa.length - dot - 1;
 
-  return dot === -1 ? 0 : `${value}`.length - dot - 1;
+  // toFixed() accepts at most 100 digits.
+  return Math.min(Math.max(fraction - Number(exponent), 0), 100);
 }
