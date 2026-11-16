@@ -64,7 +64,6 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `videoBufferActor` | reads | yes | `SourceBufferActor \| undefined` | `SegmentLoadingContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 | `videoSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## loadAudioSegments
@@ -98,7 +97,6 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `audioBufferActor` | reads | yes | `SourceBufferActor \| undefined` | `SegmentLoadingContext` | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. (documented on [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
 | `audioSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. (documented on [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
 
 ## loadTextTrackSegments

@@ -69,7 +69,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `audioBufferActor` | `SourceBufferActor \| undefined` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. |
+| `audioBufferActor` | `SourceBufferActor \| undefined` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. |
 | `audioSegmentLoaderActor` | `SegmentLoaderActor \| undefined` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. |
 | `mediaSource` | `MediaSource \| undefined` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 

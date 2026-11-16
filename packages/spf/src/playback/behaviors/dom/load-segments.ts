@@ -48,7 +48,7 @@ import {
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
 import type { SourceBufferActor } from '../../actors/dom/source-buffer';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
-import type { CreateLoadStart } from '../../primitives/load-start';
+import type { BufferActorKey, CreateLoadStart } from '../../primitives/load-start';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
 
 // Re-export buffer state types for consumers that import them from this module.
@@ -113,7 +113,6 @@ type SegmentLoadingFsmState = 'preconditions-unmet' | 'dormant' | 'metadata-only
 
 type SelectedTrackKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedTextTrackId';
 type SegmentLoaderActorKey = 'videoSegmentLoaderActor' | 'audioSegmentLoaderActor' | 'textTrackSegmentLoaderActor';
-type BufferActorKey = 'videoBufferActor' | 'audioBufferActor';
 
 type SegmentLoadingStateMap<K extends SelectedTrackKey> = {
   presentation: ReadonlySignal<SegmentLoadingState['presentation']>;
@@ -211,11 +210,7 @@ function setupSegmentLoading<
     return segmentStartForTime(state.currentTime.get() ?? 0, track.segments);
   });
 
-  const loadStartSignal = config.createLoadStart?.({
-    currentTime: state.currentTime,
-    selectedTrack,
-    bufferActor: config.bufferActorKey && context[config.bufferActorKey],
-  });
+  const loadStartSignal = config.createLoadStart?.({ state, context, config });
 
   const derivedStateSignal = computed<SegmentLoadingFsmState>(() => {
     // Policy-off wins even over preconditions: a loader arriving while
@@ -342,7 +337,7 @@ const TEXT_SEGMENT_LOADING_CONFIG = {
  * The video variant: dispatches `'load'` messages to `videoSegmentLoaderActor` for the selected video track, under the
  * four load modes.
  *
- * @observes loadingSuspended segmentLoadingBlocked videoBufferActor
+ * @observes loadingSuspended segmentLoadingBlocked
  */
 export const loadVideoSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedVideoTrackId'],
@@ -369,7 +364,7 @@ export const loadVideoSegments = defineBehavior({
  * The audio variant of {@link loadVideoSegments}: dispatches `'load'` messages to `audioSegmentLoaderActor` for the
  * selected audio track, under the same four load modes.
  *
- * @observes loadingSuspended segmentLoadingBlocked audioBufferActor
+ * @observes loadingSuspended segmentLoadingBlocked
  */
 export const loadAudioSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedAudioTrackId'],
