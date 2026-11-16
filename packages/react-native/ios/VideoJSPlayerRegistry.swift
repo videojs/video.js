@@ -5,25 +5,24 @@ import Foundation
 /// singleton because a Fabric component view is built by the mounting layer
 /// with no way to inject the module that created the engine.
 ///
-/// `createPlayer` is a synchronous method, so it lands on the JS thread while
-/// the players are confined to the main queue. Handle allocation happens on the
-/// caller's thread (cheap, locked) and every engine touch is dispatched to the
-/// main queue. Because dispatches are FIFO, a command issued in the same tick
-/// as `createPlayer` runs after construction rather than against a missing
-/// engine — the queueing the design requires falls out of the queue.
+/// `createPlayer` and the commands are synchronous methods, so they land on the
+/// JS thread. The engine is built there, before `createPlayer` returns, so a
+/// command issued in the same tick finds it; each engine dispatches its own
+/// player work to the main queue.
 @objc
 public final class VideoJSPlayerRegistry: NSObject {
   @objc(sharedRegistry)
   public static let shared = VideoJSPlayerRegistry()
 
   @objc
-  public var onEvent: ((Int, VideoJSPlayerEventType) -> Void)?
+  public var onEvent: ((Int, [String: Any]) -> Void)?
 
-  /// Main queue only.
-  private var engines: [Int: VideoJSPlayerEngine] = [:]
-
-  private let handleLock = NSLock()
+  // Guards the handle counter and the engine map, which the JS thread writes
+  // and the main queue reads for the Fabric surface; each engine guards its
+  // own state.
+  private let lock = NSLock()
   private var lastHandle = 0
+  private var engines: [Int: VideoJSPlayerEngine] = [:]
 
   override private init() {
     super.init()
@@ -33,62 +32,48 @@ public final class VideoJSPlayerRegistry: NSObject {
   public func createPlayer(source: String?) -> Int {
     // Allocated from 1, so the 0 the Fabric props default to is unambiguously
     // "no player".
-    handleLock.lock()
-    lastHandle += 1
-    let handle = lastHandle
-    handleLock.unlock()
-
-    onMainQueue { [weak self] in
-      guard let self else { return }
-
-      engines[handle] = VideoJSPlayerEngine(source: source) { [weak self] type in
-        self?.onEvent?(handle, type)
-      }
+    let handle = lock.withLock {
+      lastHandle += 1
+      return lastHandle
     }
+
+    let engine = VideoJSPlayerEngine(source: source) { [weak self] event in
+      self?.onEvent?(handle, event)
+    }
+
+    lock.withLock { engines[handle] = engine }
 
     return handle
   }
 
+  /// Unreachable by handle at once; invalidated on the main queue behind any
+  /// player work its commands already dispatched. The dispatch holds the last
+  /// reference, so the engine is also released there.
   @objc(destroyPlayer:)
   public func destroyPlayer(_ handle: Int) {
-    onMainQueue { [weak self] in
-      self?.engines.removeValue(forKey: handle)?.invalidate()
-    }
+    guard let engine = lock.withLock({ engines.removeValue(forKey: handle) }) else { return }
+
+    DispatchQueue.main.async { engine.invalidate() }
   }
 
-  @objc(commandPlayer:block:)
-  public func commandPlayer(_ handle: Int, block: @escaping (VideoJSPlayerEngine) -> Void) {
-    onMainQueue { [weak self] in
-      if let engine = self?.engine(forHandle: handle) {
-        block(engine)
-      }
-    }
-  }
-
-  /// Synchronous lookup for the Fabric surface. Safe because the surface only
-  /// mounts after `createPlayer` returned, so the construction dispatch is
-  /// already ahead of it in the main queue.
+  /// From any thread. Nil once the handle is destroyed, so a command for it
+  /// does nothing.
   @objc(engineForHandle:)
   public func engine(forHandle handle: Int) -> VideoJSPlayerEngine? {
-    engines[handle]
+    lock.withLock { engines[handle] }
+  }
+
+  /// The latest published state, from any thread. A destroyed handle reads as
+  /// a fresh player.
+  @objc(stateForHandle:)
+  public func state(forHandle handle: Int) -> VideoJSPlayerState {
+    engine(forHandle: handle)?.readState() ?? .initial
   }
 
   @objc
   public func releaseAll() {
-    onMainQueue { [weak self] in
-      guard let self else { return }
-
-      for engine in engines.values {
-        engine.invalidate()
-      }
-
-      engines.removeAll()
+    for handle in lock.withLock({ Array(engines.keys) }) {
+      destroyPlayer(handle)
     }
-  }
-
-  // Always dispatches, never runs inline on the main queue — inlining would let
-  // a command overtake a still-queued construction.
-  private func onMainQueue(_ block: @escaping () -> Void) {
-    DispatchQueue.main.async(execute: block)
   }
 }
