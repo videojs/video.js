@@ -12,7 +12,7 @@ import type { SourceBufferActor } from '../actors/dom/source-buffer';
 export interface LoadStartDeps {
   currentTime: ReadonlySignal<number | undefined>;
   selectedTrack: ReadonlySignal<{ segments: readonly Segment[] } | undefined>;
-  /** The dispatcher's SourceBuffer actor; absent for text. */
+  /** The dispatcher's SourceBuffer actor. Observed, never declared: absent for text, or in a composition without one. */
   bufferActor: ReadonlySignal<SourceBufferActor | undefined> | undefined;
 }
 
