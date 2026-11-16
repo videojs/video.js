@@ -8,46 +8,14 @@ import { createPlayer } from '../../player/create-player';
 import { useMediaInstance } from '../use-media-instance';
 
 class TestMedia extends EventTarget {
-  static instances: TestMedia[] = [];
   destroy = vi.fn();
-
-  constructor() {
-    super();
-    TestMedia.instances.push(this);
-  }
 }
 
 const MediaClass = TestMedia as unknown as new () => Media & TestMedia;
 
 describe('useMediaInstance', () => {
-  const { Player } = createPlayer({ features: [] });
-  let instance: TestMedia;
-  let attached: Media | null;
-
-  function TestComponent() {
-    instance = useMediaInstance(MediaClass);
-    return null;
-  }
-
-  function Probe() {
-    attached = useMedia();
-    return null;
-  }
-
-  function App({ mode }: { mode: 'visible' | 'hidden' }) {
-    return (
-      <Activity mode={mode}>
-        <Player>
-          <TestComponent />
-          <Probe />
-        </Player>
-      </Activity>
-    );
-  }
-
   beforeEach(() => {
     vi.useFakeTimers();
-    TestMedia.instances = [];
   });
 
   afterEach(() => {
@@ -56,6 +24,27 @@ describe('useMediaInstance', () => {
   });
 
   it('replaces the destroyed instance when an Activity is hidden and shown again', () => {
+    const { Player } = createPlayer({ features: [] });
+
+    let instance!: TestMedia;
+    let attached!: Media | null;
+
+    function TestComponent() {
+      instance = useMediaInstance(MediaClass);
+      attached = useMedia();
+      return null;
+    }
+
+    function App({ mode }: { mode: 'visible' | 'hidden' }) {
+      return (
+        <Activity mode={mode}>
+          <Player>
+            <TestComponent />
+          </Player>
+        </Activity>
+      );
+    }
+
     const { rerender } = render(<App mode="visible" />);
     const original = instance;
 
@@ -80,9 +69,22 @@ describe('useMediaInstance', () => {
   });
 
   it('keeps the same instance in StrictMode', () => {
+    const { Player } = createPlayer({ features: [] });
+
+    let instance!: TestMedia;
+    let attached!: Media | null;
+
+    function TestComponent() {
+      instance = useMediaInstance(MediaClass);
+      attached = useMedia();
+      return null;
+    }
+
     render(
       <StrictMode>
-        <App mode="visible" />
+        <Player>
+          <TestComponent />
+        </Player>
       </StrictMode>
     );
 
