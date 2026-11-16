@@ -16,10 +16,11 @@ the loader pipelines the second sets and the playability probe and reporter the 
 `deriveStartMediaTime` from the second to place TS content, whose timestamps rarely start at zero, onto the playlist
 timeline.
 
-Scope is a deliberately narrow subset of MPEG-TS: what Mux Video packages for on-demand playback, which is one
-program, H.264 + AAC-LC, unencrypted, with access-unit delimiters, verified in Chromium only. Not covered: MP3, AC-3,
-E-AC-3 or HEVC; SAMPLE-AES; ID3 timed metadata; CEA-608 captions; and what live TS needs (a PES split across
-segments, PTS rollover, discontinuities). For general MPEG-TS, use `@videojs/hlsjs-video`.
+Scope is a deliberately narrow subset of MPEG-TS: what Mux Video packages on demand and live, which is one program,
+H.264 + AAC-LC, unencrypted, with access-unit delimiters. Not covered: MP3, AC-3, E-AC-3 or HEVC; SAMPLE-AES; ID3
+timed metadata; CEA-608 captions; a PES split across segments; 33-bit PTS rollover; and timestamps that jump at a
+discontinuity. Mux marks an encoder reconnect with a discontinuity but keeps its timestamps continuous across it. For
+general MPEG-TS, use `@videojs/hlsjs-video`.
 
 A muxed rendition's in-band audio is carried in the video SourceBuffer when the track declares an audio codec. When
 the audio is demuxed into renditions of its own, the video SourceBuffer drops it and the audio SourceBuffer takes
