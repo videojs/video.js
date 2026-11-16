@@ -107,7 +107,11 @@ function resolvePresentationSetup({
           const ac = new AbortController();
 
           fetchResolvable(presentation, { signal: ac.signal })
-            .then((response) => getResponseText(response))
+            .then((response) => {
+              if (!response.ok) throw new Error(`Manifest request failed: ${response.status} ${response.statusText}`);
+
+              return getResponseText(response);
+            })
             .then((text) => {
               if (ac.signal.aborted || state.presentation.get() !== presentation) return;
 

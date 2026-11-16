@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_AUDIO_FORMAT,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
@@ -459,6 +460,20 @@ describe('HlsAudioAdapterCore', () => {
       const media = new TestAdapter();
 
       expect(media.error).toBeNull();
+      media.destroy();
+    });
+
+    it('surfaces a manifest that fails to load as fatal', async () => {
+      const media = new TestAdapter();
+      const fired: Event[] = [];
+
+      media.addEventListener('error', (event) => fired.push(event));
+
+      media.engine.state.errors.set([{ code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR }]);
+      await flush();
+
+      expect(fired).toHaveLength(1);
+      expect(media.error?.code).toBe(SVTA_PRIMARY_MANIFEST_LOAD_ERROR);
       media.destroy();
     });
 
