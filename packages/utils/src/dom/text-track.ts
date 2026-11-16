@@ -1,3 +1,5 @@
+import { hasMethods } from '../predicate';
+
 /** @internal */
 export type CaptionOrSubtitleKind = 'captions' | 'subtitles';
 
@@ -21,12 +23,13 @@ export function getCaptionOrSubtitleTracks<Track extends { kind: string }>(track
 }
 
 /**
- * Find the `<track>` element that owns the given `TextTrack`.
+ * Find the `<track>` element that owns the given `TextTrack`. The media can be the element itself or an adapter that
+ * forwards `querySelectorAll()` to it.
  *
  * @internal
  */
 export function findTrackElement(media: EventTarget, track: unknown): HTMLTrackElement | null {
-  if (!(media instanceof HTMLElement)) return null;
+  if (!hasMethods(media, ['querySelectorAll'])) return null;
 
   for (const el of media.querySelectorAll('track')) {
     if (el.track === track) return el;
