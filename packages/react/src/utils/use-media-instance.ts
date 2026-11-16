@@ -38,8 +38,7 @@ export function useMediaInstance<Instance extends Media & { destroy(): void }>(
     }
   );
 
-  // The instance may have been destroyed during an asynchronous gap between React effect cleanup and re-setup (e.g.,
-  // React <Activity> hide → reveal). The useState initializer does not re-run in this case.
+  // Replace an instance that was destroyed while hidden in a React <Activity>.
   useEffect(() => {
     if (!destroyedRef.current) return;
 
