@@ -16,6 +16,12 @@ describe('collectSpecifiers', () => {
     expect(collectSpecifiers(code)).toEqual(['./chunk-a.js', './chunk-b.js', './chunk-c.js']);
   });
 
+  it('collects dynamic imports quoted with backticks', () => {
+    const code = 'const zh = () => import(`./zh-1P3ErJe9.js`);\nconst vtt = await import(`./parse-vtt-DHGCo33d.js`);';
+
+    expect(collectSpecifiers(code)).toEqual(['./zh-1P3ErJe9.js', './parse-vtt-DHGCo33d.js']);
+  });
+
   it('ignores type imports in JSDoc without hiding the code around them', () => {
     const code = [
       'import { a } from "./chunk-a.js";',
@@ -30,6 +36,24 @@ describe('collectSpecifiers', () => {
   it('ignores prose that reads like a specifier', () => {
     expect(collectSpecifiers('// Re-exported from "the store package"')).toEqual([]);
     expect(collectSpecifiers('throw new Error(`imported from "${name}"`)')).toEqual([]);
+    expect(collectSpecifiers('const path = import(`./locales/${lang}.js`);')).toEqual([]);
+    expect(collectSpecifiers('M.info(`Server certificate applied from `+n.urlUsed+r+` for `+t+`.`)')).toEqual([]);
+  });
+});
+
+describe('resolveClosure', () => {
+  it('follows dynamic imports quoted with backticks', () => {
+    const scratch = mkdtempSync(join(import.meta.dirname, 'cdn-graph-'));
+
+    try {
+      writeFileSync(join(scratch, 'entry.js'), 'import "./i18n.js";');
+      writeFileSync(join(scratch, 'i18n.js'), 'export const zh = () => import(`./zh.js`);');
+      writeFileSync(join(scratch, 'zh.js'), 'export default {};');
+
+      expect([...resolveClosure(scratch, ['entry.js'])].sort()).toEqual(['entry.js', 'i18n.js', 'zh.js']);
+    } finally {
+      rmSync(scratch, { recursive: true, force: true });
+    }
   });
 });
 
