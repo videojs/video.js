@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Adds timed metadata, compact-player controls, and more flexible background video."
 date: 2026-11-13
 version: "10.4.0"
 prerelease: false
@@ -8,48 +8,24 @@ compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.3.0...
 ---
 
 
-### 🚀 Features
-- *(media)* Add data cues and cue values to the text-track contract ([#9610](https://github.com/videojs/video.js/pull/9610)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Add a text cues feature ([#9611](https://github.com/videojs/video.js/pull/9611)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Add typed text track definitions ([#9612](https://github.com/videojs/video.js/pull/9612)) by [@mihar-22](https://github.com/mihar-22)
-- *(react)* Add text track hooks ([#9613](https://github.com/videojs/video.js/pull/9613)) by [@mihar-22](https://github.com/mihar-22)
-- *(skins)* Disambiguate subs with same name ([#9703](https://github.com/videojs/video.js/pull/9703)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(core)* Let apps add text tracks to the player ([#9614](https://github.com/videojs/video.js/pull/9614)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Load app text tracks from a src ([#9615](https://github.com/videojs/video.js/pull/9615)) by [@mihar-22](https://github.com/mihar-22)
-- *(media)* Add removable text tracks for DOM media ([#9616](https://github.com/videojs/video.js/pull/9616)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Copy app captions into the media ([#9617](https://github.com/videojs/video.js/pull/9617)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Add time slider markers ([#9618](https://github.com/videojs/video.js/pull/9618)) by [@mihar-22](https://github.com/mihar-22)
-- *(html)* Align background-video and hls-background-video ([#9735](https://github.com/videojs/video.js/pull/9735)) by [@luwes](https://github.com/luwes)
-- *(skin)* Show only a centre play button until playback starts ([#9696](https://github.com/videojs/video.js/pull/9696)) by [@sampotts](https://github.com/sampotts)
-- *(skin)* Rework video controls for small players ([#9702](https://github.com/videojs/video.js/pull/9702)) by [@sampotts](https://github.com/sampotts)
-- *(site)* Try controls and accent color on the installation preview ([#9710](https://github.com/videojs/video.js/pull/9710)) by [@sampotts](https://github.com/sampotts)
+Video.js 10.4.0 adds a complete timed-metadata workflow, while making video controls and background video more adaptable.
 
-### 🐛 Bug Fixes
-- *(skin)* Restore older browser support in the compat skin ([#9699](https://github.com/videojs/video.js/pull/9699)) by [@sampotts](https://github.com/sampotts)
-- *(site)* Opt light theme out of browser auto-darkening ([#9695](https://github.com/videojs/video.js/pull/9695)) by [@decepulis](https://github.com/decepulis)
-- *(react)* Apply media prop updates when the render commits ([#9673](https://github.com/videojs/video.js/pull/9673)) by [@ump45nose](https://github.com/ump45nose)
-- *(media)* Recognize empty placeholders from another package copy ([#9667](https://github.com/videojs/video.js/pull/9667)) by [@BeyondITL-Mossaddique](https://github.com/BeyondITL-Mossaddique)
+## Build with timed metadata
 
-### 💼 Other
-- React Native player POC, rebased on main with iOS 27 toolchain fixes ([#9551](https://github.com/videojs/video.js/pull/9551)) by [@cjpillsbury](https://github.com/cjpillsbury)
+Use text tracks and cues to synchronize quizzes, product cards, ad breaks, chapters, and transcripts with playback. The player now reads structured data cues, including HLS metadata, and exposes typed track definitions and APIs for reading tracks, cues, and active cues ([#9610](https://github.com/videojs/video.js/pull/9610), [#9611](https://github.com/videojs/video.js/pull/9611), [#9612](https://github.com/videojs/video.js/pull/9612)). React adds hooks for the same work ([#9613](https://github.com/videojs/video.js/pull/9613)).
 
-### 🚜 Refactor
-- *(core)* Share platform-neutral player features across platforms ([#9686](https://github.com/videojs/video.js/pull/9686)) by [@daytime-em](https://github.com/daytime-em)
+Add tracks from your app, with cues in code or loaded from WebVTT and JSON files, even for embed media. App captions and subtitles also copy into compatible media so they remain available in iOS fullscreen ([#9614](https://github.com/videojs/video.js/pull/9614), [#9615](https://github.com/videojs/video.js/pull/9615), [#9616](https://github.com/videojs/video.js/pull/9616), [#9617](https://github.com/videojs/video.js/pull/9617)). Mark matching cues on the time slider with `TimeSlider.Markers` or `<media-time-slider-markers>` ([#9618](https://github.com/videojs/video.js/pull/9618)). The new [timed metadata guide](/docs/guides/timed-metadata/) and API references cover the workflow ([#9619](https://github.com/videojs/video.js/pull/9619)).
 
-### 📚 Documentation
-- *(site)* Add changelog prose for 10.3.0 ([#9697](https://github.com/videojs/video.js/pull/9697)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(site)* Update the privacy notice from the latest legal draft ([#9689](https://github.com/videojs/video.js/pull/9689)) by [@heff](https://github.com/heff)
-- *(spf)* Generate a Markdown API reference from behavior and field JSDoc ([#9396](https://github.com/videojs/video.js/pull/9396)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(site)* Align media component reference pages ([#9694](https://github.com/videojs/video.js/pull/9694)) by [@luwes](https://github.com/luwes)
-- *(site)* Add the video.js documentary blog post ([#9733](https://github.com/videojs/video.js/pull/9733)) by [@heff](https://github.com/heff)
-- *(site)* Add timed metadata guide and references ([#9619](https://github.com/videojs/video.js/pull/9619)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Link skin reference pages from choose a skin table ([#9749](https://github.com/videojs/video.js/pull/9749)) by [@decepulis](https://github.com/decepulis)
+## Adapt controls and background video
 
-### ⚙️ Miscellaneous Tasks
-- *(ci)* Stop changelog-prose relay from cancelling itself ([#9698](https://github.com/videojs/video.js/pull/9698)) by [@luwes](https://github.com/luwes)
-- *(ci)* Fix failing typecheck  ([#9706](https://github.com/videojs/video.js/pull/9706)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(sandbox)* Set controls on skinless mode ([#9693](https://github.com/videojs/video.js/pull/9693)) by [@spuppo-mux](https://github.com/spuppo-mux)
+Video skins now show a large center play button before playback starts, then reveal the remaining controls. Set `--media-controls-before-start: visible` when viewers need controls before playing ([#9696](https://github.com/videojs/video.js/pull/9696)). Default and Neutral skins also keep essential controls readable on compact players, while Compat and Scaffold hide lower-priority controls at small sizes ([#9702](https://github.com/videojs/video.js/pull/9702)). The installation preview now lets you try that setting and an accent color, and carries both into its HTML and React snippets ([#9710](https://github.com/videojs/video.js/pull/9710)).
 
-### New Contributors
-* @ump45nose made their first contribution in [#9673](https://github.com/videojs/video.js/pull/9673)
-* @daytime-em made their first contribution in [#9686](https://github.com/videojs/video.js/pull/9686)
+`<background-video>`, `<hls-background-video>`, and `<mux-background-video>` now share more consistent controls. Streaming background video supports `target`, `noloop`, and `noautoplay`, and its React components honor `loop={false}` and `autoPlay={false}` ([#9735](https://github.com/videojs/video.js/pull/9735)). Caption and subtitle choices with the same name now show `CC` or `SUB` badges ([#9703](https://github.com/videojs/video.js/pull/9703)).
+
+## Fixes and documentation
+
+Compat restores its older browser-support floor ([#9699](https://github.com/videojs/video.js/pull/9699)). React media props now update only when their render commits ([#9673](https://github.com/videojs/video.js/pull/9673)), and media capability checks work when a page loads more than one copy of `@videojs/media` ([#9667](https://github.com/videojs/video.js/pull/9667)). The site also prevents browser auto-darkening when you select the light theme ([#9695](https://github.com/videojs/video.js/pull/9695)).
+
+SPF now has generated contributor API reference ([#9396](https://github.com/videojs/video.js/pull/9396)), and media component references consistently cover source loading, protected content, and their APIs ([#9694](https://github.com/videojs/video.js/pull/9694)). The [skins guide](/docs/guides/skins/) now links to each preset preview ([#9749](https://github.com/videojs/video.js/pull/9749)). We also updated the [Privacy Notice](/privacy/) ([#9689](https://github.com/videojs/video.js/pull/9689)) and published a Video.js documentary post ([#9733](https://github.com/videojs/video.js/pull/9733)).
+
+Thanks to first-time contributors [@ump45nose](https://github.com/ump45nose) and [@daytime-em](https://github.com/daytime-em).

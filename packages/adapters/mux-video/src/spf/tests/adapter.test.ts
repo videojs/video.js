@@ -1,3 +1,4 @@
+import { createEngine } from '@videojs/spf/engines/hls-video-mpeg-ts';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
 /**
  * SPF-backed MuxVideoAdapter tests.
@@ -116,6 +117,10 @@ afterEach(() => {
 });
 
 describe('MuxVideoAdapter', () => {
+  it('builds its engine with the MPEG-TS video engine', () => {
+    expect(MuxVideoAdapter.createEngine).toBe(createEngine);
+  });
+
   it('defaults source to null', () => {
     expect(new MuxVideoAdapter().source).toBe(null);
   });

@@ -64,6 +64,7 @@ The setup declares `config?`: callers may omit it.
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
 | `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
 | `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 | `videoMessagePipelines?` | `MessagePipelines` | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 
 ### State
@@ -109,6 +110,7 @@ The setup declares `config?`: callers may omit it.
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
 | `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
 | `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 
 ### State
 
@@ -132,3 +134,4 @@ The setup declares `config?`: callers may omit it.
 | `BufferActorsContext` | interface | Context of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors), [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors). | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
 | `BufferActorsState` | interface | State of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors), [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors). | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
 | `MediaTrackType` | type | Media track type for MSE buffer setup. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
+| `SourceBufferMimeCodec` | type | The MIME codec string a SourceBuffer is created with, from the track it will carry. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |

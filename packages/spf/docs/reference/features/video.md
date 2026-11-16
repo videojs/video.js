@@ -51,6 +51,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 | `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | — | [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every variant. |
 | `videoMessagePipelines?` | `MessagePipelines` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 | `videoRules?` | `readonly SwitchVideoTrackRule[]` | — | [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | The rule chain of the pair documented on `videoConstraints`. |
@@ -78,6 +79,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 ### Composed by
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
+- [@videojs/spf/engines/hls-video-mpeg-ts](../engines/hls-video-mpeg-ts.md)
 
 ## Other functions and constants
 
