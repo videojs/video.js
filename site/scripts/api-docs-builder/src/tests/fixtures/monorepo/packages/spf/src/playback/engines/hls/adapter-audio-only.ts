@@ -5,6 +5,7 @@
  *   - Cross-package mixin resolution (host lives in core, mixin in spf)
  *   - Defaults declared as `static defaultProps` on the mixin's inner class (SpfAudioOnly.defaultProps), the shape
  *     the SPF adapters use, reached through the composed adapter's extends chain
+ *   - Static and `@internal` getters, which stay out of the property table
  *   - `@fires`-declared events: `audiomodechange` also has a dispatch site,
  *     `manifestparsed` is dispatched from a helper the builder never scans —
  *     the `@fires` tag is its only source.
@@ -26,6 +27,20 @@ export const SpfAudioOnlyMixin = <Base extends Constructor>(BaseClass: Base) => 
 
     #src: string = SpfAudioOnly.defaultProps.src;
     #preload: string = SpfAudioOnly.defaultProps.preload;
+
+    /** Read through the constructor, never the instance. */
+    static get alternativeMediaSuggestion(): string | undefined {
+      return undefined;
+    }
+
+    /**
+     * Low-level engine handle.
+     *
+     * @internal
+     */
+    get engine(): object {
+      return {};
+    }
 
     /** Source URL of the HLS manifest. */
     get src(): string {

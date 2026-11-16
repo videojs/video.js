@@ -1,0 +1,31 @@
+.html-timed-metadata-basic__container {
+  position: relative;
+}
+
+.html-timed-metadata-basic__container video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.html-timed-metadata-basic__note {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  max-width: calc(100% - 24px);
+  padding: 10px 14px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: black;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.html-timed-metadata-basic__note:not([data-active]) {
+  display: none;
+}
+
+.html-timed-metadata-basic__title {
+  display: block;
+}

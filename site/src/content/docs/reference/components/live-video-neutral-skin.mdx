@@ -67,6 +67,10 @@ The skin renders a poster image before playback starts. An element with `slot="p
 
 See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink> for complete examples.
 
+## Controls before playback
+
+Before playback starts, the skin shows only the large center play button. The other controls appear once playback starts or the media begins to autoplay. Set `--media-controls-before-start: visible` to show them from the start. See <DocsLink slug="guides/customize-skins" anchor="set-the-skins-styles">Customize skins</DocsLink>.
+
 ## Styling
 
 Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
@@ -77,7 +81,7 @@ Packaged skins style themselves and expose a small set of public CSS custom prop
 
 <FrameworkCase frameworks={["react"]}>
   <StyleCase styles={["css"]}>
-    <Demo clip={false} files={[
+    <Demo clip={false} controlsBeforeStart files={[
       { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
       { title: "App.css", code: basicUsageReactCss, lang: "css" },
     ]}>
@@ -88,7 +92,7 @@ Packaged skins style themselves and expose a small set of public CSS custom prop
 
 <FrameworkCase frameworks={["html"]}>
   <StyleCase styles={["css"]}>
-    <Demo clip={false} files={[
+    <Demo clip={false} controlsBeforeStart files={[
       { title: "index.html", code: basicUsageHtml, lang: "html" },
       { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
       { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },

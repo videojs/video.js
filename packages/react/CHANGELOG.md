@@ -1,5 +1,81 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/react@10.3.0...@videojs/react@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **core:** add a text cues feature ([#9611](https://github.com/videojs/video.js/issues/9611)) ([091226e](https://github.com/videojs/video.js/commit/091226ec2cdb45d298f4c7b071b194e439692979))
+* **core:** add time slider markers ([#9618](https://github.com/videojs/video.js/issues/9618)) ([bacd9f1](https://github.com/videojs/video.js/commit/bacd9f1129d0bc358d9cf3393462bcac4c818b4d))
+* **core:** add typed text track definitions ([#9612](https://github.com/videojs/video.js/issues/9612)) ([450caf3](https://github.com/videojs/video.js/commit/450caf3a9ea9edae7cefd12c7a3beeea9efe2f3d))
+* **core:** copy app captions into the media ([#9617](https://github.com/videojs/video.js/issues/9617)) ([b6d0199](https://github.com/videojs/video.js/commit/b6d0199b1f1c2b129f34b849a683510f3bce6392))
+* **core:** let apps add text tracks to the player ([#9614](https://github.com/videojs/video.js/issues/9614)) ([5e55538](https://github.com/videojs/video.js/commit/5e55538842f037c3cf3bed42e910059d749b9c0f))
+* **core:** load app text tracks from a src ([#9615](https://github.com/videojs/video.js/issues/9615)) ([370834f](https://github.com/videojs/video.js/commit/370834fc82a157a0347e3f49024fbd442bd5576a))
+* **html:** align background-video and hls-background-video ([#9735](https://github.com/videojs/video.js/issues/9735)) ([a3ddeb0](https://github.com/videojs/video.js/commit/a3ddeb0575c442bd79e93e1db594327f7b74b928))
+* **media:** add data cues and cue values to the text-track contract ([#9610](https://github.com/videojs/video.js/issues/9610)) ([7817ac4](https://github.com/videojs/video.js/commit/7817ac455f9685b4300b6bfda0e6b80b01e163cb))
+* **react:** add text track hooks ([#9613](https://github.com/videojs/video.js/issues/9613)) ([f894f6a](https://github.com/videojs/video.js/commit/f894f6a9108dc6e9c74a543fd9062683b600a1e8))
+* **skins:** disambiguate subs with same name ([#9703](https://github.com/videojs/video.js/issues/9703)) ([53a5c76](https://github.com/videojs/video.js/commit/53a5c765259747a17eb7693d88f800e5fed6a852))
+* **skin:** show only a centre play button until playback starts ([#9696](https://github.com/videojs/video.js/issues/9696)) ([9294e7a](https://github.com/videojs/video.js/commit/9294e7af94eccf23d3685baccfda89fe504857c5))
+
+
+### Bug Fixes
+
+* **react:** apply media prop updates when the render commits ([#9673](https://github.com/videojs/video.js/issues/9673)) ([2fee7a1](https://github.com/videojs/video.js/commit/2fee7a189552327f7280e46d3a17d021af0329c3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.4.0
+    * @videojs/media bumped to 10.4.0
+    * @videojs/native-hls-video bumped to 10.4.0
+    * @videojs/spf bumped to 10.4.0
+    * @videojs/store bumped to 10.4.0
+    * @videojs/utils bumped to 10.4.0
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.4.0
+    * @videojs/dailymotion-video bumped to 10.4.0
+    * @videojs/dash-video bumped to 10.4.0
+    * @videojs/google-analytics bumped to 10.4.0
+    * @videojs/google-cast bumped to 10.4.0
+    * @videojs/hlsjs-video bumped to 10.4.0
+    * @videojs/icons bumped to 10.4.0
+    * @videojs/mixcloud-audio bumped to 10.4.0
+    * @videojs/mux-audio bumped to 10.4.0
+    * @videojs/mux-data bumped to 10.4.0
+    * @videojs/mux-video bumped to 10.4.0
+    * @videojs/playerjs-video bumped to 10.4.0
+    * @videojs/shaka-video bumped to 10.4.0
+    * @videojs/soundcloud-audio bumped to 10.4.0
+    * @videojs/spf bumped to 10.4.0
+    * @videojs/spotify-audio bumped to 10.4.0
+    * @videojs/tiktok-video bumped to 10.4.0
+    * @videojs/twitch-video bumped to 10.4.0
+    * @videojs/vimeo-video bumped to 10.4.0
+    * @videojs/wistia-video bumped to 10.4.0
+    * @videojs/youtube-video bumped to 10.4.0
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.4.0
+    * @videojs/dailymotion-video bumped to 10.4.0
+    * @videojs/dash-video bumped to 10.4.0
+    * @videojs/google-analytics bumped to 10.4.0
+    * @videojs/google-cast bumped to 10.4.0
+    * @videojs/hlsjs-video bumped to 10.4.0
+    * @videojs/mixcloud-audio bumped to 10.4.0
+    * @videojs/mux-audio bumped to 10.4.0
+    * @videojs/mux-data bumped to 10.4.0
+    * @videojs/mux-video bumped to 10.4.0
+    * @videojs/playerjs-video bumped to 10.4.0
+    * @videojs/shaka-video bumped to 10.4.0
+    * @videojs/soundcloud-audio bumped to 10.4.0
+    * @videojs/spotify-audio bumped to 10.4.0
+    * @videojs/tiktok-video bumped to 10.4.0
+    * @videojs/twitch-video bumped to 10.4.0
+    * @videojs/vimeo-video bumped to 10.4.0
+    * @videojs/wistia-video bumped to 10.4.0
+    * @videojs/youtube-video bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/react@10.2.0...@videojs/react@10.3.0) (2026-11-03)
 
 

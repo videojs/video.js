@@ -6,6 +6,14 @@ description: Native audio playback that can provide media to a Video.js player
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
+import CodeChip from "@/components/docs/api-reference/CodeChip.astro";
+import MarkdownCode from "@/components/typography/MarkdownCode.astro";
+import Table from "@/components/typography/Table.astro";
+import Tbody from "@/components/typography/Tbody.astro";
+import Td from "@/components/typography/Td.astro";
+import Th from "@/components/typography/Th.astro";
+import Thead from "@/components/typography/Thead.astro";
+import Tr from "@/components/typography/Tr.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
@@ -72,7 +80,7 @@ Place a native `<audio>` anywhere inside `<audio-player>`. It becomes that playe
 Video.js does not replace the native audio API. Use `src` for one URL or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> when you need an HLS, Mux, Spotify, or other playback adapter.
 
 <FrameworkCase frameworks={["react"]}>
-`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`. Its `ref` resolves to the `HTMLAudioElement`, and so does `mediaRef`. Adapter-backed components such as <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> and <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`. See [Refs](#refs) for what `ref` and `mediaRef` receive.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -108,4 +116,88 @@ This native audio element uses a child source and browser controls while providi
       <BasicUsageDemoHtml />
     </Demo>
   </StyleCase>
+</FrameworkCase>
+
+## API Reference
+
+<FrameworkCase frameworks={["html"]}>
+
+### Attributes
+
+Accepts the standard `<audio>` attributes. See the [MDN `<audio>` reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/audio): <span class="code-list">{['autoplay', 'controls', 'controlslist', 'crossorigin', 'disableremoteplayback', 'loop', 'muted', 'preload', 'src'].map((name) => <CodeChip value={name} />)}</span>
+
+### Properties
+
+Exposes the native media properties. See [`HTMLAudioElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement) for details: <span class="code-list">{['autoplay', 'buffered', 'controls', 'crossOrigin', 'currentSrc', 'currentTime', 'defaultMuted', 'defaultPlaybackRate', 'disableRemotePlayback', 'duration', 'ended', 'error', 'loop', 'mediaKeys', 'muted', 'networkState', 'paused', 'playbackRate', 'played', 'preload', 'preservesPitch', 'readyState', 'remote', 'seekable', 'seeking', 'sinkId', 'src', 'srcObject', 'textTracks', 'volume'].map((name) => <CodeChip value={name} />)}</span>
+
+### Methods
+
+Supports the native media methods. See [`HTMLAudioElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement) for details: <span class="code-list">{['addTextTrack', 'canPlayType', 'fastSeek', 'load', 'pause', 'play', 'setMediaKeys', 'setSinkId'].map((name) => <CodeChip value={name} />)}</span>
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+### Props
+
+Accepts the standard React props for a native `<audio>`: <span class="code-list">{['autoPlay', 'controls', 'controlsList', 'crossOrigin', 'loop', 'muted', 'preload', 'src'].map((name) => <CodeChip value={name} />)}</span>
+
+`Audio` also accepts `children` and common element props such as `className` and `style`, plus these Video.js-specific props:
+
+<Table outerClass="my-6">
+  <Thead>
+    <Tr>
+      <Th>Prop</Th>
+      <Th>Type</Th>
+      <Th>Description</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    <Tr>
+      <Td><MarkdownCode>fallback</MarkdownCode></Td>
+      <Td><MarkdownCode>ReactNode</MarkdownCode></Td>
+      <Td>Content rendered inside the `<audio>` after `children`, which only browsers without media element support show. It isn't shown when playback fails. Defaults to an "Audio player not working?" link to `https://videojs.org/help`. Pass `null` to render nothing.</Td>
+    </Tr>
+    <Tr>
+      <Td><MarkdownCode>mediaRef</MarkdownCode></Td>
+      <Td><MarkdownCode>{"Ref<HTMLAudioElement>"}</MarkdownCode></Td>
+      <Td>Receives the rendered `HTMLAudioElement`. See [Refs](#refs).</Td>
+    </Tr>
+  </Tbody>
+</Table>
+
+### Refs
+
+#### ref
+
+Forwards to the rendered `<audio>`, an [`HTMLAudioElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement) with its complete native property and method API.
+
+```tsx
+const ref = useRef<HTMLAudioElement>(null);
+
+<Audio ref={ref} />
+```
+
+#### mediaRef
+
+Receives the same `HTMLAudioElement` as `ref`. Adapter-backed components such as <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> and <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+
+```tsx
+const mediaRef = useRef<HTMLAudioElement>(null);
+
+<Audio mediaRef={mediaRef} />
+```
+
+</FrameworkCase>
+
+### Events
+
+<FrameworkCase frameworks={["html"]}>
+Fires the standard media events: <span class="code-list">{['abort', 'canplay', 'canplaythrough', 'durationchange', 'emptied', 'encrypted', 'ended', 'error', 'loadeddata', 'loadedmetadata', 'loadstart', 'pause', 'play', 'playing', 'progress', 'ratechange', 'seeked', 'seeking', 'stalled', 'suspend', 'timeupdate', 'volumechange', 'waiting', 'waitingforkey'].map((name) => <CodeChip value={name} />)}</span>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Accepts the standard React media event props: <span class="code-list">{['onAbort', 'onCanPlay', 'onCanPlayThrough', 'onDurationChange', 'onEmptied', 'onEncrypted', 'onEnded', 'onError', 'onLoadedData', 'onLoadedMetadata', 'onLoadStart', 'onPause', 'onPlay', 'onPlaying', 'onProgress', 'onRateChange', 'onSeeked', 'onSeeking', 'onStalled', 'onSuspend', 'onTimeUpdate', 'onVolumeChange', 'onWaiting'].map((name) => <CodeChip value={name} />)}</span>
+
+The native `waitingforkey` event has no React prop. Attach a listener through the ref with `addEventListener`.
 </FrameworkCase>

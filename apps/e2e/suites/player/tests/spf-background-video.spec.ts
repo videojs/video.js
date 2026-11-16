@@ -34,6 +34,12 @@ const SVTA_UNSUPPORTED_VIDEO_FORMAT = 1004;
 /** SVTA 4 [Content Protection] 008 — encrypted, with no decryption pipeline. */
 const SVTA_UNSUPPORTED_DRM_SYSTEM = 4008;
 
+declare global {
+  interface Window {
+    __srcAtPause?: string;
+  }
+}
+
 const HTML_PAGE = '/pages/html-hls-background-video.html';
 const REACT_PAGE = '/pages/react-hls-background-video.html';
 
@@ -237,6 +243,89 @@ test.describe('SPF background video', () => {
     const videoError = await page.evaluate(() => document.querySelector('video')?.error?.code ?? null);
 
     expect(videoError).toBeNull();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Pausing before the stream attaches
+  // ---------------------------------------------------------------------------
+  // The engine assigns its MediaSource to the <video> asynchronously, and that
+  // assignment runs the media load algorithm, which resets `paused`. With
+  // `autoplay` still on, a pause made before it — the reduced-motion check on page
+  // load — would be undone. The pages pause in the same task the element is
+  // created and record the video's `src` at that moment, so each test can confirm
+  // the pause really came first.
+  test.describe('pausing before the stream attaches', () => {
+    async function expectStaysPaused(page: Page, selector: string) {
+      await page.waitForFunction(
+        (sel) => {
+          const element = document.querySelector(sel) as (HTMLElement & { target?: HTMLVideoElement }) | null;
+          const video = (element?.target ?? element) as HTMLVideoElement | null;
+
+          return !!video && video.readyState >= 2;
+        },
+        selector,
+        { timeout: 30_000 }
+      );
+
+      // The pause preceded the attach, or the test proves nothing.
+      expect(await page.evaluate(() => window.__srcAtPause)).toBe('');
+
+      // Long enough for autoplay to have kicked in had it survived.
+      await page.waitForTimeout(1_000);
+
+      const state = await page.evaluate((sel) => {
+        const element = document.querySelector(sel) as (HTMLElement & { target?: HTMLVideoElement }) | null;
+        const video = (element?.target ?? element) as HTMLVideoElement | null;
+
+        return video ? { paused: video.paused, currentTime: video.currentTime } : null;
+      }, selector);
+
+      expect(state).toEqual({ paused: true, currentTime: 0 });
+    }
+
+    async function expectPlaysOnRequest(page: Page, selector: string) {
+      await page.evaluate((sel) => {
+        const element = document.querySelector(sel) as (HTMLElement & { target?: HTMLVideoElement }) | null;
+        const video = (element?.target ?? element) as HTMLVideoElement | null;
+
+        return video?.play();
+      }, selector);
+
+      await page.waitForFunction(
+        (sel) => {
+          const element = document.querySelector(sel) as (HTMLElement & { target?: HTMLVideoElement }) | null;
+          const video = (element?.target ?? element) as HTMLVideoElement | null;
+
+          return !!video && !video.paused && video.currentTime > 0;
+        },
+        selector,
+        { timeout: 20_000 }
+      );
+    }
+
+    test('without noautoplay, the attach undoes an earlier pause', async ({ page }) => {
+      // The control, and the reason the opt-out exists. Before the stream attaches
+      // the video is already paused, so `pause()` is a no-op the element can't
+      // observe; the load the attach runs then lets autoplay start it. If this ever
+      // stays paused, the browser stopped resetting on load and the tests below no
+      // longer exercise anything.
+      await page.goto(`${HTML_PAGE}?pause`);
+      await waitForPlayback(page);
+
+      expect(await page.evaluate(() => window.__srcAtPause)).toBe('');
+    });
+
+    test('stays paused with noautoplay, then plays on request', async ({ page }) => {
+      await page.goto(`${HTML_PAGE}?noautoplay&pause`);
+      await expectStaysPaused(page, 'hls-background-video');
+      await expectPlaysOnRequest(page, 'hls-background-video');
+    });
+
+    test('React: stays paused with autoPlay={false}, then plays on request', async ({ page }) => {
+      await page.goto(`${REACT_PAGE}?noautoplay&pause`);
+      await expectStaysPaused(page, 'video');
+      await expectPlaysOnRequest(page, 'video');
+    });
   });
 
   // ---------------------------------------------------------------------------

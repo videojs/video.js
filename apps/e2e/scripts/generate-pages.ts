@@ -323,14 +323,29 @@ createRoot(document.getElementById('root')!).render(<App />);
  * `?src=` picks the source, so one page serves every shape `spf-background-video.spec.ts` drives — playable, MPEG-TS,
  * encrypted, audio-only — and a test can compare two of them without a page each. Assigned as a property rather than
  * interpolated into markup, since the DRM source carries a signed-URL query string.
+ *
+ * `?noautoplay` sets the opt-out, and `?pause` pauses the inner video in the same task the element is created, before
+ * the engine has attached its stream. What the video's `src` was at that moment is recorded on `window`, so a test can
+ * check it really paused ahead of the attach.
  */
 function backgroundVideoPage(config: MediaTypeConfig, resource: string): string {
   return `${config.imports.map((imp) => `import '${imp}';`).join('\n')}
 import { MEDIA } from '../resources';
 
-const src = new URLSearchParams(window.location.search).get('src') ?? MEDIA.${resource}.url;
+declare global {
+  interface Window {
+    __srcAtPause?: string;
+  }
+}
 
-const media = document.createElement('${config.element}') as HTMLElement & { src: string };
+const params = new URLSearchParams(window.location.search);
+const src = params.get('src') ?? MEDIA.${resource}.url;
+
+const media = document.createElement('${config.element}') as HTMLElement & {
+  src: string;
+  target: HTMLVideoElement | null;
+};
+if (params.has('noautoplay')) media.setAttribute('noautoplay', '');
 media.src = src;
 // Viewport units rather than percentages: the shared page shell's #root has no
 // height of its own, and a background video that lays out at zero is one an
@@ -339,6 +354,11 @@ media.style.width = '100vw';
 media.style.height = '100vh';
 
 document.getElementById('root')!.append(media);
+
+if (params.has('pause') && media.target) {
+  window.__srcAtPause = media.target.getAttribute('src') ?? '';
+  media.target.pause();
+}
 `;
 }
 
@@ -353,23 +373,39 @@ function reactBackgroundVideoPage(media: string, resource: string): string {
   if (!reactMedia) throw new Error(`No React component mapping for media type: ${media}`);
 
   return `import { ${reactMedia.component} } from '${reactMedia.importPath}';
+import { useLayoutEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MEDIA } from '../resources';
 
 declare global {
   interface Window {
     __backgroundVideoErrors: number;
+    __srcAtPause?: string;
   }
 }
 
 window.__backgroundVideoErrors = 0;
 
-const src = new URLSearchParams(window.location.search).get('src') ?? MEDIA.${resource}.url;
+const params = new URLSearchParams(window.location.search);
+const src = params.get('src') ?? MEDIA.${resource}.url;
 
 function App() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Mirrors the HTML page's \`?pause\`: pause in the first commit, before the engine has attached its stream.
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!params.has('pause') || !video) return;
+
+    window.__srcAtPause = video.getAttribute('src') ?? '';
+    video.pause();
+  }, []);
+
   return (
     <${reactMedia.component}
+      ref={videoRef}
       src={src}
+      autoPlay={!params.has('noautoplay')}
       style={{ width: '100vw', height: '100vh' }}
       onError={() => {
         window.__backgroundVideoErrors += 1;

@@ -2421,6 +2421,13 @@ describe('Media component pipeline (end-to-end)', () => {
       });
     });
 
+    it('omits static and @internal getters', () => {
+      const props = findElement('SpfAudio')!.reference.platforms.html.properties.definitions;
+
+      expect(props).not.toHaveProperty('alternativeMediaSuggestion');
+      expect(props).not.toHaveProperty('engine');
+    });
+
     it('extracts defaults declared next to the cross-package mixin', () => {
       const props = findElement('SpfAudio')!.reference.platforms.html.properties.definitions;
 

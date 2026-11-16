@@ -62,7 +62,7 @@ export type { HlsVideoMediaError } from './error-surface';
 export interface HlsVideoSource {
   /** Manifest URL. Mirrors the host's `src` property. */
   src?: string | undefined;
-  /** MIME type of the source. Takes precedence over inference from `src`. */
+  /** MIME type of the source. Accepted for shape compatibility; this engine plays HLS whatever the URL, so it's unused. */
   type?: string | undefined;
   /**
    * License servers for protected content, keyed by EME key-system id.
@@ -181,6 +181,9 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
  * @fires targetlivewindowchange - Fired when the target live window changes. Read `targetLiveWindow` for the new value.
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  */
+/** What the adapter's `createEngine` static builds: an engine over this adapter's state and context. */
+export type CreateEngine = (config: EngineConfig) => Composition<EngineState, EngineContext>;
+
 export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class HlsVideoImpl extends BaseClass {
     static readonly defaultProps: HlsVideoAdapterProps = {
@@ -207,10 +210,19 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * Empty here: `hls-video` has no better-equipped sibling to point at. A Media that does (a Mux Video built on this
      * engine, whose hls.js-backed counterpart plays MPEG-TS and DRM) overrides this static, and its copy gains the
      * second sentence with no other change.
+     *
+     * @internal
      */
     static get alternativeMediaSuggestion(): string | undefined {
       return undefined;
     }
+
+    /**
+     * The engine factory the adapter builds its engine with. A Media over a differently composed engine — one sharing
+     * this engine's state and context, with more features laid in, as the Mux Medias lay the MPEG-TS transmux —
+     * overrides this static and nothing else.
+     */
+    static readonly createEngine: CreateEngine = createEngine;
 
     readonly #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
@@ -287,6 +299,8 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     /**
      * Underlying playback engine — the low-level SPF reactive composition that drives playback. An advanced escape
      * hatch for direct engine access; normal playback is driven through this element's own properties and methods.
+     *
+     * @internal
      */
     get engine(): Composition<EngineState, EngineContext> {
       return this.#engine;
@@ -328,10 +342,9 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     /**
-     * Presentation time marking the start of the live-edge window — playback at `currentTime >= liveEdgeStart` counts
-     * as "at the live edge" (the same target the engine's `seekToLiveEdge` seeks to: window end − HOLD-BACK). `NaN`
-     * when the stream isn't live or nothing is resolved yet. Derived at read time from the engine's live window — no
-     * change event; re-read on `timeupdate`/`progress` (as the store's live feature does).
+     * Presentation time marking the start of the live-edge window. Playback at `currentTime >= liveEdgeStart` counts as
+     * "at the live edge", and seeking to live lands here. `NaN` when the stream isn't live or nothing has loaded yet.
+     * No change event fires; re-read it on `timeupdate` or `progress`.
      */
     get liveEdgeStart(): number {
       const edge = getLiveEdge({
@@ -650,7 +663,7 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     #createEngine(): Composition<EngineState, EngineContext> {
-      return createEngine({
+      return (this.constructor as typeof HlsVideoImpl).createEngine({
         ...this.#config,
         // A policy, not a value: the engine outlives `crossOrigin` changes and
         // consults this on every request. A consumer-supplied policy wins.
@@ -669,6 +682,7 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
   // adding back to the type or callers can't read it.
   return HlsVideoImpl as unknown as MixinReturn<Base, HlsVideoAdapterAPI, [options?: HlsVideoAdapterOptions]> & {
     readonly alternativeMediaSuggestion: string | undefined;
+    readonly createEngine: CreateEngine;
     readonly defaultProps: HlsVideoAdapterProps;
   };
 }

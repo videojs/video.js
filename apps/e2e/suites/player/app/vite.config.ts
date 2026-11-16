@@ -40,13 +40,24 @@ function getPageEntries(): Record<string, string> {
   return entries;
 }
 
+/**
+ * Keep the controls visible before playback starts on every page, since most tests use them without playing first. The
+ * tests of the before-start behaviour clear the property.
+ */
+const controlsBeforeStart = {
+  name: 'controls-before-start',
+  transformIndexHtml: () => [
+    { tag: 'style', children: ':root { --media-controls-before-start: visible; }', injectTo: 'head' as const },
+  ],
+};
+
 export default defineConfig({
   root: resolve(packageDir, 'src'),
   appType: 'mpa',
   define: {
     __DEV__: 'true',
   },
-  plugins: [...skins.plugins, react({ jsxImportSource: 'react' })],
+  plugins: [...skins.plugins, react({ jsxImportSource: 'react' }), controlsBeforeStart],
   resolve: {
     ...skins.resolve,
     dedupe: [...skins.resolve.dedupe, '@videojs/html', '@videojs/react'],

@@ -1,16 +1,13 @@
-import type { HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
+import { isNil } from '@videojs/utils/predicate';
 import type { Constructor } from '@videojs/utils/types';
-import type { CuesParsedData, NonNativeTextTracksData } from 'hls.js';
+import type { CuesParsedData, NonNativeTextTrack, NonNativeTextTracksData } from 'hls.js';
 import Hls from 'hls.js';
 
 import type { HlsEngineHost } from './types';
 
 /** Marks the `<track>` elements created here for hls.js's own text tracks. */
 const HLS_TRACK_ATTR = 'data-removeondestroy';
-
-/** Marks the subset created from hls.js's CEA-608/708 announcements, which are announced one track at a time. */
-const CC_TRACK_ATTR = 'data-cc';
 
 /** `HTMLTrackElement.LOADED` — the element parsed its resource and will not parse it again. */
 const TRACK_LOADED = 2;
@@ -41,16 +38,6 @@ export function withPreservedTextTracks(media: HTMLMediaElement | null, action: 
     action();
   } finally {
     for (const snapshot of snapshots) restoreTextTrack(snapshot);
-  }
-}
-
-/** Disables and removes every text track created for the current hls.js source. */
-export function removeHlsTextTracks(media: HTMLMediaTargetLike | null): void {
-  const trackEls = media?.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`) ?? [];
-
-  for (const trackEl of trackEls) {
-    trackEl.track.mode = 'disabled';
-    trackEl.remove();
   }
 }
 
@@ -105,6 +92,15 @@ function withReadableCues<T>(track: TextTrack, action: () => T): T {
   }
 }
 
+/** A text track hls.js announced for the current source. */
+interface HlsTextTrack {
+  info: NonNativeTextTrack;
+  /** The mode the track had when its element was last removed, put back when it is mounted again. */
+  mode: TextTrackMode | null;
+  /** The track's `<track>` element, kept while unmounted so mounting it again keeps its cues. */
+  el: HTMLTrackElement | null;
+}
+
 /**
  * Bridges hls.js non-native text tracks to native `<track>` elements so the rest of the player can treat them like any
  * other text track.
@@ -112,29 +108,75 @@ function withReadableCues<T>(track: TextTrack, action: () => T): T {
  * When `renderTextTracksNatively: false`, hls.js fires `NON_NATIVE_TEXT_TRACKS_FOUND` with track metadata and
  * `CUES_PARSED` with VTTCues. This mixin creates `<track>` elements on the media target and forwards cues into them. It
  * also syncs user track-mode changes back to hls.js via `engine.subtitleTrack`.
+ *
+ * The tracks belong to the source, not to the media element. A new manifest or the engine's destruction drops them.
+ * hls.js's own detach/attach, e.g. `hls.recoverMediaError()`, leaves them where they are: hls.js announces the subtitle
+ * set again only when its list changes, and each CC track only once 608 data shows up, and keeping the elements keeps
+ * their modes, cues and place among the other `<track>` elements. Only the adapter letting go of the element unmounts
+ * them, and the next attach mounts the same elements again with their modes and cues.
  */
 export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsTextTracks extends (BaseClass as Constructor<HlsEngineHost>) {
     #disconnect: AbortController | null = null;
+    /** The tracks of the current source, by the id hls.js addresses their cues with. */
+    #tracks = new Map<string, HlsTextTrack>();
 
     constructor(...args: any[]) {
       super(...args);
 
-      // A new manifest invalidates the tracks built from the previous one. Attaching media does not: it rebinds the
-      // handlers to the element hls.js drives now, and the tracks of the load in progress have to survive it.
-      this.engine?.on(Hls.Events.MANIFEST_LOADING, () => {
-        removeHlsTextTracks(this.target);
+      const { engine } = this;
+      if (!engine) return;
+
+      engine.on(Hls.Events.MANIFEST_LOADING, () => {
+        this.#reset();
         this.#init();
       });
-      this.engine?.on(Hls.Events.MEDIA_ATTACHED, () => this.#init());
-      this.engine?.on(Hls.Events.MEDIA_DETACHED, () => this.#destroy());
-      this.engine?.on(Hls.Events.DESTROYING, () => this.#destroy());
+      engine.on(Hls.Events.MEDIA_ATTACHED, () => {
+        this.#init();
+        this.#mount();
+      });
+      engine.on(Hls.Events.MEDIA_DETACHED, () => this.#disconnectListeners());
+      engine.on(Hls.Events.DESTROYING, () => this.#reset());
     }
 
-    #destroy(): void {
+    /** The adapter lets go of the element, unlike hls.js's own detach/attach, so the tracks leave it too. */
+    detach(): void {
+      this.#unmount();
+      super.detach();
+    }
+
+    #disconnectListeners(): void {
       this.#disconnect?.abort();
       this.#disconnect = null;
-      removeHlsTextTracks(this.target);
+    }
+
+    #reset(): void {
+      this.#disconnectListeners();
+      this.#unmount();
+      this.#tracks.clear();
+    }
+
+    /** Mounts the tracks of the current source that are not on the media element yet. */
+    #mount(): void {
+      // SAFETY: the hls.js delegate always binds to the real `<video>` element.
+      const media = this.target as HTMLVideoElement | null;
+      if (!media) return;
+
+      for (const [id, track] of this.#tracks) {
+        if (track.el?.parentNode !== media) mountTrack(media, id, track, null);
+      }
+    }
+
+    #unmount(): void {
+      for (const track of this.#tracks.values()) unmountTrack(track);
+    }
+
+    #trackFor(textTrack: TextTrack): HlsTextTrack | undefined {
+      for (const track of this.#tracks.values()) {
+        if (track.el?.track === textTrack) return track;
+      }
+
+      return undefined;
     }
 
     #init(): void {
@@ -148,62 +190,47 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       // The hls.js delegate always binds to the real `<video>` element.
       const media = this.target as HTMLVideoElement;
 
-      // NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and
-      // `default` or `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
-      // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
-      const trackIdFor = ({ _id, default: isDefault, subtitleTrack }: NonNativeTextTracksData['tracks'][number]) =>
-        _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
+      const onTracksFound = (_event: string, { tracks }: NonNativeTextTracksData) => {
+        // The subtitle set arrives in one batch and replaces the previous set. Each CC track arrives alone once 608 data
+        // shows up in the stream, again after every re-attach, and leaves the other tracks alone.
+        const incoming = new Map(tracks.map((info) => [trackIdFor(info), info]));
 
-      const onTracksFound = (_event: string, data: NonNativeTextTracksData) => {
-        // The subtitle set arrives in one batch, and each CC track arrives alone once 608 data shows up in the
-        // stream. Replace only what is being re-announced, so a CC announcement does not destroy the subtitle set
-        // and a fresh subtitle set does not destroy the CC tracks.
-        const incomingIds = new Set(data.tracks.map(trackIdFor));
-        const ccBatch = data.tracks.every((trackObj) => trackObj._id != null);
+        if (!tracks.every(isClosedCaptions)) {
+          for (const [id, track] of this.#tracks) {
+            if (isClosedCaptions(track.info) || incoming.has(id)) continue;
 
-        for (const trackEl of media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`)) {
-          const replaced = incomingIds.has(trackEl.id);
-          const ccOwned = trackEl.hasAttribute(CC_TRACK_ATTR);
-          if (!replaced && (ccBatch || ccOwned)) continue;
-
-          trackEl.track.mode = 'disabled';
-          trackEl.remove();
+            unmountTrack(track);
+            this.#tracks.delete(id);
+          }
         }
 
-        for (const trackObj of data.tracks) {
-          const baseTrackObj = trackObj.subtitleTrack ?? trackObj.closedCaptions;
+        for (const [id, info] of incoming) {
+          const track = this.#tracks.get(id);
 
-          addTextTrack(
-            media,
-            trackObj.kind as TextTrackKind,
-            trackObj.label,
-            baseTrackObj?.lang,
-            trackIdFor(trackObj),
-            trackObj.default,
-            trackObj._id != null
-          );
+          if (!track) {
+            this.#tracks.set(id, { info, mode: null, el: null });
+            continue;
+          }
+
+          const changed = !describesSameTrack(track.info, info);
+
+          track.info = info;
+
+          if (changed) replaceTrack(media, id, track);
         }
+
+        this.#mount();
       };
 
       const onCuesParsed = (_event: string, { track, cues }: CuesParsedData) => {
-        const textTrack = media.textTracks.getTrackById(track);
+        const textTrack = this.#tracks.get(track)?.el?.track;
         if (!textTrack) return;
 
-        const disabled = textTrack.mode === 'disabled';
-
-        if (disabled) {
-          textTrack.mode = 'hidden';
-        }
-
-        cues.forEach((cue: VTTCue) => {
-          if (textTrack.cues?.getCueById(cue.id)) return;
-
-          textTrack.addCue(cue);
+        withReadableCues(textTrack, () => {
+          for (const cue of cues) {
+            if (!textTrack.cues?.getCueById(cue.id)) textTrack.addCue(cue);
+          }
         });
-
-        if (disabled) {
-          textTrack.mode = 'disabled';
-        }
       };
 
       let lastShowingTrack: TextTrack | undefined;
@@ -218,36 +245,18 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
 
         if (!showingTrack) return;
 
+        const track = this.#trackFor(showingTrack);
+
         // Only on a new showing track: `onCuesParsed` fires `change` for every batch it forwards to a disabled
         // track, and refreshing each time would re-render the active cue several times a second.
-        if (showingChanged && isHlsTextTrack(media, showingTrack)) refreshCues(showingTrack);
+        if (showingChanged && track) refreshCues(showingTrack);
 
-        if (!engine.subtitleTracks.length) return;
+        // hls.js stamps each subtitle playlist's index in `subtitleTracks` on its `id`, and loads the playlist of the
+        // index `subtitleTrack` is set to; CUES_PARSED then fills the track. Any other showing track, CC or sideloaded,
+        // selects -1, which only stops subtitle loading: CEA-608 cues come from the video segments.
+        const index = track?.info.subtitleTrack?.id ?? -1;
 
-        const currentHlsTrack = engine.subtitleTracks[engine.subtitleTrack];
-
-        // If hls.subtitleTrack is -1 or its id changed compared to the one that is showing load the new subtitle track.
-        const hlsTrackId = !currentHlsTrack
-          ? undefined
-          : currentHlsTrack.default
-            ? 'default'
-            : `${engine.subtitleTracks[engine.subtitleTrack]?.type.toLowerCase()}${engine.subtitleTrack}`;
-
-        if (engine.subtitleTrack < 0 || showingTrack?.id !== hlsTrackId) {
-          const idx = engine.subtitleTracks.findIndex(({ lang, name, type, default: defaultTrack }) => {
-            return (
-              (showingTrack.id === 'default' && defaultTrack) ||
-              (lang === showingTrack.language &&
-                name === showingTrack.label &&
-                type.toLowerCase() === showingTrack.kind)
-            );
-          });
-
-          // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
-          // A closed-caption track has no entry in `subtitleTracks`, so picking one assigns -1, which only stops
-          // subtitle loading: CEA-608 cues come from the video segments.
-          engine.subtitleTrack = idx;
-        }
+        if (engine.subtitleTrack !== index) engine.subtitleTrack = index;
       };
 
       engine.on(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, onTracksFound);
@@ -268,12 +277,6 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
   return HlsJsTextTracks as unknown as Base;
 }
 
-function isHlsTextTrack(media: HTMLMediaElement, track: TextTrack): boolean {
-  const trackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
-
-  return Array.from(trackEls).some((trackEl) => trackEl.track === track);
-}
-
 /**
  * Makes the media element render the cues of a track that just became the showing one.
  *
@@ -289,41 +292,96 @@ function refreshCues(track: TextTrack): void {
   }
 }
 
-function addTextTrack(
-  mediaEl: HTMLMediaElement,
-  kind: TextTrackKind,
-  label: string,
-  lang?: string,
-  id?: string,
-  defaultTrack?: boolean,
-  ccOwned?: boolean
-): TextTrack {
-  const trackEl = document.createElement('track');
+/** CEA-608/708 tracks are the ones hls.js announces with an `_id`, one at a time. */
+function isClosedCaptions(info: NonNativeTextTrack): boolean {
+  return !isNil(info._id);
+}
 
-  trackEl.kind = kind;
-  trackEl.label = label;
+/**
+ * NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and `default` or
+ * `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set. See:
+ * https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
+ */
+function trackIdFor({ _id, default: isDefault, subtitleTrack }: NonNativeTextTrack): string {
+  return _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
+}
 
-  if (lang) {
-    // This attribute must be present if the element's kind attribute is in the subtitles state.
-    trackEl.srclang = lang;
-  }
+/** Whether a new announcement of a track would build the same `<track>` element. */
+function describesSameTrack(a: NonNativeTextTrack, b: NonNativeTextTrack): boolean {
+  const langOf = ({ subtitleTrack, closedCaptions }: NonNativeTextTrack) => (subtitleTrack ?? closedCaptions)?.lang;
 
-  if (id) {
-    trackEl.id = id;
-  }
+  return a.kind === b.kind && a.label === b.label && !!a.default === !!b.default && langOf(a) === langOf(b);
+}
 
-  if (defaultTrack) {
-    trackEl.default = true;
-  }
+/** Adds the track's element to the media element, moving it off another one, or builds it on the first mount. */
+function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack, before: Node | null): void {
+  unmountTrack(track);
 
-  trackEl.track.mode = isCaptionOrSubtitleTrack({ kind }) ? 'disabled' : 'hidden';
+  const el = track.el ?? createTrackElement(id, track.info);
 
-  // Add data attribute to identify tracks that should be removed when switching sources/destroying hls.js instance.
-  trackEl.setAttribute(HLS_TRACK_ATTR, '');
+  media.insertBefore(el, before);
+  track.el = el;
 
-  if (ccOwned) trackEl.setAttribute(CC_TRACK_ATTR, '');
+  if (track.mode) restoreMode(el.track, track.mode);
+}
 
-  mediaEl.append(trackEl);
+function createTrackElement(id: string, info: NonNativeTextTrack): HTMLTrackElement {
+  const kind = info.kind as TextTrackKind;
+  const lang = (info.subtitleTrack ?? info.closedCaptions)?.lang;
+  const el = document.createElement('track');
 
-  return trackEl.track as TextTrack;
+  el.id = id;
+  el.kind = kind;
+  el.label = info.label;
+
+  // Required when the element's kind is subtitles.
+  if (lang) el.srclang = lang;
+
+  if (info.default) el.default = true;
+
+  el.track.mode = isCaptionOrSubtitleTrack({ kind }) ? 'disabled' : 'hidden';
+
+  // Lets `withPreservedTextTracks` tell these tracks from sideloaded ones.
+  el.setAttribute(HLS_TRACK_ATTR, '');
+
+  return el;
+}
+
+/**
+ * Gives a track hls.js announced under a reused id, e.g. after a switch to a level with another subtitle group, a new
+ * element in the old one's place: the old element holds the previous playlist's cues, and the store only reads a
+ * track's kind, label and language when it is added.
+ */
+function replaceTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack): void {
+  const { el } = track;
+  if (!el) return;
+
+  const mounted = el.parentNode === media;
+  const next = el.nextSibling;
+
+  unmountTrack(track);
+  track.el = null;
+
+  if (mounted) mountTrack(media, id, track, next);
+}
+
+/**
+ * Sets a remounted track's mode so the browser keeps it. Once any track shows, Chrome turns on the subtitle track in
+ * the user's language too, unless script set that track's mode after its element was added. Setting the mode it already
+ * has does not count, so a track restored to it goes through another mode first.
+ */
+function restoreMode(track: TextTrack, mode: TextTrackMode): void {
+  if (track.mode === mode) track.mode = mode === 'disabled' ? 'hidden' : 'disabled';
+
+  track.mode = mode;
+}
+
+/** Disables and removes the track's element, remembering its mode for the next mount. */
+function unmountTrack(track: HlsTextTrack): void {
+  const { el } = track;
+  if (!el?.parentNode) return;
+
+  track.mode = el.track.mode;
+  el.track.mode = 'disabled';
+  el.remove();
 }

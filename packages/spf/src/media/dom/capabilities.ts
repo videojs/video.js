@@ -17,6 +17,7 @@
 
 import { type DrmConfig, keySystemCandidates } from '../drm';
 import { NON_FMP4_CONTAINER_MIMES } from '../hls/parse-media-playlist';
+import { asTransmuxed } from '../mpeg-ts/transmuxed-track';
 import { type CanPlayTrack, getMediaPlaylistMetadata } from '../types';
 import { buildMimeCodec } from '../utils/tracks';
 import { isCodecSupported } from './mse/mediasource-setup';
@@ -49,8 +50,9 @@ const canDecodeTrack: CanPlayTrack = (track) => {
  * pruned before selection (the type makes no pick) instead of failing/stalling deep in the pipeline. Two different
  * reasons, neither UA-based:
  *
- * - **MPEG-TS** can't be played at all here: `isTypeSupported('video/mp2t…')` is a genuine false positive on Chromium
- *   (reports `true` but appends produce no buffered range), and this engine has no TS transmux pipeline.
+ * - **MPEG-TS** can't be appended as-is: `isTypeSupported('video/mp2t…')` is a genuine false positive on Chromium
+ *   (reports `true` but appends produce no buffered range). A composition with `mpegTsTransmuxFeature` swaps in a probe
+ *   that sees a TS rendition as the fMP4 it transmuxes to; this plain probe is for compositions without it.
  * - **Raw ADTS AAC** is a _temporary_ limitation. The browser genuinely supports it (Chrome/Safari decode `audio/aac`;
  *   Firefox doesn't), so it could be made playable — but our segment actors / loading behaviors / append pipeline
  *   assume every rendition has an `EXT-X-MAP` init segment (e.g. an `append-init` task with an empty URL, fMP4-shaped
@@ -59,7 +61,7 @@ const canDecodeTrack: CanPlayTrack = (track) => {
  *   this to a bare-MIME probe (`buildMimeCodec` would project `audio/aac` with no codecs) so it plays where the browser
  *   supports it.
  *
- * Override via the engine's `canPlayTrack` config when those pipelines land.
+ * Override via the engine's `canPlayTrack` config, as `mpegTsTransmuxFeature` does for TS.
  */
 export const canPlayTrack: CanPlayTrack = (track) => {
   // Encrypted renditions are unplayable in DRM-free compositions — no EME /
@@ -91,3 +93,10 @@ export const canPlayTrackWithDrm: CanPlayTrack = (track, config) => {
 
   return canDecodeTrack(track);
 };
+
+/**
+ * {@link canPlayTrackWithDrm} over the transmuxed container, for a composition with the MPEG-TS transmux feature: a TS
+ * rendition probes by codec as the fMP4 it becomes instead of being pruned. On clear content it answers as the plain
+ * probe does, so it suits a composition without `drmFeature` too.
+ */
+export const canPlayTransmuxedTrack: CanPlayTrack = (track, config) => canPlayTrackWithDrm(asTransmuxed(track), config);

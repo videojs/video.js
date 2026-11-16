@@ -6,7 +6,7 @@ export default styles({
   rules: {
     root: {
       utilities: [
-        'pointer-events-none min-w-0 px-2 flex-1 truncate text-[calc(var(--media-spacing)*4)] text-media-foreground bg-media-background',
+        'pointer-events-none media-max-3xs:hidden min-w-0 px-2 flex-1 truncate text-[calc(var(--media-spacing)*4)] text-media-foreground bg-media-background',
         'media-high-contrast:bg-media-background forced-colors:bg-transparent! forced-colors:text-[CanvasText] forced-colors:z-40',
         'not-data-visible:opacity-0',
       ],

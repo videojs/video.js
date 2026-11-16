@@ -1,13 +1,18 @@
 import { styles } from 'vjsc/styles';
 
+// Before playback starts, only the center play button shows; `--media-controls-before-start: visible` keeps the controls.
+const hiddenBeforeStart = '[visibility:var(--media-controls-before-start,hidden)]';
+
 export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
   rules: {
     backdrop: {
       // Gradient utilities allow three stops; the clear middle band needs a fourth.
-      utilities:
+      utilities: [
         'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgb(0_0_0/0.5),transparent_40%,transparent_60%,rgb(0_0_0/0.4))] not-data-visible:hidden forced-colors:bg-none',
+        `not-data-started:${hiddenBeforeStart}`,
+      ],
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
@@ -17,7 +22,7 @@ export default styles({
     },
     center: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-2 media-360:flex',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 flex transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-2',
         'media-high-contrast:rounded-none media-high-contrast:bg-media-background media-high-contrast:px-2 forced-colors:bg-transparent!',
         'group-not-data-visible/controls:opacity-0 group-data-visible/center-buffering:hidden!',
       ],
@@ -29,24 +34,28 @@ export default styles({
         'forced-colors:inset-x-0 forced-colors:top-0 forced-colors:justify-end forced-colors:rounded-none!',
         'forced-colors:inset-e-0',
         'group-not-data-visible/controls:opacity-0',
+        `not-data-started:${hiddenBeforeStart}`,
       ],
     },
     centerButton: {
       utilities: [
-        'm-0! bg-media-background! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-(--media-button-highlight)! focus-visible:bg-(--media-button-highlight)! aria-expanded:bg-(--media-button-highlight)!',
+        // The scaffold background is transparent, so the centre controls take a dark backing to read over the video.
+        'm-0! bg-media-popover/40! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
+        'hover:bg-media-popover/60! focus-visible:bg-media-popover/60! aria-expanded:bg-media-popover/60!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],
     },
     centerPlay: {
-      utilities: 'size-14.5!',
+      // Shrinks rather than hides in small players, so there's always a start prompt.
+      utilities: 'size-14.5! media-max-360:size-11!',
     },
     centerPlayIcon: {
-      utilities: 'size-7!',
+      utilities: 'size-7! media-max-360:size-5.5!',
     },
     centerSeek: {
-      utilities: 'hidden size-8! pointer-fine:grid',
+      // Before playback starts, the play button stands alone in the center.
+      utilities: 'hidden size-8! pointer-fine:grid media-max-360:hidden! group-not-data-started/controls:hidden!',
     },
     centerSeekIcon: {
       utilities: 'size-4.5',
@@ -59,7 +68,10 @@ export default styles({
       ],
     },
     videoBottom: {
-      utilities: 'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none!',
+      utilities: [
+        'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none!',
+        `group-not-data-started/controls:${hiddenBeforeStart}`,
+      ],
     },
     sliderRow: {
       utilities: 'w-full',

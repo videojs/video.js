@@ -1,4 +1,7 @@
-/** What a page renders in place of a skin when the shell selects none: the media alone, framed as a skin would be. */
+/**
+ * What a page renders in place of a skin when the shell selects none: the media alone with its native controls, framed
+ * as a skin would be.
+ */
 export const NO_SKIN_TAG = 'sandbox-no-skin';
 
 // Its shadow root renders only unslotted children, so the media shows and a skin's slotted parts, such as a poster
@@ -7,8 +10,19 @@ class SandboxNoSkin extends HTMLElement {
   constructor() {
     super();
 
-    this.attachShadow({ mode: 'open' }).innerHTML =
-      '<style>:host { display: block; position: relative; width: 100%; }</style><slot></slot>';
+    const root = this.attachShadow({ mode: 'open' });
+
+    // A plain `<video>` is the page's, so only a slotted rule can fill the frame with it; custom media size their own.
+    root.innerHTML = `<style>
+      :host { display: block; position: relative; width: 100%; }
+      ::slotted(video) { display: block; width: 100%; height: 100%; object-fit: contain; }
+    </style><slot></slot>`;
+
+    const slot = root.querySelector('slot')!;
+
+    slot.addEventListener('slotchange', () => {
+      for (const media of slot.assignedElements()) media.toggleAttribute('controls', true);
+    });
   }
 }
 

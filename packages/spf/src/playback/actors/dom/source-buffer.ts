@@ -39,6 +39,11 @@ export interface SourceBufferActorContext {
    * and for language-less audio.
    */
   initTrackLanguage?: string | undefined;
+  /**
+   * Name of the most recently appended init segment's track. Read with `initTrackLanguage` to detect switches between
+   * same-language audio tracks with different content (a commentary track, say). Undefined for video.
+   */
+  initTrackName?: string | undefined;
   segments: Array<
     Pick<Segment, 'id' | 'startTime' | 'duration'> & {
       trackId: Track['id'];
@@ -96,7 +101,12 @@ function appendInitTask(
     await appendSegment(sourceBuffer, message.data);
     // No abort check here: the physical SourceBuffer has been modified, so
     // the model must be updated to match regardless of signal state.
-    return { ...ctx, initTrackId: message.meta.trackId, initTrackLanguage: message.meta.language };
+    return {
+      ...ctx,
+      initTrackId: message.meta.trackId,
+      initTrackLanguage: message.meta.language,
+      initTrackName: message.meta.name,
+    };
   });
 }
 
