@@ -98,11 +98,12 @@ describe('MuxDataExtension', () => {
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual(metadata);
   });
 
-  it('forwards metadata-* attributes to the extension as snake_case keys', () => {
+  it('forwards metadata-* attributes to the extension as snake_case keys', async () => {
     const { provider, el } = setup();
 
     el.setAttribute('metadata-video-title', 'Attr title');
     el.setAttribute('metadata-viewer-user-id', 'user-1');
+    await Promise.resolve();
 
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
       video_title: 'Attr title',
@@ -135,16 +136,19 @@ describe('MuxDataExtension', () => {
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
   });
 
-  it('updates extension metadata when a metadata-* attribute changes after connect', () => {
+  it('updates extension metadata when a metadata-* attribute changes after connect', async () => {
     const { provider, el } = setup();
 
     el.setAttribute('metadata-video-title', 'First');
+    await Promise.resolve();
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'First' });
 
     el.setAttribute('metadata-video-title', 'Second');
+    await Promise.resolve();
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'Second' });
 
     el.removeAttribute('metadata-video-title');
+    await Promise.resolve();
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
   });
 

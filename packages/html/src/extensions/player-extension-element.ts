@@ -1,14 +1,10 @@
 import type { PlayerExtension } from '@videojs/core/dom';
 import { ContextConsumer } from '@videojs/element/context';
+import { shallowEqual } from '@videojs/utils/object';
 
 import { type ExtensionContextValue, extensionContext } from '../player/context';
 import { UIElement } from '../ui/ui-element';
-import {
-  METADATA_ATTRIBUTE_PREFIX,
-  extensionMetadataEqual,
-  mergeExtensionMetadata,
-  readMetadataAttributes,
-} from './metadata-attributes';
+import { METADATA_ATTRIBUTE_PREFIX, mergeExtensionMetadata, readMetadataAttributes } from './metadata-attributes';
 
 /**
  * Abstract base for elements that register a player extension (e.g. Mux Data, Google Cast) with the surrounding player.
@@ -22,7 +18,11 @@ export abstract class PlayerExtensionElement<Extension extends object> extends U
   #register: ExtensionContextValue['registerExtension'] | null = null;
   #release: (() => void) | null = null;
   #metadataFromProperty: Record<string, unknown> | undefined;
-  #metadataAttributeWritesHooked = false;
+  #metadataObserver = new MutationObserver((records) => {
+    if (records.some((r) => r.attributeName?.startsWith(METADATA_ATTRIBUTE_PREFIX))) {
+      this.#pushMetadataToExtension();
+    }
+  });
 
   /**
    * Create the player extension this element registers. Called once, lazily.
@@ -52,11 +52,12 @@ export abstract class PlayerExtensionElement<Extension extends object> extends U
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.#hookMetadataAttributeWrites();
+    this.#metadataObserver.observe(this, { attributes: true });
     this.#pushMetadataToExtension();
   }
 
   override disconnectedCallback(): void {
+    this.#metadataObserver.disconnect();
     // Release while the player is still live so the extension can clean up against the real media.
     this.#setRegister(null);
     super.disconnectedCallback();
@@ -119,29 +120,8 @@ export abstract class PlayerExtensionElement<Extension extends object> extends U
 
     const target = extension as { metadata?: Record<string, unknown> | undefined };
     const next = this.getResolvedMetadata();
-    if (extensionMetadataEqual(next, target.metadata)) return;
+    if (shallowEqual(next, target.metadata)) return;
 
     target.metadata = next;
-  }
-
-  #hookMetadataAttributeWrites(): void {
-    if (this.#metadataAttributeWritesHooked) return;
-
-    this.#metadataAttributeWritesHooked = true;
-
-    const element = this as HTMLElement;
-    const setAttribute = element.setAttribute.bind(element);
-    const removeAttribute = element.removeAttribute.bind(element);
-
-    element.setAttribute = (name, value) => {
-      setAttribute(name, value);
-
-      if (name.startsWith(METADATA_ATTRIBUTE_PREFIX)) this.#pushMetadataToExtension();
-    };
-    element.removeAttribute = (name) => {
-      removeAttribute(name);
-
-      if (name.startsWith(METADATA_ATTRIBUTE_PREFIX)) this.#pushMetadataToExtension();
-    };
   }
 }

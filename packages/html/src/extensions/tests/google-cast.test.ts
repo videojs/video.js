@@ -80,4 +80,15 @@ describe('GoogleCastExtension', () => {
 
     expect(provider.extensions.get(GoogleCastExtensionBase)).toBeUndefined();
   });
+
+  it('is unaffected by metadata-* attributes', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Ignored');
+    await Promise.resolve();
+
+    const extension = provider.extensions.get(GoogleCastExtensionBase)!;
+
+    expect('metadata' in extension).toBe(false);
+  });
 });
