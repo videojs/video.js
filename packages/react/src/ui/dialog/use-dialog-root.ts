@@ -29,6 +29,9 @@ export function useDialogRoot({
   stateAttrMap = DialogDataAttrs,
   idPrefix = 'dialog',
 }: UseDialogRootOptions): DialogContextValue {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   const [core] = useState(coreFactory);
   const interactionRoot = useOptionalContainer();
 

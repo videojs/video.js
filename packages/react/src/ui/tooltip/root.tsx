@@ -46,6 +46,9 @@ export function TooltipRoot({
   children,
   ...coreProps
 }: TooltipRootProps): ReactNode {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   const container = useOptionalContainer();
   const popupGroup = useOptionalPopupGroup();
   const controls = useOptionalControlsContext();

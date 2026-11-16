@@ -40,6 +40,9 @@ export function MenuRoot({
   children,
   ...coreProps
 }: MenuRootProps): ReactNode {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   // Detect if we are nested inside a parent Menu.Content — if so, operate as
   // a submenu: no popover positioning, Trigger acts as a parent item.
   const parentMenu = useOptionalMenuContext();
