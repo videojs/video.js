@@ -54,8 +54,8 @@ export type SegmentLoaderTrack = VideoTrack | AudioTrack;
 /**
  * Message sent to a SegmentLoaderActor.
  *
- * `range` is optional to distinguish loading modes: - No range: load init segment only (metadata preload mode) - With
- * range: load init + all segments overlapping [start, end]
+ * `range` is optional to distinguish loading modes: - No range: load the init segment only - With range: load init +
+ * all segments overlapping [start, end)
  *
  * `start` and `end` are raw time values — no segment snapping. The actor maps them onto segment boundaries internally.
  */
@@ -321,12 +321,10 @@ export function createSegmentLoaderActor(
 
     // Case 3: Segments
     if (range) {
-      const segmentsToLoad = getSegmentsToLoad(
-        track.segments,
-        effectiveBuffered,
-        currentTime,
-        forwardBufferConfig
-      ).filter((seg) => {
+      const segmentsToLoad = getSegmentsToLoad(track.segments, effectiveBuffered, currentTime, {
+        ...forwardBufferConfig,
+        bufferDuration: range.end - range.start,
+      }).filter((seg) => {
         // Quality-aware filter: skip segments already covered by equal-or-higher-quality
         // content in the actor context. Preserves buffered high-quality content during
         // ABR downgrades; loads during upgrades and for uncovered positions.
