@@ -46,7 +46,9 @@ import {
   findResolvedVideoTrack,
 } from '../../../media/utils/tracks';
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
+import type { SourceBufferActor } from '../../actors/dom/source-buffer';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
+import type { CreateLoadStart } from '../../primitives/load-start';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
 
 // Re-export buffer state types for consumers that import them from this module.
@@ -91,6 +93,8 @@ export interface SegmentLoadingState {
 
 /** Context shape for segment loading. Each variant only consumes its own type's loader actor. */
 export interface SegmentLoadingContext {
+  videoBufferActor?: SourceBufferActor;
+  audioBufferActor?: SourceBufferActor;
   videoSegmentLoaderActor?: SegmentLoaderActor;
   audioSegmentLoaderActor?: SegmentLoaderActor;
   textTrackSegmentLoaderActor?: TextTrackSegmentLoaderActor;
@@ -155,7 +159,10 @@ function setupSegmentLoading<
     loadingSuspended?: ReadonlySignal<SegmentLoadingState['loadingSuspended']>;
     segmentLoadingBlocked?: ReadonlySignal<SegmentLoadingState['segmentLoadingBlocked']>;
   };
-  context: { [P in L]: ReadonlySignal<SegmentLoaderLike<Track> | undefined> };
+  context: { [P in L]: ReadonlySignal<SegmentLoaderLike<Track> | undefined> } & {
+    /** The loader's SourceBuffer actor, whose buffered ranges reveal a segment lead-in. Absent for text. */
+    bufferActor?: ReadonlySignal<SourceBufferActor | undefined>;
+  };
   config: {
     selectedKey: K;
     loaderKey: L;
@@ -165,6 +172,11 @@ function setupSegmentLoading<
     ) => Track | undefined;
     /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
+    /**
+     * Builds a signal that moves a full-range load's start earlier than the playhead (see `primitives/load-start`).
+     * Omit to start every load at the playhead.
+     */
+    createLoadStart?: CreateLoadStart;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
   const { selectedKey, loaderKey, findResolvedTrack } = config;
@@ -188,6 +200,12 @@ function setupSegmentLoading<
     if (!track) return undefined;
 
     return segmentStartForTime(state.currentTime.get() ?? 0, track.segments);
+  });
+
+  const loadStartSignal = config.createLoadStart?.({
+    currentTime: state.currentTime,
+    selectedTrack,
+    bufferActor: context.bufferActor,
   });
 
   const derivedStateSignal = computed<SegmentLoadingFsmState>(() => {
@@ -255,8 +273,8 @@ function setupSegmentLoading<
         },
       },
       'full-range': {
-        // Re-fires on selected-track changes and on segment-boundary
-        // crossings. The loader and `currentTime` are peeked — the
+        // Re-fires on selected-track changes, on segment-boundary
+        // crossings, and when the configured load start changes. The loader and `currentTime` are peeked — the
         // boundary-dedup signal already handles re-firing policy.
         effects: () => {
           // Guarded for the reason given on `'metadata-only'`'s entry: this
@@ -266,6 +284,7 @@ function setupSegmentLoading<
           const track = selectedTrack.get();
 
           segmentBoundarySignal.get();
+          const loadStart = loadStartSignal?.get();
           const loader = peek(context[loaderKey]);
           if (!track || !loader) return;
 
@@ -277,7 +296,7 @@ function setupSegmentLoading<
           loader.send({
             type: 'load',
             track,
-            range: { start: currentTime, end: currentTime + bufferDuration },
+            range: { start: loadStart ?? currentTime, end: currentTime + bufferDuration },
           });
         },
       },
@@ -316,7 +335,7 @@ const TEXT_SEGMENT_LOADING_CONFIG = {
  */
 export const loadVideoSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedVideoTrackId'],
-  contextKeys: ['videoSegmentLoaderActor'],
+  contextKeys: ['videoSegmentLoaderActor', 'videoBufferActor'],
   setup: ({
     state,
     context,
@@ -325,12 +344,13 @@ export const loadVideoSegments = defineBehavior({
     state: SegmentLoadingStateMap<'selectedVideoTrackId'>;
     context: {
       videoSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['videoSegmentLoaderActor']>;
+      videoBufferActor: ReadonlySignal<SegmentLoadingContext['videoBufferActor']>;
     };
-    config?: object;
+    config?: { createLoadStart?: CreateLoadStart };
   }) =>
     setupSegmentLoading({
       state,
-      context,
+      context: { ...context, bufferActor: context.videoBufferActor },
       config: { ...VIDEO_SEGMENT_LOADING_CONFIG, ...config },
     }),
 });
@@ -343,7 +363,7 @@ export const loadVideoSegments = defineBehavior({
  */
 export const loadAudioSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedAudioTrackId'],
-  contextKeys: ['audioSegmentLoaderActor'],
+  contextKeys: ['audioSegmentLoaderActor', 'audioBufferActor'],
   setup: ({
     state,
     context,
@@ -352,12 +372,13 @@ export const loadAudioSegments = defineBehavior({
     state: SegmentLoadingStateMap<'selectedAudioTrackId'>;
     context: {
       audioSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['audioSegmentLoaderActor']>;
+      audioBufferActor: ReadonlySignal<SegmentLoadingContext['audioBufferActor']>;
     };
-    config?: object;
+    config?: { createLoadStart?: CreateLoadStart };
   }) =>
     setupSegmentLoading({
       state,
-      context,
+      context: { ...context, bufferActor: context.audioBufferActor },
       config: { ...AUDIO_SEGMENT_LOADING_CONFIG, ...config },
     }),
 });

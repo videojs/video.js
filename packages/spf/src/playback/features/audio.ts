@@ -12,6 +12,7 @@ import { loadAudioSegments } from '../behaviors/dom/load-segments';
 import { setupAudioBufferActors } from '../behaviors/dom/setup-buffer-actors';
 import { resolveAudioTrack } from '../behaviors/resolve-track';
 import { switchAudioTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
+import { leadInLoadStart } from '../primitives/load-start';
 import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
 
 /** The behaviors the feature composes, in setup order. */
@@ -32,7 +33,12 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /** The config defaults the feature contributes. */
-export const defaultConfig = { canPlayTrack, reportUnsupportedTrackConditions } satisfies Partial<Config>;
+export const defaultConfig = {
+  canPlayTrack,
+  reportUnsupportedTrackConditions,
+  // Reach back for the previous segment when a seek lands in a boundary's lead-in; omit to load from the playhead.
+  createLoadStart: leadInLoadStart,
+} satisfies Partial<Config>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;
