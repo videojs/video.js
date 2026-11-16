@@ -1,8 +1,6 @@
 #import "VideoJSPlayerView.h"
 
-#import "VideoJSPlayerRegistry.h"
-
-#import <AVFoundation/AVFoundation.h>
+#import "VideoJSSwift.h"
 
 #import <react/renderer/components/VideoJSSpec/ComponentDescriptors.h>
 #import <react/renderer/components/VideoJSSpec/Props.h>

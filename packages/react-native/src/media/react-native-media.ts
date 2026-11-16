@@ -46,8 +46,7 @@ export function resolveNativeEvent(
         emit: previous.paused ? ['play', 'playing'] : ['playing'],
       };
 
-    case 'paused':
-      // Native says `paused`, the contract event is `pause`.
+    case 'pause':
       return { state: { ...previous, paused: true }, emit: ['pause'] };
 
     case 'ended':
