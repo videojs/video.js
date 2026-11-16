@@ -10,7 +10,7 @@ import { createSegmentLoaderActor, type SegmentLoaderActor } from '../../../acto
 import { createSourceBufferActor, type SourceBufferActor } from '../../../actors/dom/source-buffer';
 import { makeSourceBuffer } from '../../../actors/dom/tests/segment-loader-fixtures';
 import type { TextTrackSegmentLoaderActor } from '../../../actors/text-track-segment-loader';
-import { type CreateLoadStart, previousSegmentLoadStart } from '../../../primitives/load-start';
+import { type CreateLoadStart, coveringSegmentLoadStart } from '../../../primitives/load-start';
 import {
   loadAudioSegments,
   loadVideoSegments,
@@ -667,7 +667,7 @@ describe('loadVideoSegments', () => {
   });
 
   it.each([
-    { name: 'starts the load at the previous segment', createLoadStart: previousSegmentLoadStart, start: 0 },
+    { name: 'starts the load at the previous segment', createLoadStart: coveringSegmentLoadStart, start: 0 },
     { name: 'starts the load at the playhead without createLoadStart', createLoadStart: undefined, start: 10.01 },
   ])('$name when the segment at the playhead starts after it', async ({ createLoadStart, start }) => {
     const track = makeResolvedVideoTrack([makeSegment('s1', 0), makeSegment('s2', 10), makeSegment('s3', 20)]);

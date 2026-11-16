@@ -9,13 +9,13 @@ import type { Segment } from '../types';
 import type { TimeRange } from './forward-buffer';
 
 /**
- * Where a load should start when that's earlier than the playhead: the start of the segment whose tail covers
- * `currentTime`, once the segment the playlist places there turns out to start late. Reads the evidence straight from
- * what is buffered — a range that starts inside the playhead's segment, after the playhead, is that segment's media
- * starting late, and its predecessor holds the rest. `undefined` when the load should start at the playhead (it's
- * buffered, nothing near it is, or it's in the first segment, which has no predecessor).
+ * The start of the segment whose media covers `currentTime`, when that's not the segment the playlist places there: the
+ * playlist's segment turned out to start late, so its predecessor's end holds the media. Reads the evidence straight
+ * from what is buffered — a range that starts inside the playhead's segment, after the playhead, is that segment's
+ * media starting late. `undefined` when the playlist's segment is the right one to load from (the playhead is buffered,
+ * nothing near it is, or it's in the first segment, which has no predecessor).
  */
-export function previousSegmentStartIfMediaStartsLate(
+export function coveringSegmentStart(
   segments: readonly Segment[],
   bufferedRanges: readonly TimeRange[],
   currentTime: number

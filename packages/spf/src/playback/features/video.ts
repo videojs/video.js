@@ -12,7 +12,7 @@ import { loadVideoSegments } from '../behaviors/dom/load-segments';
 import { setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
 import { resolveVideoTrack } from '../behaviors/resolve-track';
 import { switchVideoTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
-import { previousSegmentLoadStart } from '../primitives/load-start';
+import { coveringSegmentLoadStart } from '../primitives/load-start';
 import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
 
 /** The behaviors the feature composes, in setup order. */
@@ -37,7 +37,7 @@ export const defaultConfig = {
   canPlayTrack,
   reportUnsupportedTrackConditions,
   // Load from the previous segment when the segment at the playhead begins after it; omit to load from the playhead.
-  createLoadStart: previousSegmentLoadStart,
+  createLoadStart: coveringSegmentLoadStart,
 } satisfies Partial<Config>;
 
 /** The state values the feature seeds. */
