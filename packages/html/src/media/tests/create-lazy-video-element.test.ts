@@ -189,4 +189,24 @@ describe('createLazyVideoElement', () => {
     element.preferPlayback = undefined;
     expect(element.hasAttribute('prefer-playback')).toBe(false);
   });
+
+  it('drops the structured source from the media when it goes back to src', async () => {
+    const tag = define([{ ...acmeVideo, tag: 'test-source-video' }]);
+    const element = create(tag, 'https://video.acme.com/b') as HTMLElement & { source: unknown };
+
+    element.source = { src: 'https://video.acme.com/a', drm: { widevine: 'https://license.example.com' } };
+    await flush();
+
+    const media = element.querySelector<SourceVideo>('test-source-video')!;
+
+    expect(media.source).toMatchObject({ drm: { widevine: 'https://license.example.com' } });
+
+    element.source = null;
+    await flush();
+
+    // The media keeps a source's options when only `src` changes, so the old ones mustn't reach the new URL.
+    expect(element.querySelector('test-source-video')).toBe(media);
+    expect(media.source).toBeNull();
+    expect(media.getAttribute('src')).toBe('https://video.acme.com/b');
+  });
 });

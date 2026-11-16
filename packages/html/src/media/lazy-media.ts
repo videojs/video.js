@@ -278,8 +278,12 @@ export class LazyMediaElement extends HTMLElementBase {
     const source = this.#source;
 
     if (!source) {
-      // The media still plays the structured source, whatever its `src` attribute says.
-      if (this.#mediaSource) media.removeAttribute('src');
+      // The media still plays the structured source, whatever its `src` attribute says, and a new `src` alone would
+      // keep that source's options, such as `drm` and `engine`. Clear it first, as React's prop sync does.
+      if (this.#mediaSource && 'source' in media) {
+        media.source = null;
+        media.removeAttribute('src');
+      }
 
       this.#mediaSource = null;
       this.#setSrc(media, this.getAttribute('src'));
