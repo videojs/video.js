@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 import { useOptionalContainer } from '../../player/context';
 import { useOptionalPopupGroup } from '../../player/popup-group-context';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { useSafeId } from '../../utils/use-safe-id';
 import { useOptionalControlsContext } from '../controls/context';
@@ -65,7 +65,7 @@ export function PopoverRoot({
 
   const popupGroupRef = useLatestRef(popupGroup);
 
-  const [popover] = useState(() => {
+  const popover = useInstance(() => {
     const instance = createPopover({
       transition: createTransition(),
       onOpenChange: (nextOpen: boolean, details: PopoverChangeDetails) => {
@@ -114,8 +114,6 @@ export function PopoverRoot({
 
     popover.close('imperative-action');
   }, [controls?.state.visible, popover]);
-
-  useDestroy(popover);
 
   const input = useSnapshot(popover.input);
 

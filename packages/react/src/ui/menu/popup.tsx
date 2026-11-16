@@ -6,7 +6,7 @@ import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import type { UIComponentProps } from '../../utils/types';
 import { useComposedRefs } from '../../utils/use-composed-refs';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { renderElement } from '../../utils/use-render';
 import { usePopupPosition } from '../popover/use-popup-position';
 import { MenuPopupContextProvider, useMenuContext } from './context';
@@ -25,7 +25,7 @@ export const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function Men
     useMenuContext();
   if (__DEV__ && parent) throw new Error('Menu.Popup must be a direct child of a root Menu.Root');
 
-  const [popup] = useState(createMenuPopup);
+  const popup = useInstance(createMenuPopup);
   const [popupElement, setPopupElement] = useState<HTMLElement | null>(null);
   const internalRef = useRef<HTMLDivElement>(null);
   const setInternalElement = useCallback(
@@ -53,8 +53,6 @@ export const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function Men
     trackResize: false,
     onSideChange: setPositionedSide,
   });
-
-  useDestroy(popup);
 
   const inactive = !state.open && state.status !== 'ending';
   if (inactive && !keepMounted) return null;
