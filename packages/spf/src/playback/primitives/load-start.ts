@@ -5,12 +5,20 @@
  */
 import { computed, type ReadonlySignal } from '../../core/signals/primitives';
 import { coveringSegmentStart } from '../../media/buffer/covering-segment-start';
+import type { TimeRange } from '../../media/buffer/forward-buffer';
 import type { MaybeResolvedPresentation, Segment } from '../../media/types';
-import type { SourceBufferActor } from '../actors/dom/source-buffer';
 
 type SelectedTrackKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedTextTrackId';
 
 type BufferActorKey = 'videoBufferActor' | 'audioBufferActor';
+
+/**
+ * The part of a SourceBuffer actor a load start reads — its buffered ranges — described structurally so this module
+ * stays DOM-free (the actor itself lives under `actors/dom`).
+ */
+interface BufferedRangesSource {
+  snapshot: ReadonlySignal<{ context: { bufferedRanges: readonly TimeRange[] } }>;
+}
 
 /**
  * A dispatcher's own setup arguments — the same `{ state, context, config }` a behavior's setup receives, passed
@@ -23,7 +31,7 @@ export interface LoadStartDeps {
     currentTime: ReadonlySignal<number | undefined>;
   } & Partial<Record<SelectedTrackKey, ReadonlySignal<string | undefined>>>;
   /** The SourceBuffer actors, absent for text or in a composition without them (the load then stays at the playhead). */
-  context: Partial<Record<BufferActorKey, ReadonlySignal<SourceBufferActor | undefined>>>;
+  context: Partial<Record<BufferActorKey, ReadonlySignal<BufferedRangesSource | undefined>>>;
   config: {
     selectedKey: SelectedTrackKey;
     /** The per-type `actorKey` the dispatcher's type config carries; text has none. */
