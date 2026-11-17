@@ -56,7 +56,7 @@ export class RemotePlayback extends EventTarget {
     const id = ++callbackIdCount;
 
     this.#callbacks.set(id, callback);
-    queueMicrotask(() => callback(this.#provider.hasDevicesAvailable()));
+    queueMicrotask(() => callback(this.#provider.isAvailable()));
     return id;
   }
 

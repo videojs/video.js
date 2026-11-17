@@ -13,7 +13,10 @@ export interface GoogleCastExtensionProps {
   contentType?: string | undefined;
   /** Stream type used on the Cast receiver. */
   streamType?: MediaStreamType | undefined;
-  /** Cast receiver application ID. Defaults to Google's default media receiver. */
+  /**
+   * Cast receiver application ID. Defaults to Google's default media receiver, which can't play Mux DRM sources, so the
+   * cast button stays disabled for those until this is set.
+   */
   receiver?: string | undefined;
   /** Custom data sent to the Cast receiver with the load request. */
   customData?: Record<string, unknown> | null | undefined;
@@ -60,14 +63,16 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     this.#media = target;
 
     if (requiresCastFramework() && !this.#provider) {
-      this.#provider = new GoogleCastProvider(this);
+      this.#provider = new GoogleCastProvider(this, () => this.#canCast());
       this.#provider.remote.addEventListener('connect', this.#onStateChange);
       this.#provider.remote.addEventListener('disconnect', this.#onStateChange);
       this.#override = this.#createRemoteOverride();
     }
 
     this.#bindProvider();
+    this.#provider?.updateAvailability();
     target.addEventListener('loadstart', this.#onLoadStart);
+    target.addEventListener('sourcechange', this.#onSourceChange);
 
     // A media swapped in mid-session may have started loading before the player attached it, so its `loadstart` has
     // already fired; follow its source now rather than waiting for one that may never come.
@@ -77,6 +82,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
   /** @internal Player lifecycle; the player calls it. */
   detach() {
     this.#media?.removeEventListener('loadstart', this.#onLoadStart);
+    this.#media?.removeEventListener('sourcechange', this.#onSourceChange);
     this.#media = null;
     this.#provider?.detach();
   }
@@ -111,6 +117,13 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
 
     provider.attach(element);
   }
+
+  /** Google's default receiver can't license Mux DRM, so a source with a Mux DRM token needs a custom `receiver`. */
+  #canCast() {
+    return !!this.#receiver || !hasMuxDrmToken(this.#media);
+  }
+
+  #onSourceChange = () => this.#provider?.updateAvailability();
 
   #onStateChange = () => {
     if (!this.#provider) return;
@@ -202,7 +215,10 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     this.#load();
   }
 
-  /** Cast receiver application ID. Read on session start; falls back to the layer's default. */
+  /**
+   * Cast receiver application ID. Read on session start; falls back to Google's default media receiver, which can't
+   * play Mux DRM sources, so the cast button stays disabled for those until this is set.
+   */
   get receiver() {
     return this.#receiver;
   }
@@ -211,6 +227,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     if (this.#receiver === value) return;
 
     this.#receiver = value;
+    this.#provider?.updateAvailability();
     this.#load();
   }
 
@@ -231,4 +248,10 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
       void this.#provider.load();
     }
   }
+}
+
+/** Whether `media` plays a Mux source signed for DRM. Only Mux sources carry a `drm.token`. */
+function hasMuxDrmToken(media: HTMLMediaTargetLike | null): boolean {
+  // SAFETY: optional chaining reads the Mux media's `source`; any other media gives `undefined`.
+  return Boolean((media as { source?: { drm?: { token?: string } } | null } | null)?.source?.drm?.token);
 }

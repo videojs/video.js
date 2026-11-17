@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { GoogleCastExtension, type GoogleCastExtensionProps } from '../index';
 import { GoogleCastProvider } from '../provider';
 import { ensureCastFramework } from '../registry';
-import { currentSession, getCastContext, getPlaylistSegmentFormat, isHls } from '../utils';
+import { currentSession, getCastContext, getPlaylistSegmentFormat, isHls, NotSupportedError } from '../utils';
 
 const mocks = vi.hoisted(() => ({
   // Set per test to a fake framework so the provider initializes as if the Cast SDK had loaded.
@@ -391,6 +391,28 @@ describe('GoogleCastProvider', () => {
     for (const [type, listener] of sdk.context.addEventListener.mock.calls) {
       expect(sdk.context.removeEventListener).toHaveBeenCalledWith(type, listener);
     }
+  });
+
+  describe('a source that cannot be cast', () => {
+    it('is not offered for casting', async () => {
+      await createCastingProvider({});
+
+      expect(new GoogleCastProvider({}).isAvailable()).toBe(true);
+      expect(new GoogleCastProvider({}, () => false).isAvailable()).toBe(false);
+    });
+
+    it('rejects a prompt without starting a session', async () => {
+      await createCastingProvider({});
+
+      const provider = new GoogleCastProvider({}, () => false);
+      const context = getCastContext()!;
+
+      vi.mocked(context.requestSession).mockClear();
+      provider.attach(createTarget().target);
+
+      await expect(provider.requestCastSession()).rejects.toThrow(NotSupportedError);
+      expect(context.requestSession).not.toHaveBeenCalled();
+    });
   });
 
   describe('load', () => {

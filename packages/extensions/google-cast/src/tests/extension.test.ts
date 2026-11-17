@@ -35,8 +35,12 @@ const mocks = vi.hoisted(() => {
       this.target = null;
     });
     destroy = vi.fn();
+    updateAvailability = vi.fn();
 
-    constructor(public config: unknown) {
+    constructor(
+      public config: unknown,
+      public canCast: () => boolean = () => true
+    ) {
       FakeProvider.instances.push(this);
     }
   }
@@ -277,6 +281,54 @@ describe('GoogleCastExtension', () => {
       googleCast.src = 'https://example.com/stream.m3u8';
 
       expect(provider.load).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Mux DRM sources', () => {
+    const DRM_SOURCE = { playbackId: 'abc', drm: { token: 'drm-token' } };
+
+    /** A Mux media component or adapter playing `source`, which it announces with `sourcechange`. */
+    function attachMux(googleCast: GoogleCastExtension, source: unknown) {
+      const media = Object.assign(createHost(document.createElement('video')), { source });
+
+      googleCast.attach({ media: media as unknown as Media, container: null });
+
+      return { media, provider: mocks.FakeProvider.instances.at(-1)! };
+    }
+
+    it('cannot cast a source signed for DRM to the default receiver', () => {
+      const { provider } = attachMux(new GoogleCastExtension(), DRM_SOURCE);
+
+      expect(provider.canCast()).toBe(false);
+    });
+
+    it('can cast it once a receiver is set, and reports the change', () => {
+      const googleCast = new GoogleCastExtension();
+      const { provider } = attachMux(googleCast, DRM_SOURCE);
+
+      provider.updateAvailability.mockClear();
+      googleCast.receiver = 'ABCD1234';
+
+      expect(provider.canCast()).toBe(true);
+      expect(provider.updateAvailability).toHaveBeenCalledTimes(1);
+    });
+
+    it('can cast Mux sources without a DRM token, and other media', () => {
+      const { provider } = attachMux(new GoogleCastExtension(), { playbackId: 'abc' });
+
+      expect(provider.canCast()).toBe(true);
+      expect(setup().provider.canCast()).toBe(true);
+    });
+
+    it('checks again when the source changes', () => {
+      const { media, provider } = attachMux(new GoogleCastExtension(), { playbackId: 'abc' });
+
+      provider.updateAvailability.mockClear();
+      media.source = DRM_SOURCE;
+      media.dispatchEvent(new Event('sourcechange'));
+
+      expect(provider.updateAvailability).toHaveBeenCalledTimes(1);
+      expect(provider.canCast()).toBe(false);
     });
   });
 

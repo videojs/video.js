@@ -37,7 +37,7 @@ Adds the <DocsLink slug="guides/architecture">Google Cast extension</DocsLink> t
 <FrameworkCase frameworks={["react"]}>
 | Prop | Type | Description |
 |---|---|---|
-| `receiver` | `string` | Cast receiver application ID. Defaults to Google's Default Media Receiver (`CC1AD845`) |
+| `receiver` | `string` | Cast receiver application ID. Defaults to Google's Default Media Receiver (`CC1AD845`), which can't play Mux DRM sources |
 | `src` | `string` | Source URL loaded on the receiver. Defaults to the source the browser is playing. Required for YouTube and Vimeo embeds |
 | `contentType` | `string` | MIME type of the Cast source. When unset, the receiver infers it from the URL |
 | `streamType` | `'on-demand' \| 'live'` | Stream type reported to the receiver. Falls back to the player's stream type |
@@ -47,7 +47,7 @@ Adds the <DocsLink slug="guides/architecture">Google Cast extension</DocsLink> t
 <FrameworkCase frameworks={["html"]}>
 | Attribute | Property | Description |
 |---|---|---|
-| `receiver` | `receiver` | Cast receiver application ID. Defaults to Google's Default Media Receiver (`CC1AD845`) |
+| `receiver` | `receiver` | Cast receiver application ID. Defaults to Google's Default Media Receiver (`CC1AD845`), which can't play Mux DRM sources |
 | `src` | `src` | Source URL loaded on the receiver. Defaults to the source the browser is playing. Required for YouTube and Vimeo embeds |
 | `content-type` | `contentType` | MIME type of the Cast source. When unset, the receiver infers it from the URL |
 | `stream-type` | `streamType` | Stream type reported to the receiver. Falls back to the player's stream type |
