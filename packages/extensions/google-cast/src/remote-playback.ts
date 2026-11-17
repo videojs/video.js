@@ -10,6 +10,12 @@ export type RemotePlaybackHooks = {
   setAvailable(available: boolean): void;
 };
 
+const STATE_EVENTS = {
+  connecting: 'connecting',
+  connected: 'connect',
+  disconnected: 'disconnect',
+} satisfies Record<RemotePlaybackState, string>;
+
 let callbackIdCount = 0;
 
 /**
@@ -82,10 +88,7 @@ export class RemotePlayback extends EventTarget {
     if (this.#state === next) return;
 
     this.#state = next;
-
-    if (next === 'connecting') this.dispatchEvent(new Event('connecting'));
-    else if (next === 'connected') this.dispatchEvent(new Event('connect'));
-    else this.dispatchEvent(new Event('disconnect'));
+    this.dispatchEvent(new Event(STATE_EVENTS[next]));
   }
 
   #setAvailable(available: boolean) {
