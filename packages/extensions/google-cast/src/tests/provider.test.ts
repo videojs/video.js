@@ -81,17 +81,24 @@ function createCastSdk() {
     addUpdateListener: vi.fn(),
     removeUpdateListener: vi.fn(),
     getStatus: vi.fn((_request: chrome.cast.media.GetStatusRequest, resolve: () => void) => resolve()),
-    editTracksInfo: vi.fn((request: { activeTrackIds: number[] }, resolve: () => void) => {
-      media.activeTrackIds = request.activeTrackIds;
-      resolve();
-    }),
+    editTracksInfo: vi.fn(
+      (request: { activeTrackIds: number[] }, resolve: () => void, _reject: (error: Error) => void) => {
+        media.activeTrackIds = request.activeTrackIds;
+        resolve();
+      }
+    ),
   };
+
+  type FakeMedia = Omit<typeof media, 'idleReason'> & { idleReason: string | null };
+  // A session lists every media it had, idle ones included, in the order they loaded.
+  const mediaList: FakeMedia[] = [media];
   const session = {
     loadMedia: vi.fn(async (request: FakeLoadRequest) => {
       media.media = { contentId: request.media.contentId, tracks: request.media.tracks ?? [] };
       media.activeTrackIds = request.activeTrackIds;
     }),
-    getSessionObj: () => ({ media: [media] }),
+    getSessionObj: () => ({ media: mediaList }),
+    getMediaSession: () => mediaList.find((entry) => !entry.idleReason) ?? null,
   };
   const context = {
     sessionState: 'SESSION_STARTED',
@@ -191,6 +198,7 @@ function createCastSdk() {
     context,
     session,
     media,
+    mediaList,
     get player() {
       return player!;
     },
@@ -595,6 +603,65 @@ describe('GoogleCastProvider', () => {
       await createResumedProvider(target, { tracks: receiverTracks, activeTrackIds: [] });
 
       expect(en.mode).toBe('disabled');
+    });
+
+    it('reads the active media when the session lists an idle one first', async () => {
+      const { target, addTrack } = createTrackTarget();
+      const en = addTrack({ src: EN, label: 'English', language: 'en', mode: 'showing' });
+      const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
+      const sdk = installCastSdk();
+      const stale = { ...sdk.media, idleReason: 'INTERRUPTED', activeTrackIds: [1] };
+
+      sdk.mediaList.unshift(stale);
+      sdk.context.sessionState = 'SESSION_RESUMED';
+      sdk.media.media = { contentId: SRC, tracks: receiverTracks };
+      sdk.media.activeTrackIds = [2];
+
+      const provider = new GoogleCastProvider({ src: SRC });
+
+      provider.attach(target);
+      await provider.onSessionStateChanged();
+
+      expect(fr.mode).toBe('showing');
+      expect(en.mode).toBe('disabled');
+    });
+
+    /** Casting a stream whose captions come from its manifest: no sidecars, so the receiver lists the tracks itself. */
+    async function castManifestCaptions(receiver: FakeCastTrack[]) {
+      const { target, addTrack } = createTrackTarget();
+      const en = addTrack({ label: 'English', language: 'en', mode: 'showing' });
+      const { sdk } = await createCastingProvider({ src: SRC }, target);
+
+      sdk.media.media.tracks = receiver;
+      sdk.player.isMediaLoaded = true;
+      sdk.player.controller!.listeners.get('isMediaLoadedChanged')!();
+      await vi.waitFor(() => expect(sdk.media.addUpdateListener).toHaveBeenCalled());
+
+      return { en, sdk };
+    }
+
+    const manifestTracks: FakeCastTrack[] = [{ trackId: 1, type: 'TEXT', language: 'en', name: 'English' }];
+
+    it('shows the local caption track on the receiver once the receiver lists it', async () => {
+      const { sdk } = await castManifestCaptions([]);
+
+      expect(sdk.media.editTracksInfo).not.toHaveBeenCalled();
+
+      sdk.media.media.tracks = manifestTracks;
+      sdk.media.addUpdateListener.mock.calls[0]![0]();
+
+      await vi.waitFor(() => expect(sdk.media.activeTrackIds).toEqual([1]));
+    });
+
+    it('turns local captions off when the receiver rejects showing them', async () => {
+      const { en, sdk } = await castManifestCaptions([]);
+
+      sdk.media.editTracksInfo.mockImplementationOnce((_request, _resolve, reject) => reject(new Error('INVALID')));
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      sdk.media.media.tracks = manifestTracks;
+      sdk.media.addUpdateListener.mock.calls[0]![0]();
+
+      await vi.waitFor(() => expect(en.mode).toBe('disabled'));
     });
 
     it("shows the receiver's track once it is added after a resumed session, without loading again", async () => {

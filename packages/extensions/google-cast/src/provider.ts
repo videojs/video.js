@@ -48,9 +48,16 @@ export class GoogleCastProvider {
   /** The receiver's active track ids after a resumed session, until a local track takes them on. */
   #resumedTrackIds: number[] | null = null;
   #trackListTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The remote media whose updates this listens to. */
+  #media: chrome.cast.media.Media | null = null;
+  /** The receiver's text track ids as last seen, so tracks it lists after loading get paired too. */
+  #remoteTextTrackKey = '';
   #onTextTrackChange = () => this.#updateRemoteTextTrack();
   #onTextTrackListChange = () => this.#queueTextTrackListSync();
-  #onMediaUpdate = () => this.#checkPlaybackRate();
+  #onMediaUpdate = () => {
+    this.#checkPlaybackRate();
+    this.#checkRemoteTextTracks();
+  };
 
   constructor(googleCast: GoogleCastConfig) {
     this.#googleCast = googleCast;
@@ -95,7 +102,7 @@ export class GoogleCastProvider {
   destroy() {
     this.detach();
     googleCastInstances.delete(this);
-    currentMedia()?.removeUpdateListener(this.#onMediaUpdate);
+    this.#watchMedia(null);
     this.#detachRemoteListeners();
     this.#isCasting = false;
     this.#isInit = false;
@@ -185,6 +192,7 @@ export class GoogleCastProvider {
       request.autoplay = autoplay;
 
       await currentSession()?.loadMedia(request);
+      this.#watchMedia();
     } catch (error) {
       // Free the source for a retry, unless a newer load has claimed another one since.
       if (this.#loadedSrc === src) this.#loadedSrc = null;
@@ -519,7 +527,7 @@ export class GoogleCastProvider {
   #disconnect() {
     if (!this.#isCasting) return;
 
-    currentMedia()?.removeUpdateListener(this.#onMediaUpdate);
+    this.#watchMedia(null);
     this.#detachRemoteListeners();
     this.#seeking = false;
     this.#playbackRate = 1;
@@ -527,6 +535,7 @@ export class GoogleCastProvider {
     this.#loadedSrc = null;
     this.#castTrackSrcs.clear();
     this.#resumedTrackIds = null;
+    this.#remoteTextTrackKey = '';
     clearTimeout(this.#trackListTimer);
 
     if (this.target) {
@@ -560,8 +569,32 @@ export class GoogleCastProvider {
 
   #onRemoteMediaLoaded() {
     this.#playbackRate = currentMedia()?.playbackRate ?? 1;
-    currentMedia()?.addUpdateListener(this.#onMediaUpdate);
+    this.#watchMedia();
+    this.#remoteTextTrackKey = getRemoteTextTrackKey();
+    this.#syncTextTracks();
+  }
 
+  /** Listen to updates from the session's current media, which changes with every load. */
+  #watchMedia(media = currentMedia() ?? null) {
+    if (this.#media === media) return;
+
+    this.#media?.removeUpdateListener(this.#onMediaUpdate);
+    this.#media = media;
+    media?.addUpdateListener(this.#onMediaUpdate);
+  }
+
+  /** The receiver can list the tracks it finds in a manifest after the media loaded; pair those once they show up. */
+  #checkRemoteTextTracks() {
+    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return;
+
+    const key = getRemoteTextTrackKey();
+    if (key === this.#remoteTextTrackKey) return;
+
+    this.#remoteTextTrackKey = key;
+    this.#syncTextTracks();
+  }
+
+  #syncTextTracks() {
     if (this.#syncTextTrackList()) return;
 
     this.#applyResumedTextTracks();
@@ -609,19 +642,30 @@ export class GoogleCastProvider {
    */
   #applyResumedTextTracks() {
     const ids = this.#resumedTrackIds;
-    if (!ids || !this.target) return;
+
+    if (ids && this.#applyRemoteTextTracks(ids, { waitForTrack: true })) this.#resumedTrackIds = null;
+  }
+
+  /**
+   * Show the local track paired with the receiver's active text track, and turn the other captions off.
+   *
+   * @param waitForTrack - Change nothing while the receiver's active track has no local pair yet.
+   * @returns Whether the local tracks were changed.
+   */
+  #applyRemoteTextTracks(ids: readonly number[], { waitForTrack = false } = {}) {
+    if (!this.target) return false;
 
     const remoteIds = new Set(getRemoteTextTracks().map(({ trackId }) => trackId));
     const activeIds = ids.filter((id) => remoteIds.has(id));
     const active = this.#pairTextTracks().find(({ trackId }) => activeIds.includes(trackId))?.local;
-    if (activeIds.length && !active) return;
-
-    this.#resumedTrackIds = null;
+    if (waitForTrack && activeIds.length && !active) return false;
 
     for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
       if (track === active) track.mode = 'showing';
       else if (track.mode === 'showing') track.mode = 'disabled';
     }
+
+    return true;
   }
 
   /** Coalesce the `addtrack` and `removetrack` events one change to the media's `<track>` children can fire. */
@@ -682,10 +726,18 @@ export class GoogleCastProvider {
       await editTracksInfo(new chrome.cast.media.EditTracksInfoRequest([...next]));
     } catch (error) {
       console.error(error);
+      // Keep the captions menu from claiming captions the receiver isn't showing.
+      this.#applyRemoteTextTracks(currentMedia()?.activeTrackIds ?? []);
     }
   }
 }
 
 function getRemoteTextTracks() {
   return (currentMedia()?.media?.tracks ?? []).filter(({ type }) => type === chrome.cast.media.TrackType.TEXT);
+}
+
+function getRemoteTextTrackKey() {
+  return getRemoteTextTracks()
+    .map(({ trackId }) => trackId)
+    .join();
 }

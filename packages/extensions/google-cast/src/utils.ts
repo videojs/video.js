@@ -73,8 +73,15 @@ export function currentSession() {
   return getCastContext()?.getCurrentSession();
 }
 
+/**
+ * The session's current media. A session can list several, idle ones included, so this is the first one still active,
+ * as the SDK picks it. Once all are idle, such as after the media ended, the latest stands in so its idle reason can
+ * still be read.
+ */
 export function currentMedia() {
-  return currentSession()?.getSessionObj().media[0] ?? undefined;
+  const session = currentSession();
+
+  return session?.getMediaSession() ?? session?.getSessionObj().media.at(-1) ?? undefined;
 }
 
 export function editTracksInfo(request: chrome.cast.media.EditTracksInfoRequest) {
