@@ -690,11 +690,7 @@ Store actions throw until the media attaches. Call fullscreen actions from a use
 
 ## Which Mux media should you use?
 
-The Mux video and Mux audio components can play through hls.js or through SPF, a smaller engine that's still under development, and you choose by import path. The default import uses hls.js today, and SPF will become the default in an upcoming release.
-
-SPF doesn't yet support everything Mux Player does: low-latency live streams play with a longer delay, Mux Data collects less detail, and live streams with gaps may not play smoothly. Read <DocsLink slug="reference/components/mux-video" anchor="choose-a-playback-engine">Choose a playback engine</DocsLink> before you pick one, and test it with your own assets, especially if your catalog uses DRM.
-
-Use the Mux audio component with the audio player and audio skins. It has the same engine choices.
+The Mux video and Mux audio components can play through hls.js or through SPF, and you choose by import path. Read <DocsLink slug="reference/components/mux-video" anchor="choose-a-playback-engine">Choose a playback engine</DocsLink> before you pick one, and test it with your own assets.
 
 ## Live streams
 
