@@ -132,6 +132,19 @@ function getFormat(segment: string | undefined) {
   return match ? match[1] : null;
 }
 
+function parseAudioRenditionUrl(playlistContent: string) {
+  for (const line of playlistContent.split('\n')) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('#EXT-X-MEDIA') && /TYPE=AUDIO/i.test(trimmed)) {
+      const match = trimmed.match(/URI="([^"]+)"/i);
+      if (match) return match[1];
+    }
+  }
+
+  return undefined;
+}
+
 function parsePlaylistUrls(playlistContent: string) {
   const lines = playlistContent.split('\n');
   const urls: string[] = [];
@@ -154,7 +167,7 @@ function parsePlaylistUrls(playlistContent: string) {
 function parseSegment(playlistContent: string) {
   const lines = playlistContent.split('\n');
 
-  return lines.find((line) => !line.trim().startsWith('#') && line.trim() !== '');
+  return lines.find((line) => !line.trim().startsWith('#') && line.trim() !== '')?.trim();
 }
 
 export async function isHls(url: string) {
@@ -178,25 +191,48 @@ export async function isHls(url: string) {
   }
 }
 
-export async function getPlaylistSegmentFormat(url: string) {
+interface PlaylistSegmentFormat {
+  videoFormat: string | null | undefined;
+  audioFormat: string | null | undefined;
+}
+
+/**
+ * Reads the segment file extensions of the first video variant and, when the multivariant playlist declares one, the
+ * first audio rendition. Audio falls back to the video format when it is muxed or its playlist can't be read.
+ */
+export async function getPlaylistSegmentFormat(url: string): Promise<PlaylistSegmentFormat> {
+  if (!url || url.startsWith('blob:')) return { videoFormat: undefined, audioFormat: undefined };
+
   try {
     const mainManifestContent = await (await fetch(url)).text();
-    let availableChunksContent = mainManifestContent;
+    let videoChunksContent = mainManifestContent;
 
     const playlists = parsePlaylistUrls(mainManifestContent);
 
     if (playlists.length > 0) {
       const chosenPlaylistUrl = new URL(playlists[0]!, url).toString();
 
-      availableChunksContent = await (await fetch(chosenPlaylistUrl)).text();
+      videoChunksContent = await (await fetch(chosenPlaylistUrl)).text();
     }
 
-    const segment = parseSegment(availableChunksContent);
-    const format = getFormat(segment);
+    const videoFormat = getFormat(parseSegment(videoChunksContent));
+    const audioRenditionPath = parseAudioRenditionUrl(mainManifestContent);
+    let audioFormat = videoFormat;
 
-    return format;
+    if (audioRenditionPath) {
+      try {
+        const audioPlaylistUrl = new URL(audioRenditionPath, url).toString();
+        const audioChunksContent = await (await fetch(audioPlaylistUrl)).text();
+
+        audioFormat = getFormat(parseSegment(audioChunksContent)) ?? videoFormat;
+      } catch (err) {
+        console.error('Error while trying to parse the audio rendition playlist', err);
+      }
+    }
+
+    return { videoFormat, audioFormat };
   } catch (err) {
     console.error('Error while trying to parse the manifest playlist', err);
-    return undefined;
+    return { videoFormat: undefined, audioFormat: undefined };
   }
 }

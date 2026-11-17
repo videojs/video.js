@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { GoogleCastExtension, type GoogleCastExtensionProps } from '../index';
 import { GoogleCastProvider } from '../provider';
 import { ensureCastFramework } from '../registry';
-import { currentSession, getCastContext, isHls } from '../utils';
+import { currentSession, getCastContext, getPlaylistSegmentFormat, isHls } from '../utils';
 
 const mocks = vi.hoisted(() => ({
   // Set per test to a fake framework so the provider initializes as if the Cast SDK had loaded.
@@ -33,7 +33,7 @@ vi.mock('../utils', async (importOriginal) => {
     currentSession: vi.fn(),
     setCastOptions: vi.fn(),
     isHls: vi.fn(async () => false),
-    getPlaylistSegmentFormat: vi.fn(async () => undefined),
+    getPlaylistSegmentFormat: vi.fn(async () => ({ videoFormat: undefined, audioFormat: undefined })),
   };
 });
 
@@ -117,8 +117,8 @@ function createCastSdk() {
         constructor(public media: MediaInfo) {}
       },
       StreamType: { LIVE: 'LIVE', BUFFERED: 'BUFFERED' },
-      HlsSegmentFormat: { FMP4: 'fmp4', TS: 'ts' },
-      HlsVideoSegmentFormat: { FMP4: 'fmp4', TS: 'ts' },
+      HlsSegmentFormat: { AAC: 'aac', FMP4: 'fmp4', TS: 'ts' },
+      HlsVideoSegmentFormat: { FMP4: 'fmp4', MPEG2_TS: 'mpeg2_ts' },
     },
   };
 
@@ -304,6 +304,25 @@ describe('GoogleCastProvider', () => {
       await expect(loadingFirst).rejects.toThrow('LOAD_FAILED');
 
       expect(provider.loadedSrc).toBe('https://example.com/second.mp4');
+    });
+
+    it.each([
+      ['fMP4', { videoFormat: 'm4s', audioFormat: 'm4s' }, 'fmp4', 'fmp4'],
+      ['TS', { videoFormat: 'ts', audioFormat: 'ts' }, 'ts', 'mpeg2_ts'],
+      ['TS with separate AAC audio', { videoFormat: 'ts', audioFormat: 'aac' }, 'aac', 'mpeg2_ts'],
+    ])('describes %s HLS segments to the receiver', async (_, formats, segmentFormat, videoSegmentFormat) => {
+      const config: GoogleCastExtensionProps = {};
+      const { provider, session } = await createCastingProvider(config);
+
+      vi.mocked(isHls).mockResolvedValueOnce(true);
+      vi.mocked(getPlaylistSegmentFormat).mockResolvedValueOnce(formats);
+      config.src = 'https://example.com/stream.m3u8';
+      await provider.load();
+
+      const [request] = session.loadMedia.mock.calls.at(-1) as unknown as [chrome.cast.media.LoadRequest];
+
+      expect(request.media.hlsSegmentFormat).toBe(segmentFormat);
+      expect(request.media.hlsVideoSegmentFormat).toBe(videoSegmentFormat);
     });
   });
 });
