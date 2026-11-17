@@ -21,9 +21,10 @@
  * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
  *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
  *   Auto-resumes into the derived state when the policy lifts.
- * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
- *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
- *   text's actor no-ops (no init concept).
+ * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires one `load` message **once on
+ *   entry**, for what surfaces metadata: the init segment alone, or, for a track that carries its init in its media
+ *   segments (`carriesInitInSegments`), the one segment at `currentTime`. Text's actor no-ops on the rangeless
+ *   message.
  * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
  *   segment-boundary crossing.
  */
@@ -37,8 +38,13 @@ import {
   type ForwardBufferConfig,
   segmentStartForTime,
 } from '../../../media/buffer/forward-buffer';
-import type { MaybeResolvedPresentation, Segment } from '../../../media/types';
-import { findResolvedAudioTrack, findResolvedTextTrack, findResolvedVideoTrack } from '../../../media/utils/tracks';
+import type { MaybeResolvedPresentation, ResolvedTrack, Segment } from '../../../media/types';
+import {
+  carriesInitInSegments,
+  findResolvedAudioTrack,
+  findResolvedTextTrack,
+  findResolvedVideoTrack,
+} from '../../../media/utils/tracks';
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
@@ -135,7 +141,7 @@ interface SegmentLoaderLike<Track> {
 function setupSegmentLoading<
   K extends SelectedTrackKey,
   L extends SegmentLoaderActorKey,
-  Track extends { segments: readonly Segment[] },
+  Track extends { segments: readonly Segment[] } & Pick<ResolvedTrack, 'type' | 'initialization'>,
 >({
   state,
   context,
@@ -207,8 +213,8 @@ function setupSegmentLoading<
       'metadata-only': {
         // Fires once on entry. Matches HTMLMediaElement's preload='metadata'
         // semantics — load enough to surface metadata for the entry-time
-        // selection. Each variant's loader decides what to do: v/a's actor
-        // fetches the init segment; text's actor treats no-range as a
+        // selection: the init segment, or one media segment for a track whose
+        // init travels in its segments. Text's actor treats no-range as a
         // no-op. Selection changes while still in `'metadata-only'` are
         // intentionally not followed.
         entry: () => {
@@ -232,7 +238,20 @@ function setupSegmentLoading<
           // write lands before or after this body runs.
           if (isLoadingDormant()) return;
 
-          loader.send({ type: 'load', track });
+          if (!carriesInitInSegments(track)) {
+            loader.send({ type: 'load', track });
+            return;
+          }
+
+          const start = segmentStartForTime(peek(state.currentTime) ?? 0, track.segments);
+          const segment = track.segments.find((s) => s.startTime === start) ?? track.segments[0];
+          const segmentStart = segment?.startTime ?? 0;
+
+          loader.send({
+            type: 'load',
+            track,
+            range: { start: segmentStart, end: segmentStart + (segment?.duration ?? 0) },
+          });
         },
       },
       'full-range': {
