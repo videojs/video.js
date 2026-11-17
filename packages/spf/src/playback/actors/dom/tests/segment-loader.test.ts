@@ -387,6 +387,19 @@ describe('createSegmentLoaderActor', () => {
     ]);
   });
 
+  it('stops at the end of the requested range', async () => {
+    const track = makeVideoTrack('track-1', [segment('s1', 0), segment('s2', 10), segment('s3', 20)]);
+    const fixture = makeLoaderFixture();
+
+    fixture.loader.send({ type: 'load', track, range: { start: 0, end: 10 } });
+
+    await committed(fixture, 'track-1', ['s1']);
+    expect(fetchedRequests().map((request) => request.url)).toEqual([
+      'http://example.com/track-1-init.mp4',
+      'http://example.com/s1.m4s',
+    ]);
+  });
+
   it('skips init segment when already loaded for the track', async () => {
     const fixture = makeLoaderFixture({ initTrackId: 'track-1' });
 
