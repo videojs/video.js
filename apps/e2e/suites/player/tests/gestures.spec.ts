@@ -187,6 +187,15 @@ test.describe('Touch controls without a skin', () => {
     await player.waitForPlayback(afterTap + 0.25);
     await page.touchscreen.tap(x, y);
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+
+    // A touch gesture must not suppress later mouse clicks or keyboard activation on the same control.
+    await page.mouse.click(x, y);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
+    await player.playButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+    await page.keyboard.press('Space');
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
   });
 });
 
