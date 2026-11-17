@@ -43,7 +43,7 @@ export class GoogleCastProvider {
   #listenersAttached = false;
   #playbackRate = 1;
   #localPaused = false;
-  /** The sidecar tracks sent to the receiver; `null` after a resumed session until the page's are taken as them. */
+  /** The sidecar tracks sent to the receiver, or `null` when they came from an earlier page that resumed the session. */
   #castTrackKey: string | null = null;
   /** The receiver's active track ids after a resumed session, until a local track takes them on. */
   #resumedTrackIds: number[] | null = null;
@@ -602,11 +602,15 @@ export class GoogleCastProvider {
     // A source change sends its own tracks.
     if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !src || this.#loadedSrc !== src) return false;
 
-    const key = getTrackKey(this.#getSidecarTracks());
+    const sidecars = this.#getSidecarTracks();
 
-    this.#castTrackKey ??= key;
-
-    if (key === this.#castTrackKey) return false;
+    if (this.#castTrackKey === null) {
+      // Only side-loaded tracks have a content id on the receiver; send the page's ones it's missing.
+      const remote = new Set(getRemoteTextTracks().map(({ trackContentId }) => trackContentId));
+      if (sidecars.every((el) => remote.has(el.src))) return false;
+    } else if (getTrackKey(sidecars) === this.#castTrackKey) {
+      return false;
+    }
 
     this.#loadRemote(this.currentTime, !this.paused).catch((error) => console.error(error));
 
@@ -650,7 +654,8 @@ export class GoogleCastProvider {
   }
 
   async #updateRemoteTextTrack() {
-    if (!this.#isCasting || !this.target) return;
+    // Media that isn't loaded can't change tracks; loading it syncs them.
+    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !this.target) return;
 
     const matched = this.#pairTextTracks().map(({ trackId, local }) => ({ trackId, mode: local.mode }));
 

@@ -597,7 +597,7 @@ describe('GoogleCastProvider', () => {
       sdk.player.controller!.listeners.get('isMediaLoadedChanged')!();
       await vi.waitFor(() => expect(sdk.media.addUpdateListener).toHaveBeenCalled());
 
-      return { en, sdk };
+      return { en, sdk, target };
     }
 
     const manifestTracks: FakeCastTrack[] = [{ trackId: 1, type: 'TEXT', language: 'en', name: 'English' }];
@@ -622,6 +622,30 @@ describe('GoogleCastProvider', () => {
       sdk.media.addUpdateListener.mock.calls[0]![0]();
 
       await vi.waitFor(() => expect(en.mode).toBe('disabled'));
+    });
+
+    it('sends a sidecar track the receiver is missing after a resumed session', async () => {
+      const { target, addTrack } = createTrackTarget();
+      const { sdk } = await createResumedProvider(target, { tracks: receiverTracks.slice(0, 1), activeTrackIds: [] });
+
+      sdk.player.isMediaLoaded = true;
+      addTrack({ src: FR, label: 'Français', language: 'fr' });
+
+      await vi.waitFor(() => expect(sdk.session.loadMedia).toHaveBeenCalledTimes(1));
+      expect(sdk.session.loadMedia.mock.calls[0]![0].media.tracks?.map((track) => track.trackContentId)).toEqual([FR]);
+    });
+
+    it('keeps local captions on when they change while the receiver has no media loaded', async () => {
+      const { en, sdk, target } = await castManifestCaptions(manifestTracks);
+
+      sdk.media.editTracksInfo.mockClear();
+      sdk.media.activeTrackIds = [];
+      sdk.player.isMediaLoaded = false;
+      target.textTracks.dispatchEvent(new Event('change'));
+      await Promise.resolve();
+
+      expect(sdk.media.editTracksInfo).not.toHaveBeenCalled();
+      expect(en.mode).toBe('showing');
     });
 
     it("shows the receiver's track once it is added after a resumed session, without loading again", async () => {
