@@ -245,6 +245,9 @@ function setupSegmentLoading<
 
           const start = segmentStartForTime(peek(state.currentTime) ?? 0, track.segments);
           const segment = track.segments.find((s) => s.startTime === start) ?? track.segments[0];
+          // No segment means an empty playlist — valid HLS (e.g. an EVENT playlist published before its first segment).
+          // Deliberately unhandled: this entry doesn't re-run when a reload adds one, so metadata waits for play, and
+          // playback itself is unaffected.
           if (!segment) return;
 
           loader.send({
