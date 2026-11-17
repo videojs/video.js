@@ -29,7 +29,7 @@ Make a migration checklist before changing your embed:
 - **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media component; the rest is mapped under [Drive playback](#drive-playback).
 - **Note your theme and CSS variables.** Compare your Mux Player theme with the two Video.js skins, and map its CSS variables.
 - **Check [Known gaps](#known-gaps)** for features your app needs.
-- **Check your catalog for raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
+- **Choose a playback engine.** See [Which Mux media should you use?](#which-mux-media-should-you-use). If you use DRM, verify playback with whichever engine you choose.
 
 <FrameworkCase frameworks={["html"]}>
 Before loading Video.js, remove Mux Player imports and CDN scripts, plus any other imports that register legacy Mux Video or Media Chrome elements. Then reload the page. These libraries share custom-element names such as `mux-video` and `media-play-button`. A name can only have one definition per document, and Video.js keeps an existing definition. If both players must remain during migration, use separate documents, such as an iframe.
