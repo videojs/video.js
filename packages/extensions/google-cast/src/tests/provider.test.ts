@@ -53,30 +53,77 @@ function createTarget(disableRemotePlayback = false) {
   return { target, textTracks };
 }
 
-/** Just enough of the Cast SDK for the provider to initialize, start a session, and send a load request. */
+interface FakeCastTrack {
+  trackId: number;
+  type: string;
+  trackContentId?: string;
+  language?: string;
+  name?: string;
+}
+
+interface FakeLoadRequest {
+  media: { contentId: string; tracks?: FakeCastTrack[] };
+  activeTrackIds: number[];
+  currentTime: number;
+  autoplay: boolean;
+}
+
+/**
+ * Just enough of the Cast SDK for the provider to initialize, start or resume a session, and send load requests. The
+ * receiver's media takes on what each load request sends, as a real receiver reports it back.
+ */
 function createCastSdk() {
-  const session = { loadMedia: vi.fn(async () => {}) };
+  const media = {
+    media: { contentId: '', tracks: [] as FakeCastTrack[] },
+    activeTrackIds: [] as number[],
+    playbackRate: 1,
+    idleReason: null,
+    addUpdateListener: vi.fn(),
+    removeUpdateListener: vi.fn(),
+    getStatus: vi.fn((_request: chrome.cast.media.GetStatusRequest, resolve: () => void) => resolve()),
+    editTracksInfo: vi.fn((request: { activeTrackIds: number[] }, resolve: () => void) => {
+      media.activeTrackIds = request.activeTrackIds;
+      resolve();
+    }),
+  };
+  const session = {
+    loadMedia: vi.fn(async (request: FakeLoadRequest) => {
+      media.media = { contentId: request.media.contentId, tracks: request.media.tracks ?? [] };
+      media.activeTrackIds = request.activeTrackIds;
+    }),
+    getSessionObj: () => ({ media: [media] }),
+  };
   const context = {
+    sessionState: 'SESSION_STARTED',
     setOptions: vi.fn(),
     requestSession: vi.fn(async () => {}),
     getCurrentSession: () => session,
     getCastState: () => 'CONNECTED',
-    getSessionState: () => 'SESSION_STARTED',
+    getSessionState: () => context.sessionState,
   };
+  let player: RemotePlayer | null = null;
 
   class RemotePlayer {
     controller: RemotePlayerController | null = null;
     isMuted = false;
     isMediaLoaded = false;
     isPaused = true;
+    currentTime = 0;
   }
 
   class RemotePlayerController {
-    constructor(player: RemotePlayer) {
-      player.controller = this;
+    readonly listeners = new Map<string, () => void>();
+
+    constructor(remotePlayer: RemotePlayer) {
+      remotePlayer.controller = this;
+      player = remotePlayer;
     }
-    addEventListener() {}
-    removeEventListener() {}
+    addEventListener(type: string, listener: () => void) {
+      this.listeners.set(type, listener);
+    }
+    removeEventListener(type: string) {
+      this.listeners.delete(type);
+    }
   }
 
   class MediaInfo {
@@ -88,6 +135,8 @@ function createCastSdk() {
 
   // SAFETY: covers every framework member `onCastFrameworkAvailable`, `requestCastSession`, and `load` touch.
   const framework = {
+    // `currentMedia()` reaches the context through `utils`' own `currentSession()`, which the module mock can't replace.
+    CastContext: { getInstance: () => context },
     RemotePlayer,
     RemotePlayerController,
     RemotePlayerEventType: {
@@ -119,29 +168,121 @@ function createCastSdk() {
       StreamType: { LIVE: 'LIVE', BUFFERED: 'BUFFERED' },
       HlsSegmentFormat: { AAC: 'aac', FMP4: 'fmp4', TS: 'ts' },
       HlsVideoSegmentFormat: { FMP4: 'fmp4', MPEG2_TS: 'mpeg2_ts' },
+      Track: class {
+        constructor(
+          public trackId: number,
+          public type: string
+        ) {}
+      },
+      TrackType: { TEXT: 'TEXT', AUDIO: 'AUDIO' },
+      TextTrackType: { CAPTIONS: 'CAPTIONS', SUBTITLES: 'SUBTITLES' },
+      EditTracksInfoRequest: class {
+        constructor(public activeTrackIds: number[]) {}
+      },
+      GetStatusRequest: class {},
+      PlayerState: { IDLE: 'IDLE', PLAYING: 'PLAYING', PAUSED: 'PAUSED', BUFFERING: 'BUFFERING' },
+      IdleReason: { FINISHED: 'FINISHED' },
     },
   };
 
-  return { framework, chromeCast, context, session };
+  return {
+    framework,
+    chromeCast,
+    context,
+    session,
+    media,
+    get player() {
+      return player!;
+    },
+  };
 }
 
-/** A provider with a connected session. `config` is read live, so tests set `src` after the session starts. */
-async function createCastingProvider(config: GoogleCastExtensionProps, target = createTarget().target) {
+function installCastSdk() {
   const sdk = createCastSdk();
 
   mocks.castFramework = sdk.framework;
   vi.stubGlobal('cast', { framework: sdk.framework });
   vi.stubGlobal('chrome', { cast: sdk.chromeCast });
-  // SAFETY: the fakes implement every context and session member the provider reaches on this path.
+  // SAFETY: the fake context implements every member the provider reaches on these paths.
   vi.mocked(getCastContext).mockReturnValue(sdk.context as unknown as cast.framework.CastContext);
+  // SAFETY: the fake session implements every member the provider reaches on these paths.
   vi.mocked(currentSession).mockReturnValue(sdk.session as unknown as cast.framework.CastSession);
 
+  return sdk;
+}
+
+/** A provider with a connected session. `config` is read live, so tests set `src` after the session starts. */
+async function createCastingProvider(config: GoogleCastExtensionProps, target = createTarget().target) {
+  const sdk = installCastSdk();
   const provider = new GoogleCastProvider(config);
 
   provider.attach(target);
   await provider.requestCastSession();
 
-  return { provider, target, session: sdk.session };
+  return { provider, target, session: sdk.session, sdk };
+}
+
+interface FakeTextTrack {
+  kind: string;
+  label: string;
+  language: string;
+  mode: TextTrackMode;
+}
+
+interface TrackInit {
+  src?: string;
+  kind?: string;
+  label?: string;
+  language?: string;
+  mode?: TextTrackMode;
+}
+
+/** A target whose text tracks can be added and removed, each backed by a `<track>` child when it has a `src`. */
+function createTrackTarget() {
+  const tracks: FakeTextTrack[] = [];
+  const elements: { src: string; kind: string; label: string; srclang: string; track: FakeTextTrack }[] = [];
+  const textTracks = Object.assign(new EventTarget(), {
+    [Symbol.iterator]: () => tracks[Symbol.iterator](),
+  });
+  // SAFETY: covers every target member the provider reads while loading, casting, and syncing text tracks.
+  const target = Object.assign(new EventTarget(), {
+    textTracks,
+    disableRemotePlayback: false,
+    paused: true,
+    muted: false,
+    currentTime: 0,
+    pause: vi.fn(),
+    querySelectorAll: () => [...elements],
+  }) as unknown as HTMLMediaTargetLike;
+
+  function addTrack({ src, kind = 'subtitles', label = '', language = '', mode = 'disabled' }: TrackInit) {
+    const track = { kind, label, language, mode };
+
+    tracks.push(track);
+
+    if (src) elements.push({ src, kind, label, srclang: language, track });
+
+    textTracks.dispatchEvent(new Event('addtrack'));
+
+    return track;
+  }
+
+  function removeTrack(track: FakeTextTrack) {
+    tracks.splice(tracks.indexOf(track), 1);
+
+    const index = elements.findIndex((el) => el.track === track);
+
+    if (index >= 0) elements.splice(index, 1);
+
+    textTracks.dispatchEvent(new Event('removetrack'));
+  }
+
+  return { target, addTrack, removeTrack };
+}
+
+/** Let the provider's coalesced track list check run. */
+function flushTrackListSync() {
+  return new Promise((resolve) => setTimeout(resolve));
 }
 
 function deferred<T>() {
@@ -323,6 +464,151 @@ describe('GoogleCastProvider', () => {
 
       expect(request.media.hlsSegmentFormat).toBe(segmentFormat);
       expect(request.media.hlsVideoSegmentFormat).toBe(videoSegmentFormat);
+    });
+  });
+
+  describe('text tracks', () => {
+    const SRC = 'https://example.com/video.mp4';
+    const EN = 'https://example.com/en.vtt';
+    const FR = 'https://example.com/fr.vtt';
+
+    function lastLoadRequest(session: { loadMedia: { mock: { calls: [FakeLoadRequest][] } } }) {
+      return session.loadMedia.mock.calls.at(-1)![0];
+    }
+
+    /** A provider whose session resumed after a page reload, with `receiver` already playing `SRC`. */
+    async function createResumedProvider(
+      target: HTMLMediaTargetLike,
+      receiver: { tracks: FakeCastTrack[]; activeTrackIds: number[] }
+    ) {
+      const sdk = installCastSdk();
+
+      sdk.context.sessionState = 'SESSION_RESUMED';
+      sdk.media.media = { contentId: SRC, tracks: receiver.tracks };
+      sdk.media.activeTrackIds = receiver.activeTrackIds;
+
+      const provider = new GoogleCastProvider({ src: SRC });
+
+      provider.attach(target);
+      await provider.onSessionStateChanged();
+
+      return { provider, sdk };
+    }
+
+    const receiverTracks: FakeCastTrack[] = [
+      { trackId: 1, type: 'TEXT', trackContentId: EN, language: 'en', name: 'English' },
+      { trackId: 2, type: 'TEXT', trackContentId: FR, language: 'fr', name: 'Français' },
+    ];
+
+    it('sends sidecar caption tracks with the load request, with the showing one active', async () => {
+      const { target, addTrack } = createTrackTarget();
+
+      addTrack({ src: EN, label: 'English', language: 'en' });
+      addTrack({ src: FR, label: 'Français', language: 'fr', mode: 'showing' });
+      addTrack({ src: 'https://example.com/thumbnails.vtt', kind: 'metadata' });
+
+      const { session } = await createCastingProvider({ src: SRC }, target);
+      const request = lastLoadRequest(session);
+
+      expect(request.media.tracks?.map((track) => track.trackContentId)).toEqual([EN, FR]);
+      expect(request.activeTrackIds).toEqual([2]);
+    });
+
+    it("loads again from the receiver's position when a sidecar track is added mid-cast", async () => {
+      const { target, addTrack } = createTrackTarget();
+
+      addTrack({ src: EN, label: 'English', language: 'en' });
+
+      const { session, sdk } = await createCastingProvider({ src: SRC }, target);
+
+      sdk.player.isMediaLoaded = true;
+      sdk.player.isPaused = false;
+      sdk.player.currentTime = 42;
+
+      addTrack({ src: FR, label: 'Français', language: 'fr', mode: 'showing' });
+      await flushTrackListSync();
+
+      await vi.waitFor(() => expect(session.loadMedia).toHaveBeenCalledTimes(2));
+
+      const request = lastLoadRequest(session);
+
+      expect(request.media.tracks?.map((track) => track.trackContentId)).toEqual([EN, FR]);
+      expect(request.activeTrackIds).toEqual([2]);
+      expect(request.currentTime).toBe(42);
+      expect(request.autoplay).toBe(true);
+    });
+
+    it('loads again without a sidecar track removed mid-cast', async () => {
+      const { target, addTrack, removeTrack } = createTrackTarget();
+
+      addTrack({ src: EN, label: 'English', language: 'en' });
+      const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
+
+      const { session, sdk } = await createCastingProvider({ src: SRC }, target);
+
+      sdk.player.isMediaLoaded = true;
+      sdk.player.currentTime = 10;
+
+      removeTrack(fr);
+      await flushTrackListSync();
+
+      await vi.waitFor(() => expect(session.loadMedia).toHaveBeenCalledTimes(2));
+
+      const request = lastLoadRequest(session);
+
+      expect(request.media.tracks?.map((track) => track.trackContentId)).toEqual([EN]);
+      expect(request.currentTime).toBe(10);
+      expect(request.autoplay).toBe(false);
+    });
+
+    it('does not load again for an added track without a file', async () => {
+      const { target, addTrack } = createTrackTarget();
+
+      addTrack({ src: EN, label: 'English', language: 'en' });
+
+      const { session, sdk } = await createCastingProvider({ src: SRC }, target);
+
+      sdk.player.isMediaLoaded = true;
+
+      addTrack({ label: 'Generated', language: 'en' });
+      await flushTrackListSync();
+
+      expect(session.loadMedia).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the local track the receiver shows after a resumed session', async () => {
+      const { target, addTrack } = createTrackTarget();
+      const en = addTrack({ src: EN, label: 'English', language: 'en', mode: 'showing' });
+      const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
+
+      const { sdk } = await createResumedProvider(target, { tracks: receiverTracks, activeTrackIds: [2] });
+
+      expect(fr.mode).toBe('showing');
+      expect(en.mode).toBe('disabled');
+      expect(sdk.media.editTracksInfo).not.toHaveBeenCalled();
+    });
+
+    it('turns local captions off when the receiver shows none after a resumed session', async () => {
+      const { target, addTrack } = createTrackTarget();
+      const en = addTrack({ src: EN, label: 'English', language: 'en', mode: 'showing' });
+
+      await createResumedProvider(target, { tracks: receiverTracks, activeTrackIds: [] });
+
+      expect(en.mode).toBe('disabled');
+    });
+
+    it("shows the receiver's track once it is added after a resumed session, without loading again", async () => {
+      const { target, addTrack } = createTrackTarget();
+      const { sdk } = await createResumedProvider(target, { tracks: receiverTracks, activeTrackIds: [2] });
+
+      sdk.player.isMediaLoaded = true;
+
+      const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
+
+      await flushTrackListSync();
+
+      expect(fr.mode).toBe('showing');
+      expect(sdk.session.loadMedia).not.toHaveBeenCalled();
     });
   });
 });

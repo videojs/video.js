@@ -43,7 +43,13 @@ export class GoogleCastProvider {
   #listenersAttached = false;
   #playbackRate = 1;
   #localPaused = false;
+  /** Sidecar track URLs the receiver is known to have, so tracks added or removed mid-cast can be told apart. */
+  #castTrackSrcs = new Set<string>();
+  /** The receiver's active track ids after a resumed session, until a local track takes them on. */
+  #resumedTrackIds: number[] | null = null;
+  #trackListTimer: ReturnType<typeof setTimeout> | undefined;
   #onTextTrackChange = () => this.#updateRemoteTextTrack();
+  #onTextTrackListChange = () => this.#queueTextTrackListSync();
   #onMediaUpdate = () => this.#checkPlaybackRate();
 
   constructor(googleCast: GoogleCastConfig) {
@@ -72,10 +78,17 @@ export class GoogleCastProvider {
   attach(target: HTMLMediaTargetLike) {
     this.target = target;
     target.textTracks.addEventListener('change', this.#onTextTrackChange);
+    target.textTracks.addEventListener('addtrack', this.#onTextTrackListChange);
+    target.textTracks.addEventListener('removetrack', this.#onTextTrackListChange);
   }
 
   detach() {
-    this.target?.textTracks.removeEventListener('change', this.#onTextTrackChange);
+    const textTracks = this.target?.textTracks;
+
+    textTracks?.removeEventListener('change', this.#onTextTrackChange);
+    textTracks?.removeEventListener('addtrack', this.#onTextTrackListChange);
+    textTracks?.removeEventListener('removetrack', this.#onTextTrackListChange);
+    clearTimeout(this.#trackListTimer);
     this.target = null;
   }
 
@@ -148,6 +161,11 @@ export class GoogleCastProvider {
       return;
     }
 
+    // Read the local element's time directly; our own `currentTime` getter reports the remote player's while casting.
+    await this.#loadRemote(this.target?.currentTime ?? 0, !this.#localPaused);
+  }
+
+  async #loadRemote(currentTime: number, autoplay: boolean) {
     const { src } = this.#googleCast;
 
     if (!src) {
@@ -158,9 +176,13 @@ export class GoogleCastProvider {
     // Claim the source before anything is awaited, so a `loadstart` that lands while the request is still being built
     // sees it as already on its way to the receiver.
     this.#loadedSrc = src;
+    this.#resumedTrackIds = null;
 
     try {
       const request = await this.#createLoadRequest(src);
+
+      request.currentTime = currentTime;
+      request.autoplay = autoplay;
 
       await currentSession()?.loadMedia(request);
     } catch (error) {
@@ -179,13 +201,12 @@ export class GoogleCastProvider {
     mediaInfo.customData = this.#googleCast.customData ?? null;
 
     const { target } = this;
-    // Embed adapters (YouTube, Vimeo) have no `<track>` children to query; an explicit `src` can still be cast.
-    const subtitles = [...(target?.querySelectorAll?.<HTMLTrackElement>('track') ?? [])].filter(
-      (el) => el.src && isCaptionOrSubtitleTrack(el)
-    );
+    const subtitles = this.#getSidecarTracks();
 
     const { Track, TrackType, TextTrackType } = chrome.cast.media;
     const activeTrackIds: number[] = [];
+
+    this.#castTrackSrcs = new Set(subtitles.map((el) => el.src));
 
     if (subtitles.length) {
       mediaInfo.tracks = subtitles.map((el, i) => {
@@ -233,10 +254,6 @@ export class GoogleCastProvider {
 
     const request = new chrome.cast.media.LoadRequest(mediaInfo);
 
-    // Read the local element's time directly; our own `currentTime` getter
-    // reports the remote player's while casting.
-    request.currentTime = this.target?.currentTime ?? 0;
-    request.autoplay = !this.#localPaused;
     request.activeTrackIds = activeTrackIds;
 
     return request;
@@ -432,6 +449,12 @@ export class GoogleCastProvider {
       if (src && src === currentMedia()?.media?.contentId) {
         this.#isCasting = true;
         this.#loadedSrc = src;
+        // The tracks on the receiver came from an earlier page; which of them are sidecars is learned as local tracks
+        // turn up there.
+        this.#castTrackSrcs = new Set();
+        // Take on the receiver's captions before anything pushes the local ones over them.
+        this.#resumedTrackIds = currentMedia()?.activeTrackIds ?? [];
+        this.#applyResumedTextTracks();
 
         this.#attachRemoteListeners();
 
@@ -441,11 +464,14 @@ export class GoogleCastProvider {
           console.error(error);
         }
 
+        if (this.#resumedTrackIds) {
+          this.#resumedTrackIds = currentMedia()?.activeTrackIds ?? [];
+          this.#applyResumedTextTracks();
+        }
+
         this.#remoteListeners[castFramework!.RemotePlayerEventType.IS_PAUSED_CHANGED]!();
         this.#remoteListeners[castFramework!.RemotePlayerEventType.PLAYER_STATE_CHANGED]!();
         this.target?.dispatchEvent(new Event('ratechange'));
-
-        // TODO: sync remote enabled text track state to local text tracks
       }
     }
   }
@@ -499,6 +525,9 @@ export class GoogleCastProvider {
     this.#playbackRate = 1;
     this.#isCasting = false;
     this.#loadedSrc = null;
+    this.#castTrackSrcs.clear();
+    this.#resumedTrackIds = null;
+    clearTimeout(this.#trackListTimer);
 
     if (this.target) {
       this.target.muted = this.#remotePlayer.isMuted;
@@ -532,6 +561,10 @@ export class GoogleCastProvider {
   #onRemoteMediaLoaded() {
     this.#playbackRate = currentMedia()?.playbackRate ?? 1;
     currentMedia()?.addUpdateListener(this.#onMediaUpdate);
+
+    if (this.#syncTextTrackList()) return;
+
+    this.#applyResumedTextTracks();
     this.#updateRemoteTextTrack();
   }
 
@@ -544,23 +577,101 @@ export class GoogleCastProvider {
     }
   }
 
+  /** Caption and subtitle `<track>` children with a file the receiver can fetch. Embeds have none to query. */
+  #getSidecarTracks() {
+    return [...(this.target?.querySelectorAll?.<HTMLTrackElement>('track') ?? [])].filter(
+      (el) => el.src && isCaptionOrSubtitleTrack(el)
+    );
+  }
+
+  /**
+   * The receiver's text tracks paired with the local tracks they show. A sidecar pairs by its file, which survives a
+   * page reload; other tracks pair by language and label.
+   */
+  #pairTextTracks() {
+    if (!this.target) return [];
+
+    const sidecars = this.#getSidecarTracks();
+    const localSubs = [...this.target.textTracks].filter(isCaptionOrSubtitleTrack);
+
+    return getRemoteTextTracks().flatMap(({ trackContentId, language, name, trackId }) => {
+      const local =
+        sidecars.find((el) => el.src === trackContentId)?.track ??
+        localSubs.find((l) => l.language === language && l.label === name);
+
+      return local ? [{ trackId, local }] : [];
+    });
+  }
+
+  /**
+   * Show the local track the receiver showed when the session resumed. Its track may not have been added yet, as with
+   * tracks a framework renders later, so this stays pending and runs again as tracks are added.
+   */
+  #applyResumedTextTracks() {
+    const ids = this.#resumedTrackIds;
+    if (!ids || !this.target) return;
+
+    const remoteIds = new Set(getRemoteTextTracks().map(({ trackId }) => trackId));
+    const activeIds = ids.filter((id) => remoteIds.has(id));
+    const active = this.#pairTextTracks().find(({ trackId }) => activeIds.includes(trackId))?.local;
+    if (activeIds.length && !active) return;
+
+    this.#resumedTrackIds = null;
+
+    for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
+      if (track === active) track.mode = 'showing';
+      else if (track.mode === 'showing') track.mode = 'disabled';
+    }
+  }
+
+  /** Coalesce the `addtrack` and `removetrack` events one change to the media's `<track>` children can fire. */
+  #queueTextTrackListSync() {
+    if (!this.#isCasting) return;
+
+    clearTimeout(this.#trackListTimer);
+    this.#trackListTimer = setTimeout(() => {
+      if (!this.#syncTextTrackList()) this.#applyResumedTextTracks();
+    });
+  }
+
+  /**
+   * Tracks can only be added to or removed from the receiver with a new load request, so when the sidecar tracks
+   * changed, load the media again from where the receiver is.
+   *
+   * @returns Whether the media is loading again.
+   */
+  #syncTextTrackList() {
+    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return false;
+
+    // A source change sends its own tracks.
+    const { src } = this.#googleCast;
+    if (!src || this.#loadedSrc !== src) return false;
+
+    const local = new Set(this.#getSidecarTracks().map((el) => el.src));
+    const remote = new Set(getRemoteTextTracks().map(({ trackContentId }) => trackContentId));
+
+    for (const trackSrc of local) {
+      if (remote.has(trackSrc)) this.#castTrackSrcs.add(trackSrc);
+    }
+
+    const added = [...local].some((trackSrc) => !this.#castTrackSrcs.has(trackSrc));
+    const removed = [...this.#castTrackSrcs].some((trackSrc) => !local.has(trackSrc));
+    if (!added && !removed) return false;
+
+    this.#loadRemote(this.currentTime, !this.paused).catch((error) => console.error(error));
+
+    return true;
+  }
+
   async #updateRemoteTextTrack() {
     if (!this.#isCasting || !this.target) return;
 
-    const localSubs = [...this.target.textTracks].filter(isCaptionOrSubtitleTrack);
-
-    const matched = (this.#remotePlayer.mediaInfo?.tracks ?? [])
-      .filter(({ type }) => type === chrome.cast.media.TrackType.TEXT)
-      .flatMap(({ language, name, trackId }) => {
-        const local = localSubs.find((l) => l.language === language && l.label === name);
-
-        return local?.mode ? [{ mode: local.mode, trackId }] : [];
-      });
+    const matched = this.#pairTextTracks().map(({ trackId, local }) => ({ trackId, mode: local.mode }));
 
     const hidden = new Set(matched.filter((m) => m.mode !== 'showing').map((m) => m.trackId));
     const showing = matched.find((m) => m.mode === 'showing')?.trackId;
 
-    const active = currentSession()?.getSessionObj().media[0]?.activeTrackIds ?? [];
+    const active = currentMedia()?.activeTrackIds ?? [];
     const next = new Set(active.filter((id) => !hidden.has(id)));
 
     if (showing) next.add(showing);
@@ -573,4 +684,8 @@ export class GoogleCastProvider {
       console.error(error);
     }
   }
+}
+
+function getRemoteTextTracks() {
+  return (currentMedia()?.media?.tracks ?? []).filter(({ type }) => type === chrome.cast.media.TrackType.TEXT);
 }
