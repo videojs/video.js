@@ -186,6 +186,7 @@ export class GestureCoordinator {
         if (preventTouchClick && event.touches.length === 0) event.preventDefault();
 
         preventTouchClick = false;
+
         if (event.touches.length === 0) multitouch = false;
       },
       { signal, passive: false }
@@ -196,6 +197,7 @@ export class GestureCoordinator {
       'touchcancel',
       (event) => {
         preventTouchClick = false;
+
         if (event.touches.length === 0) multitouch = false;
       },
       { signal, passive: true }

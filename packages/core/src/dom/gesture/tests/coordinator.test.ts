@@ -380,11 +380,13 @@ function touchEvent(target: HTMLElement, type: string, activeTouches = 0): Event
 }
 
 function pointerUp(target: HTMLElement, init: { pointerType: string; clientX: number; button?: number }): PointerEvent {
-  const event = new Event('pointerup', { bubbles: true });
+  const event = new PointerEvent('pointerup', {
+    bubbles: true,
+    pointerType: init.pointerType,
+    clientX: init.clientX,
+    button: init.button ?? 0,
+  });
 
-  Object.defineProperty(event, 'pointerType', { value: init.pointerType });
-  Object.defineProperty(event, 'clientX', { value: init.clientX });
-  Object.defineProperty(event, 'button', { value: init.button ?? 0 });
   target.dispatchEvent(event);
-  return event as PointerEvent;
+  return event;
 }
