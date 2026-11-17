@@ -24,11 +24,59 @@ import basicUsageHtml from "@/components/docs/demos/mux-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-audio/html/css/BasicUsage.ts?raw";
 
-Audio element for playing Mux-hosted HLS streams. Built on hls.js with Mux-specific optimizations.
+Audio element for playing Mux-hosted HLS streams.
 
 ## Import
 
 <MediaImports media="mux-audio" package="@videojs/mux-audio" react="MuxAudio" />
+
+## Choose a playback engine
+
+The Mux audio component can play your audio through one of two engines: hls.js or SPF. An engine is the code that downloads the stream and feeds it to the browser. You choose one by changing the import path, and nothing else in your code changes.
+
+hls.js is mature and widely used, and the default import uses it today. SPF is a smaller engine built by the Video.js team. It's still under development and doesn't yet handle everything hls.js does, but it will become the default in an upcoming release.
+
+| Import | Engine | Choose it when |
+|---|---|---|
+| `.../media/mux-audio` | hls.js today, SPF soon | You want the recommended engine, and you're fine with it changing in a future release. |
+| `.../media/mux-audio/hls-js` | hls.js | You need to stay on hls.js, or your app uses hls.js's own settings. |
+| `.../media/mux-audio/spf` | SPF | You want a smaller download, and the limits below don't affect your streams. |
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
+```
+
+All three imports give you a `MuxAudio` component that takes the same props. Different players on one page can use different engines.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/media/mux-audio/spf';
+```
+
+All three imports register the same `<mux-audio>` tag. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
+</FrameworkCase>
+
+With SPF, for now:
+
+- **Low-latency live streams play with a longer delay.** They still play, just further behind real time, like an ordinary live stream.
+- **Mux Data reports less about each view.** Views and playback problems are still recorded, but some detail about how the stream downloaded is missing.
+- **Some live streams, and their recordings, may not play smoothly.** This affects live streams that have gaps, such as when the broadcaster's connection drops, and the on-demand recordings Mux makes from them.
+
+If any of these matter for your streams, import `/hls-js`.
+
+### SPF limitations in detail
+
+**Low-Latency HLS.** SPF skips the partial segments (`EXT-X-PART`) that make LL-HLS low latency and loads whole segments instead. The stream plays as standard-latency live, at the distance from the live edge that the playlist's `HOLD-BACK` sets. SPF logs a console warning when this happens.
+
+**Mux Data.** Mux Data plugs into hls.js to collect engine-level data. It has no such integration for SPF, so it monitors the media element alone. Views, startup time, rebuffering, and playback errors still come through. Rendition switches, request timing and throughput, and engine-level errors don't. In development builds, Mux Data logs a console warning about this.
+
+**Discontinuities.** When a live encoder disconnects and reconnects, the stream picks up with new timestamps, and Mux marks the break with `EXT-X-DISCONTINUITY`. A live stream configured with a reconnect slate fills the gap with that slate instead. Without one, the discontinuities stay in the live playlist and in the on-demand asset Mux records from the stream. SPF's handling of discontinuities is still being hardened, so expect playback across one to stall, skip, or drift out of sync.
+
+**DVR.** Live playlists that keep growing so viewers can seek back (`EXT-X-PLAYLIST-TYPE:EVENT`) play, but that support is experimental. SPF logs a console warning when it loads one.
+
+**Formats and encryption.** SPF doesn't play raw ADTS AAC audio segments or decrypt `AES-128` and `SAMPLE-AES` clear-key encryption. DRM through `source.drm` works with both engines.
 
 ## Load a source
 
