@@ -335,7 +335,14 @@ export const loadVideoSegments = defineBehavior({
     context: {
       videoSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['videoSegmentLoaderActor']>;
     };
-    config?: { createLoadStart?: CreateLoadStart };
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,
@@ -362,7 +369,14 @@ export const loadAudioSegments = defineBehavior({
     context: {
       audioSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['audioSegmentLoaderActor']>;
     };
-    config?: { createLoadStart?: CreateLoadStart };
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,
