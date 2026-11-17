@@ -257,6 +257,25 @@ describe('GestureCoordinator touch click suppression', () => {
     expect(touchEnd(container).defaultPrevented).toBe(true);
   });
 
+  it('handles the next single touch when the last multitouch contact ended outside the container', () => {
+    const container = setup();
+
+    createTapGesture(container, vi.fn(), { pointer: 'touch' });
+    // Another contact is already down outside the container when this one starts inside it.
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 2);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEvent(container, 'touchend', 1).defaultPrevented).toBe(false);
+
+    // The outside contact's touchend never reaches this container; the next touch starts a fresh sequence.
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 1);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(container).defaultPrevented).toBe(true);
+  });
+
   it('does not cancel native panning after the browser cancels the pointer', () => {
     const container = setup();
     const activate = vi.fn();

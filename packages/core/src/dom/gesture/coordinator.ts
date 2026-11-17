@@ -116,7 +116,7 @@ export class GestureCoordinator {
       this.#target,
       'touchstart',
       (event) => {
-        if (event.touches.length > 1) multitouch = true;
+        multitouch = event.touches.length > 1;
       },
       { signal, passive: true }
     );
