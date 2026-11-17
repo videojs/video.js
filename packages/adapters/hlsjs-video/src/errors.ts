@@ -22,7 +22,7 @@ export function HlsJsErrorsMixin<Base extends Constructor<HlsEngineHost>>(BaseCl
       super(...args);
 
       this.engine?.on(Hls.Events.MANIFEST_LOADING, () => this.#init());
-      this.engine?.on(Hls.Events.MEDIA_ATTACHED, () => this.#init());
+      this.engine?.on(Hls.Events.MEDIA_ATTACHING, () => this.#init());
       this.engine?.on(Hls.Events.MEDIA_DETACHED, () => this.#destroy());
       this.engine?.on(Hls.Events.DESTROYING, () => this.#destroy());
     }
