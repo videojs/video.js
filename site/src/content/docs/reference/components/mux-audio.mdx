@@ -47,7 +47,7 @@ hls.js is mature and widely used, and the default import uses it today. SPF is a
 import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
 ```
 
-All three imports give you a `MuxAudio` component with the same `source` API.
+All three imports give you a `MuxAudio` component with the same basic API.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -55,7 +55,7 @@ All three imports give you a `MuxAudio` component with the same `source` API.
 import '@videojs/html/media/mux-audio/spf';
 ```
 
-All three imports register the same `<mux-audio>` tag with the same `source` API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
+All three imports register the same `<mux-audio>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
 </FrameworkCase>
 
 With SPF, for now:
