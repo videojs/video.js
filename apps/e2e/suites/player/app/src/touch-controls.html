@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Touch controls</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      media-container {
+        position: relative;
+        display: block;
+      }
+      video {
+        display: block;
+        width: 100%;
+      }
+      media-controls-content {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
+      media-controls-content:not([data-visible]) {
+        opacity: 0;
+        pointer-events: none;
+      }
+      media-play-button {
+        padding: 24px 32px;
+        background: white;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <video-player>
+      <media-container>
+        <video muted playsinline loop></video>
+        <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+        <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
+        <media-controls>
+          <media-controls-content>
+            <media-play-button>Play / pause</media-play-button>
+          </media-controls-content>
+        </media-controls>
+      </media-container>
+    </video-player>
+    <script type="module">
+      import '@videojs/html/video/player';
+      import '@videojs/html/ui/container';
+      import '@videojs/html/ui/gesture';
+      import '@videojs/html/ui/controls';
+      import '@videojs/html/ui/controls-content';
+      import '@videojs/html/ui/play-button';
+
+      document.querySelector('video').src = new URLSearchParams(location.search).get('src');
+    </script>
+  </body>
+</html>
