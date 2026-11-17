@@ -15,6 +15,7 @@ import {
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   type SvtaError,
 } from '../../../media/errors';
@@ -155,9 +156,11 @@ function deriveTargetLiveWindow(
  *
  * An allow-list, deliberately: only _verdicts_ are here. The per-rendition causes `resolve-track` reports (unsupported
  * format, unsupported DRM) stay in the sequence as context — one unplayable rendition doesn't fail the source, and
- * promoting a cause would put a dialog over a mixed source that goes on to play.
+ * promoting a cause would put a dialog over a mixed source that goes on to play. A manifest that fails to load is a
+ * verdict too: the source never resolves, so nothing else is ever reported.
  */
 const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
 ]);
