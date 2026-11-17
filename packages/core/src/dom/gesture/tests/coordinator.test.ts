@@ -233,6 +233,43 @@ describe('GestureCoordinator touch click suppression', () => {
     expect(doubletap).toHaveBeenCalledOnce();
     expect(tap).not.toHaveBeenCalled();
   });
+
+  it('leaves a multitouch sequence native until every contact has ended', () => {
+    const container = setup();
+
+    createTapGesture(container, vi.fn(), { pointer: 'touch' });
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 1);
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 2);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEvent(container, 'touchend', 1).defaultPrevented).toBe(false);
+
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(container).defaultPrevented).toBe(false);
+
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 1);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(container).defaultPrevented).toBe(true);
+  });
+
+  it('does not cancel native panning after the browser cancels the pointer', () => {
+    const container = setup();
+    const activate = vi.fn();
+
+    createTapGesture(container, activate, { pointer: 'touch' });
+    pointerDown(container);
+    touchEvent(container, 'touchstart', 1);
+    container.dispatchEvent(new Event('pointercancel', { bubbles: true }));
+
+    expect(touchEvent(container, 'touchcancel').defaultPrevented).toBe(false);
+    expect(touchEnd(container).defaultPrevented).toBe(false);
+    expect(activate).not.toHaveBeenCalled();
+  });
 });
 
 describe('GestureCoordinator.claimsTap', () => {
@@ -311,7 +348,13 @@ function pointerDown(target: HTMLElement, init: { button?: number } = {}): void 
 }
 
 function touchEnd(target: HTMLElement): Event {
-  const event = new Event('touchend', { bubbles: true, cancelable: true });
+  return touchEvent(target, 'touchend');
+}
+
+function touchEvent(target: HTMLElement, type: string, activeTouches = 0): Event {
+  const event = new Event(type, { bubbles: true, cancelable: true });
+
+  Object.defineProperty(event, 'touches', { value: Array.from({ length: activeTouches }) });
 
   target.dispatchEvent(event);
   return event;
