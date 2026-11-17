@@ -144,7 +144,7 @@ export async function fetchPlaylist(url: string, init: RequestInit): Promise<{ t
   const response = await fetch(url, init);
   if (!response.ok) throw new Error(`Failed to fetch playlist (${response.status}): ${url}`);
 
-  return { text: await response.text(), url: response.url || url };
+  return { text: await response.text(), url: response.url || new URL(url, document.baseURI).href };
 }
 
 /**
