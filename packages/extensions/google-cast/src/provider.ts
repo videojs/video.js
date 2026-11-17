@@ -43,20 +43,17 @@ export class GoogleCastProvider {
   #listenersAttached = false;
   #playbackRate = 1;
   #localPaused = false;
-  /** Sidecar track URLs the receiver is known to have, so tracks added or removed mid-cast can be told apart. */
-  #castTrackSrcs = new Set<string>();
+  /** The sidecar tracks sent to the receiver; `null` after a resumed session until the page's are taken as them. */
+  #castTrackKey: string | null = null;
   /** The receiver's active track ids after a resumed session, until a local track takes them on. */
   #resumedTrackIds: number[] | null = null;
-  #trackListTimer: ReturnType<typeof setTimeout> | undefined;
-  /** The remote media whose updates this listens to. */
-  #media: chrome.cast.media.Media | null = null;
-  /** The receiver's text track ids as last seen, so tracks it lists after loading get paired too. */
-  #remoteTextTrackKey = '';
+  /** The receiver can list a manifest's text tracks after the media loaded, so their ids are watched. */
+  #remoteTrackKey = '';
   #onTextTrackChange = () => this.#updateRemoteTextTrack();
-  #onTextTrackListChange = () => this.#queueTextTrackListSync();
+  #onTextTrackListChange = () => this.#syncTextTracks();
   #onMediaUpdate = () => {
     this.#checkPlaybackRate();
-    this.#checkRemoteTextTracks();
+    this.#checkRemoteTracks();
   };
 
   constructor(googleCast: GoogleCastConfig) {
@@ -95,14 +92,13 @@ export class GoogleCastProvider {
     textTracks?.removeEventListener('change', this.#onTextTrackChange);
     textTracks?.removeEventListener('addtrack', this.#onTextTrackListChange);
     textTracks?.removeEventListener('removetrack', this.#onTextTrackListChange);
-    clearTimeout(this.#trackListTimer);
     this.target = null;
   }
 
   destroy() {
     this.detach();
     googleCastInstances.delete(this);
-    this.#watchMedia(null);
+    currentMedia()?.removeUpdateListener(this.#onMediaUpdate);
     this.#detachRemoteListeners();
     this.#isCasting = false;
     this.#isInit = false;
@@ -192,7 +188,6 @@ export class GoogleCastProvider {
       request.autoplay = autoplay;
 
       await currentSession()?.loadMedia(request);
-      this.#watchMedia();
     } catch (error) {
       // Free the source for a retry, unless a newer load has claimed another one since.
       if (this.#loadedSrc === src) this.#loadedSrc = null;
@@ -214,7 +209,7 @@ export class GoogleCastProvider {
     const { Track, TrackType, TextTrackType } = chrome.cast.media;
     const activeTrackIds: number[] = [];
 
-    this.#castTrackSrcs = new Set(subtitles.map((el) => el.src));
+    this.#castTrackKey = getTrackKey(subtitles);
 
     if (subtitles.length) {
       mediaInfo.tracks = subtitles.map((el, i) => {
@@ -457,9 +452,7 @@ export class GoogleCastProvider {
       if (src && src === currentMedia()?.media?.contentId) {
         this.#isCasting = true;
         this.#loadedSrc = src;
-        // The tracks on the receiver came from an earlier page; which of them are sidecars is learned as local tracks
-        // turn up there.
-        this.#castTrackSrcs = new Set();
+        this.#castTrackKey = null;
         // Take on the receiver's captions before anything pushes the local ones over them.
         this.#resumedTrackIds = currentMedia()?.activeTrackIds ?? [];
         this.#applyResumedTextTracks();
@@ -470,11 +463,6 @@ export class GoogleCastProvider {
           await getMediaStatus(new chrome.cast.media.GetStatusRequest());
         } catch (error) {
           console.error(error);
-        }
-
-        if (this.#resumedTrackIds) {
-          this.#resumedTrackIds = currentMedia()?.activeTrackIds ?? [];
-          this.#applyResumedTextTracks();
         }
 
         this.#remoteListeners[castFramework!.RemotePlayerEventType.IS_PAUSED_CHANGED]!();
@@ -527,16 +515,13 @@ export class GoogleCastProvider {
   #disconnect() {
     if (!this.#isCasting) return;
 
-    this.#watchMedia(null);
+    currentMedia()?.removeUpdateListener(this.#onMediaUpdate);
     this.#detachRemoteListeners();
     this.#seeking = false;
     this.#playbackRate = 1;
     this.#isCasting = false;
     this.#loadedSrc = null;
-    this.#castTrackSrcs.clear();
     this.#resumedTrackIds = null;
-    this.#remoteTextTrackKey = '';
-    clearTimeout(this.#trackListTimer);
 
     if (this.target) {
       this.target.muted = this.#remotePlayer.isMuted;
@@ -569,36 +554,9 @@ export class GoogleCastProvider {
 
   #onRemoteMediaLoaded() {
     this.#playbackRate = currentMedia()?.playbackRate ?? 1;
-    this.#watchMedia();
-    this.#remoteTextTrackKey = getRemoteTextTrackKey();
+    currentMedia()?.addUpdateListener(this.#onMediaUpdate);
+    this.#remoteTrackKey = getTrackIdKey();
     this.#syncTextTracks();
-  }
-
-  /** Listen to updates from the session's current media, which changes with every load. */
-  #watchMedia(media = currentMedia() ?? null) {
-    if (this.#media === media) return;
-
-    this.#media?.removeUpdateListener(this.#onMediaUpdate);
-    this.#media = media;
-    media?.addUpdateListener(this.#onMediaUpdate);
-  }
-
-  /** The receiver can list the tracks it finds in a manifest after the media loaded; pair those once they show up. */
-  #checkRemoteTextTracks() {
-    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return;
-
-    const key = getRemoteTextTrackKey();
-    if (key === this.#remoteTextTrackKey) return;
-
-    this.#remoteTextTrackKey = key;
-    this.#syncTextTracks();
-  }
-
-  #syncTextTracks() {
-    if (this.#syncTextTrackList()) return;
-
-    this.#applyResumedTextTracks();
-    this.#updateRemoteTextTrack();
   }
 
   #checkPlaybackRate() {
@@ -610,6 +568,22 @@ export class GoogleCastProvider {
     }
   }
 
+  #checkRemoteTracks() {
+    const key = getTrackIdKey();
+
+    if (key !== this.#remoteTrackKey) {
+      this.#remoteTrackKey = key;
+      this.#syncTextTracks();
+    }
+  }
+
+  #syncTextTracks() {
+    if (this.#reloadChangedTracks()) return;
+
+    this.#applyResumedTextTracks();
+    this.#updateRemoteTextTrack();
+  }
+
   /** Caption and subtitle `<track>` children with a file the receiver can fetch. Embeds have none to query. */
   #getSidecarTracks() {
     return [...(this.target?.querySelectorAll?.<HTMLTrackElement>('track') ?? [])].filter(
@@ -618,91 +592,59 @@ export class GoogleCastProvider {
   }
 
   /**
-   * The receiver's text tracks paired with the local tracks they show. A sidecar pairs by its file, which survives a
-   * page reload; other tracks pair by language and label.
-   */
-  #pairTextTracks() {
-    if (!this.target) return [];
-
-    const sidecars = this.#getSidecarTracks();
-    const localSubs = [...this.target.textTracks].filter(isCaptionOrSubtitleTrack);
-
-    return getRemoteTextTracks().flatMap(({ trackContentId, language, name, trackId }) => {
-      const local =
-        sidecars.find((el) => el.src === trackContentId)?.track ??
-        localSubs.find((l) => l.language === language && l.label === name);
-
-      return local ? [{ trackId, local }] : [];
-    });
-  }
-
-  /**
-   * Show the local track the receiver showed when the session resumed. Its track may not have been added yet, as with
-   * tracks a framework renders later, so this stays pending and runs again as tracks are added.
-   */
-  #applyResumedTextTracks() {
-    const ids = this.#resumedTrackIds;
-
-    if (ids && this.#applyRemoteTextTracks(ids, { waitForTrack: true })) this.#resumedTrackIds = null;
-  }
-
-  /**
-   * Show the local track paired with the receiver's active text track, and turn the other captions off.
-   *
-   * @param waitForTrack - Change nothing while the receiver's active track has no local pair yet.
-   * @returns Whether the local tracks were changed.
-   */
-  #applyRemoteTextTracks(ids: readonly number[], { waitForTrack = false } = {}) {
-    if (!this.target) return false;
-
-    const remoteIds = new Set(getRemoteTextTracks().map(({ trackId }) => trackId));
-    const activeIds = ids.filter((id) => remoteIds.has(id));
-    const active = this.#pairTextTracks().find(({ trackId }) => activeIds.includes(trackId))?.local;
-    if (waitForTrack && activeIds.length && !active) return false;
-
-    for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
-      if (track === active) track.mode = 'showing';
-      else if (track.mode === 'showing') track.mode = 'disabled';
-    }
-
-    return true;
-  }
-
-  /** Coalesce the `addtrack` and `removetrack` events one change to the media's `<track>` children can fire. */
-  #queueTextTrackListSync() {
-    if (!this.#isCasting) return;
-
-    clearTimeout(this.#trackListTimer);
-    this.#trackListTimer = setTimeout(() => {
-      if (!this.#syncTextTrackList()) this.#applyResumedTextTracks();
-    });
-  }
-
-  /**
    * Tracks can only be added to or removed from the receiver with a new load request, so when the sidecar tracks
    * changed, load the media again from where the receiver is.
    *
    * @returns Whether the media is loading again.
    */
-  #syncTextTrackList() {
-    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return false;
-
-    // A source change sends its own tracks.
+  #reloadChangedTracks() {
     const { src } = this.#googleCast;
-    if (!src || this.#loadedSrc !== src) return false;
+    // A source change sends its own tracks.
+    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !src || this.#loadedSrc !== src) return false;
 
-    const local = new Set(this.#getSidecarTracks().map((el) => el.src));
-    const remote = new Set(getRemoteTextTracks().map(({ trackContentId }) => trackContentId));
+    const key = getTrackKey(this.#getSidecarTracks());
 
-    for (const trackSrc of local) {
-      if (remote.has(trackSrc)) this.#castTrackSrcs.add(trackSrc);
-    }
+    this.#castTrackKey ??= key;
 
-    const added = [...local].some((trackSrc) => !this.#castTrackSrcs.has(trackSrc));
-    const removed = [...this.#castTrackSrcs].some((trackSrc) => !local.has(trackSrc));
-    if (!added && !removed) return false;
+    if (key === this.#castTrackKey) return false;
 
     this.#loadRemote(this.currentTime, !this.paused).catch((error) => console.error(error));
+
+    return true;
+  }
+
+  /** The receiver's text tracks paired with the local tracks they show. */
+  #pairTextTracks() {
+    const localSubs = [...(this.target?.textTracks ?? [])].filter(isCaptionOrSubtitleTrack);
+
+    return getRemoteTextTracks().flatMap(({ language, name, trackId }) => {
+      const local = localSubs.find((l) => l.language === language && l.label === name);
+
+      return local ? [{ trackId, local }] : [];
+    });
+  }
+
+  /** After a resumed session, wait for the local track the receiver shows before showing it. */
+  #applyResumedTextTracks() {
+    if (this.#resumedTrackIds && this.#showRemoteTextTrack(this.#resumedTrackIds, true)) this.#resumedTrackIds = null;
+  }
+
+  /**
+   * Show the local track paired with the receiver's active one and turn the other captions off.
+   *
+   * @param wait - Change nothing while the receiver's active track has no local pair yet.
+   * @returns Whether the local tracks were changed.
+   */
+  #showRemoteTextTrack(ids: readonly number[], wait = false) {
+    if (!this.target) return false;
+
+    const active = this.#pairTextTracks().find(({ trackId }) => ids.includes(trackId))?.local;
+    if (wait && !active && getRemoteTextTracks().some(({ trackId }) => ids.includes(trackId))) return false;
+
+    for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
+      if (track === active) track.mode = 'showing';
+      else if (track.mode === 'showing') track.mode = 'disabled';
+    }
 
     return true;
   }
@@ -727,7 +669,7 @@ export class GoogleCastProvider {
     } catch (error) {
       console.error(error);
       // Keep the captions menu from claiming captions the receiver isn't showing.
-      this.#applyRemoteTextTracks(currentMedia()?.activeTrackIds ?? []);
+      this.#showRemoteTextTrack(currentMedia()?.activeTrackIds ?? []);
     }
   }
 }
@@ -736,8 +678,12 @@ function getRemoteTextTracks() {
   return (currentMedia()?.media?.tracks ?? []).filter(({ type }) => type === chrome.cast.media.TrackType.TEXT);
 }
 
-function getRemoteTextTrackKey() {
+function getTrackIdKey() {
   return getRemoteTextTracks()
     .map(({ trackId }) => trackId)
     .join();
+}
+
+function getTrackKey(tracks: HTMLTrackElement[]) {
+  return tracks.map((el) => el.src).join('\n');
 }

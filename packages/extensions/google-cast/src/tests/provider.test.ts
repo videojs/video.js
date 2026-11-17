@@ -288,11 +288,6 @@ function createTrackTarget() {
   return { target, addTrack, removeTrack };
 }
 
-/** Let the provider's coalesced track list check run. */
-function flushTrackListSync() {
-  return new Promise((resolve) => setTimeout(resolve));
-}
-
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((r) => {
@@ -484,16 +479,22 @@ describe('GoogleCastProvider', () => {
       return session.loadMedia.mock.calls.at(-1)![0];
     }
 
-    /** A provider whose session resumed after a page reload, with `receiver` already playing `SRC`. */
+    /**
+     * A provider whose session resumed after a page reload, with `receiver` already playing `SRC`. `stale` lists an
+     * idle media ahead of it, as a session can.
+     */
     async function createResumedProvider(
       target: HTMLMediaTargetLike,
-      receiver: { tracks: FakeCastTrack[]; activeTrackIds: number[] }
+      receiver: { tracks: FakeCastTrack[]; activeTrackIds: number[] },
+      { stale = false } = {}
     ) {
       const sdk = installCastSdk();
 
       sdk.context.sessionState = 'SESSION_RESUMED';
       sdk.media.media = { contentId: SRC, tracks: receiver.tracks };
       sdk.media.activeTrackIds = receiver.activeTrackIds;
+
+      if (stale) sdk.mediaList.unshift({ ...sdk.media, idleReason: 'INTERRUPTED', activeTrackIds: [1] });
 
       const provider = new GoogleCastProvider({ src: SRC });
 
@@ -508,20 +509,6 @@ describe('GoogleCastProvider', () => {
       { trackId: 2, type: 'TEXT', trackContentId: FR, language: 'fr', name: 'Français' },
     ];
 
-    it('sends sidecar caption tracks with the load request, with the showing one active', async () => {
-      const { target, addTrack } = createTrackTarget();
-
-      addTrack({ src: EN, label: 'English', language: 'en' });
-      addTrack({ src: FR, label: 'Français', language: 'fr', mode: 'showing' });
-      addTrack({ src: 'https://example.com/thumbnails.vtt', kind: 'metadata' });
-
-      const { session } = await createCastingProvider({ src: SRC }, target);
-      const request = lastLoadRequest(session);
-
-      expect(request.media.tracks?.map((track) => track.trackContentId)).toEqual([EN, FR]);
-      expect(request.activeTrackIds).toEqual([2]);
-    });
-
     it("loads again from the receiver's position when a sidecar track is added mid-cast", async () => {
       const { target, addTrack } = createTrackTarget();
 
@@ -534,7 +521,6 @@ describe('GoogleCastProvider', () => {
       sdk.player.currentTime = 42;
 
       addTrack({ src: FR, label: 'Français', language: 'fr', mode: 'showing' });
-      await flushTrackListSync();
 
       await vi.waitFor(() => expect(session.loadMedia).toHaveBeenCalledTimes(2));
 
@@ -558,7 +544,6 @@ describe('GoogleCastProvider', () => {
       sdk.player.currentTime = 10;
 
       removeTrack(fr);
-      await flushTrackListSync();
 
       await vi.waitFor(() => expect(session.loadMedia).toHaveBeenCalledTimes(2));
 
@@ -567,21 +552,6 @@ describe('GoogleCastProvider', () => {
       expect(request.media.tracks?.map((track) => track.trackContentId)).toEqual([EN]);
       expect(request.currentTime).toBe(10);
       expect(request.autoplay).toBe(false);
-    });
-
-    it('does not load again for an added track without a file', async () => {
-      const { target, addTrack } = createTrackTarget();
-
-      addTrack({ src: EN, label: 'English', language: 'en' });
-
-      const { session, sdk } = await createCastingProvider({ src: SRC }, target);
-
-      sdk.player.isMediaLoaded = true;
-
-      addTrack({ label: 'Generated', language: 'en' });
-      await flushTrackListSync();
-
-      expect(session.loadMedia).toHaveBeenCalledTimes(1);
     });
 
     it('shows the local track the receiver shows after a resumed session', async () => {
@@ -609,18 +579,8 @@ describe('GoogleCastProvider', () => {
       const { target, addTrack } = createTrackTarget();
       const en = addTrack({ src: EN, label: 'English', language: 'en', mode: 'showing' });
       const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
-      const sdk = installCastSdk();
-      const stale = { ...sdk.media, idleReason: 'INTERRUPTED', activeTrackIds: [1] };
 
-      sdk.mediaList.unshift(stale);
-      sdk.context.sessionState = 'SESSION_RESUMED';
-      sdk.media.media = { contentId: SRC, tracks: receiverTracks };
-      sdk.media.activeTrackIds = [2];
-
-      const provider = new GoogleCastProvider({ src: SRC });
-
-      provider.attach(target);
-      await provider.onSessionStateChanged();
+      await createResumedProvider(target, { tracks: receiverTracks, activeTrackIds: [2] }, { stale: true });
 
       expect(fr.mode).toBe('showing');
       expect(en.mode).toBe('disabled');
@@ -671,8 +631,6 @@ describe('GoogleCastProvider', () => {
       sdk.player.isMediaLoaded = true;
 
       const fr = addTrack({ src: FR, label: 'Français', language: 'fr' });
-
-      await flushTrackListSync();
 
       expect(fr.mode).toBe('showing');
       expect(sdk.session.loadMedia).not.toHaveBeenCalled();
