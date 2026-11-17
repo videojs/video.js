@@ -195,6 +195,54 @@ http://example.com/audio-seg1.m4s
     engine.destroy();
   });
 
+  it('reloads a live audio-only playlist and gives the MediaSource an infinite duration', async () => {
+    let mediaPlaylistFetches = 0;
+
+    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+
+      if (url.includes('playlist.m3u8')) {
+        return Promise.resolve(
+          new Response(`#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS="mp4a.40.2"
+http://example.com/audio-live.m3u8`)
+        );
+      }
+
+      if (url.includes('audio-live.m3u8')) {
+        mediaPlaylistFetches++;
+
+        return Promise.resolve(
+          new Response(`#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-TARGETDURATION:1
+#EXT-X-MEDIA-SEQUENCE:${mediaPlaylistFetches}
+#EXT-X-MAP:URI="http://example.com/init-audio.mp4"
+#EXTINF:1.0,
+http://example.com/audio-${mediaPlaylistFetches}.m4s
+#EXTINF:1.0,
+http://example.com/audio-${mediaPlaylistFetches + 1}.m4s`)
+        );
+      }
+
+      return unmockedFetchFallback(url);
+    });
+
+    const engine = createEngine();
+    const mediaElement = document.createElement('audio');
+
+    engine.context.mediaElement.set(mediaElement);
+    engine.state.presentation.set({ url: 'http://example.com/playlist.m3u8' });
+    engine.state.preload.set('auto');
+
+    await vi.waitFor(() => expect(mediaPlaylistFetches).toBeGreaterThanOrEqual(2), { timeout: 5000 });
+    await vi.waitFor(() => expect(engine.context.mediaSource.get()?.duration).toBe(Number.POSITIVE_INFINITY), {
+      timeout: 2000,
+    });
+
+    engine.destroy();
+  });
+
   it('plays mixed HLS source as audio-only (video tracks ignored)', async () => {
     // Mixed AV manifest: audio rendition + video stream-inf. The variant
     // should compose audio behaviors only — no video selection, no video

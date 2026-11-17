@@ -20,8 +20,8 @@ import {
   type SvtaError,
 } from '../../../media/errors';
 import { resolveLiveLatency } from '../../../media/hls/reload-policy';
+import { deriveTargetLiveWindow } from '../../../media/live-window';
 import {
-  deriveStreamType,
   getMediaPlaylistMetadata,
   isResolvedPresentation,
   isResolvedTrack,
@@ -121,28 +121,6 @@ export interface HlsVideoAdapterAPI extends HlsVideoAdapterProps {
   detach(): void;
   destroy(): void;
   play(): Promise<void>;
-}
-
-/**
- * `targetLiveWindow` per the media-ui-extensions live-edge proposal: `NaN` for on-demand (or nothing resolved yet), `0`
- * for standard sliding-window live, `Infinity` for DVR (`#EXT-X-PLAYLIST-TYPE:EVENT` — the window grows from the
- * start). Read from the timeline-bearing track's playlist metadata.
- */
-function deriveTargetLiveWindow(
-  presentation: MaybeResolvedPresentation | undefined,
-  trackId: string | undefined
-): number {
-  if (!isResolvedPresentation(presentation) || !trackId) return Number.NaN;
-
-  const track = findTrackById(presentation, trackId);
-  if (!track || !isResolvedTrack(track)) return Number.NaN;
-
-  const metadata = getMediaPlaylistMetadata(track);
-  if (!metadata) return Number.NaN;
-
-  if (metadata.playlistType === 'EVENT') return Number.POSITIVE_INFINITY;
-
-  return deriveStreamType(metadata) === 'live' ? 0 : Number.NaN;
 }
 
 // ============================================================================

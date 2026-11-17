@@ -16,6 +16,7 @@ import { endStallRecoveryFeature } from '../features/end-stall-recovery';
 import { errorFeature } from '../features/error';
 import { hlsLoadingFeature } from '../features/hls-loading';
 import { initialLoadFeature } from '../features/initial-load';
+import { liveFeature } from '../features/live';
 import { mediaSourceFeature } from '../features/media-source';
 import { multiCdnFeature } from '../features/multi-cdn';
 import { shiftTimestampsFeature } from '../features/shift-timestamps';
@@ -41,6 +42,7 @@ export const features = [
   airPlayFeature,
   currentTimeFeature,
   startPositionFeature,
+  liveFeature,
   endStallRecoveryFeature,
   chaptersFeature,
 ] as const;
