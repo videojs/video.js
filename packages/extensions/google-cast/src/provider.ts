@@ -3,7 +3,7 @@ import type { HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isCaptionOrSubtitleTrack } from '@videojs/utils/dom';
 
 import type { GoogleCastExtensionProps } from './index';
-import { castFramework, ensureCastFramework, googleCastInstances } from './registry';
+import { ensureCastFramework, whenCastFramework } from './registry';
 import { RemotePlayback, type RemotePlaybackHooks } from './remote-playback';
 import {
   currentMedia,
@@ -37,6 +37,7 @@ export class GoogleCastProvider {
   #hooks: Partial<RemotePlaybackHooks> = {};
   #remotePlayback: RemotePlayback;
   #isInit = false;
+  #cancelInit: () => void;
   #isCasting = false;
   #seeking = false;
   #remotePlayer!: cast.framework.RemotePlayer;
@@ -60,8 +61,7 @@ export class GoogleCastProvider {
   constructor(googleCast: GoogleCastConfig) {
     this.#googleCast = googleCast;
     this.#remotePlayback = new RemotePlayback(this);
-    googleCastInstances.add(this);
-    this.onCastFrameworkAvailable();
+    this.#cancelInit = whenCastFramework((framework) => this.#init(framework));
   }
 
   get remote() {
@@ -98,7 +98,8 @@ export class GoogleCastProvider {
 
   destroy() {
     this.detach();
-    googleCastInstances.delete(this);
+    this.#cancelInit();
+    this.#listenToCastContext(false);
     currentMedia()?.removeUpdateListener(this.#onMediaUpdate);
     this.#listenToRemotePlayer(false);
     this.#isCasting = false;
@@ -354,20 +355,16 @@ export class GoogleCastProvider {
     }
   }
 
-  onCastFrameworkAvailable() {
-    if (!castFramework || this.#isInit) return;
-
+  #init(framework: typeof cast.framework) {
     this.#isInit = true;
-
     this.#applyCastOptions();
+    this.#onCastStateChanged();
 
-    this.onCastStateChanged();
-
-    this.#remotePlayer = new castFramework.RemotePlayer();
-    new castFramework.RemotePlayerController(this.#remotePlayer);
+    this.#remotePlayer = new framework.RemotePlayer();
+    new framework.RemotePlayerController(this.#remotePlayer);
 
     this.#remoteListeners = {
-      [castFramework.RemotePlayerEventType.IS_CONNECTED_CHANGED]: (event?: cast.framework.RemotePlayerChangedEvent) => {
+      [framework.RemotePlayerEventType.IS_CONNECTED_CHANGED]: (event?: cast.framework.RemotePlayerChangedEvent) => {
         const value = event?.value;
 
         if (value === true) {
@@ -377,28 +374,28 @@ export class GoogleCastProvider {
           this.#hooks.setState?.('disconnected');
         }
       },
-      [castFramework.RemotePlayerEventType.DURATION_CHANGED]: () => {
+      [framework.RemotePlayerEventType.DURATION_CHANGED]: () => {
         this.target?.dispatchEvent(new Event('durationchange'));
       },
-      [castFramework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED]: () => {
+      [framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED]: () => {
         this.target?.dispatchEvent(new Event('volumechange'));
       },
-      [castFramework.RemotePlayerEventType.IS_MUTED_CHANGED]: () => {
+      [framework.RemotePlayerEventType.IS_MUTED_CHANGED]: () => {
         this.target?.dispatchEvent(new Event('volumechange'));
       },
-      [castFramework.RemotePlayerEventType.CURRENT_TIME_CHANGED]: () => {
+      [framework.RemotePlayerEventType.CURRENT_TIME_CHANGED]: () => {
         if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return;
 
         this.#notifySeeked();
         this.target?.dispatchEvent(new Event('timeupdate'));
       },
-      [castFramework.RemotePlayerEventType.VIDEO_INFO_CHANGED]: () => {
+      [framework.RemotePlayerEventType.VIDEO_INFO_CHANGED]: () => {
         this.target?.dispatchEvent(new Event('resize'));
       },
-      [castFramework.RemotePlayerEventType.IS_PAUSED_CHANGED]: () => {
+      [framework.RemotePlayerEventType.IS_PAUSED_CHANGED]: () => {
         this.target?.dispatchEvent(new Event(this.#isCasting && this.#remotePlayer.isPaused ? 'pause' : 'play'));
       },
-      [castFramework.RemotePlayerEventType.PLAYER_STATE_CHANGED]: () => {
+      [framework.RemotePlayerEventType.PLAYER_STATE_CHANGED]: () => {
         const PS = chrome.cast.media.PlayerState;
         const state = this.#isCasting ? this.#remotePlayer.playerState : undefined;
 
@@ -416,29 +413,27 @@ export class GoogleCastProvider {
         if (state === PS.PLAYING) this.target?.dispatchEvent(new Event('playing'));
         else if (state === PS.BUFFERING) this.target?.dispatchEvent(new Event('waiting'));
       },
-      [castFramework.RemotePlayerEventType.IS_MEDIA_LOADED_CHANGED]: async () => {
+      [framework.RemotePlayerEventType.IS_MEDIA_LOADED_CHANGED]: async () => {
         if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded) return;
 
         await Promise.resolve();
         this.#onRemoteMediaLoaded();
       },
     };
+
+    this.#listenToCastContext(true);
   }
 
-  onCastStateChanged() {
-    if (!this.#isInit) return;
-
+  #onCastStateChanged = () => {
     if (this.#isCasting && getCastContext()!.getCastState() === cast.framework.CastState.CONNECTING) {
       this.#hooks.setState?.('connecting');
     }
 
     this.#hooks.setAvailable?.(this.hasDevicesAvailable());
-  }
+  };
 
-  async onSessionStateChanged() {
-    if (!this.#isInit) return;
-
-    const { SESSION_RESUMED } = castFramework!.SessionState;
+  #onSessionStateChanged = async () => {
+    const { SESSION_RESUMED } = cast.framework.SessionState;
 
     if (getCastContext()!.getSessionState() === SESSION_RESUMED) {
       const { src } = this.#googleCast;
@@ -459,10 +454,25 @@ export class GoogleCastProvider {
           console.error(error);
         }
 
-        this.#remoteListeners[castFramework!.RemotePlayerEventType.IS_PAUSED_CHANGED]!();
-        this.#remoteListeners[castFramework!.RemotePlayerEventType.PLAYER_STATE_CHANGED]!();
+        this.#remoteListeners[cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED]!();
+        this.#remoteListeners[cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED]!();
         this.target?.dispatchEvent(new Event('ratechange'));
       }
+    }
+  };
+
+  #listenToCastContext(listen: boolean) {
+    if (!this.#isInit) return;
+
+    const context = getCastContext()!;
+    const { CAST_STATE_CHANGED, SESSION_STATE_CHANGED } = cast.framework.CastContextEventType;
+
+    if (listen) {
+      context.addEventListener(CAST_STATE_CHANGED, this.#onCastStateChanged);
+      context.addEventListener(SESSION_STATE_CHANGED, this.#onSessionStateChanged);
+    } else {
+      context.removeEventListener(CAST_STATE_CHANGED, this.#onCastStateChanged);
+      context.removeEventListener(SESSION_STATE_CHANGED, this.#onSessionStateChanged);
     }
   }
 

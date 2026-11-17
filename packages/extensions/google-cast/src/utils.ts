@@ -8,40 +8,6 @@ export const GOOGLE_CAST_FRAMEWORK_URL = 'https://www.gstatic.com/cv/js/sender/v
 
 const HLS_CONTENT_TYPES = ['application/x-mpegurl', 'application/vnd.apple.mpegurl', 'audio/mpegurl'];
 
-export class IterableWeakSet<T extends WeakKey> {
-  readonly #refs = new Set<WeakRef<T>>();
-  readonly #seen = new WeakMap<T, WeakRef<T>>();
-
-  add(value: T): this {
-    if (this.#seen.has(value)) return this;
-
-    const ref = new WeakRef(value);
-
-    this.#seen.set(value, ref);
-    this.#refs.add(ref);
-
-    return this;
-  }
-
-  delete(value: T): boolean {
-    const ref = this.#seen.get(value);
-    if (!ref) return false;
-
-    this.#seen.delete(value);
-
-    return this.#refs.delete(ref);
-  }
-
-  forEach(fn: (value: T) => void): void {
-    for (const ref of this.#refs) {
-      const value = ref.deref();
-
-      if (value) fn(value);
-      else this.#refs.delete(ref);
-    }
-  }
-}
-
 export function onCastApiAvailable(callback: () => void) {
   const whenDefined = () => customElements.whenDefined('google-cast-button').then(callback);
 
