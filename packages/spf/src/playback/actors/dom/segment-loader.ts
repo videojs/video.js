@@ -280,7 +280,12 @@ export function createSegmentLoaderActor(
         }
       }
 
-      const forwardFlushStart = calculateForwardFlushPoint(bufferedSegments, currentTime, forwardBufferConfig);
+      // Never flush what this load asks for: its range can start before the playhead (a dispatcher's
+      // `createLoadStart`), so the window runs to `range.end`, not just `bufferDuration` past the start.
+      const forwardFlushStart = calculateForwardFlushPoint(bufferedSegments, currentTime, {
+        ...forwardBufferConfig,
+        bufferDuration: Math.max(forwardBufferConfig.bufferDuration, range.end - currentTime),
+      });
 
       if (forwardFlushStart < Infinity) {
         removes.push({ start: forwardFlushStart, end: Infinity });

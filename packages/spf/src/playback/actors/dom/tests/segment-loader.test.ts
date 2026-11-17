@@ -387,6 +387,35 @@ describe('createSegmentLoaderActor', () => {
     ]);
   });
 
+  it('does not flush forward content the requested range still covers when the range starts before the playhead', async () => {
+    const track = makeVideoTrack('track-1', [
+      segment('s1', 0),
+      segment('s2', 10),
+      segment('s3', 20),
+      segment('s4', 30),
+      segment('s5', 40),
+    ]);
+    const sourceBuffer = makeSourceBuffer([], [[0, 50]]);
+    const buffer = createSourceBufferActor(sourceBuffer, {
+      initTrackId: 'track-1',
+      segments: seedSegments(track.segments),
+      bufferedRanges: [{ start: 0, end: 50 }],
+    });
+    const loader = createSegmentLoaderActor(buffer, fetchStream, { forwardBuffer: { bufferDuration: 25 } });
+
+    onTestFinished(() => {
+      loader.destroy();
+      buffer.destroy();
+    });
+
+    // A load that starts one segment before the playhead (20) and ends a full window past it.
+    loader.send({ type: 'load', track, range: { start: 10, end: 45 } });
+
+    await vi.waitFor(() => expect(loader.snapshot.get().value).toBe('idle'));
+    expect(sourceBuffer.remove).not.toHaveBeenCalledWith(40, Infinity);
+    expect(buffer.snapshot.get().context.segments.map(({ id }) => id)).toContain('s5');
+  });
+
   it('stops at the end of the requested range', async () => {
     const track = makeVideoTrack('track-1', [segment('s1', 0), segment('s2', 10), segment('s3', 20)]);
     const fixture = makeLoaderFixture();
