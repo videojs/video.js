@@ -32,15 +32,15 @@ Video element for playing Mux-hosted HLS streams.
 
 ## Choose a playback engine
 
-The Mux video component can play your video through one of two engines: hls.js or SPF. An engine is the code that downloads the stream and feeds it to the browser. You choose one by its import path.
+The Mux video component can play your video through one of two engines: SPF or hls.js. An engine is the code that downloads the stream and feeds it to the browser. You choose one by its import path.
 
-hls.js is mature and widely used, and the default import uses it today. SPF is a smaller engine built by the Video.js team. It's still under development and doesn't yet handle everything hls.js does, but it will become the default in an upcoming release.
+SPF is Video.js's own engine, built for the streams Mux delivers. It's a fraction of hls.js's size, and it will become the default in an upcoming release. hls.js is mature, widely used, and plays almost any HLS stream. The default import uses hls.js today.
 
 | Import | Engine | Choose it when |
 |---|---|---|
+| `.../media/mux-video/spf` | SPF | None of the cases under "When to use hls.js" applies to you. |
 | `.../media/mux-video` | hls.js today, SPF soon | You want the recommended engine, and you're fine with it changing in a future release. |
-| `.../media/mux-video/hls-js` | hls.js | You need to stay on hls.js, or any of the SPF limits below affects you. |
-| `.../media/mux-video/spf` | SPF | You want a smaller download, and none of the SPF limits below affects you. |
+| `.../media/mux-video/hls-js` | hls.js | One of the cases under "When to use hls.js" applies to you. |
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -58,15 +58,20 @@ import '@videojs/html/media/mux-video/spf';
 All three imports register the same `<mux-video>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
 </FrameworkCase>
 
-With SPF, for now:
+### When to use SPF
 
-- **Live streams without slates break.** A slate is the image Mux shows while a broadcaster reconnects. Without one, playback stops at the point where the broadcaster dropped and came back, in the live stream and in the recording Mux makes of it.
-- **Mux Data reports less.** It doesn't receive SPF's playback errors, or detail like quality switches and download speed.
-- **Low-latency live streams play with a longer delay.** They still play, just further behind real time, like an ordinary live stream.
-- **Some quality settings aren't available.** You can't set the lowest or highest quality the player picks on its own, or turn off matching quality to the player's size.
-- **Older iPhones can't play it.** SPF needs iOS 17.1 or later.
+- **You want a smaller page.** SPF is about a quarter of hls.js's size, which matters most with several players on a page or on slower connections.
+- **You use AirPlay.** Starting and stopping AirPlay works smoothly on SPF. hls.js can get into a bad state when you do either.
 
-If any of these affects you, import `/hls-js`.
+### When to use hls.js
+
+SPF is still under development. Use hls.js if any of these applies to you:
+
+- **You stream live without slates.** A slate is the image Mux shows while a broadcaster reconnects. Without one, playback stops at the point where the broadcaster dropped and came back, in the live stream and in the recording Mux makes of it.
+- **You rely on detailed Mux Data.** With SPF, Mux Data doesn't receive playback errors, or detail like quality switches and download speed.
+- **You need low latency.** SPF plays low-latency live streams with the delay of an ordinary live stream.
+- **You set quality limits on the player.** SPF doesn't let you set the lowest or highest quality the player picks on its own, or stop it from matching quality to the player's size.
+- **You support older iPhones.** SPF needs iOS 17.1 or later.
 
 ### SPF limitations in detail
 
