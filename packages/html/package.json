@@ -1,6 +1,6 @@
 {
   "name": "@videojs/html",
-  "version": "10.4.0",
+  "version": "10.5.0",
   "description": "Video.js 10 for HTML, Vue, and Svelte: player custom elements and skins for video and audio",
   "keywords": [
     "audio",
@@ -122,6 +122,11 @@
       "types": "./dist/dev/define/feature/*.d.ts",
       "development": "./dist/dev/define/feature/*.js",
       "default": "./dist/default/define/feature/*.js"
+    },
+    "./media/lazy/*": {
+      "types": "./dist/dev/media/lazy/*.d.ts",
+      "development": "./dist/dev/media/lazy/*.js",
+      "default": "./dist/default/media/lazy/*.js"
     },
     "./media/mux-video": {
       "types": "./dist/dev/define/media/mux-video/index.d.ts",

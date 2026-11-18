@@ -1,12 +1,14 @@
 import { CustomMediaElement } from '@videojs/media/dom';
 import { escapeHtml } from '@videojs/utils/string';
-import { buildVimeoIframeSrc, VimeoAdapter } from '@videojs/vimeo-video';
+import { buildVimeoIframeSrc, shouldDeferVimeoEmbed, VimeoAdapter } from '@videojs/vimeo-video';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class VimeoCustomMediaElement extends CustomMediaElement('iframe', VimeoAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildVimeoIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferVimeoEmbed(props) ? '' : buildVimeoIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `

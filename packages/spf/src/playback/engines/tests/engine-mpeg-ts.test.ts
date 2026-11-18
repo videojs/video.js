@@ -113,6 +113,33 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await engine.destroy();
   }, 60_000);
 
+  it('reaches loadedmetadata before play under preload="metadata"', async () => {
+    // TS carries its init in the media segments, so metadata preload loads one segment instead of an empty init.
+    const video = document.createElement('video');
+
+    media = video;
+    video.muted = true;
+    document.body.append(video);
+
+    const engine = createTransmuxingVideoEngine();
+    const { state, context } = engine;
+
+    context.mediaElement.set(video);
+    state.preload.set('metadata');
+    state.presentation.set({ url: MUX_TS_URL } as MaybeResolvedPresentation);
+
+    await vi.waitFor(() => expect(video.readyState).toBeGreaterThanOrEqual(HTMLMediaElement.HAVE_METADATA), {
+      timeout: 20_000,
+      interval: 250,
+    });
+
+    expect(video.paused).toBe(true);
+    expect(video.videoWidth).toBeGreaterThan(0);
+    expect(state.errors.get() ?? []).toEqual([]);
+
+    await engine.destroy();
+  }, 60_000);
+
   it('keeps a stream whose first segment presents on its boundary aligned to the playlist', async () => {
     // Mux's live streams and their recordings put a segment's first *presented* frame on the playlist boundary, with
     // B-frames decoding up to two frames earlier. Serving the 60s asset from its third segment reproduces that shape

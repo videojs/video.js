@@ -5,6 +5,7 @@ import type { Composition } from '../../../core/composition/create-composition';
 import { effect } from '../../../core/signals/effect';
 import {
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   SVTA_UNSUPPORTED_VIDEO_FORMAT,
@@ -57,12 +58,14 @@ export interface HlsBackgroundVideoAdapterAPI extends HlsBackgroundVideoAdapterP
  * no verdict behind it, and the element then sits at `readyState 0` with `error` null forever.
  *
  * The verdict is still listed, for the shapes that report nothing else: no video renditions at all, or a ladder pruned
- * before anything resolves — both of which `reportAbsentTrackType` covers from the tail of the constraint chain.
+ * before anything resolves — both of which `reportAbsentTrackType` covers from the tail of the constraint chain. So is
+ * a manifest that fails to load, fatal on every adapter: the source never resolves, so nothing else is ever reported.
  *
  * First-fatal-wins then surfaces the cause rather than the verdict when both are present, which is the more specific of
  * the two.
  */
 const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
   SVTA_UNSUPPORTED_VIDEO_FORMAT,
   SVTA_UNSUPPORTED_DRM_SYSTEM,

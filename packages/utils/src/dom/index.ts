@@ -98,10 +98,12 @@ export {
   withInlineStyles,
 } from './style';
 export {
+  nativeHlsSupport,
   supportsAnchorPositioning,
   supportsAnimationFrame,
   supportsConstructableStyleSheets,
   supportsIdleCallback,
+  supportsMediaSource,
   supportsPopoverAPI,
 } from './supports';
 export { cloneTemplateRoot, createTemplate, getTemplateElement, getTemplateRoot, renderTemplate } from './template';

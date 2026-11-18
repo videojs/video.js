@@ -3,7 +3,7 @@
  * `@videojs/spf/adapters/hls-audio`, whose types it shares: audio renditions packaged as MPEG-TS play here where that
  * Media refuses them.
  *
- * MPEG-TS support is a deliberately narrow subset: what Mux Video packages for on-demand playback. Other MPEG-TS may be
+ * MPEG-TS support is a deliberately narrow subset: what Mux Video packages, on demand and live. Other MPEG-TS may be
  * refused or may mis-play; `mpegTsTransmuxFeature` lists what is covered. For general MPEG-TS, use
  * `@videojs/hlsjs-video`.
  */

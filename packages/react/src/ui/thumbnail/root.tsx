@@ -13,7 +13,7 @@ import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useOptionalPlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { renderElement } from '../../utils/use-render';
 import { ThumbnailProvider } from './context';
 
@@ -44,15 +44,15 @@ export const ThumbnailRoot = forwardRef(function ThumbnailRoot(
 
   // Force a render when the image loads, fails, or the root is resized.
   const [, setRenderToken] = useState(0);
-  const [handle] = useState(() =>
-    createThumbnail({
-      getContainer: () => divRef.current,
-      getImg: () => imgRef.current,
-      onStateChange: () => setRenderToken((token) => token + 1),
-    })
+  const handle = useInstance(
+    () =>
+      createThumbnail({
+        getContainer: () => divRef.current,
+        getImg: () => imgRef.current,
+        onStateChange: () => setRenderToken((token) => token + 1),
+      }),
+    { setup: (instance) => instance.connect() }
   );
-
-  useDestroy(handle, () => handle.connect());
 
   // The image reports itself through this ref, so a mount, unmount, or `render` swap rebinds without an effect.
   const imageRef = useCallback(

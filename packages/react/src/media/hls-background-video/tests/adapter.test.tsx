@@ -48,11 +48,17 @@ const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 beforeEach(() => {
   instances.length = 0;
   // The engine seeds `loadActivated: true`, so a rendered `src` starts fetching
-  // the manifest at once. Stubbed so these stay offline and leave no request
-  // pending at teardown.
+  // the manifest at once. Stubbed so these stay offline: the request hangs
+  // until teardown aborts it, since a failed manifest load is itself fatal and
+  // would fire `onError` on its own.
   vi.stubGlobal(
     'fetch',
-    vi.fn(() => Promise.reject(new Error('offline')))
+    vi.fn(
+      (_input: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+        })
+    )
   );
 });
 

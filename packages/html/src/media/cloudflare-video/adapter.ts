@@ -1,4 +1,4 @@
-import { buildCloudflareIframeSrc, CloudflareAdapter } from '@videojs/cloudflare-video';
+import { buildCloudflareIframeSrc, CloudflareAdapter, shouldDeferCloudflareEmbed } from '@videojs/cloudflare-video';
 import { CustomMediaElement } from '@videojs/media/dom';
 import { escapeHtml } from '@videojs/utils/string';
 
@@ -6,7 +6,9 @@ import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class CloudflareCustomMediaElement extends CustomMediaElement('iframe', CloudflareAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildCloudflareIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferCloudflareEmbed(props) ? '' : buildCloudflareIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `

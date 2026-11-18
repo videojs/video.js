@@ -9,10 +9,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_AUDIO_FORMAT,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
 } from '../../../../media/errors';
+import { MEDIA_PLAYLIST_METADATA_KEY, type Presentation } from '../../../../media/types';
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../../primitives/error-messages';
 import { HlsAudioAdapterCore, HlsAudioMixin } from '../mixin';
 
@@ -450,6 +452,121 @@ describe('HlsAudioAdapterCore', () => {
   // ---------------------------------------------------------------------------
   // Error surface — parallels adapter.test.ts, with a narrower fatal policy
   // ---------------------------------------------------------------------------
+  describe('live surface', () => {
+    class TestAdapter extends HlsAudioMixin(EventTarget) {}
+
+    /** A resolved audio-only presentation: 5×2s segments at [100, 110], targetDuration 2 (→ liveEdgeStart 104). */
+    function liveAudioPresentation(playlistType?: 'VOD' | 'EVENT'): Presentation {
+      const complete = playlistType === 'VOD';
+      const audio = {
+        type: 'audio',
+        id: 'a-1',
+        url: 'https://example.com/audio.m3u8',
+        mimeType: 'audio/mp4',
+        codecs: ['mp4a.40.2'],
+        bandwidth: 128_000,
+        groupId: 'audio',
+        name: 'English',
+        sampleRate: 48000,
+        channels: 2,
+        initialization: { url: 'https://example.com/init.mp4' },
+        duration: complete ? 10 : Number.POSITIVE_INFINITY,
+        startTime: 0,
+        segments: [100, 102, 104, 106, 108].map((startTime, i) => ({
+          id: `seg-${i}`,
+          url: `https://example.com/${i}.m4s`,
+          duration: 2,
+          startTime,
+        })),
+        metadata: {
+          [MEDIA_PLAYLIST_METADATA_KEY]: { mediaSequence: 0, targetDuration: 2, playlistType, endList: complete },
+        },
+      };
+
+      return {
+        id: 'pres-1',
+        url: 'https://example.com/master.m3u8',
+        startTime: 0,
+        streamType: complete ? 'on-demand' : 'live',
+        selectionSets: [
+          { id: 'audio-set', type: 'audio', switchingSets: [{ id: 'as', type: 'audio', tracks: [audio] }] },
+        ],
+      } as Presentation;
+    }
+
+    function liveMedia(playlistType?: 'VOD' | 'EVENT') {
+      const media = new TestAdapter();
+
+      media.engine.state.presentation.set(liveAudioPresentation(playlistType));
+      media.engine.state.selectedAudioTrackId.set('a-1');
+      return media;
+    }
+
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    it('starts unknown / NaN before anything resolves', () => {
+      const media = new TestAdapter();
+
+      expect(media.streamType).toBe('unknown');
+      expect(media.targetLiveWindow).toBeNaN();
+      expect(media.liveEdgeStart).toBeNaN();
+      media.destroy();
+    });
+
+    it('detects live from the audio track, with change events and a liveEdgeStart', async () => {
+      const media = new TestAdapter();
+      const streamTypeChange = vi.fn();
+      const targetLiveWindowChange = vi.fn();
+
+      media.addEventListener('streamtypechange', streamTypeChange);
+      media.addEventListener('targetlivewindowchange', targetLiveWindowChange);
+
+      media.engine.state.presentation.set(liveAudioPresentation());
+      media.engine.state.selectedAudioTrackId.set('a-1');
+      await flush();
+
+      expect(media.streamType).toBe('live');
+      expect(media.targetLiveWindow).toBe(0);
+      // Window [100, 110], HOLD-BACK 3 × targetDuration(2) = 6 → 104.
+      expect(media.liveEdgeStart).toBe(104);
+      expect(streamTypeChange).toHaveBeenCalledTimes(1);
+      expect(targetLiveWindowChange).toHaveBeenCalledTimes(1);
+      media.destroy();
+    });
+
+    it('reports Infinity targetLiveWindow for an EVENT (DVR) playlist', async () => {
+      const media = liveMedia('EVENT');
+
+      await flush();
+      expect(media.targetLiveWindow).toBe(Number.POSITIVE_INFINITY);
+      media.destroy();
+    });
+
+    it('reports on-demand / NaN for a VOD playlist', async () => {
+      const media = liveMedia('VOD');
+
+      await flush();
+      expect(media.streamType).toBe('on-demand');
+      expect(media.targetLiveWindow).toBeNaN();
+      expect(media.liveEdgeStart).toBeNaN();
+      media.destroy();
+    });
+
+    it('supports a user streamType override, reverting on unknown', async () => {
+      const media = liveMedia();
+
+      await flush();
+      media.streamType = 'on-demand';
+      media.engine.state.presentation.set(liveAudioPresentation());
+      await flush();
+      expect(media.streamType).toBe('on-demand');
+
+      media.streamType = 'unknown';
+      expect(media.streamType).toBe('live');
+      media.destroy();
+    });
+  });
+
   describe('error surface', () => {
     class TestAdapter extends HlsAudioMixin(EventTarget) {}
 
@@ -459,6 +576,20 @@ describe('HlsAudioAdapterCore', () => {
       const media = new TestAdapter();
 
       expect(media.error).toBeNull();
+      media.destroy();
+    });
+
+    it('surfaces a manifest that fails to load as fatal', async () => {
+      const media = new TestAdapter();
+      const fired: Event[] = [];
+
+      media.addEventListener('error', (event) => fired.push(event));
+
+      media.engine.state.errors.set([{ code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR }]);
+      await flush();
+
+      expect(fired).toHaveLength(1);
+      expect(media.error?.code).toBe(SVTA_PRIMARY_MANIFEST_LOAD_ERROR);
       media.destroy();
     });
 

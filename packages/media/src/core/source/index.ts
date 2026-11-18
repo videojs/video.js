@@ -1,6 +1,7 @@
 export * from './adapter-type';
 export * from './cloudflare';
 export * from './dailymotion';
+export * from './lazy-media';
 export * from './mixcloud';
 export * from './soundcloud';
 export * from './spotify';

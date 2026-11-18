@@ -1,15 +1,41 @@
+import {
+  bufferFeature,
+  errorFeature,
+  metadataFeature,
+  playbackFeature,
+  playbackRateFeature,
+  timeFeature,
+} from '@videojs/core';
 import type { ComponentProps } from 'react';
 
-import { nativePlaybackFeature } from '../store/playback';
 import { createPlayer } from './create-player';
 
 /**
- * Features for a react-native video player.
- *
- * A plain array, not `as const` — `NativePlayerStore` takes a mutable array, mirroring web's `PlayerStore`, and would
- * reject a readonly tuple.
+ * The feature tuple behind {@link nativeVideoFeatures}. Spelled out, as web's `VideoFeatures` is, because `metadata` and
+ * `playbackRate` key their state on symbols `@videojs/core` doesn't export, so an inferred type couldn't be named in
+ * the published declarations; `typeof` the imported feature can.
  */
-export const nativeVideoFeatures = [nativePlaybackFeature];
+export type NativeVideoFeatures = [
+  typeof playbackFeature,
+  typeof timeFeature,
+  typeof bufferFeature,
+  typeof errorFeature,
+  typeof metadataFeature,
+  typeof playbackRateFeature,
+];
+
+/**
+ * Features for a react-native video player. Core's platform-neutral features attach to the react-native target as-is,
+ * since `ReactNativeMedia` passes the capability checks they open with.
+ */
+export const nativeVideoFeatures: NativeVideoFeatures = [
+  playbackFeature,
+  timeFeature,
+  bufferFeature,
+  errorFeature,
+  metadataFeature,
+  playbackRateFeature,
+];
 
 /**
  * Preconfigured player with the react-native video features.
