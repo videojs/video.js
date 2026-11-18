@@ -25,16 +25,3 @@
   border-radius: 9999px;
   backdrop-filter: blur(10px);
 }
-
-.media-seek-button .backward {
-  display: none;
-}
-.media-seek-button .forward {
-  display: none;
-}
-.media-seek-button[data-direction="backward"] .backward {
-  display: inline;
-}
-.media-seek-button[data-direction="forward"] .forward {
-  display: inline;
-}
