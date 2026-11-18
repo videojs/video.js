@@ -5,8 +5,11 @@ video.js for react-native
 ## Installation
 
 ```sh
-npm install @videojs/react-native
+npm install @videojs/react-native react-native-svg
 ```
+
+`react-native-svg` is a peer dependency: the skin's icons render through it. It has native code, so rebuild the app
+(and run `pod install` on iOS) after adding it.
 
 Requires React Native 0.76 or later with the New Architecture enabled (the default since 0.76): the player view is a
 Fabric component and the engine is a TurboModule, both generated from `codegenConfig`. React 18 and 19 are supported.

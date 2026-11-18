@@ -40,12 +40,17 @@ config.resolver.extraNodeModules = {
 // blockList is meant to dedupe it, but it matches symlinked paths and Metro resolves pnpm's symlinks to their real
 // `.pnpm/react@x` location, so a second copy slips in and hooks throw on a null dispatcher. Resolve every `react`
 // import as if it came from this app.
+//
+// `react-native-svg` needs the same: @videojs/icons' react-native output imports it, and pnpm gives icons its own copy
+// (peered with icons' dev React). That copy registers its native components in a registry the app never reads, so every
+// `<Path>` fails with "View config getter callback for component `RNSVGPath` must be a function".
 const appOrigin = path.join(__dirname, 'index.js');
+const appSingletons = ['react', 'react-native-svg'];
 const { resolveRequest } = config.resolver;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
-  const isReact = moduleName === 'react' || moduleName.startsWith('react/');
-  const origin = isReact ? { ...context, originModulePath: appOrigin } : context;
+  const isSingleton = appSingletons.some((name) => moduleName === name || moduleName.startsWith(`${name}/`));
+  const origin = isSingleton ? { ...context, originModulePath: appOrigin } : context;
 
   return resolveRequest(origin, moduleName, platform);
 };

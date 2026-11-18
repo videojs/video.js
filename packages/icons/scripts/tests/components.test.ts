@@ -73,6 +73,23 @@ describe('generated icon modules', () => {
     }
   });
 
+  it.each(['default', 'neutral'])('builds react-native-svg components for the %s family', async (family) => {
+    const [source, spinner, types] = await Promise.all([
+      readFile(resolve(distRoot, 'react-native', family, 'play.js'), 'utf8'),
+      readFile(resolve(distRoot, 'react-native', family, 'spinner.js'), 'utf8'),
+      readFile(resolve(distRoot, 'react-native', family, 'index.d.ts'), 'utf8'),
+    ]);
+
+    expect(source).toContain('from "react-native-svg"');
+    expect(source).toContain('forwardRef');
+    expect(source).not.toContain('xmlns');
+    expect(spinner).not.toMatch(/className|--media-spinner|style/);
+    expect(types).toContain(`import type { Svg, SvgProps } from 'react-native-svg';`);
+    expect(types).toContain(
+      'export declare const PlayIcon: React.ForwardRefExoticComponent<SvgProps & React.RefAttributes<Svg>>;'
+    );
+  });
+
   it('builds HTML strings without a React type dependency', async () => {
     const [source, types] = await Promise.all([
       readFile(resolve(distRoot, 'html/default/play.js'), 'utf8'),

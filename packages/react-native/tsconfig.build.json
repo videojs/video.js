@@ -29,5 +29,6 @@
     "target": "ESNext",
     "verbatimModuleSyntax": true
   },
-  "exclude": ["lib", "types"]
+  // The Vite config is tooling, and tests import Vitest; neither belongs in the published declarations.
+  "exclude": ["lib", "types", "vite.config.ts", "src/**/tests"]
 }

@@ -1,6 +1,6 @@
 # @videojs/icons
 
-SVG icon library for Video.js. Ships optimized icons for React, HTML strings, static rendering, and the `<media-icon>` custom element, organized into icon sets.
+SVG icon library for Video.js. Ships optimized icons for React, React Native, HTML strings, static rendering, and the `<media-icon>` custom element, organized into icon sets.
 
 ## Icon Sets
 
@@ -24,6 +24,7 @@ Icons are grouped into visual sets. Each set contains the same icon names with d
 | `cast-exit` | `CastExitIcon` | `castExitIcon` |
 | `check` | `CheckIcon` | `checkIcon` |
 | `chevron` | `ChevronIcon` | `chevronIcon` |
+| `error` | `ErrorIcon` | `errorIcon` |
 | `fullscreen-enter` | `FullscreenEnterIcon` | `fullscreenEnterIcon` |
 | `fullscreen-exit` | `FullscreenExitIcon` | `fullscreenExitIcon` |
 | `gear` | `GearIcon` | `gearIcon` |
@@ -65,6 +66,19 @@ Import from a specific icon set:
 ```tsx
 import { PlayIcon } from '@videojs/react/icons/neutral';
 ```
+
+### React Native
+
+Import icons as [`react-native-svg`](https://github.com/software-mansion/react-native-svg) components, built from the same SVG sources as the React icons. They accept `SvgProps` and support ref forwarding.
+
+```tsx
+import { PlayIcon } from '@videojs/icons/react-native';
+import { PlayIcon as NeutralPlayIcon } from '@videojs/icons/react-native/neutral';
+
+<PlayIcon color="white" width={24} height={24} />;
+```
+
+`react-native-svg` has no stylesheet support, so icons that animate through CSS, such as `spinner`, render static. Animate them from the component that renders them.
 
 ### HTML
 
@@ -112,7 +126,7 @@ Icons are designed on an **18×18 grid**. Rendering at `18px` (or exact multiple
 
 1. Add an SVG file to `src/assets/<set>/` (e.g., `src/assets/default/my-icon.svg`).
 2. Run `pnpm -F @videojs/icons build`.
-3. The build script optimizes the SVG with SVGO and generates React components and HTML string exports.
+3. The build script optimizes the SVG with SVGO and generates React, React Native, and HTML string exports.
 
 The build automatically:
 
