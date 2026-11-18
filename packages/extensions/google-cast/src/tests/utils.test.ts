@@ -99,6 +99,28 @@ describe('getPlaylistSegmentFormat', () => {
     });
   });
 
+  it('reads the format from the segment path when the URI has a fragment', async () => {
+    stubPlaylists({
+      'https://example.com/media.m3u8': '#EXTM3U\n#EXTINF:4,\nhttps://cdn.example.com/v1.2/seg0.ts#t=0\n',
+    });
+
+    await expect(getPlaylistSegmentFormat('https://example.com/media.m3u8')).resolves.toEqual({
+      videoFormat: 'ts',
+      audioFormat: 'ts',
+    });
+  });
+
+  it('reads no format from a query when the segment path has no extension', async () => {
+    stubPlaylists({
+      'https://example.com/media.m3u8': '#EXTM3U\n#EXTINF:4,\nsegments/0?file=clip.ts\n',
+    });
+
+    await expect(getPlaylistSegmentFormat('https://example.com/media.m3u8')).resolves.toEqual({
+      videoFormat: undefined,
+      audioFormat: undefined,
+    });
+  });
+
   it('does not fetch blob: URLs', async () => {
     const fetch = stubPlaylists({});
 

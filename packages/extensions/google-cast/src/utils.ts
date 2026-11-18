@@ -111,8 +111,15 @@ function getAudioRenditionUri(playlist: string) {
 }
 
 /** The file extension of the first segment a media playlist lists, such as `ts` or `m4s`. */
-function getSegmentFormat(playlist: string) {
-  return getFirstUri(playlist)?.match(/\.(\w+)(?:\?.*)?$/)?.[1];
+function getSegmentFormat(playlist: string, playlistUrl: string | URL) {
+  const uri = getFirstUri(playlist);
+  if (!uri) return undefined;
+
+  // Read the extension from the path alone, so a query or fragment can't supply one.
+  const file = new URL(uri, playlistUrl).pathname.split('/').pop() ?? '';
+  const dot = file.lastIndexOf('.');
+
+  return dot > 0 ? file.slice(dot + 1).toLowerCase() : undefined;
 }
 
 async function fetchText(url: string | URL) {
@@ -153,14 +160,17 @@ export async function getPlaylistSegmentFormat(url: string): Promise<PlaylistSeg
   try {
     const playlist = await fetchText(url);
     const variantUri = playlist.includes('#EXT-X-STREAM-INF') ? getFirstUri(playlist) : undefined;
-    const videoFormat = getSegmentFormat(variantUri ? await fetchText(new URL(variantUri, url)) : playlist);
+    const videoUrl = variantUri ? new URL(variantUri, url) : url;
+    const videoFormat = getSegmentFormat(variantUri ? await fetchText(videoUrl) : playlist, videoUrl);
 
     const audioUri = getAudioRenditionUri(playlist);
     let audioFormat = videoFormat;
 
     if (audioUri) {
       try {
-        audioFormat = getSegmentFormat(await fetchText(new URL(audioUri, url))) ?? videoFormat;
+        const audioUrl = new URL(audioUri, url);
+
+        audioFormat = getSegmentFormat(await fetchText(audioUrl), audioUrl) ?? videoFormat;
       } catch (err) {
         console.error('Error while trying to parse the audio rendition playlist', err);
       }
