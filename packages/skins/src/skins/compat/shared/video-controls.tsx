@@ -14,7 +14,7 @@ export function VideoControlsContent({
 }: ControlsSlots & { center?: boolean; live?: boolean; menu?: VjscNode } = {}) {
   return (
     <ControlsContent
-      captions={!live && <CaptionsToggle />}
+      captions={<CaptionsToggle />}
       center={center}
       live={live}
       menu={menu}

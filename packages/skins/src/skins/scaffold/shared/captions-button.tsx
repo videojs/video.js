@@ -16,7 +16,7 @@ export function CaptionsToggle() {
   );
 }
 
-export function CaptionsButton({ className, ...props }: Props<CoreProps> = {}) {
+function CaptionsButton({ className, ...props }: Props<CoreProps> = {}) {
   return (
     <$.CaptionsButton $render={Button} className={[captionsButtonStyles.root, className]} {...props}>
       <CaptionsOffIcon className={[buttonStyles.icon, captionsButtonStyles.offIcon]} />
