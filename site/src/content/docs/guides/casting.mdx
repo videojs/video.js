@@ -150,7 +150,7 @@ By default, Video.js sends the current source to Google's Default Media Receiver
 
 </FrameworkCase>
 
-The Default Media Receiver can't play Mux DRM content. For a Mux source with a `drm.token`, the Cast button stays disabled until `receiver` names a receiver that can license it.
+The Default Media Receiver can't play Mux DRM content. For a Mux source with a `drm.token`, the Cast button stays disabled until `receiver` names a receiver that can license it. See [Cast Mux DRM content](#cast-mux-drm-content).
 
 <FrameworkCase frameworks={["react"]}>
 Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">GoogleCast reference</DocsLink> for the exact option types.
@@ -159,6 +159,37 @@ Use `src` and `contentType` when the receiver should load a different source tha
 <FrameworkCase frameworks={["html"]}>
 Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">`<google-cast>` reference</DocsLink> for the exact option types and attribute-to-property mapping.
 </FrameworkCase>
+
+### Cast Mux DRM content
+
+Video.js doesn't send a Mux source's DRM token to the receiver. Follow Mux's [Google Cast DRM guide](https://www.mux.com/docs/guides/play-drm-protected-videos-on-google-cast) to build and register a receiver. Then set `receiver` to its application ID and pass the playback ID and DRM token in `customData`, in the format Mux Player sends:
+
+<FrameworkCase frameworks={["react"]}>
+
+```tsx
+<GoogleCast
+  receiver="YOUR_APP_ID"
+  customData={{ mux: { playbackId, tokens: { drm: drmToken } } }}
+/>
+```
+
+</FrameworkCase>
+<FrameworkCase frameworks={["html"]}>
+
+```html
+<google-cast receiver="YOUR_APP_ID"></google-cast>
+```
+
+```ts
+import type { GoogleCastExtension } from '@videojs/html/extensions/google-cast';
+
+const googleCast = document.querySelector<GoogleCastExtension>('google-cast')!;
+googleCast.customData = { mux: { playbackId, tokens: { drm: drmToken } } };
+```
+
+</FrameworkCase>
+
+The receiver reads `customData.mux.tokens.drm` and requests licenses from `https://license.mux.com/license/widevine/{playbackId}?token={drmToken}`. A receiver built for Mux Player reads the same format, so it works unchanged. `customData` isn't derived from the source, so update it whenever the playback ID or DRM token changes.
 
 ### Read connection state
 
