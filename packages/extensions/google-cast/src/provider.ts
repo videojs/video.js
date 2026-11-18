@@ -215,15 +215,19 @@ export class GoogleCastProvider {
     if (await isHls(src)) {
       mediaInfo.contentType ||= 'application/x-mpegURL';
 
-      const fmt = (await getPlaylistSegmentFormat(src)) ?? '';
+      const { videoFormat, audioFormat } = await getPlaylistSegmentFormat(src);
       const { HlsSegmentFormat: HS, HlsVideoSegmentFormat: HVS } = chrome.cast.media;
 
-      if (fmt.includes('m4s') || fmt.includes('mp4')) {
+      if (videoFormat?.includes('m4s') || videoFormat?.includes('mp4') || videoFormat?.includes('m4a')) {
         mediaInfo.hlsSegmentFormat = HS.FMP4;
         mediaInfo.hlsVideoSegmentFormat = HVS.FMP4;
-      } else if (fmt.includes('ts')) {
+      } else if (audioFormat?.includes('aac')) {
+        // Packed AAC audio renditions alongside TS video.
+        mediaInfo.hlsSegmentFormat = HS.AAC;
+        mediaInfo.hlsVideoSegmentFormat = HVS.MPEG2_TS;
+      } else if (videoFormat?.includes('ts') || audioFormat?.includes('ts')) {
         mediaInfo.hlsSegmentFormat = HS.TS;
-        mediaInfo.hlsVideoSegmentFormat = HVS.TS;
+        mediaInfo.hlsVideoSegmentFormat = HVS.MPEG2_TS;
       }
     }
 
