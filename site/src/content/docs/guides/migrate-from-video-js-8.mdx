@@ -745,7 +745,7 @@ You get `targetLiveWindow` and `liveEdgeStart` in state, plus a live button that
 
 The live skins have no time slider. To preserve DVR scrubbing, add one to custom UI or installed skin source; follow <DocsLink slug="guides/live-streams" anchor="dvr-let-users-scrub-back">the DVR setup</DocsLink>.
 
-The live composition is deliberately narrower than the video one. It leaves out playback rate, quality, and audio-track state, so those controls don't appear in a live skin's settings menu. If you need an omitted feature on a live player, build your own player from a feature list rather than taking the preset's.
+The live composition leaves out playback-rate state, so live skins have no speed menu. Live skins don't show quality or audio-track menus either, though custom UI can read that state. If you need playback rate on a live player, build your own player from a feature list rather than taking the preset's.
 
 <FrameworkCase frameworks={["html"]}>
 That's what <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> is for. Hand it a feature list and you get back a `PlayerElement` class to register as your own player element, plus a `PlayerController` bound to that player's features.
