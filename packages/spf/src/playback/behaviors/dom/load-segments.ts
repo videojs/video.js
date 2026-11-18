@@ -47,6 +47,7 @@ import {
 } from '../../../media/utils/tracks';
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
+import type { CreateLoadStart } from '../../primitives/load-start';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
 
 // Re-export buffer state types for consumers that import them from this module.
@@ -165,6 +166,11 @@ function setupSegmentLoading<
     ) => Track | undefined;
     /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
+    /**
+     * Builds a signal that moves a full-range load's start earlier than the playhead (see `primitives/load-start`).
+     * Omit to start every load at the playhead.
+     */
+    createLoadStart?: CreateLoadStart;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
   const { selectedKey, loaderKey, findResolvedTrack } = config;
@@ -189,6 +195,8 @@ function setupSegmentLoading<
 
     return segmentStartForTime(state.currentTime.get() ?? 0, track.segments);
   });
+
+  const loadStartSignal = config.createLoadStart?.({ state, context, config });
 
   const derivedStateSignal = computed<SegmentLoadingFsmState>(() => {
     // Policy-off wins even over preconditions: a loader arriving while
@@ -255,8 +263,8 @@ function setupSegmentLoading<
         },
       },
       'full-range': {
-        // Re-fires on selected-track changes and on segment-boundary
-        // crossings. The loader and `currentTime` are peeked — the
+        // Re-fires on selected-track changes, on segment-boundary
+        // crossings, and when the configured load start changes. The loader and `currentTime` are peeked — the
         // boundary-dedup signal already handles re-firing policy.
         effects: () => {
           // Guarded for the reason given on `'metadata-only'`'s entry: this
@@ -266,6 +274,7 @@ function setupSegmentLoading<
           const track = selectedTrack.get();
 
           segmentBoundarySignal.get();
+          const loadStart = loadStartSignal?.get();
           const loader = peek(context[loaderKey]);
           if (!track || !loader) return;
 
@@ -277,7 +286,7 @@ function setupSegmentLoading<
           loader.send({
             type: 'load',
             track,
-            range: { start: currentTime, end: currentTime + bufferDuration },
+            range: { start: loadStart ?? currentTime, end: currentTime + bufferDuration },
           });
         },
       },
@@ -326,7 +335,14 @@ export const loadVideoSegments = defineBehavior({
     context: {
       videoSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['videoSegmentLoaderActor']>;
     };
-    config?: object;
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,
@@ -353,7 +369,14 @@ export const loadAudioSegments = defineBehavior({
     context: {
       audioSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['audioSegmentLoaderActor']>;
     };
-    config?: object;
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,
