@@ -1,11 +1,14 @@
 import { PlayButtonCore } from '@videojs/core';
+import { PauseIcon, PlayIcon, RestartIcon } from '@videojs/icons/react-native';
 import { isUndefined } from '@videojs/utils/predicate';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Pressable, type PressableProps, StyleSheet, Text } from 'react-native';
+import { Pressable, type PressableProps } from 'react-native';
 
 import { usePlayer } from '../player/context';
 import { selectPlayback } from '../store/selectors';
+import { toNativeA11yProps } from './utils/accessibility';
+import { buttonStyles, ICON_COLOR, ICON_SIZE } from './utils/button';
 
 export interface PlayButtonProps extends Omit<PressableProps, 'onPress' | 'children'> {
   disabled?: boolean | undefined;
@@ -17,10 +20,6 @@ export interface PlayButtonProps extends Omit<PressableProps, 'onPress' | 'child
  * Binds `PlayButtonCore` — the same framework-agnostic core the web button uses — to the store during render, which is
  * the pattern `createMediaButton` follows: feed the core the selected slice, read the projected state straight back,
  * and let the store's selector equality drive re-renders. The core holds no subscription of its own.
- *
- * Two things the web adapter does are deliberately dropped. `core.getAttrs()` emits `aria-*`, which means nothing in
- * react-native, so accessibility props are mapped by hand. And `core.getLabel()` returns an i18n `Text` token needing
- * `translateText`; the label here is derived from `paused` instead, leaving i18n for later.
  */
 export function PlayButton({ disabled, style, ...props }: PlayButtonProps): ReactNode {
   const playback = usePlayer(selectPlayback);
@@ -33,19 +32,23 @@ export function PlayButton({ disabled, style, ...props }: PlayButtonProps): Reac
   core.setMedia(playback);
 
   const state = core.getState();
-  const label = state.paused ? 'Play' : 'Pause';
+  const Icon = state.ended ? RestartIcon : state.paused ? PlayIcon : PauseIcon;
 
   return (
     <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: Boolean(disabled) }}
+      role="button"
+      {...toNativeA11yProps(core.getAttrs(state))}
       disabled={disabled}
       onPress={() => core.toggle(playback)}
-      style={[styles.button, style as object]}
+      style={(pressState) => [
+        buttonStyles.button,
+        pressState.pressed && buttonStyles.pressed,
+        disabled && buttonStyles.disabled,
+        typeof style === 'function' ? style(pressState) : style,
+      ]}
       {...props}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Icon color={ICON_COLOR} width={ICON_SIZE} height={ICON_SIZE} />
     </Pressable>
   );
 }
@@ -53,19 +56,3 @@ export function PlayButton({ disabled, style, ...props }: PlayButtonProps): Reac
 export namespace PlayButton {
   export type Props = PlayButtonProps;
 }
-
-const styles = StyleSheet.create({
-  button: {
-    position: 'absolute',
-    bottom: 12,
-    left: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
-  label: {
-    color: 'white',
-    fontWeight: '600',
-  },
-});

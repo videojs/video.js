@@ -3,7 +3,7 @@ import { existsSync, rmSync, watch } from 'node:fs';
 import { emitElementBase, emitElementFamily } from './build/element.js';
 import { emitHtmlFamily } from './build/html.js';
 import { loadIconFamilies } from './build/model.js';
-import { emitReactFamily } from './build/react.js';
+import { emitReactFamily, emitReactNativeFamily } from './build/react.js';
 import { emitRenderFamily } from './build/render.js';
 import { emitVjscFamily } from './build/vjsc.js';
 import { ASSETS_DIR, DIST_DIR } from './internal/paths.js';
@@ -27,6 +27,7 @@ async function build(): Promise<void> {
     emitVjscFamily(family);
     emitHtmlFamily(family);
     await emitReactFamily(family);
+    await emitReactNativeFamily(family);
     emitRenderFamily(family);
     emitElementFamily(family);
   }
