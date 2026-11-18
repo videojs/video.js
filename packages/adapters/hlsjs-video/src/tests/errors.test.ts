@@ -40,11 +40,67 @@ function setup() {
   const video = document.createElement('video');
 
   host.attach(video);
+  (engine as any).emit(Hls.Events.MEDIA_ATTACHING);
   (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
   return { engine, host, video };
 }
 
 describe('HlsJsErrorsMixin', () => {
+  it('captures an in-flight manifest failure before reattachment finishes', () => {
+    const engine = createEngine();
+    const host = new HlsJsErrors(engine);
+    const video = document.createElement('video');
+    const handler = vi.fn();
+
+    host.addEventListener('error', handler);
+    host.attach(video);
+    (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+    host.detach();
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    host.attach(video);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHING);
+    (engine as any).emit(Hls.Events.ERROR, {
+      type: Hls.ErrorTypes.NETWORK_ERROR,
+      details: Hls.ErrorDetails.MANIFEST_LOAD_ERROR,
+      fatal: true,
+      response: { code: 403 },
+      error: new Error('Forbidden'),
+    });
+
+    expect(handler).toHaveBeenCalledOnce();
+    expect(host.error!.data.response.code).toBe(403);
+
+    const error = host.error;
+
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(host.error).toBe(error);
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('retains a fatal manifest error when MSE attachment completes later', () => {
+    const engine = createEngine();
+    const host = new HlsJsErrors(engine);
+
+    host.attach(document.createElement('video'));
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHING);
+    (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+    (engine as any).emit(Hls.Events.ERROR, {
+      type: Hls.ErrorTypes.NETWORK_ERROR,
+      details: Hls.ErrorDetails.MANIFEST_LOAD_ERROR,
+      fatal: true,
+      error: new Error('Forbidden'),
+    });
+
+    const error = host.error;
+
+    expect(error).toBeInstanceOf(MediaError);
+
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(host.error).toBe(error);
+  });
+
   it('dispatches an error event on the host for fatal errors', () => {
     const { engine, host } = setup();
 

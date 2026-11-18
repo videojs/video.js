@@ -15,12 +15,13 @@ import {
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   type SvtaError,
 } from '../../../media/errors';
 import { resolveLiveLatency } from '../../../media/hls/reload-policy';
+import { deriveTargetLiveWindow } from '../../../media/live-window';
 import {
-  deriveStreamType,
   getMediaPlaylistMetadata,
   isResolvedPresentation,
   isResolvedTrack,
@@ -122,28 +123,6 @@ export interface HlsVideoAdapterAPI extends HlsVideoAdapterProps {
   play(): Promise<void>;
 }
 
-/**
- * `targetLiveWindow` per the media-ui-extensions live-edge proposal: `NaN` for on-demand (or nothing resolved yet), `0`
- * for standard sliding-window live, `Infinity` for DVR (`#EXT-X-PLAYLIST-TYPE:EVENT` — the window grows from the
- * start). Read from the timeline-bearing track's playlist metadata.
- */
-function deriveTargetLiveWindow(
-  presentation: MaybeResolvedPresentation | undefined,
-  trackId: string | undefined
-): number {
-  if (!isResolvedPresentation(presentation) || !trackId) return Number.NaN;
-
-  const track = findTrackById(presentation, trackId);
-  if (!track || !isResolvedTrack(track)) return Number.NaN;
-
-  const metadata = getMediaPlaylistMetadata(track);
-  if (!metadata) return Number.NaN;
-
-  if (metadata.playlistType === 'EVENT') return Number.POSITIVE_INFINITY;
-
-  return deriveStreamType(metadata) === 'live' ? 0 : Number.NaN;
-}
-
 // ============================================================================
 // Error surface
 // ============================================================================
@@ -155,9 +134,11 @@ function deriveTargetLiveWindow(
  *
  * An allow-list, deliberately: only _verdicts_ are here. The per-rendition causes `resolve-track` reports (unsupported
  * format, unsupported DRM) stay in the sequence as context — one unplayable rendition doesn't fail the source, and
- * promoting a cause would put a dialog over a mixed source that goes on to play.
+ * promoting a cause would put a dialog over a mixed source that goes on to play. A manifest that fails to load is a
+ * verdict too: the source never resolves, so nothing else is ever reported.
  */
 const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
 ]);
@@ -181,6 +162,9 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
  * @fires targetlivewindowchange - Fired when the target live window changes. Read `targetLiveWindow` for the new value.
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  */
+/** What the adapter's `createEngine` static builds: an engine over this adapter's state and context. */
+export type CreateEngine = (config: EngineConfig) => Composition<EngineState, EngineContext>;
+
 export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class HlsVideoImpl extends BaseClass {
     static readonly defaultProps: HlsVideoAdapterProps = {
@@ -213,6 +197,13 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     static get alternativeMediaSuggestion(): string | undefined {
       return undefined;
     }
+
+    /**
+     * The engine factory the adapter builds its engine with. A Media over a differently composed engine — one sharing
+     * this engine's state and context, with more features laid in, as the Mux Medias lay the MPEG-TS transmux —
+     * overrides this static and nothing else.
+     */
+    static readonly createEngine: CreateEngine = createEngine;
 
     readonly #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
@@ -655,7 +646,7 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     #createEngine(): Composition<EngineState, EngineContext> {
-      return createEngine({
+      return (this.constructor as typeof HlsVideoImpl).createEngine({
         ...this.#config,
         // A policy, not a value: the engine outlives `crossOrigin` changes and
         // consults this on every request. A consumer-supplied policy wins.
@@ -674,6 +665,7 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
   // adding back to the type or callers can't read it.
   return HlsVideoImpl as unknown as MixinReturn<Base, HlsVideoAdapterAPI, [options?: HlsVideoAdapterOptions]> & {
     readonly alternativeMediaSuggestion: string | undefined;
+    readonly createEngine: CreateEngine;
     readonly defaultProps: HlsVideoAdapterProps;
   };
 }

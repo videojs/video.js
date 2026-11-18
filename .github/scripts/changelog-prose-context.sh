@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Pre-fetch everything the changelog prose agent needs into CONTEXT_DIR so the
 # agent itself never has to touch GitHub: PR metadata for every "#NNNN" in the
-# raw changelog, the linkable docs slugs, two recent changelogs as tone
-# examples, and the writing style guide.
+# raw changelog, the linkable docs slugs, the packages that are not published
+# yet, two recent changelogs as tone examples, and the writing style guide.
 #
 # Usage: changelog-prose-context.sh [VERSION] [CONTEXT_DIR]
 #
@@ -99,6 +99,26 @@ find "$DOCS_ROOT/guides" "$DOCS_ROOT/reference" \
   | sed -e "s#^$DOCS_ROOT/##" -e 's#\.mdx\?$##' \
   | sort > "$CONTEXT_DIR/docs.txt"
 echo "Listed $(wc -l < "$CONTEXT_DIR/docs.txt") docs pages"
+
+# ── Unpublished packages ─────────────────────────────────────────
+# A private package that no published package depends on never reaches npm,
+# so its changes are in-development work (React Native, say). Private packages
+# that a published one bundles, such as skins and icons, ship with it and are
+# left out. One line per package: "<changelog scope>\t<package name>".
+PACKAGE_MANIFESTS=()
+for manifest in packages/*/package.json packages/*/*/package.json; do
+  [ -f "$manifest" ] && PACKAGE_MANIFESTS+=("$manifest")
+done
+jq -rn '
+  [inputs | . + { scope: (input_filename | split("/")[-2]) }] as $packages
+  | [$packages[] | select(.private != true)
+      | (.dependencies // {}) + (.devDependencies // {}) + (.peerDependencies // {})
+      | keys[]] as $shipped
+  | $packages[] | select(.private == true)
+  | select(.name as $name | $shipped | index($name) | not)
+  | "\(.scope)\t\(.name)"
+' "${PACKAGE_MANIFESTS[@]}" | sort > "$CONTEXT_DIR/unpublished-packages.txt"
+echo "Listed $(wc -l < "$CONTEXT_DIR/unpublished-packages.txt") unpublished packages"
 
 # ── Tone examples ────────────────────────────────────────────────
 # The two highest-versioned other changelogs. Sort on a key that ranks

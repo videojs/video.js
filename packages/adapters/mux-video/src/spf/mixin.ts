@@ -50,8 +50,9 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
     };
 
     /**
-     * Named on the error copy when this engine can't play a source: the hls.js-backed Mux Media plays the MPEG-TS
-     * sources that SPF does not, and it backs both `<mux-video>` and `<mux-audio>`.
+     * Named on the error copy when this engine can't play a source: the hls.js-backed Mux Media plays what these
+     * flavors still refuse (a protected asset on the audio flavor, codecs the transmuxer doesn't cover), and it backs
+     * both `<mux-video>` and `<mux-audio>`.
      *
      * Names the flavor rather than an import path, because one Media is reached through three of them —
      * `@videojs/html`, `@videojs/react`, and this package — and each has a different counterpart. The flavor suffix is

@@ -58,6 +58,8 @@ If the user is active, or if the video is paused, this component will show contr
 
 User activity is tracked via pointer movement, keyboard input, and focus events on the player container. On touch devices, a quick tap toggles visibility. `mouseleave` immediately sets the user as inactive.
 
+The controls also report whether playback has started, with `data-started`. A pending autoplay counts as started, matching the play button. Pausing does not clear it.
+
 `visibility` selects between the two modes. The default, `auto`, follows the player's controls visibility state as described above. `always` keeps the controls visible and reports the user as active regardless of playback or idle state, and works without the controls feature. The idle delay itself is not configurable.
 
 <FrameworkCase frameworks={["react"]}>
@@ -90,7 +92,7 @@ User activity is tracked via pointer movement, keyboard input, and focus events 
 `Controls.Backdrop` is an optional presentational sibling of `Controls.Content`. It receives the same controls state data attributes, allowing its styling and transitions to be authored independently from the controls surface.
 </FrameworkCase>
 
-The controls parts ship no styles. These example rules provide click-through and fade behavior:
+The controls parts ship no styles. These example rules provide click-through and fade behavior, and keep the controls hidden until playback starts. Use `visibility` rather than `opacity` for that last rule, so the hidden controls can't receive focus:
 
 <FrameworkCase frameworks={["html"]}>
 ```css
@@ -120,6 +122,12 @@ media-controls-content:not([data-visible]) {
 
 media-controls-backdrop:not([data-visible]) {
   opacity: 0;
+}
+
+/* Hide the controls until playback starts */
+media-controls-content:not([data-started]),
+media-controls-backdrop:not([data-started]) {
+  visibility: hidden;
 }
 ```
 </FrameworkCase>
@@ -154,6 +162,12 @@ React renders `<div>` elements. Add a `className` to style them:
 
 .controls-backdrop:not([data-visible]) {
   opacity: 0;
+}
+
+/* Hide the controls until playback starts */
+.controls:not([data-started]),
+.controls-backdrop:not([data-started]) {
+  visibility: hidden;
 }
 ```
 </FrameworkCase>

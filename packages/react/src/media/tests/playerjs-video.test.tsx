@@ -51,6 +51,23 @@ describe('PlayerJsVideo', () => {
     expect(iframe.getAttribute('referrerpolicy')).toBe('no-referrer');
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', async () => {
+    const { container } = render(<PlayerJsVideo src={SRC} preload="none" />);
+
+    await flushDeferredEmbed();
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
+
+  it('accepts autoPlay like <video>, building the embed under preload="none"', () => {
+    const { container, media } = renderWithMedia(<PlayerJsVideo src={SRC} preload="none" autoPlay />);
+    const iframe = container.querySelector('iframe')!;
+
+    expect(media.autoplay).toBe(true);
+    expect(iframe.getAttribute('src')).toContain('autoplay=true');
+    expect(iframe.hasAttribute('autoplay')).toBe(false);
+  });
+
   it('renders without a source and builds the embed when one arrives', async () => {
     const { container, rerender } = render(<PlayerJsVideo />);
     const iframe = container.querySelector('iframe')!;

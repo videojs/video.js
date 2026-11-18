@@ -6,6 +6,8 @@ import { TestExtensionProvider } from './test-utils';
 
 class FakeExtension implements PlayerExtension {
   destroyed = false;
+  metadata: Record<string, unknown> | undefined = undefined;
+
   destroy() {
     this.destroyed = true;
   }
@@ -91,6 +93,28 @@ describe('PlayerExtensionElement', () => {
     expect(provider.extensions.get(FakeExtension)).toBeUndefined();
   });
 
+  it('forwards metadata-* attributes to extensions that expose metadata', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'From attribute');
+    // MutationObserver fires on microtask.
+    await Promise.resolve();
+
+    expect(el.instance.metadata).toEqual({ video_title: 'From attribute' });
+    expect(provider.extensions.get(FakeExtension)).toBe(el.instance);
+  });
+
+  it('forwards metadata-* attributes when parsed into a player', () => {
+    const provider = new TestExtensionProvider();
+
+    document.body.append(provider);
+    provider.innerHTML = `<${TestPlayerExtensionElement.tagName} metadata-video-title="From attribute"></${TestPlayerExtensionElement.tagName}>`;
+
+    const instance = provider.extensions.get(FakeExtension)!;
+
+    expect(instance.metadata).toEqual({ video_title: 'From attribute' });
+  });
+
   it('does not create an extension when destroyed before use', () => {
     // `extensionDuringFieldInit` already forced creation, so assert through a
     // subclass that never touches it.
@@ -109,5 +133,86 @@ describe('PlayerExtensionElement', () => {
     el.destroy();
 
     expect(el.created).toBe(0);
+  });
+
+  it('updates metadata when attributes change via toggleAttribute', async () => {
+    const { el } = setup();
+
+    el.toggleAttribute('metadata-live', true);
+    // MutationObserver fires on microtask.
+    await Promise.resolve();
+
+    expect(el.instance.metadata).toEqual({ live: '' });
+  });
+
+  it('updates metadata when attributes change via setAttributeNS', async () => {
+    const { el } = setup();
+
+    el.setAttributeNS(null, 'metadata-video-title', 'Via NS');
+    await Promise.resolve();
+
+    expect(el.instance.metadata).toEqual({ video_title: 'Via NS' });
+  });
+
+  it('updates metadata when attributes change via removeAttributeNode', async () => {
+    const { el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Initial');
+    await Promise.resolve();
+
+    const attr = el.getAttributeNode('metadata-video-title')!;
+
+    el.removeAttributeNode(attr);
+    await Promise.resolve();
+
+    expect(el.instance.metadata).toBeUndefined();
+  });
+
+  it('updates metadata when attributes change via setAttributeNode', async () => {
+    const { el } = setup();
+
+    const attr = document.createAttribute('metadata-video-title');
+
+    attr.value = 'Via Attr Node';
+
+    el.setAttributeNode(attr);
+    await Promise.resolve();
+
+    expect(el.instance.metadata).toEqual({ video_title: 'Via Attr Node' });
+  });
+
+  it('does not push metadata to extensions without a metadata property', async () => {
+    class NoMetadataExtension implements PlayerExtension {
+      destroyed = false;
+
+      destroy() {
+        this.destroyed = true;
+      }
+    }
+
+    class NoMetadataElement extends PlayerExtensionElement<NoMetadataExtension> {
+      static readonly tagName = 'test-no-metadata-ext';
+
+      get instance(): NoMetadataExtension {
+        return this.extension;
+      }
+
+      protected createExtension(): NoMetadataExtension {
+        return new NoMetadataExtension();
+      }
+    }
+
+    customElements.define(NoMetadataElement.tagName, NoMetadataElement);
+
+    const provider = new TestExtensionProvider();
+    const el = new NoMetadataElement();
+
+    provider.append(el);
+    document.body.append(provider);
+
+    el.setAttribute('metadata-video-title', 'Ignored');
+    await Promise.resolve();
+
+    expect('metadata' in el.instance).toBe(false);
   });
 });

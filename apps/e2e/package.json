@@ -8,6 +8,7 @@
     "install:deps": "playwright install-deps || echo \"Note: Playwright system deps could not be installed. If e2e tests fail, run with sudo: sudo playwright install-deps (or sudo pnpm test:e2e:install from the workspace root)\"",
     "postinstall": "node -e \"process.env.CI || process.exit(1)\" || (pnpm run install:browsers && pnpm run install:deps)",
     "generate-pages": "tsx scripts/generate-pages.ts",
+    "measure-embed-payloads": "tsx scripts/measure-embed-payloads.ts",
     "e2e": "vp run test:player",
     "test:headed": "playwright test --config suites/player/playwright.config.ts --headed",
     "test:debug": "playwright test --config suites/player/playwright.config.ts --debug",

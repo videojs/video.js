@@ -1,7 +1,12 @@
 'use client';
 
-import { buildYouTubeIframeSrc, YouTubeAdapter, type YouTubeAdapterProps } from '@videojs/youtube-video';
-import { forwardRef, type ReactNode, useState } from 'react';
+import {
+  buildYouTubeIframeSrc,
+  shouldDeferYouTubeEmbed,
+  YouTubeAdapter,
+  type YouTubeAdapterProps,
+} from '@videojs/youtube-video';
+import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -24,18 +29,22 @@ export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(fun
   const media = useMediaInstance(YouTubeAdapter);
   const props: Partial<YouTubeAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildYouTubeIframeSrc(props.src || props.source?.src || '', {
-      ...YouTubeAdapter.defaultProps,
-      ...props,
-      // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferYouTubeEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildYouTubeIframeSrc(props.src || props.source?.src || '', {
+          ...YouTubeAdapter.defaultProps,
+          ...props,
+          // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
-  const { ref: eventsRef, props: iframeProps } = useMediaEvents(
+  const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<YouTubeAdapterProps, Record<string, unknown>>(media, props, YouTubeAdapter.defaultProps),
     media
   );
+  const { style, ...iframeProps } = elementProps as Record<string, unknown> & { style?: CSSProperties };
   const attachRef = useAttachMedia(media);
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
@@ -54,10 +63,10 @@ export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(fun
       width="100%"
       height="100%"
       referrerPolicy={props.source?.engine?.youtube?.referrerPolicy}
-      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
-      // skin above it sees hover and clicks.
-      style={{ pointerEvents: props.controls ? undefined : 'none' }}
       {...iframeProps}
+      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
+      // skin above it sees hover and clicks. Merged so a consumer's own styles survive without undoing it.
+      style={props.controls ? style : { ...style, pointerEvents: 'none' }}
       ref={composedRef}
     >
       {children}

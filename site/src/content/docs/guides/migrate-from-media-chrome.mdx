@@ -609,8 +609,7 @@ These Media Chrome features have no direct equivalent yet. Several can be approx
 - Volume and muted preferences are not persisted across sessions, so Media Chrome's `novolumepref` and `nomutedpref` opt-outs have nothing to opt out of ([#944](https://github.com/videojs/v10/issues/944)). Video.js can choose an initial subtitle track from the locale, but it does not yet remember the viewer's later language choice ([#1786](https://github.com/videojs/v10/issues/1786)).
 - No `breakpoints` or container-breakpoint attributes; use CSS container queries instead
 - No `seektoliveoffset` or `noautoseektolive` controls, and live-edge offset and tolerance aren't configurable ([#1730](https://github.com/videojs/v10/issues/1730))
-- Chapters render and each time-slider segment reflects `data-active`, but there's no player-level active chapter value, `chapterchange` event, or menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873))
-- Cue points are not supported ([#1442](https://github.com/videojs/v10/issues/1442))
+- No menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873)). Each time-slider segment reflects `data-active`, and you can read the active chapter, add chapters from code, and add cue points on a `metadata` track; see <DocsLink slug="guides/timed-metadata" anchor="add-chapters">Timed metadata</DocsLink>.
 
 <FrameworkCase frameworks={["react"]}>
 Chapters still work. Add a `<track kind="chapters">` with the `default` attribute. The packaged skins then split the time slider into chapter segments and show the chapter title on hover, via `TimeSlider.Chapters` and `TimeSlider.ChapterTitle`.

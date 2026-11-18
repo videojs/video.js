@@ -1,6 +1,6 @@
 /**
- * Live video player preset — `liveVideoFeatures` (adds `liveFeature`; drops `playbackRateFeature`, `qualityFeature`,
- * and `audioTrackFeature`) with a skin that swaps the time slider and time displays for a Live button.
+ * Live video player preset — `liveVideoFeatures` (adds `liveFeature`; drops `playbackRateFeature`) with a skin that
+ * swaps the time slider and time displays for a Live button.
  */
 export { liveVideoFeatures } from '@videojs/core/dom';
 export { CompatLiveVideoSkinElement } from './compat-skin';

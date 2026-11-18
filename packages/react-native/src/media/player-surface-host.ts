@@ -20,8 +20,8 @@ type Listener = (event: never) => void;
  *
  * Unlike `HTMLMediaElementHost`, this does not forward the media contract to its target. An `HTMLMediaElement` _is_ the
  * playback engine and owns `paused`/`currentTime`, so the web host can delegate reads to it. A Fabric view owns no
- * playback state — it renders frames for a handle — so subclasses mirror state from the native event channel instead.
- * Closest web analogue is `VimeoMedia`, which mirrors for the same reason.
+ * playback state — it renders frames for a handle — so subclasses read state from the native engine behind the handle
+ * instead.
  *
  * The emitter is hand-rolled rather than `TypedEventTarget()` from core: that returns the global `EventTarget`, whose
  * `dispatchEvent` demands a real `Event` instance, and `Event` is not available as a value under this package's

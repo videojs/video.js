@@ -339,16 +339,12 @@ describe('createPlayer', () => {
   it('does not retain disconnected context media as a native fallback', async () => {
     const { PlayerElement } = createPlayer({ features: backgroundFeatures });
     const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
-    const background = document.createElement(defineTestElement(BackgroundVideo));
-    const video = document.createElement('video');
+    const background = document.createElement(defineTestElement(BackgroundVideo)) as BackgroundVideo;
 
-    video.slot = 'media';
-
-    background.append(video);
     player.append(background);
     document.body.append(player);
 
-    await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+    await vi.waitFor(() => expect(player.store.target?.media).toBe(background.target));
 
     background.remove();
     expect(player.store.target).toBeNull();

@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { Activity } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import * as Popover from '../index.parts';
@@ -84,5 +85,28 @@ describe('Popover', () => {
 
     rerender(getPopover(true));
     expect(screen.getByTestId('popup').style.left).toBe('170px');
+  });
+
+  it('opens after an Activity hide destroyed its controller', async () => {
+    function App({ mode }: { mode: 'visible' | 'hidden' }) {
+      return (
+        <Activity mode={mode}>
+          <Popover.Root>
+            <Popover.Trigger data-testid="trigger">Open</Popover.Trigger>
+            <Popover.Popup data-testid="popup">Content</Popover.Popup>
+          </Popover.Root>
+        </Activity>
+      );
+    }
+
+    const { rerender } = render(<App mode="visible" />);
+
+    rerender(<App mode="hidden" />);
+    await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+    rerender(<App mode="visible" />);
+
+    fireEvent.click(screen.getByTestId('trigger'));
+
+    await waitFor(() => expect(screen.getByTestId('popup')).toBeTruthy());
   });
 });

@@ -1,0 +1,58 @@
+---
+title: getTextTracks
+description: The text tracks a filter or track definition matches, from the media or the app
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { getTextTracks } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { getTextTracks } from '@videojs/html';
+```
+</FrameworkCase>
+
+`getTextTracks` returns the tracks in `textTrackList` that a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, from the media and the app alike. Each track's `source` says which. The list comes from the <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink>.
+
+A filter picks tracks by `kind`, `label`, or `language`, or with a function. Each given field must match, and a list of kinds matches any kind in it. Without a filter, `getTextTracks` returns every track.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+In a component, <DocsLink slug="reference/api/use-text-tracks">`useTextTracks`</DocsLink> re-renders when the tracks change. `getTextTracks` reads them once, such as in an event handler. Pass it a store typed with your player's features, such as the one the preset's `usePlayer` returns:
+
+```tsx
+import { getTextTracks } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
+
+function LogChaptersButton() {
+  const store = usePlayer();
+
+  return <button onClick={() => console.log(getTextTracks(store, { kind: 'chapters' }))}>Log chapter tracks</button>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Read the tracks in a `player.store.subscribe()` callback to follow changes:
+
+```ts
+const player = document.querySelector('video-player')!;
+
+player.store.subscribe(() => {
+  const captions = getTextTracks(player.store, { kind: ['captions', 'subtitles'] });
+  console.log(captions.map((track) => track.label));
+});
+```
+</FrameworkCase>
+
+<UtilReference util="getTextTracks" />

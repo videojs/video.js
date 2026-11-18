@@ -26,9 +26,10 @@ Four states encode the load-gating policy directly:
 - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
   Auto-resumes into the derived state when the policy lifts.
-- `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
-  message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
-  text's actor no-ops (no init concept).
+- `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires one `load` message **once on
+  entry**, for what surfaces metadata: the init segment alone, or, for a track that carries its init in its media
+  segments (`carriesInitInSegments`), the one segment at `currentTime`. Text's actor no-ops on the rangeless
+  message.
 - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
   segment-boundary crossing.
 
@@ -41,7 +42,11 @@ Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/b
 
 ### Config
 
-The setup declares `config?`: callers may omit it. It has no keys.
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `createLoadStart?` | `CreateLoadStart` | Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes. The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the segment at the playhead begins after it. Omit to load from the playhead. |
 
 ### State
 
@@ -70,7 +75,11 @@ Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/b
 
 ### Config
 
-The setup declares `config?`: callers may omit it. It has no keys.
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `createLoadStart?` | `CreateLoadStart` | Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes. The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the segment at the playhead begins after it. Omit to load from the playhead. |
 
 ### State
 

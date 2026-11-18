@@ -74,7 +74,7 @@ How far `source.drm` gets depends on which engine plays the stream:
 | <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> | FairPlay, Widevine, PlayReady | |
 | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> | FairPlay, Widevine, PlayReady through hls.js; FairPlay only through the browser's own HLS | See [Two playback paths](#two-playback-paths) |
 | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> | FairPlay | Reads only the `com.apple.fps` entry |
-| <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | FairPlay, Widevine, PlayReady | Same paths as HlsJsVideo; also accept a Mux DRM token |
+| <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | FairPlay, Widevine, PlayReady | Accept a Mux DRM token. The hls.js flavor licenses like HlsJsVideo; on SPF, MuxVideo licenses like HlsVideo and MuxAudio ignores `drm` |
 | <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | FairPlay, Widevine, PlayReady | Plays DRM-protected DASH and HLS |
 | <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | None | Accepts `drm` and ignores it, so one source object serves both HLS components |
 | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | None | Doesn't read `source.drm`. Use ShakaVideo for protected DASH |
@@ -86,7 +86,7 @@ How far `source.drm` gets depends on which engine plays the stream:
 | <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> | FairPlay, Widevine, PlayReady | |
 | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> | FairPlay, Widevine, PlayReady through hls.js; FairPlay only through the browser's own HLS | See [Two playback paths](#two-playback-paths) |
 | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink> | FairPlay | Reads only the `com.apple.fps` entry |
-| <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | FairPlay, Widevine, PlayReady | Same paths as `<hlsjs-video>`; also accept a Mux DRM token |
+| <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | FairPlay, Widevine, PlayReady | Accept a Mux DRM token. The hls.js flavor licenses like `<hlsjs-video>`; on SPF, `<mux-video>` licenses like `<hls-video>` and `<mux-audio>` ignores `drm` |
 | <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | FairPlay, Widevine, PlayReady | Plays DRM-protected DASH and HLS |
 | <DocsLink slug="reference/components/hls-audio">`<hls-audio>`</DocsLink> | None | Accepts `drm` and ignores it, so one source object serves both HLS components |
 | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | None | Doesn't read `source.drm`. Use `<shaka-video>` for protected DASH |

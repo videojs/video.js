@@ -31,7 +31,110 @@ function create(tag: string, attrs: Record<string, string> = {}): Element {
   return container.querySelector(tag)!;
 }
 
+// Attributes set after construction, as on an element created by script. happy-dom also constructs parsed elements
+// before setting their attributes, so this is how opt-outs reach these tests either way.
+function createWith<T extends HTMLElement>(Base: new () => T, attrs: Record<string, string>): T {
+  const tag = `test-created-${++tagCounter}`;
+
+  customElements.define(tag, class extends (Base as new () => HTMLElement) {});
+
+  const element = document.createElement(tag) as T;
+
+  for (const [name, value] of Object.entries(attrs)) element.setAttribute(name, value);
+
+  document.body.appendChild(element);
+
+  return element;
+}
+
 describe('BackgroundVideo', () => {
+  describe('playback defaults', () => {
+    it('lets an explicit muted win over nomuted', () => {
+      const el = createWith(BackgroundVideo, { nomuted: '', muted: '' });
+
+      expect(el.target!.muted).toBe(true);
+    });
+
+    it('unmutes with nomuted alone', () => {
+      const el = createWith(BackgroundVideo, { nomuted: '' });
+
+      expect(el.target!.muted).toBe(false);
+    });
+  });
+
+  it('observes src, the playback defaults and their opt-outs, and the passthrough attributes', () => {
+    expect(BackgroundVideo.observedAttributes).toEqual([
+      'src',
+      'muted',
+      'loop',
+      'autoplay',
+      'nomuted',
+      'noloop',
+      'noautoplay',
+      'controls',
+      'controlslist',
+      'crossorigin',
+      'preload',
+    ]);
+  });
+
+  describe('passthrough attributes', () => {
+    it('mirrors changes onto the inner video', () => {
+      const el = create(defineElement()) as BackgroundVideo;
+
+      el.setAttribute('preload', 'metadata');
+      el.setAttribute('crossorigin', 'anonymous');
+
+      expect(el.target!.getAttribute('preload')).toBe('metadata');
+      expect(el.target!.getAttribute('crossorigin')).toBe('anonymous');
+
+      el.removeAttribute('crossorigin');
+
+      expect(el.target!.hasAttribute('crossorigin')).toBe(false);
+    });
+  });
+
+  describe('src', () => {
+    it('assigns the inner video when set as a property', () => {
+      const el = create(defineElement()) as BackgroundVideo;
+
+      el.src = 'https://example.com/v.mp4';
+
+      expect(el.src).toBe('https://example.com/v.mp4');
+      expect(el.target!.src).toBe('https://example.com/v.mp4');
+    });
+  });
+
+  describe('error', () => {
+    it('re-fires the inner video error from the element', () => {
+      const el = create(defineElement()) as BackgroundVideo;
+      let fired = 0;
+
+      el.addEventListener('error', () => fired++);
+      el.target!.dispatchEvent(new Event('error'));
+
+      expect(fired).toBe(1);
+    });
+  });
+
+  describe('target', () => {
+    it('is the shadow video even when the element has a light-DOM video', () => {
+      const tag = defineElement();
+      const container = document.createElement('div');
+
+      document.body.appendChild(container);
+      container.innerHTML = `<${tag} src="https://example.com/v.mp4"><video slot="media"></video><video></video></${tag}>`;
+
+      const el = container.querySelector(tag) as BackgroundVideo;
+      const shadowVideo = el.shadowRoot!.querySelector('video')!;
+
+      expect(el.target).toBe(shadowVideo);
+      expect(el.getMediaTarget()).toBe(shadowVideo);
+      expect(shadowVideo.muted).toBe(true);
+      expect(shadowVideo.getAttribute('src') ?? shadowVideo.src).toBe('https://example.com/v.mp4');
+    });
+  });
+
   describe('XSS prevention', () => {
     it('does not inject nodes when a whitelisted attribute value contains a quote breakout', () => {
       const tag = defineElement();

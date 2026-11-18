@@ -1,4 +1,4 @@
-import { type MediaCrossOriginType, toMediaCrossOrigin } from '@videojs/media';
+import { type MediaCrossOriginType, type MediaStreamType, MediaStreamTypes, toMediaCrossOrigin } from '@videojs/media';
 import { onEvent } from '@videojs/utils/dom';
 import type { Constructor, MixinReturn } from '@videojs/utils/types';
 
@@ -6,13 +6,28 @@ import type { Composition } from '../../../core/composition/create-composition';
 import { effect } from '../../../core/signals/effect';
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   type SvtaError,
 } from '../../../media/errors';
+import { resolveLiveLatency } from '../../../media/hls/reload-policy';
+import { deriveTargetLiveWindow } from '../../../media/live-window';
+import {
+  getMediaPlaylistMetadata,
+  isResolvedPresentation,
+  isResolvedTrack,
+  type MaybeResolvedPresentation,
+} from '../../../media/types';
+import { findTrackById } from '../../../media/utils/tracks';
 import { crossOriginToRequestCredentials } from '../../../network/request-credentials';
 import { resolveSourceUrl } from '../../../network/resolve-source-url';
 import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls-audio';
-import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../primitives/error-messages';
+import {
+  DVR_EXPERIMENTAL_MESSAGE,
+  LOW_LATENCY_UNSUPPORTED_MESSAGE,
+  UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE,
+} from '../../primitives/error-messages';
+import { getLiveEdge, type LiveWindowState, liveTrackId } from '../../primitives/live-window';
 import {
   firstFatal,
   type HlsVideoMediaError,
@@ -38,11 +53,14 @@ export interface HlsAudioAdapterProps {
    */
   crossOrigin: MediaCrossOriginType | '' | null;
   disableRemotePlayback: boolean;
+  streamType: MediaStreamType;
 }
 
 export interface HlsAudioAdapterAPI extends HlsAudioAdapterProps {
   readonly engine: Composition<EngineState, EngineContext>;
   readonly error: HlsVideoMediaError | null;
+  readonly liveEdgeStart: number;
+  readonly targetLiveWindow: number;
   attach(mediaElement: HTMLMediaElement): void;
   detach(): void;
   destroy(): void;
@@ -50,11 +68,14 @@ export interface HlsAudioAdapterAPI extends HlsAudioAdapterProps {
 }
 
 /**
- * Which reported conditions this composition treats as fatal. Only the audio verdict: an audio-only engine composes no
- * video selection, so `SVTA_NO_SUPPORTED_VIDEO_TRACK` is never reported and surfacing it would describe a track type
- * this media doesn't have.
+ * Which reported conditions this composition treats as fatal: a manifest that fails to load, and the audio verdict. An
+ * audio-only engine composes no video selection, so `SVTA_NO_SUPPORTED_VIDEO_TRACK` is never reported and surfacing it
+ * would describe a track type this media doesn't have.
  */
-const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([SVTA_NO_SUPPORTED_AUDIO_TRACK]);
+const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
+  SVTA_NO_SUPPORTED_AUDIO_TRACK,
+]);
 
 /**
  * Mixin that adds SPF audio-only HLS playback to any base class.
@@ -73,8 +94,13 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([SVTA_NO_SUPPORTED
  *   media.attach(document.querySelector('video'));
  *   media.src = 'https://stream.mux.com/abc123.m3u8';
  *
+ * @fires streamtypechange - Fired when the detected stream type changes. Read `streamType` for the new value.
+ * @fires targetlivewindowchange - Fired when the target live window changes. Read `targetLiveWindow` for the new value.
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  */
+/** What the adapter's `createEngine` static builds: an engine over this adapter's state and context. */
+export type CreateEngine = (config: EngineConfig) => Composition<EngineState, EngineContext>;
+
 export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class HlsAudioImpl extends BaseClass {
     static readonly defaultProps: HlsAudioAdapterProps = {
@@ -83,6 +109,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       preload: '',
       crossOrigin: null,
       disableRemotePlayback: false,
+      streamType: MediaStreamTypes.UNKNOWN,
     };
 
     /**
@@ -105,11 +132,24 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       return undefined;
     }
 
+    /**
+     * The engine factory the adapter builds its engine with. A Media over a differently composed engine — one sharing
+     * this engine's state and context, with more features laid in, as the Mux Medias lay the MPEG-TS transmux —
+     * overrides this static and nothing else.
+     */
+    static readonly createEngine: CreateEngine = createEngine;
+
     readonly #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
     #preload: '' | 'none' | 'metadata' | 'auto' = HlsAudioImpl.defaultProps.preload;
     #crossOrigin: MediaCrossOriginType | null = toMediaCrossOrigin(HlsAudioImpl.defaultProps.crossOrigin);
     #disableRemotePlayback: boolean = HlsAudioImpl.defaultProps.disableRemotePlayback;
+    #streamType: MediaStreamType = HlsAudioImpl.defaultProps.streamType;
+    #isUserStreamType = false;
+    #targetLiveWindow = Number.NaN;
+    /** Delivery notices already logged for the current source — see the video adapter. */
+    #noticed = new Set<string>();
+    #stopLiveSync: () => void;
     #error: HlsVideoMediaError | null = null;
     /** Reported condition currently surfaced — see the video adapter's note. */
     #reportedCode: number | null = null;
@@ -126,6 +166,16 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
       this.#config = config ?? {};
       this.#engine = this.#createEngine();
+
+      // Mirror the engine's live detection onto the media surface, as the video
+      // adapter does; `liveEdgeStart` is derived at read time.
+      this.#stopLiveSync = effect(() => {
+        const presentation = this.#engine.state.presentation.get();
+
+        this.#setDetectedStreamType(presentation?.streamType ?? MediaStreamTypes.UNKNOWN);
+        this.#setTargetLiveWindow(deriveTargetLiveWindow(presentation, liveTrackId(this.#engine.state)));
+        this.#reportDeliveryNotices(presentation);
+      });
 
       // Promote the first fatal condition out of the engine's reported sequence
       // onto the media surface. Clearing rides the same signal: `collectErrors`
@@ -144,6 +194,97 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
      */
     get error(): HlsVideoMediaError | null {
       return this.#error;
+    }
+
+    // -------------------------------------------------------------------------
+    // Live surface — streamType / targetLiveWindow / liveEdgeStart, as on the
+    // video adapter
+    // -------------------------------------------------------------------------
+
+    /**
+     * The source's stream type — `'live'`, `'on-demand'`, or `'unknown'` until a media playlist has been parsed.
+     * Setting a non-`'unknown'` value pins a user override (detection stops updating it); setting `'unknown'` reverts
+     * to the engine's detected value.
+     */
+    get streamType(): MediaStreamType {
+      return this.#streamType;
+    }
+
+    set streamType(value: MediaStreamType) {
+      if (value === MediaStreamTypes.UNKNOWN) {
+        this.#isUserStreamType = false;
+        this.#updateStreamType(this.#engine.state.presentation.get()?.streamType ?? MediaStreamTypes.UNKNOWN);
+        return;
+      }
+
+      this.#isUserStreamType = true;
+      this.#updateStreamType(value);
+    }
+
+    /**
+     * Presentation time marking the start of the live-edge window. Playback at `currentTime >= liveEdgeStart` counts as
+     * "at the live edge", and seeking to live lands here. `NaN` when the stream isn't live or nothing has loaded yet.
+     * No change event fires; re-read it on `timeupdate` or `progress`.
+     */
+    get liveEdgeStart(): number {
+      const edge = getLiveEdge({
+        state: this.#engine.state as LiveWindowState,
+        config: { resolveLiveLatency },
+      });
+
+      return edge?.liveEdgeStart ?? Number.NaN;
+    }
+
+    /**
+     * The target live window: `NaN` for on-demand (or unknown), `0` for standard sliding-window live, `Infinity` for
+     * DVR (`#EXT-X-PLAYLIST-TYPE:EVENT`). Fires `targetlivewindowchange` on change.
+     */
+    get targetLiveWindow(): number {
+      return this.#targetLiveWindow;
+    }
+
+    #setDetectedStreamType(value: MediaStreamType): void {
+      if (this.#isUserStreamType) return;
+
+      this.#updateStreamType(value);
+    }
+
+    #updateStreamType(value: MediaStreamType): void {
+      if (this.#streamType === value) return;
+
+      this.#streamType = value;
+      this.dispatchEvent?.(new Event('streamtypechange'));
+    }
+
+    #setTargetLiveWindow(value: number): void {
+      if (Object.is(this.#targetLiveWindow, value)) return;
+
+      this.#targetLiveWindow = value;
+      this.dispatchEvent?.(new Event('targetlivewindowchange'));
+    }
+
+    #reportDeliveryNotices(presentation: MaybeResolvedPresentation | undefined): void {
+      if (!isResolvedPresentation(presentation)) {
+        this.#noticed.clear();
+        return;
+      }
+
+      const trackId = liveTrackId(this.#engine.state);
+      const track = trackId ? findTrackById(presentation, trackId) : undefined;
+      if (!track || !isResolvedTrack(track)) return;
+
+      const metadata = getMediaPlaylistMetadata(track);
+      if (!metadata) return;
+
+      if (metadata.lowLatency && !this.#noticed.has('lowLatency')) {
+        this.#noticed.add('lowLatency');
+        console.warn(this.#withSuggestion(LOW_LATENCY_UNSUPPORTED_MESSAGE));
+      }
+
+      if (metadata.playlistType === 'EVENT' && !this.#noticed.has('dvr')) {
+        this.#noticed.add('dvr');
+        console.warn(this.#withSuggestion(DVR_EXPERIMENTAL_MESSAGE));
+      }
     }
 
     #setError(reported: SvtaError | undefined, errors: readonly SvtaError[] | undefined): void {
@@ -213,6 +354,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     destroy(): void {
       this.#cancelPendingPlay();
+      this.#stopLiveSync();
       this.#stopErrorSync();
       this.#engine.destroy();
     }
@@ -369,7 +511,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     #createEngine(): Composition<EngineState, EngineContext> {
-      return createEngine({
+      return (this.constructor as typeof HlsAudioImpl).createEngine({
         ...this.#config,
         // A policy, not a value — see the video mixin. A consumer-supplied one wins.
         requestCredentials:
@@ -387,6 +529,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
   // adding back to the type or callers can't read it.
   return HlsAudioImpl as unknown as MixinReturn<Base, HlsAudioAdapterAPI, [options?: HlsAudioAdapterOptions]> & {
     readonly alternativeMediaSuggestion: string | undefined;
+    readonly createEngine: CreateEngine;
     readonly defaultProps: HlsAudioAdapterProps;
   };
 }

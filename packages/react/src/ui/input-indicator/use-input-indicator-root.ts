@@ -2,9 +2,9 @@
 
 import type { IndicatorLifecycleState, InputActionEvent, MediaSnapshot } from '@videojs/core';
 import type { State as StoreState } from '@videojs/store';
-import { useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { useIndicatorVisibility } from './use-indicator-visibility';
 import { useInputActionSubscription } from './use-input-action-subscription';
 import { type RenderedIndicatorOptions, useRenderedIndicatorState } from './use-rendered-indicator-state';
@@ -22,9 +22,8 @@ export function useInputIndicatorRoot<IndicatorState extends IndicatorLifecycleS
   props: Props,
   options?: RenderedIndicatorOptions
 ) {
-  const [core] = useState(createCore);
+  const core = useInstance(createCore);
 
-  useDestroy(core);
   core.setProps(props);
   const showIndicator = useIndicatorVisibility(() => core.close());
 

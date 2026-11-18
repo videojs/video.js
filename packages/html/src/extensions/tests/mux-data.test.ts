@@ -98,6 +98,73 @@ describe('MuxDataExtension', () => {
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual(metadata);
   });
 
+  it('forwards metadata-* attributes to the extension as snake_case keys', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Attr title');
+    el.setAttribute('metadata-viewer-user-id', 'user-1');
+    await Promise.resolve();
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'Attr title',
+      viewer_user_id: 'user-1',
+    });
+    expect(el.metadata).toEqual({
+      video_title: 'Attr title',
+      viewer_user_id: 'user-1',
+    });
+  });
+
+  it('lets the metadata property override metadata-* attributes with the same key', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'From attribute');
+    el.metadata = { video_title: 'From property', video_id: 'id-1' };
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'From property',
+      video_id: 'id-1',
+    });
+  });
+
+  it('does not treat non-metadata-* attributes as metadata', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('env-key', 'test-key');
+    el.setAttribute('player-software-name', 'custom');
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
+  });
+
+  it('updates extension metadata when a metadata-* attribute changes after connect', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'First');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'First' });
+
+    el.setAttribute('metadata-video-title', 'Second');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'Second' });
+
+    el.removeAttribute('metadata-video-title');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
+  });
+
+  it('reads metadata-* attributes when parsed into a connected player', () => {
+    const provider = new TestExtensionProvider();
+
+    document.body.append(provider);
+    provider.innerHTML =
+      '<test-mux-data metadata-video-title="Parsed title" metadata-viewer-user-id="parsed-user"></test-mux-data>';
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'Parsed title',
+      viewer_user_id: 'parsed-user',
+    });
+  });
+
   it.each([
     ['before', 'metadata'],
     ['after', 'src'],

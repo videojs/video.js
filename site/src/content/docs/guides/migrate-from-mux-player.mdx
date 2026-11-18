@@ -29,7 +29,7 @@ Make a migration checklist before changing your embed:
 - **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media component; the rest is mapped under [Drive playback](#drive-playback).
 - **Note your theme and CSS variables.** Compare your Mux Player theme with the two Video.js skins, and map its CSS variables.
 - **Check [Known gaps](#known-gaps)** for features your app needs.
-- **Check your catalog for MPEG-TS, raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
+- **Choose a playback engine.** See [Which Mux media should you use?](#which-mux-media-should-you-use). If you use DRM, verify playback with whichever engine you choose.
 
 <FrameworkCase frameworks={["html"]}>
 Before loading Video.js, remove Mux Player imports and CDN scripts, plus any other imports that register legacy Mux Video or Media Chrome elements. Then reload the page. These libraries share custom-element names such as `mux-video` and `media-play-button`. A name can only have one definition per document, and Video.js keeps an existing definition. If both players must remain during migration, use separate documents, such as an iframe.
@@ -359,7 +359,7 @@ Render the <DocsLink slug="reference/components/mux-data">Mux Data extension</Do
 <FrameworkCase frameworks={["html"]}>
 | Mux Player | Video.js v10 |
 |---|---|
-| `metadata-*`, the `metadata` property | the `metadata` property |
+| `metadata-*`, the `metadata` property | `metadata-*` attributes or the `metadata` property on `<mux-data>` |
 | `env-key` | `env-key`, rarely needed for Mux-hosted content |
 | `disable-cookies` | `disable-cookies` |
 | `beacon-collection-domain` | `beacon-collection-domain` |
@@ -367,7 +367,7 @@ Render the <DocsLink slug="reference/components/mux-data">Mux Data extension</Do
 | `debug` | the `debug` attribute or property |
 | `disable-tracking` | omit the component |
 
-Set `metadata` as a property because it takes an object, while attributes take strings.
+Use `metadata-*` attributes when the values are known at render time (`metadata-video-title`, `metadata-viewer-user-id`, and so on). Use the `metadata` property when your app builds the object in script.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -651,7 +651,7 @@ Use the <DocsLink slug="reference/api/player-store">player store</DocsLink> for 
 | `player.muted` | `muted` in player state; write with `setMuted(value)` |
 | `player.playbackRate` | the player's `setPlaybackRate`, or `media.playbackRate` |
 | `player.requestFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
-| `player.addChapters([…])` | a `<track kind="chapters">`, covered below |
+| `player.addChapters([…])` | a `chapters` track added from code, covered below |
 
 Standard media properties update player state through media events. If the volume is `0`, `setMuted(false)` also sets it to `0.25`. Mux Player's smart-unmute behavior carries over through `setMuted(false)`. To unmute and keep a zero volume, set `media.muted` directly.
 
@@ -690,37 +690,7 @@ Store actions throw until the media attaches. Call fullscreen actions from a use
 
 ## Which Mux media should you use?
 
-Choose and test the engine before migration, especially when your catalog uses DRM or TS-packaged media.
-
-<FrameworkCase frameworks={["react"]}>
-`MuxVideo` supports two playback engines: SPF and hls.js. Choose the engine by import path. The `/spf` import is smaller, and `/hls-js` is more compatible. The default import currently uses hls.js. Start with that default:
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-`<mux-video>` supports two playback engines: SPF and hls.js. Choose the engine by import path. The `/spf` import is smaller, and `/hls-js` is more compatible. The default import currently uses hls.js. Start with that default:
-</FrameworkCase>
-
-| Import | Engine | When |
-|---|---|---|
-| `.../media/mux-video` | hls.js | **The default. Start here.** |
-| `.../media/mux-video/spf` | SPF | Your streams use fMP4/CMAF segments and fit the limitations below. |
-| `.../media/mux-video/hls-js` | hls.js | Your app depends on hls.js and needs its instance or settings. |
-
-The SPF engine does not support MPEG-TS segments, raw ADTS AAC, or whole-segment AES-128 encryption. Keep the default for assets that need those formats. The SPF engine also lacks low-latency HLS support, and its DVR playback is experimental.
-
-Both flavors support DRM through `source.drm`. Verify license exchange and playback with your protected assets on supported browsers before changing engines.
-
-<FrameworkCase frameworks={["html"]}>
-All three imports register the same `<mux-video>` tag and accept the same source, so changing the engine is an import change. Load only one registration for that tag on a page.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["react"]}>
-All three imports provide a `MuxVideo` component with the same source API, so changing the engine is an import change. React components do not register a custom element, and different imports can coexist if separate players need different engines.
-</FrameworkCase>
-
-The default import currently uses hls.js, but its engine can change in a future release. Use `/hls-js` when your app depends on hls.js APIs. Test the chosen engine with your assets and supported browsers.
-
-The Mux audio component has the same three import paths. Use it with the audio player and audio skins.
+The Mux video and Mux audio components can play through hls.js or through SPF, and you choose by import path. Read <DocsLink slug="guides/mux" anchor="choose-a-playback-engine">Choose a playback engine</DocsLink> before you pick one, and test it with your own assets.
 
 ## Live streams
 
@@ -767,7 +737,7 @@ You get `targetLiveWindow` and `liveEdgeStart` in player state, plus a live butt
 
 The live skins have no time slider. To preserve DVR scrubbing, add one to custom UI or installed skin source; follow <DocsLink slug="guides/live-streams" anchor="dvr-let-users-scrub-back">the DVR setup</DocsLink>.
 
-The live composition is narrower than the video one on purpose: it leaves out quality, audio-track, and playback-rate state. A live skin's settings menu therefore holds captions and nothing else. If you need one of the omitted features on a live player, build your own player from a feature list rather than taking the preset's.
+The live composition leaves out playback-rate state. A live skin's settings menu holds captions and nothing else, though custom UI can read quality and audio-track state. If you need playback rate on a live player, build your own player from a feature list rather than taking the preset's.
 
 <FrameworkCase frameworks={["html"]}>
 Use <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> to build a player element from that list.
@@ -874,9 +844,41 @@ Add a chapters track with the `default` attribute inside your media. The skins t
 ```
 </FrameworkCase>
 
-To replace `addChapters()`, convert your chapter array to a WebVTT file and set its URL as the track's `src` ([#1268](https://github.com/videojs/v10/issues/1268)).
+To replace `addChapters()`, add a `chapters` track from code. Each chapter's title moves from `value` to `text`, and a chapter without an `endTime` runs to the next one. A WebVTT file in a `<track>`, as above, still works too.
 
-The time slider marks the segment containing the current playback time with `data-active`, so you can style the active segment. The player still has no active-chapter state, `chapterchange` event, or menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873)). If UI outside the time slider needs the current chapter, derive it from `currentTime` and the read-only `chaptersCues` array. Cue points aren't implemented at all ([#1442](https://github.com/videojs/v10/issues/1442)).
+<FrameworkCase frameworks={["html"]}>
+```ts
+player.store.addTextTrack({
+  kind: 'chapters',
+  cues: [
+    { startTime: 0, text: 'Introduction' },
+    { startTime: 95, text: 'Setup' },
+  ],
+});
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { useCreateTextTrack } from '@videojs/react';
+
+function Chapters() {
+  useCreateTextTrack({
+    kind: 'chapters',
+    cues: [
+      { startTime: 0, text: 'Introduction' },
+      { startTime: 95, text: 'Setup' },
+    ],
+  });
+
+  return null;
+}
+```
+</FrameworkCase>
+
+The time slider marks the segment containing the current playback time with `data-active`, so you can style the active segment. In place of `activeChapter`, read the active cue through `chaptersTrack` with `useActiveTextCues()` in React, or `getActiveTextCues()` in a store subscription in HTML; that subscription also stands in for `chapterchange`. There's still no menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873)). See <DocsLink slug="guides/timed-metadata" anchor="add-chapters">Timed metadata</DocsLink>.
+
+Cue points become cues on a `metadata` track. Define the track with `defineTextTrack()`, add your cue points with `useCreateTextTrack()` or the store's `addTextTrack()`, and read the active one, in place of `activeCuePoint` and `cuepointchange`, with `useActiveTextCues()` or `getActiveTextCues()`. Each cue point's `value` carries over as the cue's `value`. To mark cue points on the time slider, add the time slider markers. See <DocsLink slug="guides/timed-metadata">Timed metadata</DocsLink>.
 
 ## Signed playback and DRM
 

@@ -36,6 +36,8 @@ export interface FrameParams {
   readonly captions: CaptionsMode;
   readonly locale: SandboxLocaleTag;
   readonly accentColor: string;
+  /** Show the skin's control bar before playback starts. */
+  readonly controlsBeforeStart: boolean;
   readonly width: number;
   readonly ratio: AspectRatio;
   readonly scheme: ColorScheme;
@@ -88,6 +90,8 @@ function buildUrl(panel: ComparePanel, params: FrameParams, bustCache = false): 
   if (params.captions !== 'none') query.set('captions', params.captions);
 
   if (params.accentColor) query.set('accent', params.accentColor);
+
+  if (params.controlsBeforeStart) query.set('prestart', '1');
 
   if (params.mirror) query.set('mirror', '1');
 

@@ -8,7 +8,12 @@ import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils
 import { deepEqual } from '@videojs/utils/object';
 
 import type { CloudflareAdapterProps } from './props';
-import { buildCloudflareIframeSrc, type CloudflareSource, parseCloudflareSource } from './source';
+import {
+  buildCloudflareIframeSrc,
+  type CloudflareSource,
+  parseCloudflareSource,
+  shouldDeferCloudflareEmbed,
+} from './source';
 import { type CloudflareStreamApi, type CloudflareStreamPlayerApi, loadCloudflareStreamApi } from './stream-api';
 
 /**
@@ -41,6 +46,11 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #attachId = 0;
   // The SDK has no teardown, so its listeners are unbound one by one.
   #playerListeners: [type: string, listener: () => void][] = [];
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. Cloudflare then starts as it loads, rather than
+  // once the SDK is up to take `play()`.
+  #embedPlays = false;
 
   #src = CloudflareAdapter.defaultProps.src;
   #autoplay = CloudflareAdapter.defaultProps.autoplay;
@@ -107,6 +117,8 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#pendingLoad = false;
     this.#textTracksHost = null;
     this.#target = null;
+    this.#activated = false;
+    this.#embedPlays = false;
     // Unblock callers awaiting load; they re-check `#player` (now null) and no-op.
     this.#loadComplete.resolve();
     this.#resetState();
@@ -167,6 +179,10 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
     const load = this.#beginLoad();
 
+    // The autoplay a `play()` wrote was for the video it built. Dropping it from the URL rebuilds the frame below rather
+    // than swapping, since the player keeps the autoplay it was built with.
+    this.#embedPlays = false;
+
     // Reset before bailing on an empty src: a cleared source has nothing to load, but the old video's state still goes.
     this.#resetState();
     // `emptied` announces that reset and so precedes the empty-src bail; a cleared source is the one case where the
@@ -203,14 +219,16 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     const nextSrc = buildCloudflareIframeSrc(this.#src, this.#snapshotProps());
 
     if (target && nextSrc && embedParamsOf(nextSrc) !== embedParamsOf(target.getAttribute('src') ?? '')) {
-      // The rebuilt embed reports its own metadata, which settles this load.
+      // The rebuilt embed reports its own metadata, which settles this load when it preloads.
       target.src = nextSrc;
+      this.#settleIfNotPreloading(load);
       return;
     }
 
     // The player mimics `HTMLVideoElement` down to a writable `src`, so swap the video instead of discarding a working
     // embed and its SDK connection.
     this.#player.src = parsed.id;
+    this.#settleIfNotPreloading(load);
   }
 
   // Take over as the current load; settling the outgoing barrier releases its waiters.
@@ -218,6 +236,12 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#loadComplete.resolve();
     this.#loadComplete = createPublicPromise<void>();
     return this.#loadComplete;
+  }
+
+  // An embed told not to preload reports no metadata until it plays, so a load waiting on metadata would leave `play()`
+  // waiting on the playback it starts. Like a native element, the load ends once the source is set.
+  #settleIfNotPreloading(load: PublicPromise<void>) {
+    if (this.#embedPreload === 'none' && !this.#autoplay) load.resolve();
   }
 
   // Whether the embed is playing the reported source; a cleared or unrecognized src leaves it on the previous video.
@@ -238,6 +262,15 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
 
   async play() {
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
+      this.#wake();
+    }
+
     await this.#loadComplete;
 
     // The embed still holds the previous video, so playing it would resume a source that is no longer reported.
@@ -306,10 +339,14 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
     this.#afterLoad((p) => {
       p.autoplay = value;
     });
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -337,10 +374,14 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
     this.#afterLoad((p) => {
       p.controls = value;
     });
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -355,10 +396,14 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
     this.#afterLoad((p) => {
-      p.preload = value;
+      p.preload = this.#embedPreload;
     });
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -459,6 +504,12 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
     // The `src` property resolves an empty attribute to the document URL; only the attribute spots a placeholder.
     if (!target.getAttribute('src')) {
+      // A dormant embed is built by `play()`; until then no player is coming to settle this load.
+      if (this.#isDormant()) {
+        this.#loadComplete.resolve();
+        return false;
+      }
+
       const initialSrc = buildCloudflareIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no player is coming to settle this load.
@@ -516,7 +567,26 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
       // A source arrived while the SDK was loading, so the embed points at the previous one; only the player can move.
       this.#pendingLoad = false;
       void this.load();
+      return;
     }
+
+    this.#settleIfNotPreloading(this.#loadComplete);
+  }
+
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferCloudflareEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || this.#player || this.#creatingPlayer || target.getAttribute('src')) return;
+
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   // Whether a callback belongs to a superseded attach; an embed keeps reporting after its player reference is gone.
@@ -545,13 +615,19 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#defaultMuted || this.#muted;
   }
 
+  // What the embed is told to preload. Playing overrides `preload`, so an embed built or kept for it must not wait to
+  // load, or it would report no metadata.
+  get #embedPreload() {
+    return this.#activated ? 'auto' : this.#preload || CloudflareAdapter.defaultProps.preload;
+  }
+
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,
-      preload: this.#preload || CloudflareAdapter.defaultProps.preload,
+      preload: this.#embedPreload,
       poster: this.#poster,
       source: this.#source,
     };

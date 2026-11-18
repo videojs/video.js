@@ -1,5 +1,35 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/vimeo-video@10.4.0...@videojs/vimeo-video@10.5.0) (2026-11-16)
+
+
+### Features
+
+* add LazyVideo and LazyAudio ([#9583](https://github.com/videojs/video.js/issues/9583)) ([536dde0](https://github.com/videojs/video.js/commit/536dde05e6e9e32ccb183d796fdd65cb1e8a7c36))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.5.0
+    * @videojs/utils bumped to 10.5.0
+
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/vimeo-video@10.3.0...@videojs/vimeo-video@10.4.0) (2026-11-13)
+
+
+### Bug Fixes
+
+* **media:** recognize empty placeholders from another package copy ([#9667](https://github.com/videojs/video.js/issues/9667)) ([2c88e68](https://github.com/videojs/video.js/commit/2c88e684c8ecd2efe5aa67905daf1b1bc4dbb232))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.4.0
+    * @videojs/utils bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/vimeo-video@10.2.0...@videojs/vimeo-video@10.3.0) (2026-11-03)
 
 

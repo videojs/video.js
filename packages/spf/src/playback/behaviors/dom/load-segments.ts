@@ -21,9 +21,10 @@
  * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
  *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
  *   Auto-resumes into the derived state when the policy lifts.
- * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
- *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
- *   text's actor no-ops (no init concept).
+ * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires one `load` message **once on
+ *   entry**, for what surfaces metadata: the init segment alone, or, for a track that carries its init in its media
+ *   segments (`carriesInitInSegments`), the one segment at `currentTime`. Text's actor no-ops on the rangeless
+ *   message.
  * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
  *   segment-boundary crossing.
  */
@@ -37,10 +38,16 @@ import {
   type ForwardBufferConfig,
   segmentStartForTime,
 } from '../../../media/buffer/forward-buffer';
-import type { MaybeResolvedPresentation, Segment } from '../../../media/types';
-import { findResolvedAudioTrack, findResolvedTextTrack, findResolvedVideoTrack } from '../../../media/utils/tracks';
+import type { MaybeResolvedPresentation, ResolvedTrack, Segment } from '../../../media/types';
+import {
+  carriesInitInSegments,
+  findResolvedAudioTrack,
+  findResolvedTextTrack,
+  findResolvedVideoTrack,
+} from '../../../media/utils/tracks';
 import type { BufferState, SegmentLoaderActor, SourceBufferState } from '../../actors/dom/segment-loader';
 import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
+import type { CreateLoadStart } from '../../primitives/load-start';
 import { AUDIO_TYPE_CONFIG, TEXT_TYPE_CONFIG, VIDEO_TYPE_CONFIG } from '../../primitives/track-types';
 
 // Re-export buffer state types for consumers that import them from this module.
@@ -135,7 +142,7 @@ interface SegmentLoaderLike<Track> {
 function setupSegmentLoading<
   K extends SelectedTrackKey,
   L extends SegmentLoaderActorKey,
-  Track extends { segments: readonly Segment[] },
+  Track extends { segments: readonly Segment[] } & Pick<ResolvedTrack, 'type' | 'initialization'>,
 >({
   state,
   context,
@@ -159,6 +166,11 @@ function setupSegmentLoading<
     ) => Track | undefined;
     /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
+    /**
+     * Builds a signal that moves a full-range load's start earlier than the playhead (see `primitives/load-start`).
+     * Omit to start every load at the playhead.
+     */
+    createLoadStart?: CreateLoadStart;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
   const { selectedKey, loaderKey, findResolvedTrack } = config;
@@ -184,6 +196,8 @@ function setupSegmentLoading<
     return segmentStartForTime(state.currentTime.get() ?? 0, track.segments);
   });
 
+  const loadStartSignal = config.createLoadStart?.({ state, context, config });
+
   const derivedStateSignal = computed<SegmentLoadingFsmState>(() => {
     // Policy-off wins even over preconditions: a loader arriving while
     // either gate holds must not dispatch.
@@ -207,8 +221,8 @@ function setupSegmentLoading<
       'metadata-only': {
         // Fires once on entry. Matches HTMLMediaElement's preload='metadata'
         // semantics — load enough to surface metadata for the entry-time
-        // selection. Each variant's loader decides what to do: v/a's actor
-        // fetches the init segment; text's actor treats no-range as a
+        // selection: the init segment, or one media segment for a track whose
+        // init travels in its segments. Text's actor treats no-range as a
         // no-op. Selection changes while still in `'metadata-only'` are
         // intentionally not followed.
         entry: () => {
@@ -232,12 +246,25 @@ function setupSegmentLoading<
           // write lands before or after this body runs.
           if (isLoadingDormant()) return;
 
-          loader.send({ type: 'load', track });
+          if (!carriesInitInSegments(track)) {
+            loader.send({ type: 'load', track });
+            return;
+          }
+
+          const start = segmentStartForTime(peek(state.currentTime) ?? 0, track.segments);
+          const segment = track.segments.find((s) => s.startTime === start) ?? track.segments[0];
+          const segmentStart = segment?.startTime ?? 0;
+
+          loader.send({
+            type: 'load',
+            track,
+            range: { start: segmentStart, end: segmentStart + (segment?.duration ?? 0) },
+          });
         },
       },
       'full-range': {
-        // Re-fires on selected-track changes and on segment-boundary
-        // crossings. The loader and `currentTime` are peeked — the
+        // Re-fires on selected-track changes, on segment-boundary
+        // crossings, and when the configured load start changes. The loader and `currentTime` are peeked — the
         // boundary-dedup signal already handles re-firing policy.
         effects: () => {
           // Guarded for the reason given on `'metadata-only'`'s entry: this
@@ -247,6 +274,7 @@ function setupSegmentLoading<
           const track = selectedTrack.get();
 
           segmentBoundarySignal.get();
+          const loadStart = loadStartSignal?.get();
           const loader = peek(context[loaderKey]);
           if (!track || !loader) return;
 
@@ -258,7 +286,7 @@ function setupSegmentLoading<
           loader.send({
             type: 'load',
             track,
-            range: { start: currentTime, end: currentTime + bufferDuration },
+            range: { start: loadStart ?? currentTime, end: currentTime + bufferDuration },
           });
         },
       },
@@ -307,7 +335,14 @@ export const loadVideoSegments = defineBehavior({
     context: {
       videoSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['videoSegmentLoaderActor']>;
     };
-    config?: object;
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,
@@ -334,7 +369,14 @@ export const loadAudioSegments = defineBehavior({
     context: {
       audioSegmentLoaderActor: ReadonlySignal<SegmentLoadingContext['audioSegmentLoaderActor']>;
     };
-    config?: object;
+    config?: {
+      /**
+       * Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes.
+       * The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the
+       * segment at the playhead begins after it. Omit to load from the playhead.
+       */
+      createLoadStart?: CreateLoadStart;
+    };
   }) =>
     setupSegmentLoading({
       state,

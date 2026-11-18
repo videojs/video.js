@@ -7,14 +7,14 @@ import { MixcloudAudio } from '@videojs/react/media/mixcloud-audio';
 import { createRoot } from 'react-dom/client';
 
 function App() {
-  const { source } = useSandbox();
+  const { source, mediaProps } = useSandbox();
   const { url = '', controls = false } = SOURCES[source];
 
   return (
     <AudioPlayer>
       <AudioSkinComponent>
         {/* Hidden unless it is showing Mixcloud's own chrome, so it takes no room and needs no size. */}
-        <MixcloudAudio src={url} controls={controls} />
+        <MixcloudAudio src={url} {...mediaProps} controls={controls} />
       </AudioSkinComponent>
     </AudioPlayer>
   );

@@ -11,7 +11,13 @@
  * Returns `null` when there is no live edge to track: an unresolved presentation or track, a track with no segments, or
  * a **complete** playlist (VoD, or live that has ended — a finite `Track.duration`).
  */
-import { isResolvedPresentation, isResolvedTrack, type MaybeResolvedPresentation } from './types';
+import {
+  deriveStreamType,
+  getMediaPlaylistMetadata,
+  isResolvedPresentation,
+  isResolvedTrack,
+  type MaybeResolvedPresentation,
+} from './types';
 import { findTrackById } from './utils/tracks';
 
 export interface LiveWindow {
@@ -41,4 +47,26 @@ export function liveWindowFor(
     start: segments[0]!.startTime,
     end: last.startTime + last.duration,
   };
+}
+
+/**
+ * `targetLiveWindow` per the media-ui-extensions live-edge proposal: `NaN` for on-demand (or nothing resolved yet), `0`
+ * for standard sliding-window live, `Infinity` for DVR (`#EXT-X-PLAYLIST-TYPE:EVENT` — the window grows from the
+ * start). Read from the timeline-bearing track's playlist metadata.
+ */
+export function deriveTargetLiveWindow(
+  presentation: MaybeResolvedPresentation | undefined,
+  trackId: string | undefined
+): number {
+  if (!isResolvedPresentation(presentation) || !trackId) return Number.NaN;
+
+  const track = findTrackById(presentation, trackId);
+  if (!track || !isResolvedTrack(track)) return Number.NaN;
+
+  const metadata = getMediaPlaylistMetadata(track);
+  if (!metadata) return Number.NaN;
+
+  if (metadata.playlistType === 'EVENT') return Number.POSITIVE_INFINITY;
+
+  return deriveStreamType(metadata) === 'live' ? 0 : Number.NaN;
 }

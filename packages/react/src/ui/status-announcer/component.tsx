@@ -8,12 +8,12 @@ import {
 } from '@videojs/core';
 import { shouldAnnounceStatusChange, subscribeToStatusAnnouncer } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
-import { forwardRef, useEffect, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useEffect, useSyncExternalStore } from 'react';
 
 import { useLocale, useTranslator } from '../../i18n/context';
 import { useContainer, usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { renderElement } from '../../utils/use-render';
 
 export interface StatusAnnouncerProps
@@ -26,11 +26,10 @@ export const StatusAnnouncer = forwardRef(function StatusAnnouncer(
   const { render, className, style, closeDelay, labels, ...elementProps } = componentProps;
   const translator = useTranslator();
   const locale = useLocale();
-  const [core] = useState(() => new StatusAnnouncerCore());
+  const core = useInstance(() => new StatusAnnouncerCore());
   const store = usePlayer();
   const container = useContainer();
 
-  useDestroy(core);
   core.setProps({
     closeDelay,
     labels: {
