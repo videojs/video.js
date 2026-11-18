@@ -162,14 +162,19 @@ Use `src` and `contentType` when the receiver should load a different source tha
 
 ### Cast DRM-protected content
 
-The Default Media Receiver can't license DRM-protected content, because it has no way to receive a license server from the sender. Register and host your own receiver ([Google's guide](https://developers.google.com/cast/codelabs/cast-receiver)), then set `receiver` to its application ID and pass the license server in `customData`:
+The Default Media Receiver can't license DRM-protected content, because it has no way to receive a license server from the sender. Register and host your own receiver ([Google's guide](https://developers.google.com/cast/codelabs/cast-receiver)), then set `receiver` to its application ID and pass the license servers in `customData`. Use the same shape as a source's <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">`drm`</DocsLink>, keyed by EME key system id:
 
 <FrameworkCase frameworks={["react"]}>
 
 ```tsx
 <GoogleCast
   receiver="YOUR_APP_ID"
-  customData={{ drm: { protectionSystem: 'widevine', licenseUrl } }}
+  customData={{
+    drm: {
+      'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+      'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
+    },
+  }}
 />
 ```
 
@@ -184,22 +189,35 @@ The Default Media Receiver can't license DRM-protected content, because it has n
 import type { GoogleCastExtension } from '@videojs/html/extensions/google-cast';
 
 const googleCast = document.querySelector<GoogleCastExtension>('google-cast')!;
-googleCast.customData = { drm: { protectionSystem: 'widevine', licenseUrl } };
+googleCast.customData = {
+  drm: {
+    'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+    'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
+  },
+};
 ```
 
 </FrameworkCase>
 
-The receiver reads it from the load request and licenses the stream with it:
+The receiver picks a key system the device supports and licenses the stream from its server:
 
 ```js
-const context = cast.framework.CastReceiverContext.getInstance();
+const { CastReceiverContext, ContentProtection } = cast.framework;
+
+const PROTECTION_SYSTEMS = {
+  'com.widevine.alpha': ContentProtection.WIDEVINE,
+  'com.microsoft.playready': ContentProtection.PLAYREADY,
+};
+
+const context = CastReceiverContext.getInstance();
 
 context.getPlayerManager().setMediaPlaybackInfoHandler((loadRequest, playbackConfig) => {
-  const drm = loadRequest.media.customData?.drm;
+  const drm = loadRequest.media.customData?.drm ?? {};
+  const keySystem = Object.keys(PROTECTION_SYSTEMS).find((id) => drm[id]?.licenseUrl);
 
-  if (drm) {
-    playbackConfig.protectionSystem = drm.protectionSystem;
-    playbackConfig.licenseUrl = drm.licenseUrl;
+  if (keySystem) {
+    playbackConfig.protectionSystem = PROTECTION_SYSTEMS[keySystem];
+    playbackConfig.licenseUrl = drm[keySystem].licenseUrl;
   }
 
   return playbackConfig;
@@ -208,9 +226,9 @@ context.getPlayerManager().setMediaPlaybackInfoHandler((loadRequest, playbackCon
 context.start();
 ```
 
-Video.js doesn't send the media's `source.drm` to the receiver, so `customData` is the only way the license server gets there. Update `customData` whenever the source or its license URL changes. Serve the receiver over HTTPS: DRM playback needs a secure context.
+Video.js doesn't send the media's `source.drm` to the receiver, so `customData` is the only way the license servers get there. Update `customData` whenever the source or its license servers change. Serve the receiver over HTTPS: DRM playback needs a secure context.
 
-For a Mux source, the Widevine license URL is `https://license.mux.com/license/widevine/{playbackId}?token={drmToken}`. A receiver built with [Mux's Google Cast DRM guide](https://www.mux.com/docs/guides/play-drm-protected-videos-on-google-cast) reads `customData.mux` instead: pass `{ mux: { playbackId, tokens: { drm: drmToken } } }`, the format Mux Player sends.
+A Mux source carries only a `drm.token`, so build its license URLs from the token. For Widevine, that's `https://license.mux.com/license/widevine/{playbackId}?token={drmToken}`. A receiver built with [Mux's Google Cast DRM guide](https://www.mux.com/docs/guides/play-drm-protected-videos-on-google-cast) reads `customData.mux` instead: pass `{ mux: { playbackId, tokens: { drm: drmToken } } }`, the format Mux Player sends.
 
 ### Read connection state
 
