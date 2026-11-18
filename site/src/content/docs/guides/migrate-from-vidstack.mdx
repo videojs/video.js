@@ -1382,7 +1382,7 @@ These changes don't throw errors, so test for them:
 - **Captions.** The captions toggle prefers the browser's language over the `default` track.
 - **Embeds.** YouTube URLs and Vimeo no longer use their privacy-enhanced modes by default; `youtube/ID` shorthands still do.
 - **Time.** `currentTime` updates about four times a second instead of every frame.
-- **Live.** Playback counts as live within 5 seconds of the stream's live edge start, not 10 seconds of the seekable end, and live skins have no time slider, quality, audio track, or rate menu.
+- **Live.** Playback counts as live within 5 seconds of the stream's live edge start, not 10 seconds of the seekable end, and live skins have no time slider or rate menu.
 - **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%. Vidstack's controls did the same, but setting its `volume` or `muted` properties didn't.
 - **System integration.** Nothing is saved between visits, and Video.js doesn't set Media Session metadata for lock screens and hardware keys.
 - **Tooltips.** They open after 600 ms instead of 700 ms.

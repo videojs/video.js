@@ -1,7 +1,7 @@
-import { audioText, captionsText, qualityText, settingsText, speedText } from '@videojs/core/i18n/text/menu';
+import { audioText, captionsText, qualityText, settingsText } from '@videojs/core/i18n/text/menu';
 import * as $ from '@videojs/core/vjsc';
-import { CaptionsOffIcon, ChevronIcon, GearIcon, SpeechIcon, SpeedIcon, SwitchesIcon } from '@videojs/icons/vjsc';
-import { Template, Text } from 'vjsc/components';
+import { CaptionsOffIcon, ChevronIcon, GearIcon, SpeechIcon, SwitchesIcon } from '@videojs/icons/vjsc';
+import { Template, Text, type VjscNode } from 'vjsc/components';
 
 import popupStyles from '../../../styles/popups/popup.styles';
 import { Button } from './button';
@@ -11,7 +11,7 @@ import menuStyles from './menu.styles';
 import settingsButtonStyles from './settings-button.styles';
 import { ButtonTooltip } from './tooltip';
 
-function MenuChevron({ back = false }: { back?: boolean } = {}) {
+export function MenuChevron({ back = false }: { back?: boolean } = {}) {
   return <ChevronIcon className={back ? menuStyles.backChevron : menuStyles.forwardChevron} />;
 }
 
@@ -81,37 +81,6 @@ function AudioTrackMenu() {
   );
 }
 
-function PlaybackRateMenu() {
-  return (
-    <$.Menu.Root>
-      <$.PlaybackRateRadioGroup.Root>
-        <$.Menu.Trigger className={menuStyles.item}>
-          <SpeedIcon className={menuStyles.triggerIcon} />
-          <Text token={speedText.key}>{speedText.text}</Text>
-          <Text className={menuStyles.hint}>
-            <$.PlaybackRateRadioGroup.Value className={menuStyles.hintLabel} />
-            <MenuChevron />
-          </Text>
-        </$.Menu.Trigger>
-        <$.Menu.Content className={menuStyles.content}>
-          <$.Menu.Item className={menuStyles.backItem}>
-            <MenuChevron back />
-            <Text token={speedText.key}>{speedText.text}</Text>
-          </$.Menu.Item>
-          <$.Menu.Separator className={menuStyles.separator} />
-          <$.PlaybackRateRadioGroup.Options className={menuStyles.radioGroup}>
-            <Template name="playback-rate-option">
-              <RadioItem>
-                <Template.Part name="label" />
-              </RadioItem>
-            </Template>
-          </$.PlaybackRateRadioGroup.Options>
-        </$.Menu.Content>
-      </$.PlaybackRateRadioGroup.Root>
-    </$.Menu.Root>
-  );
-}
-
 function CaptionsMenu() {
   return (
     <$.Menu.Root>
@@ -144,7 +113,8 @@ function CaptionsMenu() {
   );
 }
 
-export function SettingsMenu() {
+// `rate` takes the playback-rate submenu from the on-demand presets; live leaves it out.
+export function SettingsMenu({ rate }: { rate?: VjscNode } = {}) {
   return (
     <$.Menu.Root side="top" align="center">
       <ButtonTooltip label={<Text token={settingsText.key}>{settingsText.text}</Text>}>
@@ -162,7 +132,7 @@ export function SettingsMenu() {
         <$.Menu.Content className={menuStyles.content}>
           <QualityMenu />
           <AudioTrackMenu />
-          <PlaybackRateMenu />
+          {rate}
           <CaptionsMenu />
         </$.Menu.Content>
       </$.Menu.Popup>

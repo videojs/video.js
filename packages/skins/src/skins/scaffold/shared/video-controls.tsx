@@ -21,7 +21,7 @@ export function VideoControlsContent({
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <VideoBufferingIndicator />
       <ControlsContent
-        captions={!live && <CaptionsToggle />}
+        captions={<CaptionsToggle />}
         center={center}
         live={live}
         menu={menu}

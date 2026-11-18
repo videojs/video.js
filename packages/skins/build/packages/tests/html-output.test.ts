@@ -82,9 +82,21 @@ describe('generated HTML package skins', () => {
     if (['compat-live-video', 'compat-live-audio', 'scaffold-live-video', 'scaffold-live-audio'].includes(skin)) {
       expect(tags).not.toContain('time-slider');
       expect(tags).not.toContain('time');
+      expect(tags).not.toContain('playback-rate-radio-group');
+    }
+
+    if (skin.endsWith('live-audio')) {
       expect(tags).not.toContain('quality-radio-group');
       expect(tags).not.toContain('audio-track-radio-group');
+    }
+
+    // Live video matches the video settings menu without playback rate.
+    if (skin.endsWith('live-video')) {
+      expect(tags).toContain('quality-radio-group');
+      expect(tags).toContain('audio-track-radio-group');
       expect(tags).not.toContain('playback-rate-radio-group');
+      expect(tags).toContain('captions-button');
+      expect(template.match(/<media-captions-radio-group\b/g)).toHaveLength(1);
     }
 
     if (skin.startsWith('scaffold-')) {
@@ -93,12 +105,6 @@ describe('generated HTML package skins', () => {
       if (skin.endsWith('video')) {
         expect(template).not.toContain('<media-status-indicator actions="togglePaused"');
       }
-    }
-
-    if (skin === 'compat-live-video' || skin === 'scaffold-live-video') {
-      expect(tags).toContain('captions-radio-group');
-      expect(template.match(/<media-captions-button\b/g)).toHaveLength(1);
-      expect(template).not.toContain('media-settings-button');
     }
 
     for (const tag of registeredTags) {

@@ -13,5 +13,8 @@ export default styles({
         'group-has-[[data-volume-level][aria-expanded=true]]/controls:mask-media-volume-open',
       ],
     },
+    settingsButton: {
+      utilities: 'media-max-3xs:hidden',
+    },
   },
 });
