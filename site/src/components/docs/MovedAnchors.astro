@@ -1,0 +1,36 @@
+---
+/**
+ * Sends a reader who arrives on a section that has left this page to the section's new home. Fragments never reach
+ * the server, so a Netlify redirect can't do this; the page carries the map and follows it in the browser.
+ */
+import type { SupportedFramework } from '@/types/docs';
+import { type MovedAnchors, resolveMovedAnchors } from '@/utils/docs/movedAnchors';
+
+interface Props {
+  movedAnchors: MovedAnchors | undefined;
+  framework: SupportedFramework;
+}
+
+const { movedAnchors, framework } = Astro.props;
+const resolved = movedAnchors ? resolveMovedAnchors(movedAnchors, framework) : null;
+---
+
+{resolved && <script type="application/json" data-moved-anchors set:html={JSON.stringify(resolved)} />}
+
+<script>
+  import { findMovedAnchorTarget } from '@/utils/docs/movedAnchorTarget';
+
+  function followMovedAnchor() {
+    const data = document.querySelector('script[data-moved-anchors]');
+    if (!data?.textContent) return;
+
+    const target = findMovedAnchorTarget(JSON.parse(data.textContent), location.hash, (id) =>
+      Boolean(document.getElementById(id))
+    );
+
+    if (target) location.replace(target);
+  }
+
+  document.addEventListener('astro:page-load', followMovedAnchor);
+  window.addEventListener('hashchange', followMovedAnchor);
+</script>

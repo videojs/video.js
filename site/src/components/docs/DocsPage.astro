@@ -9,6 +9,7 @@ import ApiStabilityBadge from '@/components/docs/ApiStabilityBadge.astro';
 import DocsNavigation from '@/components/docs/DocsNavigation.astro';
 import EditPageButton from '@/components/docs/EditPageButton.astro';
 import { TableOfContents } from '@/components/docs/TableOfContents';
+import MovedAnchors from '@/components/docs/MovedAnchors.astro';
 import JsonLd from '@/components/JsonLd.astro';
 import defaultMarkdownComponents from '@/components/typography/defaultMarkdownComponents';
 import H2Markdown from '@/components/typography/H2Markdown.astro';
@@ -158,6 +159,7 @@ const jsonLdSchema = createTechArticleSchema({
           )
         }
         <Content components={{ ...defaultMarkdownComponents }} />
+        <MovedAnchors movedAnchors={doc.data.movedAnchors} framework={framework} />
       </article>
       <footer class="mb-18 grid gap-5">
         <DocsNavigation prev={prev} next={next} framework={framework} docTitles={docTitles} />
