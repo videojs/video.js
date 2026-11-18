@@ -584,7 +584,11 @@ export class GoogleCastProvider {
     this.#updateRemoteTextTrack();
   }
 
-  /** Caption and subtitle `<track>` children with a file the receiver can fetch. Embeds have none to query. */
+  /**
+   * Caption and subtitle `<track>` children with a file, which the receiver only gets through the load request.
+   * Manifest tracks are left out because the receiver reads them from the stream; `#pairTextTracks()` syncs both kinds.
+   * Embeds have no children to query.
+   */
   #getSidecarTracks() {
     return [...(this.target?.querySelectorAll?.<HTMLTrackElement>('track') ?? [])].filter(
       (el) => el.src && isCaptionOrSubtitleTrack(el)
