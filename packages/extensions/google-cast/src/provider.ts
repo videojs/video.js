@@ -1,3 +1,4 @@
+import type { TextTrackLike } from '@videojs/media';
 import type { HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isCaptionOrSubtitleTrack } from '@videojs/utils/dom';
 
@@ -578,7 +579,11 @@ export class GoogleCastProvider {
   }
 
   #syncTextTracks() {
-    if (this.#reloadChangedTracks()) return;
+    // Tracks can only be added to or removed from the receiver with a new load request.
+    if (this.#haveSidecarTracksChanged()) {
+      this.#loadRemote(this.currentTime, !this.paused).catch((error) => console.error(error));
+      return;
+    }
 
     this.#applyResumedTextTracks();
     this.#updateRemoteTextTrack();
@@ -595,13 +600,8 @@ export class GoogleCastProvider {
     );
   }
 
-  /**
-   * Tracks can only be added to or removed from the receiver with a new load request, so when the sidecar tracks
-   * changed, load the media again from where the receiver is.
-   *
-   * @returns Whether the media is loading again.
-   */
-  #reloadChangedTracks() {
+  /** Whether the page's sidecar tracks differ from the ones the receiver has. */
+  #haveSidecarTracksChanged() {
     const { src } = this.#googleCast;
     // A source change sends its own tracks.
     if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !src || this.#loadedSrc !== src) return false;
@@ -609,16 +609,13 @@ export class GoogleCastProvider {
     const sidecars = this.#getSidecarTracks();
 
     if (this.#castTrackKey === null) {
-      // Only side-loaded tracks have a content id on the receiver; send the page's ones it's missing.
+      // Only side-loaded tracks have a content id on the receiver, so only sidecars it's missing count.
       const remote = new Set(getRemoteTextTracks().map(({ trackContentId }) => trackContentId));
-      if (sidecars.every((el) => remote.has(el.src))) return false;
-    } else if (getTrackKey(sidecars) === this.#castTrackKey) {
-      return false;
+
+      return !sidecars.every((el) => remote.has(el.src));
     }
 
-    this.#loadRemote(this.currentTime, !this.paused).catch((error) => console.error(error));
-
-    return true;
+    return getTrackKey(sidecars) !== this.#castTrackKey;
   }
 
   /** The receiver's text tracks paired with the local tracks they show. */
@@ -632,29 +629,32 @@ export class GoogleCastProvider {
     });
   }
 
-  /** After a resumed session, wait for the local track the receiver shows before showing it. */
-  #applyResumedTextTracks() {
-    if (this.#resumedTrackIds && this.#showRemoteTextTrack(this.#resumedTrackIds, true)) this.#resumedTrackIds = null;
+  /** The local track paired with one of the receiver's active track ids. */
+  #findLocalTextTrack(ids: readonly number[]) {
+    return this.#pairTextTracks().find(({ trackId }) => ids.includes(trackId))?.local;
   }
 
-  /**
-   * Show the local track paired with the receiver's active one and turn the other captions off.
-   *
-   * @param wait - Change nothing while the receiver's active track has no local pair yet.
-   * @returns Whether the local tracks were changed.
-   */
-  #showRemoteTextTrack(ids: readonly number[], wait = false) {
-    if (!this.target) return false;
+  /** After a resumed session, wait for the local track the receiver shows before showing it. */
+  #applyResumedTextTracks() {
+    const ids = this.#resumedTrackIds;
+    if (!ids) return;
 
-    const active = this.#pairTextTracks().find(({ trackId }) => ids.includes(trackId))?.local;
-    if (wait && !active && getRemoteTextTracks().some(({ trackId }) => ids.includes(trackId))) return false;
+    const active = this.#findLocalTextTrack(ids);
+    // The receiver shows a track the page hasn't added yet.
+    if (!active && getRemoteTextTracks().some(({ trackId }) => ids.includes(trackId))) return;
+
+    this.#resumedTrackIds = null;
+    this.#showLocalTextTrack(active);
+  }
+
+  /** Show `active` and turn the other local captions off. */
+  #showLocalTextTrack(active: TextTrackLike | undefined) {
+    if (!this.target) return;
 
     for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
       if (track === active) track.mode = 'showing';
       else if (track.mode === 'showing') track.mode = 'disabled';
     }
-
-    return true;
   }
 
   async #updateRemoteTextTrack() {
@@ -678,7 +678,7 @@ export class GoogleCastProvider {
     } catch (error) {
       console.error(error);
       // Keep the captions menu from claiming captions the receiver isn't showing.
-      this.#showRemoteTextTrack(currentMedia()?.activeTrackIds ?? []);
+      this.#showLocalTextTrack(this.#findLocalTextTrack(currentMedia()?.activeTrackIds ?? []));
     }
   }
 }
