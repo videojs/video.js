@@ -59,7 +59,10 @@ export class GoogleCastProvider {
     this.#checkRemoteTracks();
   };
 
-  /** @param canCast - Whether the source can be cast at all; casting is reported unavailable while it can't. */
+  /**
+   * @param canCast - Whether the source can be cast at all. A new session is refused while it can't; a running one can
+   *   still end.
+   */
   constructor(googleCast: GoogleCastConfig, canCast: () => boolean = () => true) {
     this.#googleCast = googleCast;
     this.#canCast = canCast;
@@ -114,11 +117,14 @@ export class GoogleCastProvider {
     Object.assign(this.#hooks, hooks);
   }
 
-  /** Whether a cast session can be offered: the source can be cast, and a device is around to cast it to. */
+  /**
+   * Whether a cast session can be offered: a device is around, and the source can be cast. A session already running
+   * stays available, so it can still be ended after the source changes to one that can't be cast.
+   */
   isAvailable() {
     const state = getCastContext()?.getCastState();
 
-    return this.#canCast() && !!state && state !== cast.framework.CastState.NO_DEVICES_AVAILABLE;
+    return this.#allowsCasting() && !!state && state !== cast.framework.CastState.NO_DEVICES_AVAILABLE;
   }
 
   /** Report availability again, after something the `canCast` check reads changed. */
@@ -131,7 +137,7 @@ export class GoogleCastProvider {
       throw new InvalidStateError('disableRemotePlayback attribute is present.');
     }
 
-    if (!this.#canCast()) {
+    if (!this.#allowsCasting()) {
       throw new NotSupportedError('This source needs a custom Cast receiver.');
     }
 
@@ -385,6 +391,7 @@ export class GoogleCastProvider {
         } else {
           this.#disconnect();
           this.#hooks.setState?.('disconnected');
+          this.updateAvailability();
         }
       },
       [framework.RemotePlayerEventType.DURATION_CHANGED]: () => {
@@ -509,6 +516,10 @@ export class GoogleCastProvider {
     }
 
     this.#listenersAttached = listen;
+  }
+
+  #allowsCasting() {
+    return this.#isCasting || this.#canCast();
   }
 
   #disconnect() {
