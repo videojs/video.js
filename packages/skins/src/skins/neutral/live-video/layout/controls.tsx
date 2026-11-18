@@ -3,14 +3,15 @@ import { Box } from 'vjsc/components';
 
 import { AirPlayButton } from '../../../../components/buttons/airplay-button';
 import { ButtonTooltip } from '../../../../components/buttons/button-tooltip';
+import { CaptionsButton } from '../../../../components/buttons/captions-button';
 import { CastButton } from '../../../../components/buttons/cast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { LiveButton } from '../../../../components/buttons/live-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
 import { PlayButton } from '../../../../components/buttons/play-button';
-import { CaptionsMenu } from '../../../../components/menus/captions-menu';
 import { VolumePopover } from '../../../../components/menus/volume-popover';
 import controlsStyles from '../../../../styles/layout/controls.styles';
+import { LiveVideoSettingsMenu } from '../../../shared/live-video/menus/settings-menu';
 import styles from './controls.styles';
 
 export function NeutralLiveVideoControls() {
@@ -38,7 +39,10 @@ export function NeutralLiveVideoControls() {
           <Box aria-hidden="true" className={controlsStyles.spacer} />
 
           <$.Controls.Group className={styles.end}>
-            <CaptionsMenu />
+            <ButtonTooltip side="top">
+              <CaptionsButton className={controlsStyles.captionsButton} />
+            </ButtonTooltip>
+            <LiveVideoSettingsMenu className={styles.settingsButton} />
             <ButtonTooltip side="top">
               <CastButton />
             </ButtonTooltip>
