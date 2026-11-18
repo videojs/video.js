@@ -16,7 +16,13 @@ concurrency:
 
 jobs:
   implement:
-    if: github.event.issue.pull_request == null && github.event.label.name == 'agent:pr'
+    # Only a person may trigger this write-scope agent. Bot-applied labels
+    # (for example from the triage agent) are ignored, and codex-action's
+    # default gate then requires the labeler to have write access.
+    if: >-
+      github.event.issue.pull_request == null &&
+      github.event.label.name == 'agent:pr' &&
+      github.event.sender.type == 'User'
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 60
 
@@ -35,7 +41,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         with:
-          allow-bot-users: 'github-actions[bot]'
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           codex-version: 0.149.1
           model: gpt-5.6-sol
