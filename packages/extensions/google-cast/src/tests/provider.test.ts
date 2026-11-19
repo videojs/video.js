@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { GoogleCastExtension, type GoogleCastExtensionProps } from '../index';
 import { GoogleCastProvider } from '../provider';
 import { ensureCastFramework } from '../registry';
-import { currentSession, getCastContext, getPlaylistSegmentFormat, isHls } from '../utils';
+import { currentSession, getCastContext, getPlaylistSegmentFormat, isHls, NotSupportedError } from '../utils';
 
 const mocks = vi.hoisted(() => ({
   // Set per test to a fake framework so the provider initializes as if the Cast SDK had loaded.
@@ -126,13 +126,13 @@ function createCastSdk() {
   }
 
   class RemotePlayerController {
-    readonly listeners = new Map<string, () => void>();
+    readonly listeners = new Map<string, (event?: { value: unknown }) => void>();
 
     constructor(remotePlayer: RemotePlayer) {
       remotePlayer.controller = this;
       player = remotePlayer;
     }
-    addEventListener(type: string, listener: () => void) {
+    addEventListener(type: string, listener: (event?: { value: unknown }) => void) {
       this.listeners.set(type, listener);
     }
     removeEventListener(type: string) {
@@ -228,9 +228,13 @@ function installCastSdk() {
 }
 
 /** A provider with a connected session. `config` is read live, so tests set `src` after the session starts. */
-async function createCastingProvider(config: GoogleCastExtensionProps, target = createTarget().target) {
+async function createCastingProvider(
+  config: GoogleCastExtensionProps,
+  target = createTarget().target,
+  canCast?: () => boolean
+) {
   const sdk = installCastSdk();
-  const provider = new GoogleCastProvider(config);
+  const provider = new GoogleCastProvider(config, canCast);
 
   provider.attach(target);
   await provider.requestCastSession();
@@ -391,6 +395,49 @@ describe('GoogleCastProvider', () => {
     for (const [type, listener] of sdk.context.addEventListener.mock.calls) {
       expect(sdk.context.removeEventListener).toHaveBeenCalledWith(type, listener);
     }
+  });
+
+  describe('a source that cannot be cast', () => {
+    it('is not offered for casting', async () => {
+      await createCastingProvider({});
+
+      expect(new GoogleCastProvider({}).isAvailable()).toBe(true);
+      expect(new GoogleCastProvider({}, () => false).isAvailable()).toBe(false);
+    });
+
+    it('rejects a prompt without starting a session', async () => {
+      await createCastingProvider({});
+
+      const provider = new GoogleCastProvider({}, () => false);
+      const context = getCastContext()!;
+
+      vi.mocked(context.requestSession).mockClear();
+      provider.attach(createTarget().target);
+
+      await expect(provider.requestCastSession()).rejects.toThrow(NotSupportedError);
+      expect(context.requestSession).not.toHaveBeenCalled();
+    });
+
+    it('keeps a running session available, so it can still be ended', async () => {
+      let canCast = true;
+      const setAvailable = vi.fn();
+      const { provider, sdk } = await createCastingProvider({}, undefined, () => canCast);
+
+      provider.bindHooks({ setAvailable });
+      canCast = false;
+      provider.updateAvailability();
+
+      expect(setAvailable).toHaveBeenLastCalledWith(true);
+
+      sdk.context.requestSession.mockClear();
+      await provider.requestCastSession();
+
+      expect(sdk.context.requestSession).toHaveBeenCalledTimes(1);
+
+      sdk.player.controller!.listeners.get('isConnectedChanged')!({ value: false });
+
+      expect(setAvailable).toHaveBeenLastCalledWith(false);
+    });
   });
 
   describe('load', () => {

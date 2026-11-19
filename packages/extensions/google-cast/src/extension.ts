@@ -1,7 +1,7 @@
 import type { MediaOverride, PlayerTarget } from '@videojs/core/dom';
 import type { MediaStreamType } from '@videojs/media';
 import { getMediaElement, type HTMLMediaTargetLike } from '@videojs/media/dom';
-import { isUndefined } from '@videojs/utils/predicate';
+import { isNil, isPlainObject, isUndefined } from '@videojs/utils/predicate';
 
 import { GoogleCastProvider } from './provider';
 import { requiresCastFramework } from './utils';
@@ -13,7 +13,10 @@ export interface GoogleCastExtensionProps {
   contentType?: string | undefined;
   /** Stream type used on the Cast receiver. */
   streamType?: MediaStreamType | undefined;
-  /** Cast receiver application ID. Defaults to Google's default media receiver. */
+  /**
+   * Cast receiver application ID. Defaults to Google's default media receiver, which can't license DRM, so the cast
+   * button stays disabled for DRM-protected sources until this is set.
+   */
   receiver?: string | undefined;
   /** Custom data sent to the Cast receiver with the load request. */
   customData?: Record<string, unknown> | null | undefined;
@@ -60,14 +63,16 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     this.#media = target;
 
     if (requiresCastFramework() && !this.#provider) {
-      this.#provider = new GoogleCastProvider(this);
+      this.#provider = new GoogleCastProvider(this, () => this.#canCast());
       this.#provider.remote.addEventListener('connect', this.#onStateChange);
       this.#provider.remote.addEventListener('disconnect', this.#onStateChange);
       this.#override = this.#createRemoteOverride();
     }
 
     this.#bindProvider();
+    this.#provider?.updateAvailability();
     target.addEventListener('loadstart', this.#onLoadStart);
+    target.addEventListener('sourcechange', this.#onSourceChange);
 
     // A media swapped in mid-session may have started loading before the player attached it, so its `loadstart` has
     // already fired; follow its source now rather than waiting for one that may never come.
@@ -77,6 +82,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
   /** @internal Player lifecycle; the player calls it. */
   detach() {
     this.#media?.removeEventListener('loadstart', this.#onLoadStart);
+    this.#media?.removeEventListener('sourcechange', this.#onSourceChange);
     this.#media = null;
     this.#provider?.detach();
   }
@@ -111,6 +117,13 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
 
     provider.attach(element);
   }
+
+  /** Google's default receiver can't license DRM, so a protected source needs a custom `receiver`. */
+  #canCast() {
+    return !!this.#receiver || !isDrmProtected(this.#media);
+  }
+
+  #onSourceChange = () => this.#provider?.updateAvailability();
 
   #onStateChange = () => {
     if (!this.#provider) return;
@@ -202,7 +215,10 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     this.#load();
   }
 
-  /** Cast receiver application ID. Read on session start; falls back to the layer's default. */
+  /**
+   * Cast receiver application ID. Read on session start; falls back to Google's default media receiver, which can't
+   * license DRM, so the cast button stays disabled for DRM-protected sources until this is set.
+   */
   get receiver() {
     return this.#receiver;
   }
@@ -211,6 +227,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     if (this.#receiver === value) return;
 
     this.#receiver = value;
+    this.#provider?.updateAvailability();
     this.#load();
   }
 
@@ -231,4 +248,37 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
       void this.#provider.load();
     }
   }
+}
+
+/** The parts of a media's `source` that carry DRM config, across the adapters that expose one. */
+interface DrmSourceLike {
+  drm?: unknown;
+  engine?: {
+    hlsJs?: { drmSystems?: unknown; emeEnabled?: boolean } | undefined;
+    nativeHls?: { drmSystems?: unknown } | undefined;
+  };
+}
+
+/**
+ * Whether `media` plays a DRM-protected source: a Mux `drm.token`, license servers in `source.drm`, or an engine's own
+ * DRM config. Reads the same fields the hls.js adapter treats as protected.
+ */
+function isDrmProtected(media: HTMLMediaTargetLike | null): boolean {
+  // SAFETY: optional chaining reads the media's `source`; media without one gives `undefined`.
+  const source = (media as { source?: DrmSourceLike | null } | null)?.source;
+  if (!source) return false;
+
+  const { drm, engine } = source;
+
+  return (
+    hasDrmConfig(drm) ||
+    hasDrmConfig(engine?.hlsJs?.drmSystems) ||
+    !!engine?.hlsJs?.emeEnabled ||
+    hasDrmConfig(engine?.nativeHls?.drmSystems)
+  );
+}
+
+/** Whether `value` is a DRM config with at least one set entry, such as a key system or a Mux `token`. */
+function hasDrmConfig(value: unknown): boolean {
+  return isPlainObject(value) && Object.values(value).some((entry) => !isNil(entry));
 }

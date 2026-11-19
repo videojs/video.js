@@ -33,6 +33,7 @@ type GoogleCastConfig = GoogleCastExtensionProps;
 export class GoogleCastProvider {
   target: HTMLMediaTargetLike | null = null;
   #googleCast: GoogleCastConfig;
+  #canCast: () => boolean;
   #loadedSrc: string | null = null;
   #hooks: Partial<RemotePlaybackHooks> = {};
   #remotePlayback: RemotePlayback;
@@ -58,8 +59,13 @@ export class GoogleCastProvider {
     this.#checkRemoteTracks();
   };
 
-  constructor(googleCast: GoogleCastConfig) {
+  /**
+   * @param canCast - Whether the source can be cast at all. A new session is refused while it can't; a running one can
+   *   still end.
+   */
+  constructor(googleCast: GoogleCastConfig, canCast: () => boolean = () => true) {
     this.#googleCast = googleCast;
+    this.#canCast = canCast;
     this.#remotePlayback = new RemotePlayback(this);
     this.#cancelInit = whenCastFramework((framework) => this.#init(framework));
   }
@@ -111,15 +117,28 @@ export class GoogleCastProvider {
     Object.assign(this.#hooks, hooks);
   }
 
-  hasDevicesAvailable() {
+  /**
+   * Whether a cast session can be offered: a device is around, and the source can be cast. A session already running
+   * stays available, so it can still be ended after the source changes to one that can't be cast.
+   */
+  isAvailable() {
     const state = getCastContext()?.getCastState();
 
-    return !!state && state !== cast.framework.CastState.NO_DEVICES_AVAILABLE;
+    return this.#allowsCasting() && !!state && state !== cast.framework.CastState.NO_DEVICES_AVAILABLE;
+  }
+
+  /** Report availability again, after something the `canCast` check reads changed. */
+  updateAvailability() {
+    if (this.#isInit) this.#hooks.setAvailable?.(this.isAvailable());
   }
 
   async requestCastSession() {
     if (this.target?.disableRemotePlayback) {
       throw new InvalidStateError('disableRemotePlayback attribute is present.');
+    }
+
+    if (!this.#allowsCasting()) {
+      throw new NotSupportedError('This source needs a custom Cast receiver.');
     }
 
     await ensureCastFramework();
@@ -372,6 +391,7 @@ export class GoogleCastProvider {
         } else {
           this.#disconnect();
           this.#hooks.setState?.('disconnected');
+          this.updateAvailability();
         }
       },
       [framework.RemotePlayerEventType.DURATION_CHANGED]: () => {
@@ -429,7 +449,7 @@ export class GoogleCastProvider {
       this.#hooks.setState?.('connecting');
     }
 
-    this.#hooks.setAvailable?.(this.hasDevicesAvailable());
+    this.updateAvailability();
   };
 
   #onSessionStateChanged = async () => {
@@ -496,6 +516,10 @@ export class GoogleCastProvider {
     }
 
     this.#listenersAttached = listen;
+  }
+
+  #allowsCasting() {
+    return this.#isCasting || this.#canCast();
   }
 
   #disconnect() {

@@ -302,6 +302,12 @@ export function MuxPlayer() {
 <DocsLinkCard slug="guides/mux-data" description="Metadata, options, and configuration">Mux Data</DocsLinkCard>
 <DocsLinkCard slug="guides/casting" description="Receivers, load requests, and session state">Cast to AirPlay and Chromecast</DocsLinkCard>
 
+### Cast DRM-protected content
+
+Google's Default Media Receiver can't license DRM, so while the source has a `drm.token`, the Cast button stays disabled until the Google Cast extension's `receiver` is set. <DocsLink slug="guides/casting" anchor="cast-drm-protected-content">Cast DRM-protected content</DocsLink> covers hosting your own receiver and passing it a license server through `customData`.
+
+Build the Widevine license URL from the playback ID and DRM token: `https://license.mux.com/license/widevine/{playbackId}?token={drmToken}`. A receiver built with [Mux's Google Cast DRM guide](https://www.mux.com/docs/guides/play-drm-protected-videos-on-google-cast) reads `customData.mux` instead. For that receiver, pass `{ mux: { playbackId, tokens: { drm: drmToken } } }`, the format Mux Player sends.
+
 ## Examples
 
 ### Basic Usage
