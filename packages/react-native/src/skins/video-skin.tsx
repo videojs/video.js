@@ -38,13 +38,15 @@ export function VideoSkin({ children, ...props }: VideoSkinProps): ReactNode {
       <BufferingIndicator />
       {/* The bar is the title's own padding and background, so a player without a title shows no empty strip. */}
       <Title style={styles.title} />
-      <View pointerEvents="box-none" style={styles.bottom}>
-        <TimeSlider style={styles.slider} />
+      <View style={styles.buttonContainer}>
         <View style={styles.buttons}>
           <SeekButton seconds={-10} />
           <PlayButton />
           <SeekButton seconds={10} />
         </View>
+      </View>
+      <View pointerEvents="box-none" style={styles.bottom}>
+        <TimeSlider style={styles.slider} />
       </View>
       {/* Above the controls so its message is not dimmed or crossed by them; it ignores touches. */}
       <InlineError />
@@ -76,6 +78,11 @@ const styles = StyleSheet.create({
   },
   slider: {
     marginHorizontal: 4,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   buttons: {
     flexDirection: 'row',
