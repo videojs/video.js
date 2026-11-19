@@ -284,11 +284,12 @@ describe('GoogleCastExtension', () => {
     });
   });
 
-  describe('Mux DRM sources', () => {
+  describe('DRM sources', () => {
     const DRM_SOURCE = { playbackId: 'abc', drm: { token: 'drm-token' } };
+    const WIDEVINE = { 'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' } };
 
-    /** A Mux media component or adapter playing `source`, which it announces with `sourcechange`. */
-    function attachMux(googleCast: GoogleCastExtension, source: unknown) {
+    /** A media component or adapter playing `source`, which it announces with `sourcechange`. */
+    function attachSource(googleCast: GoogleCastExtension, source: unknown) {
       const media = Object.assign(createHost(document.createElement('video')), { source });
 
       googleCast.attach({ media: media as unknown as Media, container: null });
@@ -297,14 +298,14 @@ describe('GoogleCastExtension', () => {
     }
 
     it('cannot cast a source signed for DRM to the default receiver', () => {
-      const { provider } = attachMux(new GoogleCastExtension(), DRM_SOURCE);
+      const { provider } = attachSource(new GoogleCastExtension(), DRM_SOURCE);
 
       expect(provider.canCast()).toBe(false);
     });
 
     it('can cast it once a receiver is set, and reports the change', () => {
       const googleCast = new GoogleCastExtension();
-      const { provider } = attachMux(googleCast, DRM_SOURCE);
+      const { provider } = attachSource(googleCast, DRM_SOURCE);
 
       provider.updateAvailability.mockClear();
       googleCast.receiver = 'ABCD1234';
@@ -314,14 +315,38 @@ describe('GoogleCastExtension', () => {
     });
 
     it('can cast Mux sources without a DRM token, and other media', () => {
-      const { provider } = attachMux(new GoogleCastExtension(), { playbackId: 'abc' });
+      const { provider } = attachSource(new GoogleCastExtension(), { playbackId: 'abc' });
 
       expect(provider.canCast()).toBe(true);
       expect(setup().provider.canCast()).toBe(true);
     });
 
+    it.each([
+      ['license servers in `drm`', { src: 'https://example.com/a.m3u8', drm: WIDEVINE }],
+      ['license servers on a Mux source', { playbackId: 'abc', drm: WIDEVINE }],
+      ['hls.js `drmSystems`', { src: 'https://example.com/a.m3u8', engine: { hlsJs: { drmSystems: WIDEVINE } } }],
+      ['hls.js `emeEnabled`', { src: 'https://example.com/a.m3u8', engine: { hlsJs: { emeEnabled: true } } }],
+      [
+        'native HLS `drmSystems`',
+        { src: 'https://example.com/a.m3u8', engine: { nativeHls: { drmSystems: WIDEVINE } } },
+      ],
+    ])('cannot cast a source with %s to the default receiver', (_, source) => {
+      const { provider } = attachSource(new GoogleCastExtension(), source);
+
+      expect(provider.canCast()).toBe(false);
+    });
+
+    it('can cast a source whose DRM config has no entries', () => {
+      const { provider } = attachSource(new GoogleCastExtension(), {
+        src: 'https://example.com/a.m3u8',
+        drm: { token: undefined },
+      });
+
+      expect(provider.canCast()).toBe(true);
+    });
+
     it('checks again when the source changes', () => {
-      const { media, provider } = attachMux(new GoogleCastExtension(), { playbackId: 'abc' });
+      const { media, provider } = attachSource(new GoogleCastExtension(), { playbackId: 'abc' });
 
       provider.updateAvailability.mockClear();
       media.source = DRM_SOURCE;
