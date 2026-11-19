@@ -1,6 +1,8 @@
 'use client';
 
 import { identity, noop } from '@videojs/utils/function';
+import { isFunction } from '@videojs/utils/predicate';
+import { useMemo } from 'react';
 
 import type { AnyStore, InferStoreState } from '../../core/store';
 import { type Comparator, type Selector, useSelector } from './use-selector';
@@ -44,8 +46,14 @@ export function useStore<S extends AnyStore, R>(
 ): R;
 
 export function useStore(store: AnyStore, selector?: Selector<any, any>, isEqual?: Comparator<any>) {
-  const subscribe = selector ? (cb: () => void) => store.subscribe(cb) : noopSubscribe,
-    getSnapshot = selector ? () => store.state : () => store;
+  const hasSelector = isFunction(selector);
+
+  // Keyed on whether a selector exists, not its identity, so an inline selector does not resubscribe every render.
+  const subscribe = useMemo(
+      () => (hasSelector ? (cb: () => void) => store.subscribe(cb) : noopSubscribe),
+      [store, hasSelector]
+    ),
+    getSnapshot = useMemo(() => (hasSelector ? () => store.state : () => store), [store, hasSelector]);
 
   return useSelector(subscribe, getSnapshot, selector ?? identity, isEqual);
 }

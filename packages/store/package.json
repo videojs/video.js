@@ -51,8 +51,7 @@
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
   },
   "dependencies": {
-    "@videojs/utils": "workspace:*",
-    "react-compiler-runtime": "^1.0.0"
+    "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
