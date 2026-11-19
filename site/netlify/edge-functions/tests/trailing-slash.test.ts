@@ -17,7 +17,9 @@ describe('trailingSlash', () => {
   });
 
   it('moves alias hosts to videojs.org in the same hop', async () => {
-    expect(await locationOf('https://videojs.com/guides/react/')).toBe('https://videojs.org/guides/react');
+    expect(await locationOf('https://videojs.com/docs/guides/autoplay/')).toBe(
+      'https://videojs.org/docs/guides/autoplay'
+    );
     expect(await locationOf('https://www.videojs.com/blog/')).toBe('https://videojs.org/blog');
   });
 
@@ -25,6 +27,14 @@ describe('trailingSlash', () => {
     expect(await locationOf('https://deploy-preview-1--vjs10-site.netlify.app/blog/')).toBe(
       'https://deploy-preview-1--vjs10-site.netlify.app/blog'
     );
+  });
+
+  it('sends legacy guides and tags straight to the legacy site, keeping the slash', async () => {
+    expect(await locationOf('https://videojs.org/guides/react/?ref=x')).toBe(
+      'https://legacy.videojs.org/guides/react/?ref=x'
+    );
+    expect(await locationOf('https://videojs.com/tags/plugins/')).toBe('https://legacy.videojs.org/tags/plugins/');
+    expect(await locationOf('https://videojs.org/guides/')).toBe('https://videojs.org/guides');
   });
 
   it('leaves the embed snippet URL and the PostHog proxy to the redirect rules', async () => {
