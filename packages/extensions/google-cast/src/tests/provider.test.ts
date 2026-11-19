@@ -55,7 +55,7 @@ function createTarget(disableRemotePlayback = false) {
 
 /** Just enough of the Cast SDK for the provider to initialize, start a session, and send a load request. */
 function createCastSdk() {
-  const session = { loadMedia: vi.fn(async () => {}) };
+  const session = { loadMedia: vi.fn(async () => {}), getSessionObj: () => ({ media: [] }) };
   const context = {
     setOptions: vi.fn(),
     requestSession: vi.fn(async () => {}),
@@ -64,18 +64,28 @@ function createCastSdk() {
     getSessionState: () => 'SESSION_STARTED',
   };
 
+  const players: RemotePlayer[] = [];
+
   class RemotePlayer {
     controller: RemotePlayerController | null = null;
     isMuted = false;
     isMediaLoaded = false;
     isPaused = true;
+
+    constructor() {
+      players.push(this);
+    }
   }
 
   class RemotePlayerController {
+    handlers: Record<string, () => unknown> = {};
+
     constructor(player: RemotePlayer) {
       player.controller = this;
     }
-    addEventListener() {}
+    addEventListener(type: string, handler: () => unknown) {
+      this.handlers[type] = handler;
+    }
     removeEventListener() {}
   }
 
@@ -88,6 +98,7 @@ function createCastSdk() {
 
   // SAFETY: covers every framework member `onCastFrameworkAvailable`, `requestCastSession`, and `load` touch.
   const framework = {
+    CastContext: { getInstance: () => context },
     RemotePlayer,
     RemotePlayerController,
     RemotePlayerEventType: {
@@ -122,7 +133,7 @@ function createCastSdk() {
     },
   };
 
-  return { framework, chromeCast, context, session };
+  return { framework, chromeCast, context, session, players };
 }
 
 /** A provider with a connected session. `config` is read live, so tests set `src` after the session starts. */
@@ -141,7 +152,31 @@ async function createCastingProvider(config: GoogleCastExtensionProps, target = 
   provider.attach(target);
   await provider.requestCastSession();
 
-  return { provider, target, session: sdk.session };
+  return { provider, target, session: sdk.session, remotePlayer: sdk.players.at(-1)! };
+}
+
+/** Runs `action`, then collects any rejection it left unhandled. */
+async function collectUnhandledRejections(action: () => unknown): Promise<unknown[]> {
+  // SAFETY: tests run on Node, and the test types omit Node's globals.
+  const { process } = globalThis as unknown as {
+    process: {
+      on(type: string, fn: (reason: unknown) => void): void;
+      off(type: string, fn: (reason: unknown) => void): void;
+    };
+  };
+  const reasons: unknown[] = [];
+  const onRejection = (reason: unknown) => reasons.push(reason);
+
+  process.on('unhandledRejection', onRejection);
+
+  try {
+    await action();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  } finally {
+    process.off('unhandledRejection', onRejection);
+  }
+
+  return reasons;
 }
 
 function deferred<T>() {
@@ -236,6 +271,18 @@ describe('GoogleCastProvider', () => {
 
     expect(() => provider.attach(target)).not.toThrow();
     expect(() => provider.detach()).not.toThrow();
+  });
+
+  it('syncs remote text tracks without error when the target has no text tracks', async () => {
+    const { target } = createTarget();
+
+    Object.assign(target, { textTracks: undefined });
+    const { remotePlayer } = await createCastingProvider({}, target);
+
+    remotePlayer.isMediaLoaded = true;
+    const reasons = await collectUnhandledRejections(() => remotePlayer.controller!.handlers.isMediaLoadedChanged!());
+
+    expect(reasons).toEqual([]);
   });
 
   it('removes the text track change listener on destroy', () => {

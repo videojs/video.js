@@ -545,9 +545,10 @@ export class GoogleCastProvider {
   }
 
   async #updateRemoteTextTrack() {
-    if (!this.#isCasting || !this.target) return;
+    const textTracks = this.#textTracks;
+    if (!this.#isCasting || !textTracks) return;
 
-    const localSubs = [...this.target.textTracks].filter(isCaptionOrSubtitleTrack);
+    const localSubs = [...textTracks].filter(isCaptionOrSubtitleTrack);
 
     const matched = (this.#remotePlayer.mediaInfo?.tracks ?? [])
       .filter(({ type }) => type === chrome.cast.media.TrackType.TEXT)
