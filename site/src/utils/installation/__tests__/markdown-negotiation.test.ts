@@ -42,6 +42,7 @@ describe('markdown negotiation', () => {
     expect(response?.status).toBe(200);
     expect(response?.headers.get('netlify-vary')).toContain('package-manager');
     expect(response?.headers.get('netlify-vary')).not.toContain('install-method');
+    expect(response?.headers.get('x-markdown-tokens')).toBe(String(Math.ceil(body.length / 4)));
     expect(body).toContain('# Shadcn Installation Guide');
     expect(body).toContain('- `framework`: `html`');
     expect(body).toContain('- `media`: `spotify`');
