@@ -38,6 +38,8 @@ export const DEFAULT_BACK_BUFFER_CONFIG: BackBufferConfig = {
  *   const flushEnd = calculateBackBufferFlushPoint(segments, 18);
  *   // Returns 6 (flush [0, 6), keep [6-18))
  *
+ *   Never flushes the segment before the playhead's, whatever `keepSegments` says; see `playheadPredecessorStart`.
+ *
  * @param segments - Available segments (should be sorted by startTime)
  * @param currentTime - Current playback position in seconds
  * @param config - Optional back buffer configuration
@@ -48,6 +50,31 @@ export function calculateBackBufferFlushPoint(
   currentTime: number,
   config: BackBufferConfig = DEFAULT_BACK_BUFFER_CONFIG
 ): number {
+  return Math.min(
+    keepSegmentsFlushPoint(segments, currentTime, config),
+    playheadPredecessorStart(segments, currentTime)
+  );
+}
+
+/**
+ * The start of the segment before the playhead's — the back-buffer's hard floor, whatever `keepSegments` says. Segment
+ * boundaries are approximate: the predecessor's media can run past its playlist end, so its tail may be the media under
+ * the playhead (after a seek onto a boundary, before the later segment's first frame). And MSE removes a flushed
+ * range's decode dependents through the next keyframe, so flushing the predecessor's span would take that tail with it.
+ * `Infinity` when there is no predecessor to keep.
+ */
+function playheadPredecessorStart(segments: Segment[], currentTime: number): number {
+  const playheadSegment = segments.find(
+    ({ startTime, duration }) => startTime <= currentTime && currentTime < startTime + duration
+  );
+  const playheadStart = playheadSegment?.startTime ?? currentTime;
+  const predecessor = segments.filter(({ startTime, duration }) => startTime + duration <= playheadStart).at(-1);
+
+  return predecessor?.startTime ?? Infinity;
+}
+
+/** The flush point the `keepSegments` count alone gives. */
+function keepSegmentsFlushPoint(segments: Segment[], currentTime: number, config: BackBufferConfig): number {
   if (segments.length === 0) {
     return 0;
   }

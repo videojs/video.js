@@ -293,6 +293,95 @@ describe('syncTextTracks', () => {
     }
   });
 
+  it('refreshes the cues of a track reselected after being disabled', async () => {
+    const mediaElement = document.createElement('video');
+    const presentation = makePresentation([{ id: 'track-en', language: 'en' }]);
+    const { state, context, reactor } = setup({ presentation, selectedTextTrackId: 'track-en' });
+
+    context.mediaElement.set(mediaElement);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const track = mediaElement.querySelector<HTMLTrackElement>('#track-en')!.track;
+    const cues = [new VTTCue(0, 2, 'A'), new VTTCue(2, 4, 'B')];
+
+    for (const cue of cues) track.addCue(cue);
+
+    try {
+      state.selectedTextTrackId.set(undefined);
+      await vi.waitFor(() => expect(track.mode).toBe('disabled'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const removeCue = vi.spyOn(track, 'removeCue');
+
+      state.selectedTextTrackId.set('track-en');
+
+      await vi.waitFor(() => expect(removeCue).toHaveBeenCalledTimes(cues.length));
+      expect(track.mode).toBe('showing');
+      expect(Array.from(track.cues!)).toEqual(cues);
+    } finally {
+      reactor.destroy();
+    }
+  });
+
+  it('refreshes the cues of a track reselected through native UI', async () => {
+    const mediaElement = document.createElement('video');
+    const presentation = makePresentation([
+      { id: 'track-en', language: 'en' },
+      { id: 'track-es', language: 'es' },
+    ]);
+    const { context, reactor } = setup({ presentation, selectedTextTrackId: 'track-en' });
+
+    context.mediaElement.set(mediaElement);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const enTrack = mediaElement.querySelector<HTMLTrackElement>('#track-en')!.track;
+    const esTrack = mediaElement.querySelector<HTMLTrackElement>('#track-es')!.track;
+    const cue = new VTTCue(0, 2, 'A');
+
+    enTrack.addCue(cue);
+
+    try {
+      enTrack.mode = 'disabled';
+      esTrack.mode = 'showing';
+      mediaElement.textTracks.dispatchEvent(new Event('change'));
+
+      const removeCue = vi.spyOn(enTrack, 'removeCue');
+
+      esTrack.mode = 'disabled';
+      enTrack.mode = 'showing';
+      mediaElement.textTracks.dispatchEvent(new Event('change'));
+
+      expect(removeCue).toHaveBeenCalledExactlyOnceWith(cue);
+      expect(Array.from(enTrack.cues!)).toEqual([cue]);
+    } finally {
+      reactor.destroy();
+    }
+  });
+
+  it('does not refresh the cues on a change that keeps the same showing track', async () => {
+    const mediaElement = document.createElement('video');
+    const presentation = makePresentation([{ id: 'track-en', language: 'en' }]);
+    const { context, reactor } = setup({ presentation, selectedTextTrackId: 'track-en' });
+
+    context.mediaElement.set(mediaElement);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const track = mediaElement.querySelector<HTMLTrackElement>('#track-en')!.track;
+
+    track.addCue(new VTTCue(0, 2, 'A'));
+
+    const removeCue = vi.spyOn(track, 'removeCue');
+
+    try {
+      mediaElement.textTracks.dispatchEvent(new Event('change'));
+      mediaElement.textTracks.dispatchEvent(new Event('change'));
+
+      expect(removeCue).not.toHaveBeenCalled();
+    } finally {
+      reactor.destroy();
+    }
+  });
+
   it('removes track elements on destroy', async () => {
     const mediaElement = document.createElement('video');
     const presentation = makePresentation([

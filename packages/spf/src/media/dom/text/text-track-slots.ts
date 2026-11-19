@@ -68,6 +68,21 @@ export function removeAllSubtitlesTracksFromMedia(mediaElement: HTMLMediaElement
 }
 
 /**
+ * Make the media element render the cues of a track that just became the showing one.
+ *
+ * SPF slots have no `src`, so their load fails. WebKit only hands a re-enabled track's cues back to the media element
+ * when its `<track>` loaded, so a slot turned off and on again keeps its cues but renders none — and because the cues
+ * are still cached as loaded, seeking back into their range never restores them. Adding a cue the track already holds
+ * is a no-op in WebKit, so each cue is removed before it is added back.
+ */
+export function refreshTextTrackCues(track: globalThis.TextTrack): void {
+  for (const cue of Array.from(track.cues ?? [])) {
+    track.removeCue(cue);
+    track.addCue(cue);
+  }
+}
+
+/**
  * Apply a selection to a `TextTrackList` by setting each subtitle/caption track's `mode` to `'showing'` if its `id`
  * matches `selectedId` and `'disabled'` otherwise. Tracks of other kinds (chapters, metadata, descriptions) are left
  * untouched — they may be owned by the host page.

@@ -1,3 +1,6 @@
+export * from './feature';
+export * from './player';
+export * from './store/features';
 export * from './ui/airplay-button/core';
 export * from './ui/airplay-button/data';
 export * from './ui/alert-dialog/core';
@@ -43,6 +46,7 @@ export * from './ui/play-button/core';
 export * from './ui/play-button/data';
 export * from './ui/playback-rate-button/core';
 export * from './ui/playback-rate-button/data';
+export * from './ui/playback-rate-button/vars';
 export * from './ui/playback-rate-radio-group/core';
 export * from './ui/playback-rate-radio-group/data';
 export * from './ui/popover/core';
@@ -80,6 +84,9 @@ export * from './ui/time-slider/chapters/core';
 export * from './ui/time-slider/chapters/data';
 export * from './ui/time-slider/chapters/types';
 export * from './ui/time-slider/chapters/vars';
+export * from './ui/time-slider/markers/core';
+export * from './ui/time-slider/markers/data';
+export * from './ui/time-slider/markers/vars';
 export * from './ui/time-slider/vars';
 export * from './ui/title/core';
 export * from './ui/title/data';
@@ -99,3 +106,23 @@ export * from './ui/volume-slider/core';
 export * from './ui/volume-slider/data';
 export * from './ui/volume-slider/vars';
 export * from './version';
+export type {
+  AddTextTrack,
+  InferCueValue,
+  TextCueFormat,
+  TextCueFormatResult,
+  TextCueInit,
+  TextTrackContent,
+  TextTrackHandle,
+  TextTrackInit,
+} from './text-track/app';
+export * from './text-track/chapters';
+export * from './text-track/definition';
+export * from './text-track/hls';
+export * from './text-track/read';
+export type {
+  InferSchemaOutput,
+  StandardSchemaV1,
+  StandardSchemaV1Props,
+  StandardSchemaV1Result,
+} from './text-track/schema';

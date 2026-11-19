@@ -101,6 +101,7 @@ export default {
     speed: '속도',
     captions: '캡션',
     playbackRate: '재생 속도',
+    customRate: '맞춤 설정, {rate}',
     back: '뒤로',
     off: '끄기',
     auto: '자동',

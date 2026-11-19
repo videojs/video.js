@@ -1,6 +1,7 @@
 import { noop } from '@videojs/utils/function';
-import { isPromise } from '@videojs/utils/predicate';
+import { isPromise, isUndefined } from '@videojs/utils/predicate';
 
+import { roundPlaybackRate } from '../core/ui/utils/playback-rates';
 import { getMediaInputActionValue } from './media-action-value';
 import type { AnyPlayerStore } from './player';
 import {
@@ -90,25 +91,37 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     vol.setVolume(vol.volume + step);
   },
 
-  speedUp({ store }) {
+  // With a `value`, steps by that amount, so a hotkey can change speed in finer or coarser steps than the menu offers.
+  // Otherwise moves to the next faster or slower of the player's rates, stopping at the ends.
+  speedUp({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
 
-    const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx < 0 || idx >= playbackRates.length - 1 ? 0 : idx + 1;
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate + value));
+      return;
+    }
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    const { playbackRates, playbackRate } = rate;
+    const faster = playbackRates.filter((candidate) => candidate > playbackRate);
+    if (faster.length === 0) return;
+
+    rate.setPlaybackRate(Math.min(...faster));
   },
 
-  speedDown({ store }) {
+  speedDown({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
 
-    const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx <= 0 ? playbackRates.length - 1 : idx - 1;
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate - value));
+      return;
+    }
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    const { playbackRates, playbackRate } = rate;
+    const slower = playbackRates.filter((candidate) => candidate < playbackRate);
+    if (slower.length === 0) return;
+
+    rate.setPlaybackRate(Math.max(...slower));
   },
 };

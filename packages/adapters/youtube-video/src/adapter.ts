@@ -2,7 +2,13 @@
 // TypeScript and reshaped as a media adapter (mirrors `dom/vimeo`).
 // Source: https://github.com/muxinc/media-elements
 
-import { EMPTY_TIME_RANGES, MediaError, type TextTrackListLike, type Video } from '@videojs/media';
+import {
+  MediaError,
+  type MediaPlaybackRateRange,
+  NO_TIME_RANGES_YET,
+  type TextTrackListLike,
+  type Video,
+} from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, noop, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -21,7 +27,7 @@ import {
   youtubeErrorCodeToMediaErrorCode,
 } from './iframe-api';
 import type { YouTubeAdapterProps } from './props';
-import { buildYouTubeIframeSrc, parseYouTubeSource, type YouTubeSource } from './source';
+import { buildYouTubeIframeSrc, parseYouTubeSource, shouldDeferYouTubeEmbed, type YouTubeSource } from './source';
 import { YouTubeTextTrackList } from './text-tracks';
 
 const SEEK_TOLERANCE = 1;
@@ -55,6 +61,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #creatingPlayer = false;
   // Keep URL-only option changes pending until a valid source can rebuild the embed.
   #pendingEmbedOptions = false;
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. YouTube then starts as it loads, rather than once
+  // the iframe API is up to take `playVideo()`.
+  #embedPlays = false;
   // Settings to apply to a replacement player before it reports its own.
   #restoreSettings: ReadonlySet<PlayerSetting> = new Set();
   // Settings written through setters since attach; before a player reports, only these are real.
@@ -158,6 +169,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#playerReady = false;
     this.#pendingLoad = false;
     this.#creatingPlayer = false;
+    this.#activated = false;
+    this.#embedPlays = false;
     this.#restoreSettings = new Set();
     this.#writtenSettings = new Set();
     this.#playerSettingsRead = false;
@@ -285,6 +298,15 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   async play() {
     let recreations: number;
 
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
+      this.#wake();
+    }
+
     // Recreating the embed replaces the load barrier; follow it to the replacement player.
     do {
       recreations = this.#recreations;
@@ -360,11 +382,25 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
+  /**
+   * YouTube plays any rate from 0.25 to 2, rounded down to a step of 0.05, though `getAvailablePlaybackRates` lists
+   * only quarter steps.
+   *
+   * @internal
+   */
+  get playbackRateRange(): MediaPlaybackRateRange {
+    return PLAYBACK_RATE_RANGE;
+  }
+
   get autoplay() {
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -386,7 +422,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -400,7 +440,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -425,6 +469,9 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     const engineChanged = !deepEqual(this.#source?.engine?.youtube ?? null, source?.engine?.youtube ?? null);
 
     this.#pendingEmbedOptions ||= engineChanged;
+
+    // The autoplay a `play()` wrote was for the video it built, so an embed rebuilt for another must not carry it.
+    if (srcChanged || engineChanged) this.#embedPlays = false;
 
     this.#source = source;
     this.#src = src;
@@ -473,13 +520,13 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   get buffered() {
-    return this.#progress > 0 ? createTimeRange(0, this.#progress) : EMPTY_TIME_RANGES;
+    return this.#progress > 0 ? createTimeRange(0, this.#progress) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -518,7 +565,15 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (!target || this.#player || this.#creatingPlayer) return false;
 
     // Only the attribute tells an embed apart from a placeholder; `src` resolves empty to the document URL.
-    if (!target.getAttribute('src') || this.#pendingEmbedOptions) {
+    const hasEmbed = !!target.getAttribute('src');
+
+    // A dormant embed is built by `play()`; until then no player is coming to settle this load.
+    if (!hasEmbed && this.#isDormant()) {
+      this.#loadComplete.resolve();
+      return false;
+    }
+
+    if (!hasEmbed || this.#pendingEmbedOptions) {
       const initialSrc = buildYouTubeIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no player is coming to settle this load.
@@ -535,6 +590,24 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.dispatchEvent(new Event('loadstart'));
     void this.#createPlayerApi(target);
     return true;
+  }
+
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferYouTubeEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || this.#player || this.#creatingPlayer || target.getAttribute('src')) return;
+
+    // The embed is built from the current source, so a load requested while dormant has nothing left to replay.
+    this.#pendingLoad = false;
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   async #createPlayerApi(target: HTMLIFrameElement) {
@@ -610,7 +683,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       // The embed reads mute once, from its URL, and either property says to start muted.
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
@@ -900,6 +973,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     tryCall(() => player.setOption('captions', 'track', language ? { languageCode: language } : {}));
   }
 }
+
+const PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.25, max: 2 };
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

@@ -4,8 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo, createTimeRanges } from '../../../tests/test-helpers';
-import { bufferFeature } from '../buffer';
-import { timeFeature } from '../time';
+import { bufferFeature, timeFeature } from '../shared';
 
 describe('bufferFeature', () => {
   describe('attach', () => {

@@ -5,23 +5,37 @@
  * VTTCue objects.
  */
 
-// Singleton dummy video (reused across all parsing)
-let dummyVideo: HTMLVideoElement | null = null;
+type ParserCrossOrigin = 'anonymous' | 'use-credentials';
 
-function ensureDummyVideo(): HTMLVideoElement {
-  if (!dummyVideo) {
-    dummyVideo = document.createElement('video');
-    dummyVideo.muted = true;
-    dummyVideo.preload = 'none';
-    dummyVideo.style.display = 'none';
-    dummyVideo.crossOrigin = 'anonymous';
+// One dummy video per CORS mode, reused across all parsing. The browser reads
+// the parent video's `crossorigin` when it fetches a `<track>`, so sharing one
+// video and flipping the attribute would race concurrent loads.
+const dummyVideos = new Map<ParserCrossOrigin, HTMLVideoElement>();
+
+function ensureDummyVideo(crossOrigin: ParserCrossOrigin): HTMLVideoElement {
+  let video = dummyVideos.get(crossOrigin);
+
+  if (!video) {
+    video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'none';
+    video.style.display = 'none';
+    video.crossOrigin = crossOrigin;
+    dummyVideos.set(crossOrigin, video);
   }
 
-  return dummyVideo;
+  return video;
 }
 
-export function resolveVttSegment(url: string): Promise<VTTCue[]> {
-  const video = ensureDummyVideo();
+/**
+ * Load and parse one VTT segment. `credentials: 'include'` fetches it in `use-credentials` CORS mode, so cookie-gated
+ * cross-origin subtitles load like the rest of the stream; any other mode fetches it `anonymous`.
+ */
+export function resolveVttSegment(
+  url: string,
+  { credentials }: { credentials?: RequestCredentials | undefined } = {}
+): Promise<VTTCue[]> {
+  const video = ensureDummyVideo(credentials === 'include' ? 'use-credentials' : 'anonymous');
   const track = document.createElement('track');
 
   track.kind = 'subtitles';
@@ -73,5 +87,5 @@ export function resolveVttSegment(url: string): Promise<VTTCue[]> {
 }
 
 export function destroyVttResolver(): void {
-  dummyVideo = null;
+  dummyVideos.clear();
 }

@@ -1,6 +1,7 @@
 import type { MediaRemotePlaybackState, RemotePlaybackConnectionState } from '@videojs/media';
 import { isMediaRemotePlaybackCapable } from '@videojs/media';
 import { isWebKitAirPlayCapable, listen, type WebkitAvailabilityEvent } from '@videojs/utils/dom';
+import { noop } from '@videojs/utils/function';
 
 import { definePlayerFeature } from '../../feature';
 import { exitFullscreen, isFullscreen } from '../../presentation/fullscreen';
@@ -27,6 +28,10 @@ export const remotePlaybackFeature = definePlayerFeature({
   attach({ target, signal, set }) {
     const { media } = target;
     if (!isMediaRemotePlaybackCapable(media)) return;
+
+    // Leave remote playback unsupported for media that disable it, rather than relying on the platform to reject
+    // `watchAvailability()`: a custom media may not.
+    if (media.disableRemotePlayback === true) return;
 
     // Safari's W3C `media.remote` events don't fire reliably for AirPlay
     // session changes. When WebKit's AirPlay APIs are available, drive both
@@ -71,7 +76,8 @@ export const remotePlaybackFeature = definePlayerFeature({
       });
 
     signal.addEventListener('abort', () => {
-      media.remote?.cancelWatchAvailability?.().catch(() => {});
+      // Some implementations return `void` rather than a promise.
+      media.remote?.cancelWatchAvailability?.()?.catch(noop);
     });
   },
 });

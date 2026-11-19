@@ -102,6 +102,7 @@ export default {
     speed: 'Snelheid',
     captions: 'Ondertiteling',
     playbackRate: 'Afspeelsnelheid',
+    customRate: 'Aangepast, {rate}',
     back: 'Terug',
     off: 'Uit',
     auto: 'Automatisch',

@@ -20,6 +20,8 @@ export interface SkinSelection {
   readonly styling: Styling;
   readonly skins: SkinSource | undefined;
   readonly skin: Skin;
+  /** Skins are off, so only the platform has two values to compare. */
+  readonly skinless: boolean;
   readonly media: MediaId;
 }
 
@@ -70,7 +72,8 @@ function panel(
 
 /** Whether an axis has two values to show for the current selection. */
 export function compareAvailable(axis: CompareAxis, selection: SkinSelection): boolean {
-  const { platform, styling, skins, skin, media } = selection;
+  const { platform, styling, skins, skin, skinless, media } = selection;
+  if (skinless && axis !== 'platform') return false;
 
   switch (axis) {
     case 'styling':
@@ -123,6 +126,7 @@ export interface SelectionSummary {
   readonly platform: Platform;
   readonly media: MediaId;
   readonly skin: Skin;
+  readonly skinless: boolean;
   readonly styling: Styling;
   readonly skins: SkinSource;
   readonly width: number;
@@ -133,12 +137,13 @@ export interface SelectionSummary {
 export function summarizeSelection(summary: SelectionSummary): string {
   const descriptor = MEDIA[summary.media];
   const skinned = descriptor.player !== 'background';
+  const skin = summary.skinless
+    ? ['no skin']
+    : [SKIN_LABELS[summary.skin], STYLING_LABELS[summary.styling], SKIN_SOURCE_PHRASES[summary.skins]];
   const parts = [
     PLATFORM_LABELS[summary.platform],
     descriptor.label,
-    ...(skinned
-      ? [SKIN_LABELS[summary.skin], STYLING_LABELS[summary.styling], SKIN_SOURCE_PHRASES[summary.skins]]
-      : []),
+    ...(skinned ? skin : []),
     ...(skinned ? [`${summary.width}px`] : []),
     descriptor.fixedSource ? 'fixed source' : SOURCES[summary.source].label,
   ];

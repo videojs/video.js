@@ -5,6 +5,8 @@ import { expect, test } from '@playwright/test';
 
 const SANDBOX_BASE = process.env.SANDBOX_URL ?? 'http://localhost:5299';
 
+// `prestart=1` keeps the controls visible before playback starts, since these tests use them without playing.
+
 // Authored skins compile from `packages/skins/src`, so these cases only mean something where that package exists.
 const WORKSPACE_SKINS = existsSync(resolve(import.meta.dirname, '../../../../../packages/skins/package.json'));
 
@@ -27,6 +29,7 @@ for (const { platform, styling } of CASES) {
       source: 'mp4-1',
       preload: 'metadata',
       autoplay: '0',
+      prestart: '1',
     });
 
     await page.goto(`${SANDBOX_BASE}/${platform}-video/?${query}`, { waitUntil: 'domcontentloaded' });
@@ -66,6 +69,7 @@ for (const { platform, styling } of CASES) {
         skin,
         source: 'mp4-1',
         autoplay: '0',
+        prestart: '1',
         muted: '1',
         loop: '0',
         preload: 'metadata',
@@ -99,6 +103,7 @@ test('the compat preview keeps its thumbnail fixed when the chapter title change
     skin: 'compat',
     source: 'mp4-1',
     autoplay: '0',
+    prestart: '1',
     muted: '1',
     loop: '0',
     preload: 'metadata',

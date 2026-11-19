@@ -1,7 +1,12 @@
 'use client';
 
-import { buildCloudflareIframeSrc, CloudflareAdapter, type CloudflareAdapterProps } from '@videojs/cloudflare-video';
-import { forwardRef, type ReactNode, useState } from 'react';
+import {
+  buildCloudflareIframeSrc,
+  CloudflareAdapter,
+  type CloudflareAdapterProps,
+  shouldDeferCloudflareEmbed,
+} from '@videojs/cloudflare-video';
+import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -24,20 +29,24 @@ export const CloudflareVideo = forwardRef<HTMLIFrameElement, CloudflareVideoProp
   const media = useMediaInstance(CloudflareAdapter);
   const props: Partial<CloudflareAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildCloudflareIframeSrc(props.src || props.source?.src || '', {
-      ...CloudflareAdapter.defaultProps,
-      ...props,
-      // The embed reads mute once, out of the URL it is rendered with, and either
-      // prop says to start muted. Leaving `muted` out of the URL would leave a
-      // muted autoplay blocked by the browser, since the embed comes up audible.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferCloudflareEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildCloudflareIframeSrc(props.src || props.source?.src || '', {
+          ...CloudflareAdapter.defaultProps,
+          ...props,
+          // The embed reads mute once, out of the URL it is rendered with, and either
+          // prop says to start muted. Leaving `muted` out of the URL would leave a
+          // muted autoplay blocked by the browser, since the embed comes up audible.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
-  const { ref: eventsRef, props: iframeProps } = useMediaEvents(
+  const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<CloudflareAdapterProps, Record<string, unknown>>(media, props, CloudflareAdapter.defaultProps),
     media
   );
+  const { style, ...iframeProps } = elementProps as Record<string, unknown> & { style?: CSSProperties };
   const attachRef = useAttachMedia(media);
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
@@ -56,10 +65,10 @@ export const CloudflareVideo = forwardRef<HTMLIFrameElement, CloudflareVideoProp
       width="100%"
       height="100%"
       referrerPolicy={props.source?.engine?.cloudflare?.referrerPolicy}
-      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
-      // skin above it sees hover and clicks.
-      style={{ pointerEvents: props.controls ? undefined : 'none' }}
       {...iframeProps}
+      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
+      // skin above it sees hover and clicks. Merged so a consumer's own styles survive without undoing it.
+      style={props.controls ? style : { ...style, pointerEvents: 'none' }}
       ref={composedRef}
     >
       {children}

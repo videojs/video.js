@@ -25,9 +25,9 @@ function runPending() {
  * Recover an effect that wrote a signal one of its own dependencies reads.
  *
  * When an effect body writes a signal that an intermediate computed in its own dependency graph consumes (e.g. a
- * track-selection effect writing the selection slot a candidate-set computed consults), the graph can't tell the
- * effect: the write marks the intermediate dirty, but the effect is the in-flight consumer, so no watcher notification
- * fires — and the effect finishes the run _clean but stale_. Worse, every later external change routed through that
+ * track-selection effect writing the selection key a candidate-set computed consults), the graph can't tell the effect:
+ * the write marks the intermediate dirty, but the effect is the in-flight consumer, so no watcher notification fires —
+ * and the effect finishes the run _clean but stale_. Worse, every later external change routed through that
  * intermediate is deduped against its standing dirty flag, so the effect never hears about those either (the
  * lost-wakeup).
  *

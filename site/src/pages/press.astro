@@ -1,0 +1,233 @@
+---
+import Download from '@/assets/icons/download.svg?react';
+import CopyButton from '@/components/CopyButton';
+import Footer from '@/components/Footer.astro';
+import NavBar from '@/components/NavBar/NavBar.astro';
+import Base from '@/layouts/Base.astro';
+
+// Files live in `public/press/`. The zip bundles every logo as SVG and PNG.
+const ASSET_BASE = '/press';
+const KIT_FILE = `${ASSET_BASE}/videojs-brand-assets.zip`;
+
+const logos = [
+  {
+    id: 'logo-color',
+    name: 'Color',
+    usage: 'Primary logo for light backgrounds.',
+    previewClass: 'bg-white',
+  },
+  {
+    id: 'logo-color-white-text',
+    name: 'Color, white text',
+    usage: 'Primary logo for dark backgrounds.',
+    previewClass: 'bg-faded-black',
+  },
+  {
+    id: 'logo-black',
+    name: 'Black',
+    usage: 'One-color version for light backgrounds.',
+    previewClass: 'bg-manila-light',
+  },
+  {
+    id: 'logo-white',
+    name: 'White',
+    usage: 'One-color version for dark or photo backgrounds.',
+    previewClass: 'bg-warm-gray',
+  },
+] as const;
+
+const avatar = {
+  id: 'avatar',
+  name: 'Avatar',
+  usage: 'Square mark for social profiles, app icons, and small spaces.',
+};
+
+const boilerplates = [
+  {
+    id: 'short',
+    title: 'Short',
+    text: 'Video.js is a free, open-source video player for the web, used on millions of websites since 2010.',
+  },
+  {
+    id: 'long',
+    title: 'Long',
+    text: 'Video.js is a free, open-source video player for HTML and React. Created in 2010 to help move web video from Flash to HTML5, it now plays video on millions of websites. Video.js 10 is a ground-up rebuild that brings together the people behind Video.js, Plyr, Vidstack, Media Chrome, and Mux Player into one modular, accessible player. The project is guided by its Technical Steering Committee, with Mux serving as Corporate Shepherd.',
+  },
+] as const;
+
+const buttonClass =
+  'inline-flex items-center gap-1.5 rounded-md corner-squircle border border-manila-75 bg-manila-50 px-3 py-2 text-p3 dark:border-line dark:bg-warm-gray intent:bg-hover';
+const cardClass = 'rounded-lg corner-squircle border border-faded-black p-5 dark:border-manila-light';
+const sectionHeadingClass = 'mb-5 font-display text-h25 text-faded-black uppercase dark:text-manila-light';
+---
+
+<Base
+  title="Press"
+  description="Video.js logos, brand assets, and a project description for press, blog posts, and talks."
+>
+  <NavBar />
+  <main
+    id="main-content"
+    class="mx-auto w-full max-w-305 px-5 pt-10 pb-20 md:pt-20"
+    data-ph-capture-attribute-location="press-page"
+  >
+    <header
+      class="mb-12 border-y border-faded-black py-4 dark:border-manila-light"
+    >
+      <h1
+        class="text-center font-display text-h2 text-faded-black uppercase dark:text-manila-light"
+      >
+        Press
+      </h1>
+    </header>
+
+    <section aria-labelledby="logos" class="mb-16">
+      <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 id="logos" class="mb-2 font-display text-h25 text-faded-black uppercase dark:text-manila-light">
+            Logos
+          </h2>
+          <p class="text-p2">
+            Writing about Video.js, giving a talk, or listing it on your site? Use these.
+          </p>
+        </div>
+        <a
+          href={KIT_FILE}
+          download
+          data-ph-capture-attribute-cta="press-download-all"
+          class={buttonClass}
+        >
+          <Download className="size-4" aria-hidden="true" />
+          Download all (SVG, PNG)
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {
+          logos.map((logo) => (
+            <figure class:list={[cardClass, 'flex flex-col gap-4']}>
+              <div
+                class:list={[
+                  'flex aspect-video items-center justify-center rounded-md corner-squircle border border-manila-75 px-10 dark:border-line',
+                  logo.previewClass,
+                ]}
+              >
+                <img
+                  src={`${ASSET_BASE}/videojs-${logo.id}.svg`}
+                  alt={`Video.js logo, ${logo.name.toLowerCase()}`}
+                  width="500"
+                  height="90"
+                  class="h-auto w-full max-w-sm"
+                />
+              </div>
+              <figcaption class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="font-display text-h3 uppercase">{logo.name}</p>
+                  <p class="text-p3">{logo.usage}</p>
+                </div>
+                <div class="flex gap-2">
+                  <a
+                    href={`${ASSET_BASE}/videojs-${logo.id}.svg`}
+                    download
+                    data-ph-capture-attribute-cta={`press-${logo.id}-svg`}
+                    class={buttonClass}
+                  >
+                    <Download className="size-4" aria-hidden="true" />
+                    SVG
+                  </a>
+                  <a
+                    href={`${ASSET_BASE}/videojs-${logo.id}.png`}
+                    download
+                    data-ph-capture-attribute-cta={`press-${logo.id}-png`}
+                    class={buttonClass}
+                  >
+                    <Download className="size-4" aria-hidden="true" />
+                    PNG
+                  </a>
+                </div>
+              </figcaption>
+            </figure>
+          ))
+        }
+
+        <figure class:list={[cardClass, 'grid gap-4 md:col-span-2 md:grid-cols-[auto_1fr] md:items-center md:gap-6']}>
+          <img
+            src={`${ASSET_BASE}/videojs-${avatar.id}.svg`}
+            alt="Video.js avatar"
+            width="200"
+            height="200"
+            class="size-40 rounded-md corner-squircle"
+          />
+          <figcaption class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="font-display text-h3 uppercase">{avatar.name}</p>
+              <p class="text-p3">{avatar.usage}</p>
+            </div>
+            <div class="flex gap-2">
+              <a
+                href={`${ASSET_BASE}/videojs-${avatar.id}.svg`}
+                download
+                data-ph-capture-attribute-cta={`press-${avatar.id}-svg`}
+                class={buttonClass}
+              >
+                <Download className="size-4" aria-hidden="true" />
+                SVG
+              </a>
+              <a
+                href={`${ASSET_BASE}/videojs-${avatar.id}.png`}
+                download
+                data-ph-capture-attribute-cta={`press-${avatar.id}-png`}
+                class={buttonClass}
+              >
+                <Download className="size-4" aria-hidden="true" />
+                PNG
+              </a>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+
+      <p class="mt-5 text-p3">
+        Please don't recolor, stretch, rotate, or add effects to the logos. Leave some clear space around them, and pick
+        the version with the most contrast against your background.
+      </p>
+    </section>
+
+    <section aria-labelledby="about" class="mb-16">
+      <h2 id="about" class={sectionHeadingClass}>About Video.js</h2>
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {
+          boilerplates.map((boilerplate) => (
+            <div class:list={[cardClass, 'flex flex-col gap-4']} data-press-boilerplate>
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="font-display text-h3 uppercase">{boilerplate.title}</h3>
+                <CopyButton
+                  client:idle
+                  copyFrom={{ container: '[data-press-boilerplate]', target: 'p' }}
+                  copiedCheck
+                  cta={`press-copy-${boilerplate.id}`}
+                  className={buttonClass}
+                >
+                  Copy
+                </CopyButton>
+              </div>
+              <p class="text-p2">{boilerplate.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="name">
+      <h2 id="name" class={sectionHeadingClass}>Name and trademark</h2>
+      <div class="grid max-w-3xl gap-3 text-p2">
+        <p>
+          In text, write <strong>Video.js</strong>, with a capital V, a lowercase "js", and the dot. Versions are written
+          as <strong>Video.js 10</strong>.
+        </p>
+        <p>The term VIDEO.JS is a registered trademark of Brightcove Inc.</p>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

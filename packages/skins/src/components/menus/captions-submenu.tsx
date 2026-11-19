@@ -29,6 +29,7 @@ export function CaptionsSubmenu({ ...props }: Props<MenuProps> = {}) {
             <Template name="captions-option">
               <RadioItem>
                 <Template.Part name="label" />
+                <Template.Part name="badge" className={styles.badge} />
               </RadioItem>
             </Template>
           </$.CaptionsRadioGroup.Options>

@@ -115,6 +115,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
   #target: HTMLVideoElement | null = null;
   // What the live monitor currently reflects, so a sync can react only to what changed.
   #monitoredSrc: string | null = null;
+  #monitoredMetadata: MuxDataOptions['data'] | undefined;
   #monitoredEngine: unknown = null;
   #engineHook: 'hlsjs' | 'dashjs' | null = null;
   #monitoredSoftwareName: string | null = null;
@@ -278,6 +279,11 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#target?.mux?.updateData(initTime ? { player_init_time: initTime } : {});
   }
 
+  /**
+   * Video metadata reported with the view. Applied on the next sync rather than immediately: when it changes together
+   * with the source, it belongs to the incoming video, so it rides the `videochange` instead of relabelling the
+   * outgoing view.
+   */
   get metadata() {
     return this.#metadata;
   }
@@ -286,7 +292,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     if (this.#metadata === value) return;
 
     this.#metadata = value;
-    this.#target?.mux?.updateData(value ? { ...value } : {});
+    this.#syncMonitor();
   }
 
   #destroyMonitor() {
@@ -296,6 +302,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     }
 
     this.#monitoredSrc = null;
+    this.#monitoredMetadata = undefined;
     this.#monitoredEngine = null;
     this.#engineHook = null;
     this.#monitoredSoftwareName = null;
@@ -353,15 +360,20 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#syncSoftwareName();
 
     const src = srcOf(media);
-    if (src === this.#monitoredSrc) return;
-
     // A cleared source isn't a new video (the element's own events wind the view down), and it isn't tracked: the
-    // video that loads next is still compared against the last video the monitor was told about.
+    // video that loads next is still compared against the last video the monitor was told about. Metadata waits for
+    // that video too, so the view winding down keeps its own.
     if (!src) return;
+
+    if (src === this.#monitoredSrc) {
+      this.#syncMetadata(mux);
+      return;
+    }
 
     const isFirstSource = !this.#monitoredSrc;
 
     this.#monitoredSrc = src;
+    this.#monitoredMetadata = this.#metadata;
 
     // A monitor started before the first source has its pending view: name the video rather than change it.
     if (isFirstSource) {
@@ -370,6 +382,15 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     }
 
     mux.emit('videochange', this.#videoData(media));
+  }
+
+  /** Apply a metadata change to the current video's view. */
+  #syncMetadata(mux: LiveMuxMonitor) {
+    const metadata = this.#metadata;
+    if (metadata === this.#monitoredMetadata) return;
+
+    this.#monitoredMetadata = metadata;
+    mux.updateData(metadata ? { ...metadata } : {});
   }
 
   /** Keep engine telemetry hooked to the engine actually playing, without restarting the monitor. */
@@ -432,6 +453,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     const player_software_name = this.#softwareName();
 
     this.#monitoredSrc = srcOf(media);
+    this.#monitoredMetadata = this.#metadata;
     this.#monitoredSoftwareName = player_software_name;
     this.#trackEngine(engine, engineOptions);
 

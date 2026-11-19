@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { HTMLAudioAdapter } from '../../html-audio-adapter';
 import { HTMLVideoAdapter } from '../../html-video-adapter';
+import { createTextTrack } from '../../text-track';
 import { CustomMediaElement } from '../index';
 
 afterEach(() => {
@@ -619,6 +620,83 @@ describe('CustomMediaElement', () => {
     });
   });
 
+  describe('text tracks', () => {
+    const trackDescriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+    beforeEach(() => {
+      const tracks = new WeakMap<HTMLTrackElement, { mode: string }>();
+
+      // Jsdom doesn't link a `<track>` element to a `TextTrack`, so give each element one.
+      Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+        configurable: true,
+        get(this: HTMLTrackElement) {
+          if (!tracks.has(this)) tracks.set(this, { mode: 'disabled' });
+
+          return tracks.get(this);
+        },
+      });
+    });
+
+    afterEach(() => {
+      if (trackDescriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', trackDescriptor);
+      else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+    });
+
+    it('keeps a created track through child syncs and removes it through the element', () => {
+      const el = create(defineVideoElement());
+      const video = el.shadowRoot!.querySelector('video')!;
+      const { track } = createTextTrack(el, { kind: 'metadata', label: 'Ads' })!;
+      const authored = document.createElement('track');
+
+      authored.kind = 'captions';
+      el.appendChild(authored);
+      el.shadowRoot!.querySelector('slot:not([name])')!.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      expect(Array.from(video.querySelectorAll('track'), ({ kind }) => kind).sort()).toEqual(['captions', 'metadata']);
+
+      el.removeTextTrack(track);
+
+      expect(Array.from(video.querySelectorAll('track'), ({ kind }) => kind)).toEqual(['captions']);
+    });
+
+    it('removes an authored track for good', () => {
+      const el = create(defineVideoElement());
+      const video = el.shadowRoot!.querySelector('video')!;
+      const slot = el.shadowRoot!.querySelector('slot:not([name])')!;
+      const authored = document.createElement('track');
+
+      authored.kind = 'captions';
+      el.appendChild(authored);
+      slot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+      el.removeTextTrack(video.querySelector('track')!.track);
+
+      // A later child, such as a new `<source>`, syncs the children again.
+      el.appendChild(document.createElement('source'));
+      slot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      expect(video.querySelectorAll('track')).toHaveLength(0);
+      expect(authored.isConnected).toBe(false);
+    });
+
+    it('creates a removable track on a media element nested in another', () => {
+      const outer = create(defineVideoElement());
+      const inner = document.createElement(defineVideoElement().tag) as HTMLElement;
+
+      inner.slot = 'media';
+      outer.appendChild(inner);
+      outer.shadowRoot!.querySelector('slot[name=media]')!.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      const video = inner.shadowRoot!.querySelector('video')!;
+      const handle = createTextTrack(outer, { kind: 'captions', label: 'Copy' })!;
+
+      expect(video.querySelectorAll('track')).toHaveLength(1);
+
+      handle.remove();
+
+      expect(video.querySelectorAll('track')).toHaveLength(0);
+    });
+  });
+
   describe('event delegation', () => {
     it('forwards non-composed media events from the target to the host', () => {
       const el = create(defineVideoElement());
@@ -706,6 +784,19 @@ describe('CustomMediaElement', () => {
       el.remove();
       await Promise.resolve();
       expect(el.destroyed).toBe(false);
+    });
+
+    it('destroys when only an ancestor has keep-alive', async () => {
+      const player = document.createElement('div');
+      const el = create(defineVideoElement());
+
+      player.setAttribute('keep-alive', '');
+      player.appendChild(el);
+      document.body.appendChild(player);
+
+      player.remove();
+      await Promise.resolve();
+      expect(el.destroyed).toBe(true);
     });
 
     it('does not destroy when synchronously moved to a new parent', async () => {

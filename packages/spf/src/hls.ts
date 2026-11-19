@@ -17,7 +17,7 @@ export {
 // form-encoding `licenseRequest` factory (the `spc=` FairPlay dialect), plus
 // `licenseResponse` unwrappers — a FairPlay CKC unwrapper (XML/JSON envelopes)
 // and a JSON license unwrapper. Imported only when dropped into a
-// `source.drm[ks]` slot, so a composition that needs none pays for none.
+// `source.drm[ks]` entry, so a composition that needs none pays for none.
 export {
   detectFairPlayCkc,
   formEncodeLicenseRequest,
@@ -103,12 +103,14 @@ export { initialLoadFeature } from './playback/features/initial-load';
 export { liveFeature } from './playback/features/live';
 export { mediaSourceFeature } from './playback/features/media-source';
 export { monitorPlayerSizeFeature } from './playback/features/monitor-player-size';
+export { mpegTsTransmuxFeature } from './playback/features/mpeg-ts-transmux';
 export { multiCdnFeature } from './playback/features/multi-cdn';
 export { shiftTextTimestampsFeature } from './playback/features/shift-text-timestamps';
 export { shiftTimestampsFeature } from './playback/features/shift-timestamps';
 export { startPositionFeature } from './playback/features/start-position';
 export { textTracksFeature } from './playback/features/text-tracks';
 export { videoFeature } from './playback/features/video';
+export { mpegTsAudioTransmuxFeature } from './playback/features/mpeg-ts-audio-transmux';
 // The engines themselves are not here: each has its own entry point —
 // `@videojs/spf/engines/hls-video`, `@videojs/spf/engines/hls-audio`, and
 // `@videojs/spf/engines/hls-background-video` — exporting the same names

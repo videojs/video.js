@@ -24,7 +24,7 @@ import { pick } from '@videojs/utils/object';
 import type { FC, ReactNode } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useDestroy } from '../utils/use-destroy';
+import { useInstance } from '../utils/use-instance';
 import { PlayerContextProvider, useMedia, usePlayerContext } from './context';
 
 /** Configures the feature-backed store and provider component created by {@link createPlayer}. */
@@ -111,7 +111,7 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     const { children } = props;
     // Only inputs declared by selected features are forwarded to store actions.
     const configValues = pick(props, configKeys);
-    const [store, setStore] = useState(() => createConfiguredStore(configValues));
+    const store = useInstance(() => createConfiguredStore(configValues));
     const syncedValues = useRef({ store, values: configValues });
 
     const [media, setMedia] = useState<Media | null>(null);
@@ -122,8 +122,6 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     // Created with the player, so its creation time is the player's init time.
     const [extensions] = useState(() => new PlayerExtensionCoordinator(() => reattach.current?.()));
     const registerExtension = useCallback((extension: PlayerExtension) => extensions.register(extension), [extensions]);
-
-    useDestroy(store);
 
     // Sync committed configuration props to the existing store.
     useLayoutEffect(() => {
@@ -155,13 +153,8 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     useEffect(() => {
       if (!media) return;
 
-      // The store may have been destroyed during an asynchronous gap between React
-      // effect cleanup and re-setup (e.g., React <Activity> hide → reveal). The
-      // useState initializer does not re-run in this case.
-      if (store.destroyed) {
-        setStore(createConfiguredStore(syncedValues.current.values));
-        return;
-      }
+      // Shown again after an <Activity> hide destroyed the store; useInstance is replacing it.
+      if (store.destroyed) return;
 
       // Extensions attach before the store so their overrides are in place when
       // features first read the media; the store sees the media through their facade.

@@ -101,6 +101,7 @@ export default {
     speed: 'Hastighed',
     captions: 'Undertekster',
     playbackRate: 'Afspilningshastighed',
+    customRate: 'Tilpasset, {rate}',
     back: 'Tilbage',
     off: 'Fra',
     auto: 'Automatisk',

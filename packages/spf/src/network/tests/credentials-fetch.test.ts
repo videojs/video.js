@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { credentialsFetch } from '../credentials-fetch';
+import { credentialsFetch, resolveRequestCredentials } from '../credentials-fetch';
 import type { FetchOptions, FetchText, Resource } from '../fetch';
 
 const playlist = { url: 'https://cdn.example.com/r.m3u8' };
@@ -71,5 +71,22 @@ describe('credentialsFetch', () => {
 
     await fetch(playlist, { credentials: 'omit' });
     expect(base).toHaveBeenCalledWith(playlist, { credentials: 'omit' });
+  });
+});
+
+describe('resolveRequestCredentials', () => {
+  it('returns a fixed mode as is', () => {
+    expect(resolveRequestCredentials('include', playlist)).toBe('include');
+  });
+
+  it('hands a policy the resource', () => {
+    const policy = vi.fn(() => 'include' as const);
+
+    expect(resolveRequestCredentials(policy, playlist)).toBe('include');
+    expect(policy).toHaveBeenCalledWith(playlist);
+  });
+
+  it('yields no mode without a policy', () => {
+    expect(resolveRequestCredentials(undefined, playlist)).toBeUndefined();
   });
 });

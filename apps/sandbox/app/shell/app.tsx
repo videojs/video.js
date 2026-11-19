@@ -24,13 +24,24 @@ import {
   type TextDirection,
 } from '@app/constants';
 import { COMPARE_LABELS } from '@app/labels';
-import { hasTailwindSkin, isMediaId, landingSource, MEDIA, type MediaId, mediaSources } from '@app/media';
+import {
+  hasNoSkinChoice,
+  hasTailwindSkin,
+  isMediaId,
+  landingSource,
+  MEDIA,
+  type MediaId,
+  mediaSources,
+  startsSkinless,
+} from '@app/media';
 import { CAPTIONS_MODES, type CaptionsMode } from '@app/shared/captions';
 import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } from '@app/shared/player-frame';
 import { skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '@app/shared/skin-sources';
 import {
+  DAILYMOTION_SOURCE_IDS,
   DEFAULT_SOURCE,
+  MIXCLOUD_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
   SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
@@ -57,7 +68,14 @@ function readMedia(params: URLSearchParams): MediaId {
 // Embed sources are listed apart from SOURCE_IDS, but a shared link may name any of them.
 const writeUrl = createUrlWriter();
 
-const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS, ...SOUNDCLOUD_SOURCE_IDS];
+const LINKABLE_SOURCE_IDS = [
+  ...SOURCE_IDS,
+  ...YOUTUBE_SOURCE_IDS,
+  ...PLAYERJS_SOURCE_IDS,
+  ...SOUNDCLOUD_SOURCE_IDS,
+  ...MIXCLOUD_SOURCE_IDS,
+  ...DAILYMOTION_SOURCE_IDS,
+];
 
 function readOption<T extends string, const Fallback>(
   values: readonly T[],
@@ -93,6 +111,8 @@ function readParams() {
     skins: readSkins(params.get('skins'), platform),
     media,
     skin: readOption(SKINS, params.get('skin'), 'default'),
+    // Written only when it differs from the media's own default, so a link without it starts as the media does.
+    skinless: params.has('skinless') ? hasNoSkinChoice(media) && params.get('skinless') === '1' : startsSkinless(media),
     // A valid `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: readOption(LINKABLE_SOURCE_IDS, params.get('source'), MEDIA[media].entrySource ?? DEFAULT_SOURCE),
     autoplay: params.get('autoplay') === '1',
@@ -101,6 +121,7 @@ function readParams() {
     preload: readOption(PRELOAD_VALUES, params.get('preload'), DEFAULT_PRELOAD),
     captions: readOption(CAPTIONS_MODES, params.get('captions'), 'none'),
     accentColor: params.get('accent')?.trim() ?? '',
+    controlsBeforeStart: params.get('prestart') === '1',
     locale: readOption(SANDBOX_LOCALE_TAGS, params.get('locale'), DEFAULT_SANDBOX_LOCALE),
     width: readWidth(params.get('width')),
     ratio: readOption(ASPECT_RATIOS, params.get('ratio'), '16:9'),
@@ -134,6 +155,7 @@ function storeOptionsOpen(open: boolean): void {
 /** The preferences a frame applies to its document rather than renders from, repeated to it once it has loaded. */
 function postPreferences(target: Window, params: FrameParams): void {
   target.postMessage({ type: 'accent-change', accent: params.accentColor }, '*');
+  target.postMessage({ type: 'prestart-change', prestart: params.controlsBeforeStart }, '*');
   target.postMessage({ type: 'width-change', width: params.width }, '*');
   target.postMessage({ type: 'ratio-change', ratio: params.ratio }, '*');
   target.postMessage({ type: 'scheme-change', scheme: params.scheme }, '*');
@@ -148,6 +170,7 @@ export function App() {
   const [media, setMedia] = useState<MediaId>(initial.media);
   const [skins, setSkins] = useState(initial.skins);
   const [skin, setSkin] = useState(initial.skin);
+  const [skinless, setSkinless] = useState(initial.skinless);
   const [source, setSource] = useState(initial.source);
   const [autoplay, setAutoplay] = useState(initial.autoplay);
   const [muted, setMuted] = useState(initial.muted);
@@ -155,6 +178,7 @@ export function App() {
   const [preload, setPreload] = useState<PreloadValue>(initial.preload);
   const [captions, setCaptions] = useState<CaptionsMode>(initial.captions);
   const [accentColor, setAccentColor] = useState(initial.accentColor);
+  const [controlsBeforeStart, setControlsBeforeStart] = useState(initial.controlsBeforeStart);
   const [locale, setLocale] = useState<SandboxLocaleTag>(initial.locale);
   const [width, setWidth] = useState(initial.width);
   const [ratio, setRatio] = useState<AspectRatio>(initial.ratio);
@@ -179,8 +203,8 @@ export function App() {
   // The frames: one for the selection, or two differing on the compared axis. The first panel is what the navbar
   // reports as the resolved skin source.
   const selection: SkinSelection = useMemo(
-    () => ({ platform, styling, skins, skin, media }),
-    [platform, styling, skins, skin, media]
+    () => ({ platform, styling, skins, skin, skinless, media }),
+    [platform, styling, skins, skin, skinless, media]
   );
   const panels = useMemo(() => comparePanels(selection, compare), [selection, compare]);
   const skinSource = panels[0]?.skins ?? 'package';
@@ -202,6 +226,7 @@ export function App() {
   const frames = useRef(new Map<string, HTMLIFrameElement>());
   const previousPreviewState = useRef({
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -209,6 +234,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     playerWidth,
     ratio,
     scheme,
@@ -220,6 +246,7 @@ export function App() {
   const mirroring = mirror && compare !== 'off';
   const frameParams: FrameParams = {
     media,
+    skinless,
     source,
     autoplay,
     muted,
@@ -228,6 +255,7 @@ export function App() {
     captions,
     locale,
     accentColor,
+    controlsBeforeStart,
     width: playerWidth,
     ratio,
     scheme,
@@ -256,9 +284,13 @@ export function App() {
 
     if (accentColor) params.set('accent', accentColor);
 
+    if (controlsBeforeStart) params.set('prestart', '1');
+
     if (width !== undefined) params.set('width', String(width));
 
     if (ratio !== '16:9') params.set('ratio', ratio);
+
+    if (skinless !== startsSkinless(media)) params.set('skinless', skinless ? '1' : '0');
 
     if (skins !== undefined) params.set('skins', skins);
 
@@ -277,6 +309,7 @@ export function App() {
     skins,
     media,
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -284,6 +317,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     locale,
     width,
     ratio,
@@ -313,6 +347,8 @@ export function App() {
 
     if (previous.skin !== skin) post({ type: 'skin-change', skin });
 
+    if (previous.skinless !== skinless) post({ type: 'skinless-change', skinless });
+
     if (previous.source !== source) post({ type: 'source-change', source });
 
     if (previous.autoplay !== autoplay) post({ type: 'autoplay-change', autoplay });
@@ -327,6 +363,10 @@ export function App() {
 
     if (previous.accentColor !== accentColor) post({ type: 'accent-change', accent: accentColor });
 
+    if (previous.controlsBeforeStart !== controlsBeforeStart) {
+      post({ type: 'prestart-change', prestart: controlsBeforeStart });
+    }
+
     if (previous.playerWidth !== playerWidth) post({ type: 'width-change', width: playerWidth });
 
     if (previous.ratio !== ratio) post({ type: 'ratio-change', ratio });
@@ -339,6 +379,7 @@ export function App() {
 
     previousPreviewState.current = {
       skin,
+      skinless,
       source,
       autoplay,
       muted,
@@ -346,6 +387,7 @@ export function App() {
       preload,
       captions,
       accentColor,
+      controlsBeforeStart,
       playerWidth,
       ratio,
       scheme,
@@ -354,6 +396,7 @@ export function App() {
     };
   }, [
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -361,6 +404,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     playerWidth,
     ratio,
     scheme,
@@ -432,13 +476,14 @@ export function App() {
     if (compare !== 'off' && !compareAvailable(compare, selection)) setCompare('off');
   }, [compare, selection]);
 
-  // Land on the media's own source in the same update that switches media — `readParams` covers the first-mount half.
-  // Switching remounts the preview frame with the URL of that render, so a source fixed up by an effect afterwards would
-  // be posted to a page that is still loading and lost.
+  // Land on the media's own source and skin default in the same update that switches media — `readParams` covers the
+  // first-mount half. Switching remounts the preview frame with the URL of that render, so a value fixed up by an effect
+  // afterwards would be posted to a page that is still loading and lost.
   const handleMediaChange = useCallback(
     (value: MediaId) => {
       setMedia(value);
       setSource((current) => landingSource(value, platform, current));
+      setSkinless(startsSkinless(value));
     },
     [platform]
   );
@@ -488,6 +533,10 @@ export function App() {
       target.postMessage({ type: 'skin-change', skin: panel.skin }, '*');
     }
 
+    if (frameQuery.get('skinless') !== (skinless ? '1' : '0')) {
+      target.postMessage({ type: 'skinless-change', skinless }, '*');
+    }
+
     if (frameQuery.get('source') !== source) target.postMessage({ type: 'source-change', source }, '*');
 
     postPreferences(target, frameParams);
@@ -497,6 +546,7 @@ export function App() {
     platform,
     media,
     skin,
+    skinless,
     styling,
     skins: skinSource,
     width: playerWidth,
@@ -537,6 +587,7 @@ export function App() {
               onStylingChange={handleStylingChange}
               skin={skin}
               onSkinChange={setSkin}
+              skinless={skinless}
               skins={skinSource}
               onSkinsChange={handleSkinsChange}
               compare={compare}
@@ -568,6 +619,8 @@ export function App() {
           onLocaleChange={setLocale}
           accentColor={accentColor}
           onAccentColorChange={setAccentColor}
+          controlsBeforeStart={controlsBeforeStart}
+          onControlsBeforeStartChange={setControlsBeforeStart}
           autoplay={autoplay}
           onAutoplayChange={setAutoplay}
           muted={muted}
@@ -578,6 +631,9 @@ export function App() {
           onPreloadChange={setPreload}
           captions={captions}
           onCaptionsChange={setCaptions}
+          skinless={skinless}
+          onSkinlessChange={setSkinless}
+          skinlessDisabled={!hasNoSkinChoice(media)}
           preferences={preferences}
         />
       </div>

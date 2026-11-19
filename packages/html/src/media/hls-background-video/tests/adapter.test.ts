@@ -1,4 +1,5 @@
 import type { HlsBackgroundVideoAdapter } from '@videojs/spf/adapters/hls-background-video';
+import { HlsBackgroundVideoMpegTsAdapter } from '@videojs/spf/adapters/hls-background-video-mpeg-ts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxBackgroundVideo } from '../../mux-background-video';
@@ -44,6 +45,22 @@ function create(tag: string, attrs: Record<string, string> = {}): HlsBackgroundV
   return container.querySelector(tag) as HlsBackgroundVideo;
 }
 
+// Attributes set after construction, as on an element created by script. happy-dom also constructs parsed elements
+// before setting their attributes, so this is how opt-outs reach these tests either way.
+function createWith<T extends HTMLElement>(Base: new () => T, attrs: Record<string, string>): T {
+  const tag = `test-created-${++tagCounter}`;
+
+  customElements.define(tag, class extends (Base as new () => HTMLElement) {});
+
+  const element = document.createElement(tag) as T;
+
+  for (const [name, value] of Object.entries(attrs)) element.setAttribute(name, value);
+
+  document.body.appendChild(element);
+
+  return element;
+}
+
 /** The Media the element registers, which is what the engine hangs off. */
 function mediaOf(element: HlsBackgroundVideo) {
   return element.getMediaTarget() as unknown as HlsBackgroundVideoAdapter;
@@ -58,6 +75,13 @@ describe('HlsBackgroundVideo', () => {
     expect(element.video).toBeInstanceOf(HTMLVideoElement);
   });
 
+  it('exposes the inner video as target', () => {
+    const element = create(defineElement());
+
+    expect(element.target).toBe(element.shadowRoot!.querySelector('video'));
+    expect(element.video).toBe(element.target);
+  });
+
   it('forces the ambient playback attributes onto the inner video', () => {
     // The whole point of the element: no nomuted/noloop/noautoplay opt-outs.
     const { video } = create(defineElement());
@@ -69,6 +93,42 @@ describe('HlsBackgroundVideo', () => {
     // Set as a property too — an attribute set post-createElement doesn't take,
     // and without it autoplay is refused.
     expect(video?.muted).toBe(true);
+  });
+
+  it('turns autoplay off with noautoplay, keeping muted and loop', () => {
+    const { target } = createWith(HlsBackgroundVideo, { noautoplay: '' });
+
+    expect(target?.autoplay).toBe(false);
+    expect(target?.hasAttribute('autoplay')).toBe(false);
+    expect(target?.muted).toBe(true);
+    expect(target?.loop).toBe(true);
+  });
+
+  it('turns looping off with noloop', () => {
+    const { target } = createWith(HlsBackgroundVideo, { noloop: '' });
+
+    expect(target?.loop).toBe(false);
+    expect(target?.autoplay).toBe(true);
+  });
+
+  it('ignores nomuted', () => {
+    const { target } = createWith(HlsBackgroundVideo, { nomuted: '' });
+
+    expect(target?.muted).toBe(true);
+  });
+
+  it('mirrors crossorigin onto the inner video as it changes, but not preload', () => {
+    const element = create(defineElement());
+
+    element.setAttribute('crossorigin', 'use-credentials');
+    element.setAttribute('preload', 'none');
+
+    expect(element.target?.getAttribute('crossorigin')).toBe('use-credentials');
+    expect(element.target?.preload).toBe('auto');
+
+    element.removeAttribute('crossorigin');
+
+    expect(element.target?.hasAttribute('crossorigin')).toBe(false);
   });
 
   it('reads src from the attribute', () => {
@@ -102,11 +162,20 @@ describe('HlsBackgroundVideo', () => {
     expect(element.src).toBe(src);
   });
 
-  it('observes only src', () => {
+  it('observes src, the playback defaults, the noloop / noautoplay opt-outs, and the passthrough attributes', () => {
     // `max-resolution` is a URL param, `preload` means nothing to an engine that
     // loads immediately, and `audio` / `debug` from the package this replaces are
     // gone for good.
-    expect(HlsBackgroundVideo.observedAttributes).toEqual(['src']);
+    expect(HlsBackgroundVideo.observedAttributes).toEqual([
+      'src',
+      'loop',
+      'autoplay',
+      'noloop',
+      'noautoplay',
+      'controls',
+      'controlslist',
+      'crossorigin',
+    ]);
   });
 
   // The engine's reported sequence is the only failure signal this composition
@@ -149,8 +218,51 @@ describe('HlsBackgroundVideo', () => {
     });
   });
 
-  it('is what <mux-background-video> resolves to', () => {
-    // An alias, so there is one implementation to test rather than two.
-    expect(MuxBackgroundVideo).toBe(HlsBackgroundVideo);
+  describe('teardown', () => {
+    it('releases its engine a microtask after it is removed', async () => {
+      const element = create(defineElement());
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      element.remove();
+      await flush();
+
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+
+    it('releases its engine when only an ancestor has keep-alive', async () => {
+      const player = document.createElement('div');
+      const element = document.createElement(defineElement()) as HlsBackgroundVideo;
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      player.setAttribute('keep-alive', '');
+      player.append(element);
+      document.body.append(player);
+      player.remove();
+      await flush();
+
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+
+    it('keeps its engine with keep-alive until adapter.destroy()', async () => {
+      const element = create(defineElement(), { 'keep-alive': '' });
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      element.remove();
+      await flush();
+
+      expect(destroy).not.toHaveBeenCalled();
+
+      element.adapter.destroy();
+
+      expect(element.adapter).toBe(mediaOf(element));
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+  });
+
+  it('is what <mux-background-video> extends, with the MPEG-TS Media in place of the HLS one', () => {
+    // A subclass over the MPEG-TS Media, so there is one element implementation to test rather than two.
+    expect(Object.getPrototypeOf(MuxBackgroundVideo)).toBe(HlsBackgroundVideo);
+    expect(MuxBackgroundVideo.Adapter).toBe(HlsBackgroundVideoMpegTsAdapter);
+    expect(MuxBackgroundVideo.Adapter).not.toBe(HlsBackgroundVideo.Adapter);
   });
 });

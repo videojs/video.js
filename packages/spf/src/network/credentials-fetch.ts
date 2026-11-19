@@ -9,6 +9,26 @@ import type { FetchOptions, Resource } from './fetch';
  */
 export type RequestCredentialsPolicy = RequestCredentials | ((resource: Resource) => RequestCredentials | undefined);
 
+/**
+ * Resolve the `credentials` mode a policy yields for one resource. For requests the engine doesn't make through a
+ * decorated fetch, such as the browser loading a `<track>` resource.
+ */
+export function resolveRequestCredentials(
+  policy: RequestCredentialsPolicy | undefined,
+  resource: Resource
+): RequestCredentials | undefined {
+  return isFunction(policy) ? policy(resource) : policy;
+}
+
+/** The config key every behavior that makes requests reads, declared once so it carries one meaning. */
+export interface RequestCredentialsConfig {
+  /**
+   * The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the
+   * chapters document; absent → the platform default.
+   */
+  requestCredentials?: RequestCredentialsPolicy;
+}
+
 /** Any `Resource`-addressable fetch — `fetchResolvable`, `FetchText`, and `FetchBytes` all qualify. */
 type CredentialableFetch = (addressable: Resource, options?: FetchOptions) => Promise<unknown>;
 
@@ -29,8 +49,6 @@ export function credentialsFetch<Fetch extends CredentialableFetch>(
   // decorate, so the fetch is returned as is.
   if (policy === undefined) return baseFetch;
 
-  const resolve = isFunction(policy) ? policy : () => policy;
-
   return ((addressable: Resource, options?: FetchOptions) =>
-    baseFetch(addressable, { credentials: resolve(addressable), ...options })) as Fetch;
+    baseFetch(addressable, { credentials: resolveRequestCredentials(policy, addressable), ...options })) as Fetch;
 }

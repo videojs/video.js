@@ -135,6 +135,13 @@ for (const preset of ['video', 'audio'] as const) {
     if (preset === 'video') {
       const settings = consumer.getByRole('button', { name: 'Settings' });
 
+      // Before playback starts, only the centre play button shows until the skin opts out.
+      await expect(settings).toBeHidden();
+      await skin.evaluate((element) => {
+        if (!(element instanceof HTMLElement)) throw new Error('Expected an HTML skin element.');
+
+        element.style.setProperty('--media-controls-before-start', 'visible');
+      });
       await expect(settings).toBeVisible();
       await settings.click();
       await expect(settings).toHaveAttribute('aria-expanded', 'true');

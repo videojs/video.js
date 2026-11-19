@@ -1,6 +1,5 @@
 import { isBoolean, isFunction, isObject, isUndefined } from '@videojs/utils/predicate';
 
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from './constants';
 import type { MediaBufferState, MediaPlaybackState, MediaTimeState } from './state';
 import { MediaReadyState } from './types';
 import type {
@@ -140,12 +139,7 @@ export function isMediaBufferCapable(value: unknown): value is MediaBufferCapabi
 
   const media = value as Record<string, unknown>;
 
-  return (
-    !isUndefined(media.buffered) &&
-    media.buffered !== EMPTY_TIME_RANGES &&
-    !isUndefined(media.seekable) &&
-    media.seekable !== EMPTY_TIME_RANGES
-  );
+  return !isUndefined(media.buffered) && !isUndefined(media.seekable);
 }
 
 export function isMediaErrorCapable(value: unknown): value is MediaErrorCapability {
@@ -161,7 +155,7 @@ export function isMediaTextTrackCapable(value: unknown): value is MediaTextTrack
 
   const media = value as Record<string, unknown>;
 
-  return !isUndefined(media.textTracks) && media.textTracks !== EMPTY_TEXT_TRACKS;
+  return !isUndefined(media.textTracks);
 }
 
 export function isMediaVideoRenditionCapable(value: unknown): value is MediaVideoRenditionCapability {
@@ -193,7 +187,7 @@ export function isMediaRemotePlaybackCapable(value: unknown): value is MediaRemo
 
   const media = value as Record<string, unknown>;
 
-  return isObject(media.remote) && media.remote !== EMPTY_REMOTE;
+  return isObject(media.remote);
 }
 
 export function isMediaStreamTypeCapable(value: unknown): value is MediaStreamTypeCapability {

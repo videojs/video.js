@@ -27,6 +27,13 @@ describe('deriveStatus', () => {
     });
   });
 
+  it('skips playback status before playback starts', () => {
+    expect(deriveStatus({ action: 'togglePaused' }, { ...SNAPSHOT, paused: true, started: false })).toBeNull();
+    expect(deriveStatus({ action: 'togglePaused' }, { ...SNAPSHOT, paused: true, started: true })).toMatchObject({
+      status: 'play',
+    });
+  });
+
   it('derives volume status and value', () => {
     expect(deriveStatus({ action: 'volumeStep', value: 0.3 }, SNAPSHOT)).toMatchObject({
       status: 'volume-high',

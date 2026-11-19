@@ -13,6 +13,7 @@ import { currentTimeFeature } from '../features/current-time';
 import { errorFeature } from '../features/error';
 import { hlsLoadingFeature } from '../features/hls-loading';
 import { mediaSourceFeature } from '../features/media-source';
+import { shiftTimestampsFeature } from '../features/shift-timestamps';
 
 // ============================================================================
 // Background-Video Engine State & Context
@@ -28,6 +29,7 @@ export const features = [
   calculateDurationFeature,
   mediaSourceFeature,
   backgroundVideoFeature,
+  shiftTimestampsFeature,
   currentTimeFeature,
 ] as const;
 
@@ -78,13 +80,12 @@ export const defaultConfig = composed.defaultConfig;
 export const initialState = { ...composed.initialState, loadActivated: true };
 
 /**
- * Create a background-video playback engine.
- *
- * Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven, preload-monitoring, and
- * play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution rule by default) replaces
- * `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds `loadActivated: true` so
- * the composition behaves as if preload has already been activated — appropriate for ambient / hero / GIF-replacement
- * surfaces that should start loading the moment a src is set.
+ * Create a background-video playback engine: one video rendition pinned for the session, no audio or text, loading as
+ * soon as a source is set. Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven,
+ * preload-monitoring, and play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution
+ * rule by default) replaces `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds
+ * `loadActivated: true` so the composition behaves as if preload has already been activated — appropriate for ambient /
+ * hero / GIF-replacement surfaces that should start loading the moment a src is set.
  *
  * Error reporting is _not_ subtracted: `collectErrors` owns the sequence, `resolveVideoTrack` reports per-rendition
  * causes, and `selectVideoTrack` reports the video verdict when nothing survives its constraints. Without them every

@@ -9,7 +9,7 @@ import {
   volumeFeature,
 } from '@videojs/core/dom';
 import { defineSlice } from '@videojs/store';
-import { Component, type ErrorInfo, type ReactNode, StrictMode, useState } from 'react';
+import { Activity, Component, type ErrorInfo, type ReactNode, StrictMode, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -86,74 +86,76 @@ describe('createPlayer', () => {
       vi.useRealTimers();
     });
 
-    it('recovers after Activity-style async destroy (React <Activity>)', () => {
-      const { Player, usePlayer } = createPlayer({ features: [mockSlice] });
+    it('replaces the store when an Activity is shown after hiding destroyed it', () => {
+      vi.useFakeTimers();
 
+      const { Player, usePlayer } = createPlayer({ features: [mockSlice] });
       let store!: PlayerStore;
-      // Captured inside TestComponent so we can trigger a media-dep change
-      // from the test body, simulating Activity reveal re-running the attach effect.
-      let setMediaFn!: (media: HTMLMediaElement | null) => void;
 
       function TestComponent() {
         store = usePlayer();
-        const { setMedia } = usePlayerContext();
-
-        setMediaFn = setMedia;
         return null;
       }
 
-      render(
-        <Player>
-          <TestComponent />
-        </Player>
-      );
+      function App({ mode }: { mode: 'visible' | 'hidden' }) {
+        return (
+          <Activity mode={mode}>
+            <Player>
+              <Video />
+              <TestComponent />
+            </Player>
+          </Activity>
+        );
+      }
 
+      const { rerender } = render(<App mode="visible" />);
       const originalStore = store;
 
-      expect(originalStore.destroyed).toBe(false);
+      rerender(<App mode="hidden" />);
+      act(() => vi.runAllTimers());
 
-      // Simulate the Activity gap: the deferred timeout fires before React gets
-      // a chance to re-run effects, leaving the store destroyed.
-      originalStore.destroy();
       expect(originalStore.destroyed).toBe(true);
 
-      // Mirrors the real app: Activity reveals the subtree with an already-attached media component.
-      expect(() => {
-        act(() => {
-          setMediaFn(document.createElement('video'));
-        });
-      }).not.toThrow();
+      rerender(<App mode="visible" />);
 
-      expect(store).toBeDefined();
-      expect(store.destroyed).toBe(false);
       expect(store).not.toBe(originalStore);
+      expect(store.destroyed).toBe(false);
+
+      vi.useRealTimers();
     });
 
     it('seeds current config inputs when replacing a destroyed store', () => {
+      vi.useFakeTimers();
+
       const { Player, usePlayer } = createPlayer({ features: [metadataFeature] });
       let store!: PlayerStore<[typeof metadataFeature]>;
-      let setMedia!: (media: HTMLMediaElement | null) => void;
 
       function Consumer() {
         store = usePlayer();
-        setMedia = usePlayerContext().setMedia;
         return null;
       }
 
-      render(
-        <Player title="Replacement title">
-          <Consumer />
-        </Player>
-      );
+      function App({ mode, title }: { mode: 'visible' | 'hidden'; title: string }) {
+        return (
+          <Activity mode={mode}>
+            <Player title={title}>
+              <Consumer />
+            </Player>
+          </Activity>
+        );
+      }
 
+      const { rerender } = render(<App mode="visible" title="Original title" />);
       const destroyedStore = store;
 
-      destroyedStore.destroy();
-
-      act(() => setMedia(document.createElement('video')));
+      rerender(<App mode="hidden" title="Replacement title" />);
+      act(() => vi.runAllTimers());
+      rerender(<App mode="visible" title="Replacement title" />);
 
       expect(store).not.toBe(destroyedStore);
       expect(store.title).toBe('Replacement title');
+
+      vi.useRealTimers();
     });
 
     describe('extensions', () => {
@@ -464,6 +466,37 @@ describe('createPlayer', () => {
         expect(store[prop]).toBe(cleared);
       }
     );
+
+    it('seeds defaultPlaybackRates and restores the defaults when the prop is removed', () => {
+      const { Player, usePlayer } = createPlayer({ features: [features.playbackRate] });
+      let store!: PlayerStore;
+
+      function Consumer() {
+        store = usePlayer();
+        return null;
+      }
+
+      const { rerender } = render(
+        <Player>
+          <Consumer />
+        </Player>
+      );
+      const defaults = store.playbackRates;
+
+      rerender(
+        <Player defaultPlaybackRates={[2, 1, 0.5]}>
+          <Consumer />
+        </Player>
+      );
+      expect(store.playbackRates).toEqual([2, 1, 0.5]);
+
+      rerender(
+        <Player>
+          <Consumer />
+        </Player>
+      );
+      expect(store.playbackRates).toEqual(defaults);
+    });
 
     it('seeds config inputs during SSR', () => {
       const { Player, usePlayer } = createPlayer({ features: [metadataFeature] });

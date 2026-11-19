@@ -82,12 +82,12 @@ export default function App() {
 ## How it works
 
 <FrameworkCase frameworks={["react"]}>
-- `Hotkey` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
+- `Hotkey` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. `speedUp` and `speedDown` move through the player's playback rates, or step by `value` when you pass one. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
 - `Gesture` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
 - `StatusAnnouncer` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
-- `<media-hotkey>` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
+- `<media-hotkey>` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. `speedUp` and `speedDown` move through the player's playback rates, or step by `value` when you pass one. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
 - `<media-gesture>` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
 - `<media-status-announcer>` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
@@ -127,6 +127,24 @@ For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-
 <FrameworkCase frameworks={["html"]}>
 For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the skin source to your project</DocsLink> and edit its `<media-hotkey>` declarations. Adding another binding alongside the packaged skin does not replace its bindings. For a custom UI, edit your own `<media-hotkey>` set directly.
 </FrameworkCase>
+
+### Tap to play on touch
+
+The packaged skins toggle controls on a touch tap, and the center play button starts playback. To play and pause with a tap anywhere on the video instead, bind `togglePaused` in place of `toggleControls` for touch:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<Gesture type="tap" action="togglePaused" pointer="touch" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-gesture type="tap" action="togglePaused" pointer="touch"></media-gesture>
+```
+</FrameworkCase>
+
+A tap then pauses playback as well, and taps no longer show or hide the controls.
 
 ### Seek step size
 

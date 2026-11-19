@@ -1,4 +1,5 @@
 import {
+  isMediaBufferCapable,
   isMediaMutedCapable,
   isMediaPlaybackRateCapable,
   isMediaVolumeCapable,
@@ -72,8 +73,9 @@ async function attachAndLoad(
   if (!media.src) media.src = VIDEO_ID;
 
   // Opt out of the bootstrap unless a test asks for it: it posts commands of its own and swallows what the embed
-  // reports, which is the subject of `TikTokAdapter bootstrap` rather than of the protocol these tests check.
-  if (media.preload === TikTokAdapter.defaultProps.preload) media.preload = 'none';
+  // reports, which is the subject of `TikTokAdapter bootstrap` rather than of the protocol these tests check. TikTok's
+  // own chrome is the opt-out that changes nothing else the host does.
+  if (!media.autoplay) media.controls = true;
 
   const iframe = createIframe();
 
@@ -103,19 +105,18 @@ describe('buildTikTokIframeSrc', () => {
 
   it('leaves muted and loop out rather than turning them off', () => {
     // Off is the player's default for both, so an explicit 0 says nothing.
-    const src = buildTikTokIframeSrc(VIDEO_ID, { defaultMuted: false, loop: false, preload: 'none' });
+    const src = buildTikTokIframeSrc(VIDEO_ID, { defaultMuted: false, loop: false, controls: true });
 
-    expect(src).toBe(`https://www.tiktok.com/player/v1/${VIDEO_ID}?controls=0&rel=0`);
+    expect(src).toBe(`https://www.tiktok.com/player/v1/${VIDEO_ID}?rel=0`);
   });
 
-  it('carries a bootstrap autoplay unless preload opts out', () => {
-    // An embed that never autoplays answers no command, so every preload but `none` takes the autoplay that
-    // brings TikTok's player up.
+  it('carries a bootstrap autoplay whatever preload says', () => {
+    // An embed that never autoplays answers no command, and under a skin nothing can click it awake, so every preload
+    // takes the autoplay that brings TikTok's player up.
     expect(buildTikTokIframeSrc(VIDEO_ID, TikTokAdapter.defaultProps)).toContain('autoplay=1');
     expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'auto' })).toContain('autoplay=1');
-    // An unset preload is the default one, so a bare source still brings it up.
+    expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'none' })).toContain('autoplay=1');
     expect(buildTikTokIframeSrc(VIDEO_ID)).toContain('autoplay=1');
-    expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'none' })).not.toContain('autoplay');
   });
 
   it('shows TikTok controls when controls=true', () => {
@@ -193,6 +194,14 @@ describe('TikTokAdapter', () => {
     expect(media.src).toBe(TikTokAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new TikTokAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src when attached', () => {
@@ -280,7 +289,7 @@ describe('TikTokAdapter', () => {
     const media = new TikTokAdapter();
 
     // This is about the play the caller asked for before the embed could take one, not the bootstrap's commands.
-    media.preload = 'none';
+    media.controls = true;
     const iframe = createIframe();
 
     media.attach(iframe);
@@ -309,12 +318,12 @@ describe('TikTokAdapter', () => {
     media.detach();
   });
 
-  it.each(['metadata', 'none'] as const)(
-    'does not replay a play the listener took back before the embed was ready with preload=%s',
-    async (preload) => {
+  it.each([false, true])(
+    'does not replay a play the listener took back before the embed was ready with controls=%s',
+    async (controls) => {
       const media = new TikTokAdapter();
 
-      media.preload = preload;
+      media.controls = controls;
       const iframe = createIframe();
 
       media.attach(iframe);
@@ -328,7 +337,7 @@ describe('TikTokAdapter', () => {
 
       report(iframe, 'onPlayerReady');
 
-      if (preload === 'metadata') report(iframe, 'onStateChange', STATE.PAUSED);
+      if (!controls) report(iframe, 'onStateChange', STATE.PAUSED);
 
       expect(commands).not.toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'play' }, '*');
       media.detach();
@@ -391,14 +400,14 @@ describe('TikTokAdapter', () => {
     const { iframe } = await attachAndLoad(media);
     const events: string[] = [];
 
-    for (const type of ['timeupdate', 'durationchange', 'seeking', 'seeked'] as const) {
+    for (const type of ['timeupdate', 'progress', 'durationchange', 'seeking', 'seeked'] as const) {
       media.addEventListener(type, () => events.push(type));
     }
 
     report(iframe, 'onCurrentTime', { currentTime: 2.5, duration: 15 });
     expect(media.currentTime).toBe(2.5);
     expect(media.duration).toBe(15);
-    expect(events).toEqual(['timeupdate', 'durationchange']);
+    expect(events).toEqual(['timeupdate', 'progress', 'durationchange']);
     // Only a position is reported, so what has played is all that is known to be
     // buffered.
     expect(media.buffered.length).toBe(1);
@@ -407,7 +416,7 @@ describe('TikTokAdapter', () => {
 
     // A duration that has not changed is not announced again.
     report(iframe, 'onCurrentTime', { currentTime: 3, duration: 15 });
-    expect(events).toEqual(['timeupdate', 'durationchange', 'timeupdate']);
+    expect(events).toEqual(['timeupdate', 'progress', 'durationchange', 'timeupdate', 'progress']);
     media.detach();
   });
 
@@ -562,9 +571,11 @@ describe('TikTokAdapter', () => {
     const { iframe } = await attachAndLoad(media);
     const seeking = vi.fn();
     const seeked = vi.fn();
+    const progress = vi.fn();
 
     media.addEventListener('seeking', seeking);
     media.addEventListener('seeked', seeked);
+    media.addEventListener('progress', progress);
 
     media.currentTime = 30;
     expect(media.seeking).toBe(true);
@@ -572,6 +583,8 @@ describe('TikTokAdapter', () => {
     // The requested position is reported right away; the embed only reports one
     // every so often.
     expect(media.currentTime).toBe(30);
+    expect(progress).toHaveBeenCalledTimes(1);
+    expect(media.buffered.end(0)).toBe(30);
 
     report(iframe, 'onCurrentTime', { currentTime: 30.2, duration: 60 });
     expect(media.seeking).toBe(false);
@@ -954,7 +967,7 @@ describe('TikTokAdapter', () => {
 // TikTok's player stays dormant without an autoplay, answering no command. The host brings it up with one nobody
 // asked for and parks it, so the caller gets a player that answers rather than a video that played.
 describe('TikTokAdapter bootstrap', () => {
-  /** Attach with the bootstrap left on, the way every preload but `none` arrives. */
+  /** Attach with the bootstrap left on, the way every chromeless embed arrives. */
   async function attachBootstrapped(media: TikTokAdapter) {
     if (!media.src) media.src = VIDEO_ID;
 
@@ -1210,17 +1223,18 @@ describe('TikTokAdapter bootstrap', () => {
     media.detach();
   });
 
-  it('leaves the player dormant under preload=none', async () => {
+  it('brings the player up under preload=none too', async () => {
     const media = new TikTokAdapter();
 
+    // A dormant player starts only from a click inside the frame, which a skin or poster drawn over it takes.
     media.preload = 'none';
     const { iframe, commands } = await attachBootstrapped(media);
 
-    expect(iframe.getAttribute('src')).not.toContain('autoplay');
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
 
     report(iframe, 'onPlayerReady');
 
-    expect(commands).not.toHaveBeenCalled();
+    expect(commands).toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'pause' }, '*');
     media.detach();
   });
 });

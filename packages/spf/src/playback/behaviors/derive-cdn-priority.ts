@@ -1,7 +1,27 @@
+import { defineBehavior } from '../../core/composition/define-behavior';
+import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
+import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
+import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../media/types';
+import { getCdnId as defaultGetCdnId, type GetCdnId, getOrderedCdnIds } from '../../media/utils/cdn';
+
+export interface DeriveCdnPriorityState {
+  presentation?: MaybeResolvedPresentation;
+  /**
+   * The CDNs the source is served from (track-URL origins), in manifest priority order — most-preferred first (mirrors
+   * HLS content steering's `PATHWAY-PRIORITY`). Owned by `deriveCdnPriority`, read by `track-switching`'s
+   * `preferActiveCdn` scope, which narrows to the highest-priority CDN with surviving tracks so video / audio / text
+   * stay on one host. Only meaningful for redundant-stream sources; a single-CDN source has one entry.
+   */
+  cdnPriority?: string[];
+}
+
+const samePriority = (a: string[] | undefined, b: string[]): boolean =>
+  !!a && a.length === b.length && a.every((cdn, i) => cdn === b[i]);
+
 /**
- * **Session-level CDN priority.** While a presentation is resolved, owns the `cdnPriority` signal: the distinct CDNs
- * the source is served from (origin of each track's URL), in manifest priority order — most-preferred first. Cleared on
- * src unload. The name mirrors HLS content steering's `PATHWAY-PRIORITY`.
+ * **Publishes which CDNs a source is served from, most-preferred first.** While a presentation is resolved, owns the
+ * `cdnPriority` signal: the distinct CDNs the source is served from (origin of each track's URL), in manifest priority
+ * order — most-preferred first. Cleared on src unload. The name mirrors HLS content steering's `PATHWAY-PRIORITY`.
  *
  * Redundant-stream sources (e.g. Mux's `?redundant_streams=true`) list the same content on multiple hosts, so the
  * candidate tracks already include one variant per CDN. This behavior publishes _which_ CDNs exist and their priority;
@@ -17,24 +37,6 @@
  * Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`, mirroring `setupTrackSwitching`. The resolved
  * state owns the signal; its entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per
  * `reactors.md`).
- */
-
-import { defineBehavior } from '../../core/composition/define-behavior';
-import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
-import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
-import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../media/types';
-import { getCdnId as defaultGetCdnId, type GetCdnId, getOrderedCdnIds } from '../../media/utils/cdn';
-
-export interface DeriveCdnPriorityState {
-  presentation?: MaybeResolvedPresentation;
-  cdnPriority?: string[];
-}
-
-const samePriority = (a: string[] | undefined, b: string[]): boolean =>
-  !!a && a.length === b.length && a.every((cdn, i) => cdn === b[i]);
-
-/**
- * Manage `cdnPriority`: publish the manifest-ordered CDN list on src load, clear on src unload.
  *
  * @example
  *   const reactor = deriveCdnPriority.setup({ state });
@@ -50,7 +52,10 @@ export const deriveCdnPriority = defineBehavior({
       presentation: ReadonlySignal<DeriveCdnPriorityState['presentation']>;
       cdnPriority: Signal<DeriveCdnPriorityState['cdnPriority']>;
     };
-    config?: { getCdnId?: GetCdnId };
+    config?: {
+      /** See `TrackSwitchingSharedConfig['getCdnId']`. */
+      getCdnId?: GetCdnId;
+    };
   }) => {
     const getCdnId = config.getCdnId ?? defaultGetCdnId;
     const derivedStateSignal = computed(() =>

@@ -16,6 +16,7 @@ import { installSandboxMirror } from '../sandbox-mirror';
 import { getChapters, getPlaceholderSrc, getPosterSrc, getStoryboardSrc, isLiveSource, SOURCES } from '../sources';
 import { renderChapters } from './chapters';
 import { bindSandboxHtmlLocaleChange, prepareSandboxHtmlLocale, wrapSandboxHtmlI18n } from './i18n';
+import { defineNoSkin } from './no-skin';
 import { loadHtmlSkinTag } from './skins';
 import { renderStoryboard } from './storyboard';
 
@@ -35,7 +36,10 @@ export interface HtmlSandboxContext {
   readonly live: boolean;
   /** The player element for this render, such as `video-player` or `live-audio-player`. */
   readonly playerTag: string;
-  /** The skin element the shell selected and the runtime registered, such as `video-skin` or `audio-neutral-skin`. */
+  /**
+   * The skin element the shell selected and the runtime registered, such as `video-skin` or `audio-neutral-skin`, or a
+   * bare frame when it selected none.
+   */
   readonly skinTag: string;
   /** The source's poster URL, safe to interpolate into an attribute, or empty when it has none. */
   readonly poster: string;
@@ -105,6 +109,8 @@ export function createLatestLoader() {
 function loadSkinTag(player: HtmlSandboxPlayer, state: SandboxState, live: boolean): Promise<string> {
   // The background skin is one element with no skin or styling variants, imported by the template.
   if (player === 'background') return Promise.resolve('background-video-skin');
+
+  if (state.skinless) return Promise.resolve(defineNoSkin());
 
   return loadHtmlSkinTag({ player, live, skin: state.skin, styling: state.styling, source: state.skins });
 }

@@ -3,6 +3,7 @@ import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Dialog } from '..';
+import { createPlayerWrapper } from '../../../testing/mocks';
 
 afterEach(cleanup);
 
@@ -30,6 +31,42 @@ describe('Dialog', () => {
     expect(popup.getAttribute('aria-labelledby')).toBe(getByRole('heading').id);
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+  });
+
+  it('reports document scope outside a player', () => {
+    const { getByRole } = render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>Content</Dialog.Popup>
+      </Dialog.Root>
+    );
+
+    expect(getByRole('dialog').getAttribute('data-scope')).toBe('document');
+  });
+
+  it('confines a dialog to its player', async () => {
+    const container = document.createElement('div');
+    const { Wrapper, value } = createPlayerWrapper();
+
+    value.container = container;
+    document.body.append(container);
+
+    const { getByRole, getByTestId } = render(
+      <Wrapper>
+        <Dialog.Root defaultOpen>
+          <Dialog.Backdrop data-testid="backdrop" />
+          <Dialog.Popup>Content</Dialog.Popup>
+        </Dialog.Root>
+      </Wrapper>,
+      { container }
+    );
+
+    const popup = getByRole('dialog');
+
+    await waitFor(() => expect(popup.getAttribute('data-scope')).toBe('player'));
+    expect(popup.hasAttribute('aria-modal')).toBe(false);
+    expect(getByTestId('backdrop').getAttribute('data-scope')).toBe('player');
+
+    container.remove();
   });
 
   it('closes only from Close', () => {

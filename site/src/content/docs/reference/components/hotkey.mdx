@@ -60,7 +60,7 @@ Key patterns are case-insensitive and may use:
 - `Mod` for `Meta` on macOS and `Ctrl` elsewhere.
 - The special `0-9` range for digit-based seeking.
 
-Choose an `action` from the API reference below. Pass `value` as seconds for `seekStep`, a volume delta such as `0.05` or `-0.05` for `volumeStep`, or a percentage from 0 to 100 for `seekToPercent`. When omitted, `seekStep` defaults to 10 seconds and `volumeStep` defaults to five percentage points; `ArrowLeft`, `j`, and `ArrowDown` use the negative step. When `value` is omitted from `seekToPercent` with `keys="0-9"`, the pressed digit supplies the percentage.
+Choose an `action` from the API reference below. Pass `value` as seconds for `seekStep`, a volume delta such as `0.05` or `-0.05` for `volumeStep`, a percentage from 0 to 100 for `seekToPercent`, or a rate change such as `0.1` for `speedUp` and `speedDown`. When omitted, `seekStep` defaults to 10 seconds and `volumeStep` defaults to five percentage points; `ArrowLeft`, `j`, and `ArrowDown` use the negative step. When `value` is omitted from `seekToPercent` with `keys="0-9"`, the pressed digit supplies the percentage. When it is omitted from `speedUp` and `speedDown`, they move to the next faster or slower of the player's playback rates.
 
 Toggle actions ignore held-key repeats. Step, rate, and percentage actions may repeat. A matched shortcut prevents the browser's default behavior. Unmodified shortcuts are ignored in editable fields, and <kbd>Space</kbd> or <kbd>Enter</kbd> still activates focused buttons, links, and sliders normally.
 

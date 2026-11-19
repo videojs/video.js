@@ -1,0 +1,38 @@
+---
+title: useTextTracks
+description: Hook that returns the text tracks a filter or track definition matches, from the media or the app
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+## Import
+
+```tsx
+import { useTextTracks } from '@videojs/react';
+```
+
+`useTextTracks` returns the tracks in `textTrackList` that a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, and re-renders when they change. Tracks from the media and from the app are listed alike; each track's `source` says which. It returns an empty list when the player has no <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink>.
+
+A filter picks tracks by `kind`, `label`, or `language`, or with a function. Each given field must match, and a list of kinds matches any kind in it. Without a filter, it returns every track. Keep a function filter's identity across renders.
+
+```tsx title="ChapterTrackPicker.tsx"
+import { useTextTracks } from '@videojs/react';
+
+function ChapterTrackPicker() {
+  const tracks = useTextTracks({ kind: 'chapters' });
+  if (tracks.length < 2) return null;
+
+  return (
+    <select aria-label="Chapters">
+      {tracks.map((track) => (
+        <option key={track.id} value={track.id}>
+          {track.label || track.language}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+<UtilReference util="useTextTracks" />

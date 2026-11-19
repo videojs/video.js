@@ -4,7 +4,7 @@
  * this file supplies the `messagePipelines` the segment/text loaders run to _fill and act on_ that behavior's state.
  * It's the relocation analog of `track-switching`'s config-supplied constraint/rule chain — a pluggable strategy handed
  * to the machinery via config, not applied inline — supplied to the loaders rather than applied by the behavior, so the
- * two coordinate through the shared `mediaContainerData` / `startMediaTime` slots alone, never by import.
+ * two coordinate through the shared `mediaContainerData` / `startMediaTime` signals alone, never by import.
  *
  * DOM-free: it composes the loader vocabularies (`segment-load-pipeline`, `text-segment-load-pipeline`) through their
  * structural sink seams and shifts cues via the structural `Cue` type, so it names no `SourceBuffer`,
@@ -27,6 +27,7 @@ import { findMediaTrack, type MediaHandlerType, readBaseMediaDecodeTime } from '
 import { resolveVttSegmentMetadata, type TextSegmentMetadata } from '../../media/text/resolve-vtt-metadata';
 import type { Cue, MaybeResolvedPresentation, MediaContainerData } from '../../media/types';
 import { findTrackById, getTracksByType } from '../../media/utils/tracks';
+import { type RequestCredentialsPolicy, resolveRequestCredentials } from '../../network/credentials-fetch';
 import type { DeriveStartMediaTime } from './derive-start-media-time';
 import { peekHead } from './head-peek';
 import { dispatchStep, fetchStep, type LoadStep, type MessagePipelines, type StepDeps } from './segment-load-pipeline';
@@ -38,7 +39,7 @@ import {
   textStepWiring,
 } from './text-segment-load-pipeline';
 
-/** The composition slots these steps read — the view asserted from the opaque `deps.state`. */
+/** The composition signals these steps read — the view asserted from the opaque `deps.state`. */
 interface RelocationSlots {
   presentation?: MaybeResolvedPresentation;
   mediaContainerData?: Record<string, MediaContainerData>;
@@ -48,12 +49,13 @@ interface RelocationSlots {
 
 type ContainerSlot = Signal<Record<string, MediaContainerData> | undefined>;
 
-/** Assert the relocation state view from the opaque step deps — this module knows the slots the composition provides. */
+/** Assert the relocation state view from the opaque step deps — this module knows the signals the composition provides. */
 function relocationState(deps: StepDeps): StateSignals<RelocationSlots> {
   return deps.state as unknown as StateSignals<RelocationSlots>;
 }
 
-function containerSlot(deps: StepDeps): ContainerSlot {
+/** The container-data slot, or `undefined` in a composition that declares none (which then relocates nothing). */
+function containerSlot(deps: StepDeps): ContainerSlot | undefined {
   return relocationState(deps).mediaContainerData;
 }
 
@@ -87,10 +89,28 @@ function awaitDefined(read: () => number | undefined): Promise<number> {
  * `'audio'`), so ABR rungs of a type share the origin (discover skips once the type's value is present). The steps
  * read/write `state.mediaContainerData[trackType]` via their call-time `deps`; the stamp applies the same
  * `deriveStartMediaTime` seam the reactor uses, read from the composition config at call time, so the buffer offset and
- * the model's `startMediaTime` agree. A composition whose config carries no `deriveStartMediaTime` doesn't relocate:
- * the stamp leaves appends native.
+ * the model's `startMediaTime` agree. A composition whose config carries no `deriveStartMediaTime`, or whose state
+ * declares no `mediaContainerData`, doesn't relocate: the steps leave appends native.
  */
 export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePipelines {
+  const { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime } = relocationStepsFor(trackType);
+
+  return () => ({
+    remove: [dispatchStep],
+    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
+    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
+  });
+}
+
+/** The relocation steps by role, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export interface RelocationSteps {
+  readInitTrackInfo: LoadStep;
+  readSegmentOrigin: LoadStep;
+  stampStartMediaTime: LoadStep;
+}
+
+/** The relocation steps themselves, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export function relocationStepsFor(trackType: 'video' | 'audio'): RelocationSteps {
   const handlerType: MediaHandlerType = trackType === 'video' ? 'vide' : 'soun';
 
   /**
@@ -103,7 +123,7 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (op.type !== 'append-init' || !frame.data) return;
 
     const slot = containerSlot(deps);
-    if (peek(slot)?.[trackType]?.timescale !== undefined) return; // already have it (any rung of this type)
+    if (!slot || peek(slot)?.[trackType]?.timescale !== undefined) return; // already have it (any rung of this type)
 
     frame.data = await peekHead(frame.data, (bytes) => {
       const track = findMediaTrack(bytes, handlerType);
@@ -125,6 +145,8 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (op.type !== 'append-segment' || !frame.data) return;
 
     const slot = containerSlot(deps);
+    if (!slot) return;
+
     const container = peek(slot)?.[trackType];
     if (container?.baseMediaDecodeTime !== undefined) return; // established
 
@@ -144,11 +166,11 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
 
   /**
    * Stamp step — tier-agnostic apply. Relocate by the `derive`d `startMediaTime` for this type (`offset =
-   * −startMediaTime`). Applies the **same** `derive` the reactor uses, over the shared `mediaContainerData` slot — so
+   * −startMediaTime`). Applies the **same** `derive` the reactor uses, over the shared `mediaContainerData` signal — so
    * the buffer offset matches the model's stamped `startMediaTime`, and it's robust to `established` + late tracks (the
-   * slot persists; the model value may not be re-stamped after the reactor goes sticky). Awaited: per-type resolves at
-   * once (own origin discovered earlier in this pipeline); shared-`min` waits until every selected A/V origin is in —
-   * the barrier, filled by the other type's discover step. A derived `0` (0-PTS / below threshold) leaves the append
+   * signal persists; the model value may not be re-stamped after the reactor goes sticky). Awaited: per-type resolves
+   * at once (own origin discovered earlier in this pipeline); shared-`min` waits until every selected A/V origin is in
+   * — the barrier, filled by the other type's discover step. A derived `0` (0-PTS / below threshold) leaves the append
    * native — setting `timestampOffset` at all can ripple.
    */
   const stampStartMediaTime: LoadStep = async (frame, signal, deps) => {
@@ -159,19 +181,22 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (!derive) return;
 
     const state = relocationState(deps);
+    const slot = state.mediaContainerData;
+    if (!slot) return;
+
     // Liveness guard: if THIS type's own origin wasn't discovered — `readSegmentOrigin`
     // ran earlier in this pipeline and found no `tfdt` (mock / TS / containerless) — the
     // source isn't relocatable, so leave the append native and DON'T wait. Only a
     // discoverable type awaits the derived origin (which for shared-`min` legitimately
     // blocks on the other selected type — the barrier).
-    const own = peek(state.mediaContainerData)?.[trackType];
+    const own = peek(slot)?.[trackType];
 
     if (own?.timescale === undefined || own.baseMediaDecodeTime === undefined || own.segmentStartTime === undefined) {
       return;
     }
 
     const startMediaTime = await awaitDefined(() => {
-      const containerData = state.mediaContainerData.get();
+      const containerData = slot.get();
       if (!containerData) return undefined;
 
       return derive(containerData, {
@@ -184,11 +209,7 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     frame.meta = { ...(frame.meta ?? frame.op.meta), timestampOffset: -startMediaTime };
   };
 
-  return () => ({
-    remove: [dispatchStep],
-    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
-    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
-  });
+  return { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime };
 }
 
 // ============================================================================
@@ -206,9 +227,11 @@ const resolveWithMetadataStep = async <C extends Cue>(
   signal: AbortSignal,
   deps: TextStepDeps
 ): Promise<void> => {
+  const { url } = frame.op.segment;
+  const { requestCredentials } = deps.config as { requestCredentials?: RequestCredentialsPolicy };
   const [cues, metadata] = await Promise.all([
-    textStepWiring<C>(deps).resolveSegment(frame.op.segment.url),
-    resolveVttSegmentMetadata(frame.op.segment.url),
+    textStepWiring<C>(deps).resolveSegment(url),
+    resolveVttSegmentMetadata(url, { credentials: resolveRequestCredentials(requestCredentials, { url }) }),
   ]);
 
   if (signal.aborted) return;

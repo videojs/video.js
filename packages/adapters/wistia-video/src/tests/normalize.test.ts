@@ -310,7 +310,7 @@ describe('normalizeWistiaPlayer', () => {
     });
 
     it('reports itself able to buffer before a duration is known', () => {
-      // `EMPTY_TIME_RANGES` reads as "no buffer surface", so an empty `seekable` needs a range of its own.
+      // An `undefined` range reads as "no buffer surface", so `seekable` needs a range before a duration is known.
       const player = createPlayer();
 
       expect(player.duration).toBe(0);
@@ -358,7 +358,7 @@ describe('normalizeWistiaPlayer', () => {
     const player = createPlayer();
 
     expect(player.played.length).toBe(0);
-    expect(player.textTracks.length).toBe(0);
+    expect(player.textTracks).toBeUndefined();
     expect(player.videoWidth).toBe(0);
     expect(player.error).toBe(null);
     expect(player.canPlayType('video/mp4')).toBe('');

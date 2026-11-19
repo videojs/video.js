@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PartiallyResolvedTextTrack } from '../../../types';
 import {
   addSubtitlesTracksToMedia,
   getShowingSubtitlesTrackFromMedia,
+  refreshTextTrackCues,
   removeAllSubtitlesTracksFromMedia,
   syncTextTrackModes,
 } from '../text-track-slots';
@@ -165,6 +166,27 @@ describe('removeAllSubtitlesTracksFromMedia', () => {
 
     removeAllSubtitlesTracksFromMedia(media);
     expect(media.children.length).toBe(0);
+  });
+});
+
+describe('refreshTextTrackCues', () => {
+  it('removes and re-adds every cue, keeping the same cues in order', () => {
+    const media = document.createElement('video');
+    const track = media.addTextTrack('subtitles');
+    const cues = [new VTTCue(0, 2, 'A'), new VTTCue(2, 4, 'B')];
+
+    track.mode = 'showing';
+
+    for (const cue of cues) track.addCue(cue);
+
+    const removeCue = vi.spyOn(track, 'removeCue');
+    const addCue = vi.spyOn(track, 'addCue');
+
+    refreshTextTrackCues(track);
+
+    expect(removeCue.mock.calls).toEqual([[cues[0]], [cues[1]]]);
+    expect(addCue.mock.calls).toEqual([[cues[0]], [cues[1]]]);
+    expect(Array.from(track.cues!)).toEqual(cues);
   });
 });
 

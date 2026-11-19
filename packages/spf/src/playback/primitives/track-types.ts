@@ -1,13 +1,12 @@
 /**
  * **Per-type config bundles for per-type behavior variants.**
  *
- * Each `*_TYPE_CONFIG` constant names the per-type slot keys that per-type-variant setup-shape helpers consume.
- * Variants reference the shared constant at their `defineBehavior` setup body rather than constructing the config
- * inline, so the per-type identity (which state slot, which context slot, which discriminant) lives in one place per
- * type.
+ * Each `*_TYPE_CONFIG` constant names the per-type keys that per-type-variant setup-shape helpers consume. Variants
+ * reference the shared constant at their `defineBehavior` setup body rather than constructing the config inline, so the
+ * per-type identity (which state key, which context key, which discriminant) lives in one place per type.
  *
  * Every entry is a generic-name-to-type-specific-name mapping, and the target object varies: `selectedKey` names a
- * state slot, `actorKey` / `loaderKey` a context slot, and the `*Key` entries for config facets (`constraintsKey`,
+ * state key, `actorKey` / `loaderKey` a context key, and the `*Key` entries for config facets (`constraintsKey`,
  * `rulesKey`, `messagePipelinesKey`) name the per-type **engine config** key a variant reads into its helper's generic
  * one — `config[VIDEO_TYPE_CONFIG.constraintsKey]` feeds `constraints`, the way rules read `state[config.selectedKey]`.
  * One engine config reaches every variant, so the per-type key is what keeps video's chain out of audio's. The bundle
@@ -55,8 +54,8 @@ export const AUDIO_TYPE_CONFIG = {
 
 /**
  * Type-identity bundle for text-track-typed behaviors. Text tracks have no `SourceBufferActor` (MSE doesn't apply), so
- * this bundle omits `actorKey`, and no user-selection slot in the video/audio sense (`switchTextTrack` resolves
- * standing intent through its own terminal), so it omits `userSelectionKey`. The `loaderKey` points at the
+ * this bundle omits `actorKey`, and no user-selection key in the video/audio sense (`switchTextTrack` resolves standing
+ * intent through its own terminal), so it omits `userSelectionKey`. The `loaderKey` points at the
  * text-track-segment-loader actor (a `MessageActor` with continue-vs-preempt semantics, parallel to v/a's
  * `SegmentLoaderActor`).
  *

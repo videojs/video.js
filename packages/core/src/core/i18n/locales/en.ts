@@ -100,6 +100,7 @@ export default {
     speed: 'Speed',
     captions: 'Captions',
     playbackRate: 'Playback rate',
+    customRate: 'Custom, {rate}',
     back: 'Back',
     off: 'Off',
     auto: 'Auto',

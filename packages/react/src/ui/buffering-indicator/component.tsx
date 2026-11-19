@@ -8,11 +8,11 @@ import {
 } from '@videojs/core';
 import { logMissingFeature, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
-import { forwardRef, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useSyncExternalStore } from 'react';
 
 import { usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { renderElement } from '../../utils/use-render';
 
 export interface BufferingIndicatorProps
@@ -44,9 +44,8 @@ export const BufferingIndicator = forwardRef(function BufferingIndicator(
 
   const playback = usePlayer(selectPlayback);
 
-  const [core] = useState(() => new BufferingIndicatorCore());
+  const core = useInstance(() => new BufferingIndicatorCore());
 
-  useDestroy(core);
   core.setProps({ delay });
 
   if (playback) core.update(playback);

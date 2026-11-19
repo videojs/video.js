@@ -1,0 +1,156 @@
+---
+title: DailymotionVideo
+frameworkTitle:
+  html: dailymotion-video
+description: Video component that plays Dailymotion videos through a Dailymotion player configuration
+---
+
+import Aside from "@/components/Aside.astro";
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/dailymotion-video/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/dailymotion-video/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/dailymotion-video/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.ts?raw";
+
+The Dailymotion player plays videos inside a player configuration you create in [Dailymotion Studio](https://www.dailymotion.com/partner/embed/players), and this component drives it through the [Dailymotion Web SDK](https://developers.dailymotion.com/reference/web-sdk-player-methods). Dailymotion refuses any embed that doesn't name a player configuration, so every source carries a Player ID. See [Create a Player](https://developers.dailymotion.com/docs/create-a-player) in the official Dailymotion documentation.
+
+<Aside type="caution" title="Works without a skin">
+  Dailymotion's terms don't allow covering its player, so this component uses Dailymotion's own controls instead of a
+  Video.js skin (see [Use Dailymotion's controls](#use-dailymotions-controls)). If you need it to work with a skin,
+  [open an issue](https://github.com/videojs/video.js/issues) describing your use case.
+</Aside>
+
+## Import
+
+<MediaImports media="dailymotion-video" package="@videojs/dailymotion-video" react="DailymotionVideo" />
+
+## Load a source
+
+The simplest `src` is the player embed URL Dailymotion Studio gives you, which names both the player configuration and the video:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<DailymotionVideo src="https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<dailymotion-video src="https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87"></dailymotion-video>
+```
+</FrameworkCase>
+
+### Specify the Player ID
+
+These URLs name a video but no player configuration, so pair them with `engine.dailymotion.player`:
+
+- Video page URLs: `dailymotion.com/video/<id>`
+- Legacy embed URLs: `dailymotion.com/embed/video/<id>`, or `geo.dailymotion.com/player.html?video=<id>`, where they now redirect
+- Short links: `dai.ly/<id>`
+
+`engine.dailymotion.player` also wins over the configuration a player embed URL names. [Configure the player in Dailymotion Studio](#configure-the-player-in-dailymotion-studio) covers where a Player ID comes from. Dailymotion's [runtime parameters](https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters) go next to it:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<DailymotionVideo
+  source={{
+    src: 'https://www.dailymotion.com/video/x84sh87',
+    engine: { dailymotion: { player: 'x8lr5', startTime: 10 } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('dailymotion-video');
+video.source = {
+  src: 'https://www.dailymotion.com/video/x84sh87',
+  engine: { dailymotion: { player: 'x8lr5', startTime: 10 } },
+};
+```
+</FrameworkCase>
+
+The URL's query can also carry Dailymotion's `startTime` (or the older `start`), `scaleMode`, and `customConfig[key]=value`, as Dailymotion's iframe embed reads them; `engine.dailymotion` wins over them. `loop`, `autoplay`, and mute come from the component's own props.
+
+Without a Player ID, the component reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error instead of creating a player Dailymotion would reject, and in development it logs a warning that points to `engine.dailymotion.player`. The SDK script is loaded from `geo.dailymotion.com` with the first player created on the page; under a <DocsLink slug="guides/content-security-policy">Content Security Policy</DocsLink>, allow that origin.
+
+## Use Dailymotion's controls
+
+Dailymotion's [Terms of Use](https://legal.dailymotion.com/en/terms-of-use/) don't allow blocking any part of its embedded player, including its links back to Dailymotion. So the component always lets the player take pointer input, and Dailymotion's own controls, logo, and links stay usable.
+
+A <DocsLink slug="guides/skins">skin</DocsLink> doesn't work over the player, which takes the pointer input over the video before the skin can see it, so use the component without one, as in [Basic Usage](#basic-usage).
+
+## Configure the player in Dailymotion Studio
+
+Create a player configuration on the Players page in [Dailymotion Studio](https://www.dailymotion.com/partner/embed/players). Its Player ID is the part of the player embed URL Studio gives you after `/player/`: `x8lr5` in `geo.dailymotion.com/player/x8lr5.html`.
+
+The player configuration decides what the embed can't change at runtime:
+
+| Setting | Effect |
+|---|---|
+| Controls | Which of Dailymotion's controls show. `controls` has no effect. |
+| Autostart | `autoplay` decides whether the video starts: with it off, the component pauses the configuration's autostart as it starts. An ad that plays first is never paused, and the video after it is. Turning Autostart off avoids the pause. |
+| Autonext | When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
+| Picture-in-picture | Dailymotion's picture-in-picture moves the player out of the element. |
+| Poster, preload, and inline playback | `poster`, `preload`, and `playsinline` are accepted for parity with `<video>` but have no effect. |
+
+## Behavior
+
+- Volume and mute both work, like a native `<video>`. Dailymotion has no separate mute, so muting sets its volume to `0` and unmuting restores the previous level.
+- `playbackRate` takes Dailymotion's rates, `0.25` to `2` in steps of `0.25`. Dailymotion rounds any other value up to the next one and caps it at `2`, and `playbackRate` then reports the rate it plays at.
+- `loop` is passed to Dailymotion, which restarts the video itself.
+- A new source loads into the same player while the Player ID and the runtime parameters other than `startTime` stay the same, whether they come from `engine.dailymotion` or the URL's query. Any other change creates a new player, since Dailymotion only reads them when a player is created. So does `autoplay`, but only at the next load: call `load()` to apply a change right away. `muted` and `loop` change in place.
+- Depending on the player configuration, Dailymotion may ignore a seek made before the video first plays, and playback then starts from the beginning. To start at a known position, set `startTime` on the source (under `engine.dailymotion`, or in the URL) instead: Dailymotion applies it on load.
+- Seeking while paused stays paused, as on a native `<video>`. Dailymotion starts playback on a seek from its start or end screen, and the component pauses it again as it starts, unless an ad plays first.
+- The SDK reports no buffered range, so `buffered` ends at the furthest point played.
+- Ads play inside the embed, and the component never pauses one. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
+- When the browser refuses to start playback, as it does for unmuted autoplay, the component reports `pause` instead of playing.
+- Fullscreen targets the element the player is built in.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="DailymotionVideo">
+  <Fragment slot="engine-dailymotion">
+    Pass the Player ID as `player`, plus [Dailymotion runtime parameters](https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters) under `source.engine.dailymotion`, spelled exactly as Dailymotion spells them. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+
+    The video comes from `src`, and `loop` and `autoplay` from the props of the same name, so none of them has an `engine.dailymotion` spelling. Mute isn't a runtime parameter either: the component applies it through the SDK. [Configure the player in Dailymotion Studio](#configure-the-player-in-dailymotion-studio) lists what only the player configuration decides, such as controls.
+  </Fragment>
+</MediaReference>

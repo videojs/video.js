@@ -102,6 +102,7 @@ export default {
     speed: 'Abiadura',
     captions: 'Azpitituluak',
     playbackRate: 'Erreprodukzio-abiadura',
+    customRate: 'Pertsonalizatua, {rate}',
     back: 'Atzera',
     off: 'Desaktibatuta',
     auto: 'Automatikoa',

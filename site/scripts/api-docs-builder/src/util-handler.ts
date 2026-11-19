@@ -22,7 +22,7 @@ import type {
   UtilTypeParameter,
 } from '../../../src/types/util-reference.js';
 import { utilReferenceSlug } from '../../../src/utils/utilReferenceSlug.js';
-import { abbreviateType, formatDetailedType, formatType } from './formatter.js';
+import { abbreviateType, formatDetailedType, formatType, isConstantKeyed } from './formatter.js';
 import type { NamedDeclaration, ResolvedType, SourceFile } from './oxc-project.js';
 import {
   getJSDoc,
@@ -56,6 +56,8 @@ const UTIL_ENTRY_POINTS: EntryPoint[] = [
   { index: 'packages/core/src/core/i18n/index.ts', framework: null },
   { index: 'packages/core/src/dom/store/selectors.ts', framework: null },
   { index: 'packages/core/src/dom/store/features/orientation-lock.ts', framework: null },
+  { index: 'packages/core/src/core/text-track/definition.ts', framework: null },
+  { index: 'packages/core/src/core/text-track/read.ts', framework: null },
   { index: 'packages/media/src/core/source/adapter-type.ts', framework: null },
   { index: 'packages/store/src/core/selector.ts', framework: null },
 ];
@@ -356,7 +358,7 @@ function buildTypeFields(project: OxcProject, type: ResolvedType): NonNullable<R
 
   for (const resolved of project.interfaceMembers(type)) {
     const member = resolved.member;
-    const name = 'key' in member ? staticName(member.key) : undefined;
+    const name = 'key' in member && !isConstantKeyed(member) ? staticName(member.key) : undefined;
     if (!name) continue;
 
     let memberType: TSType | undefined;

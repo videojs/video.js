@@ -1,0 +1,43 @@
+{
+  "name": "@videojs/react-native-example",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "pods": "cd ios && bundle exec pod install",
+    "bundle:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output /dev/null",
+    "bundle:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output /dev/null",
+    "typecheck": "tsc",
+    "clean": "rimraf --glob android/build android/app/build android/.cxx ios/Pods ios/build 'ios/*.xcworkspace' vendor",
+    "postinstall": "node scripts/hoist-gradle-plugin.mjs"
+  },
+  "dependencies": {
+    "@videojs/react-native": "workspace:*",
+    "react": "19.2.8",
+    "react-native": "0.86.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "20.2.0",
+    "@react-native-community/cli-platform-android": "20.2.0",
+    "@react-native-community/cli-platform-ios": "20.2.0",
+    "@react-native/babel-preset": "0.86.2",
+    "@react-native/codegen": "0.86.2",
+    "@react-native/gradle-plugin": "0.86.2",
+    "@react-native/metro-config": "0.86.2",
+    "@react-native/typescript-config": "0.86.2",
+    "@types/react": "^19.2.0",
+    "react-native-builder-bob": "^0.43.0",
+    "react-native-monorepo-config": "^0.4.0",
+    "rimraf": "^6.1.3",
+    "typescript": "^6.0.3",
+    "yaml": "^2.8.1"
+  },
+  "engines": {
+    "node": ">= 22.11.0"
+  }
+}

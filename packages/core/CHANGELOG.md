@@ -1,5 +1,80 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/core@10.4.0...@videojs/core@10.5.0) (2026-11-16)
+
+
+### Bug Fixes
+
+* **utils:** find track elements through media adapters ([#9765](https://github.com/videojs/video.js/issues/9765)) ([cff5ed5](https://github.com/videojs/video.js/commit/cff5ed58a5e7f10c9059847b089ede21f01bc4e9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.5.0
+    * @videojs/store bumped to 10.5.0
+    * @videojs/utils bumped to 10.5.0
+    * video.js bumped to 10.5.0
+
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/core@10.3.0...@videojs/core@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **core:** add a text cues feature ([#9611](https://github.com/videojs/video.js/issues/9611)) ([091226e](https://github.com/videojs/video.js/commit/091226ec2cdb45d298f4c7b071b194e439692979))
+* **core:** add time slider markers ([#9618](https://github.com/videojs/video.js/issues/9618)) ([bacd9f1](https://github.com/videojs/video.js/commit/bacd9f1129d0bc358d9cf3393462bcac4c818b4d))
+* **core:** add typed text track definitions ([#9612](https://github.com/videojs/video.js/issues/9612)) ([450caf3](https://github.com/videojs/video.js/commit/450caf3a9ea9edae7cefd12c7a3beeea9efe2f3d))
+* **core:** copy app captions into the media ([#9617](https://github.com/videojs/video.js/issues/9617)) ([b6d0199](https://github.com/videojs/video.js/commit/b6d0199b1f1c2b129f34b849a683510f3bce6392))
+* **core:** let apps add text tracks to the player ([#9614](https://github.com/videojs/video.js/issues/9614)) ([5e55538](https://github.com/videojs/video.js/commit/5e55538842f037c3cf3bed42e910059d749b9c0f))
+* **core:** load app text tracks from a src ([#9615](https://github.com/videojs/video.js/issues/9615)) ([370834f](https://github.com/videojs/video.js/commit/370834fc82a157a0347e3f49024fbd442bd5576a))
+* **media:** add data cues and cue values to the text-track contract ([#9610](https://github.com/videojs/video.js/issues/9610)) ([7817ac4](https://github.com/videojs/video.js/commit/7817ac455f9685b4300b6bfda0e6b80b01e163cb))
+* **skins:** disambiguate subs with same name ([#9703](https://github.com/videojs/video.js/issues/9703)) ([53a5c76](https://github.com/videojs/video.js/commit/53a5c765259747a17eb7693d88f800e5fed6a852))
+* **skin:** show only a centre play button until playback starts ([#9696](https://github.com/videojs/video.js/issues/9696)) ([9294e7a](https://github.com/videojs/video.js/commit/9294e7af94eccf23d3685baccfda89fe504857c5))
+
+
+### Bug Fixes
+
+* **media:** recognize empty placeholders from another package copy ([#9667](https://github.com/videojs/video.js/issues/9667)) ([2c88e68](https://github.com/videojs/video.js/commit/2c88e684c8ecd2efe5aa67905daf1b1bc4dbb232))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.4.0
+    * @videojs/store bumped to 10.4.0
+    * @videojs/utils bumped to 10.4.0
+    * video.js bumped to 10.4.0
+
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0) (2026-11-03)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **core:** show a pending autoplay as starting playback ([#9609](https://github.com/videojs/video.js/issues/9609)) ([6f56667](https://github.com/videojs/video.js/commit/6f566672ffd095301f9bcef9ecccdbdc1ebe536f))
+* **packages:** configure playback rates on the player ([#9533](https://github.com/videojs/video.js/issues/9533)) ([bd4e8bf](https://github.com/videojs/video.js/commit/bd4e8bf9ee82470d1641f0e093ae61fc63893eb3))
+
+
+### Bug Fixes
+
+* **core:** handle void remote playback cancellation ([#9652](https://github.com/videojs/video.js/issues/9652)) ([f00035c](https://github.com/videojs/video.js/commit/f00035ce3748fff5996c8a7ed429ba568f941eba))
+* **core:** hide open popovers before entering fullscreen ([#9627](https://github.com/videojs/video.js/issues/9627)) ([1e2291c](https://github.com/videojs/video.js/commit/1e2291c7da0839471e10422a066e56480609a925))
+* **core:** keep embeds from taking a volume the browser locks ([#9602](https://github.com/videojs/video.js/issues/9602)) ([9b115eb](https://github.com/videojs/video.js/commit/9b115eb2178d37597e6e7a7459c41018946d1a1d))
+* **element:** deliver context to consumers connected before their provider ([#9663](https://github.com/videojs/video.js/issues/9663)) ([f61f17e](https://github.com/videojs/video.js/commit/f61f17e8fd0961ed125500df1a21ecc5c9c5c084))
+* **packages:** show only the control name in the playback rate tooltip ([#9532](https://github.com/videojs/video.js/issues/9532)) ([10e6884](https://github.com/videojs/video.js/commit/10e6884c0893537e88761a1848d2ceed7d9f05fc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.3.0
+    * @videojs/store bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+    * video.js bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0) (2026-10-22)
 
 

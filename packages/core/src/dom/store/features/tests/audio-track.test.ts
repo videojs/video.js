@@ -3,7 +3,7 @@ import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
-import { audioTrackFeature } from '../audio-track';
+import { audioTrackFeature } from '../shared';
 
 class TestAudioTrackList extends EventTarget {
   tracks: AudioTrackLike[];

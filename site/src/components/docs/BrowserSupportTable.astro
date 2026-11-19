@@ -14,6 +14,7 @@ import Thead from '@/components/typography/Thead.astro';
 import Tr from '@/components/typography/Tr.astro';
 import {
   caniuseVersion,
+  COMPAT_BROWSERSLIST_QUERY,
   type CssRequirementKind,
   cssRequirementSupport,
   resolveSupportedBrowsers,
@@ -28,8 +29,10 @@ interface Props {
 const { kind } = Astro.props;
 
 const browsers = resolveSupportedBrowsers();
+const compatBrowsers = resolveSupportedBrowsers(COMPAT_BROWSERSLIST_QUERY);
 const support = cssRequirementSupport();
 const coverage = supportedCoverage();
+const compatCoverage = supportedCoverage(COMPAT_BROWSERSLIST_QUERY);
 
 const KIND_LABEL = {
   required: 'Required',
@@ -62,20 +65,27 @@ function groupCell(values: Record<SupportBrowserId, string | null>, ids: readonl
 {
   kind === 'browsers' && (
     <Table>
-      <caption class="sr-only">Supported browsers and the versions of each that Video.js supports</caption>
+      <caption class="sr-only">
+        Supported browsers, the versions of each that Video.js supports, and the older versions the Compat skin also
+        reaches
+      </caption>
       <Thead>
         <Tr>
           <Th scope="col">Browser</Th>
           <Th scope="col">Versions</Th>
+          <Th scope="col">Compat skin</Th>
         </Tr>
       </Thead>
       <Tbody>
-        {browsers.map((browser) => (
+        {browsers.map((browser, index) => (
           <Tr>
             <Td as="th" scope="row" class="text-left font-medium">
               {browser.name}
             </Td>
             <Td class="tabular-nums">{browser.minimum ? `${browser.minimum} and later` : UNSUPPORTED}</Td>
+            <Td class="tabular-nums">
+              {compatBrowsers[index]?.minimum ? `${compatBrowsers[index].minimum} and later` : UNSUPPORTED}
+            </Td>
           </Tr>
         ))}
       </Tbody>
@@ -87,8 +97,8 @@ function groupCell(values: Record<SupportBrowserId, string | null>, ids: readonl
   kind === 'coverage' && (
     <P>
       These versions account for {percent(coverage)} of global web usage according to{' '}
-      <A href="https://github.com/browserslist/caniuse-lite">caniuse-lite</A> {caniuseVersion()}, and this figure updates
-      when we update that data.
+      <A href="https://github.com/browserslist/caniuse-lite">caniuse-lite</A> {caniuseVersion()}, and the Compat
+      versions account for {percent(compatCoverage)}. These figures update when we update that data.
     </P>
   )
 }
@@ -119,6 +129,7 @@ function groupCell(values: Record<SupportBrowserId, string | null>, ids: readonl
               <div class="mt-1 text-p4 font-normal">
                 {KIND_LABEL[requirement.kind]}. {requirement.effect}.
               </div>
+              {requirement.compat && <div class="mt-1 text-p4 font-normal">{requirement.compat}.</div>}
             </Td>
             {COLUMN_GROUPS.map((group) => <Td class="tabular-nums">{groupCell(firstVersion, group.ids)}</Td>)}
             <Td class="tabular-nums">{percent(globalSupport)}</Td>

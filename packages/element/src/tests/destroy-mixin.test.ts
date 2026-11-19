@@ -59,6 +59,48 @@ describe('DestroyMixin', () => {
 
     expect(destroyCallback).toHaveBeenCalledTimes(1);
   });
+
+  it('destroy() destroys destroyable descendants, including in shadow roots', () => {
+    const parent = createElement(DestroyableElement);
+    const wrapper = document.createElement('div');
+    const host = document.createElement('div');
+    const child = createElement(DestroyableElement);
+    const control = createElement(DestroyableElement);
+    const ownShadowChild = createElement(DestroyableElement);
+
+    host.attachShadow({ mode: 'open' }).appendChild(control);
+    wrapper.append(child, host);
+    parent.append(wrapper);
+    parent.attachShadow({ mode: 'open' }).appendChild(ownShadowChild);
+
+    parent.destroy();
+
+    expect(child.destroyed).toBe(true);
+    expect(control.destroyed).toBe(true);
+    expect(ownShadowChild.destroyed).toBe(true);
+  });
+
+  it('destroy() destroys descendants before running its own destroyCallback', () => {
+    const order: string[] = [];
+
+    class TestElement extends DestroyableElement {
+      override destroyCallback(): void {
+        order.push(this.id);
+        super.destroyCallback();
+      }
+    }
+
+    const parent = createElement(TestElement);
+    const child = createElement(TestElement);
+
+    parent.id = 'parent';
+    child.id = 'child';
+    parent.append(child);
+
+    parent.destroy();
+
+    expect(order).toEqual(['child', 'parent']);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -113,6 +155,53 @@ describe('DestroyMixin deferred destruction', () => {
 
     vi.advanceTimersByTime(100);
     expect(el.destroyed).toBe(false);
+  });
+
+  it('inherits keep-alive from light-DOM ancestors and shadow hosts', () => {
+    const player = document.createElement('div');
+    const skin = document.createElement('div');
+    const control = createElement(DestroyableElement);
+    const child = createElement(DestroyableElement);
+
+    skin.attachShadow({ mode: 'open' }).appendChild(control);
+    player.append(skin, child);
+    player.setAttribute('keep-alive', '');
+
+    document.body.appendChild(player);
+    player.remove();
+
+    vi.advanceTimersByTime(100);
+    expect(control.destroyed).toBe(false);
+    expect(child.destroyed).toBe(false);
+  });
+
+  it('destroys an element removed on its own from a kept-alive tree', () => {
+    const host = document.createElement('div');
+    const el = createElement(DestroyableElement);
+
+    host.attachShadow({ mode: 'open' }).appendChild(el);
+    host.setAttribute('keep-alive', '');
+
+    document.body.appendChild(host);
+    el.remove();
+
+    vi.advanceTimersByTime(100);
+    expect(el.destroyed).toBe(true);
+  });
+
+  it('destroys a kept-alive descendant when an ancestor without keep-alive destroys itself', () => {
+    const parent = createElement(DestroyableElement);
+    const child = createElement(DestroyableElement);
+
+    child.setAttribute('keep-alive', '');
+    parent.append(child);
+
+    document.body.appendChild(parent);
+    parent.remove();
+
+    vi.advanceTimersByTime(100);
+    expect(parent.destroyed).toBe(true);
+    expect(child.destroyed).toBe(true);
   });
 
   it('manual destroy() works even with keep-alive', () => {

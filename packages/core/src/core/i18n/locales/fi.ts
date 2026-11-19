@@ -100,6 +100,7 @@ export default {
     speed: 'Nopeus',
     captions: 'Tekstitykset',
     playbackRate: 'Toistonopeus',
+    customRate: 'Oma, {rate}',
     back: 'Takaisin',
     off: 'Pois',
     auto: 'Automaattinen',

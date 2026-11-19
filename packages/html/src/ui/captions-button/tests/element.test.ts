@@ -68,8 +68,8 @@ describe('CaptionsButtonElement', () => {
     const provider = document.createElement('test-captions-button-player') as TestPlayerProviderElement;
     const button = document.createElement(CaptionsButtonElement.tagName) as CaptionsButtonElement;
     const textTrackList: MediaTextTrackState['textTrackList'] = [
-      { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-      { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+      { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+      { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
     ];
 
     button.commandfor = 'captions-toggle';

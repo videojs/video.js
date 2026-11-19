@@ -1,3 +1,5 @@
+import { hasMethods } from '../predicate';
+
 /** @internal */
 export type CaptionOrSubtitleKind = 'captions' | 'subtitles';
 
@@ -21,18 +23,58 @@ export function getCaptionOrSubtitleTracks<Track extends { kind: string }>(track
 }
 
 /**
- * Find the `<track>` element that owns the given `TextTrack`.
+ * Find the `<track>` element that owns the given `TextTrack`. The media can be the element itself or an adapter that
+ * forwards `querySelectorAll()` to it.
  *
  * @internal
  */
 export function findTrackElement(media: EventTarget, track: unknown): HTMLTrackElement | null {
-  if (!(media instanceof HTMLElement)) return null;
+  if (!hasMethods(media, ['querySelectorAll'])) return null;
 
   for (const el of media.querySelectorAll('track')) {
     if (el.track === track) return el;
   }
 
   return null;
+}
+
+/**
+ * Add a text track to a media element through a `<track>` child, so removing the element removes the track. A track
+ * from `HTMLMediaElement.addTextTrack()` can never be removed. The track starts `hidden`, like one from
+ * `addTextTrack()`, and comes from `addTextTrack()` instead where the element yields no track.
+ *
+ * Chromium discards cues added to the track before the element settles, which a `<track>` without `src` does by firing
+ * `error` once it leaves `disabled` mode.
+ *
+ * @internal
+ */
+export function addRemovableTextTrack(
+  media: HTMLMediaElement,
+  kind: TextTrackKind,
+  label?: string,
+  language?: string
+): TextTrack {
+  const element = media.ownerDocument.createElement('track');
+
+  element.kind = kind;
+
+  if (label) element.label = label;
+
+  if (language) element.srclang = language;
+
+  media.append(element);
+
+  // Environments without native text tracks, such as jsdom, leave `track` unset.
+  const { track } = element;
+
+  if (!track) {
+    element.remove();
+    return media.addTextTrack(kind, label, language);
+  }
+
+  track.mode = 'hidden';
+
+  return track;
 }
 
 /** @internal */

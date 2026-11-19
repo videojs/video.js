@@ -339,16 +339,12 @@ describe('createPlayer', () => {
   it('does not retain disconnected context media as a native fallback', async () => {
     const { PlayerElement } = createPlayer({ features: backgroundFeatures });
     const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
-    const background = document.createElement(defineTestElement(BackgroundVideo));
-    const video = document.createElement('video');
+    const background = document.createElement(defineTestElement(BackgroundVideo)) as BackgroundVideo;
 
-    video.slot = 'media';
-
-    background.append(video);
     player.append(background);
     document.body.append(player);
 
-    await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+    await vi.waitFor(() => expect(player.store.target?.media).toBe(background.target));
 
     background.remove();
     expect(player.store.target).toBeNull();
@@ -430,6 +426,33 @@ describe('createPlayer', () => {
     await player.updateComplete;
 
     expect(player.store.orientationLockType).toBe('landscape');
+
+    player.remove();
+  });
+
+  it('applies playback rates configuration through attributes and properties', async () => {
+    const { PlayerElement } = createPlayer({ features: [features.playbackRate] });
+    const tagName = 'test-playback-rates-player';
+
+    customElements.define(tagName, PlayerElement);
+
+    const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
+    const defaults = player.store.playbackRates;
+
+    player.setAttribute('default-playback-rates', '2 1 0.5');
+    document.body.append(player);
+
+    expect(player.store.playbackRates).toEqual([2, 1, 0.5]);
+
+    player.defaultPlaybackRates = [1, 1.5];
+    await player.updateComplete;
+
+    expect(player.store.playbackRates).toEqual([1, 1.5]);
+
+    player.defaultPlaybackRates = undefined;
+    await player.updateComplete;
+
+    expect(player.store.playbackRates).toEqual(defaults);
 
     player.remove();
   });

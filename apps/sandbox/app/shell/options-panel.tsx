@@ -49,6 +49,9 @@ export type OptionsPanelProps = {
   onLocaleChange: (value: SandboxLocaleTag) => void;
   accentColor: string;
   onAccentColorChange: (value: string) => void;
+  /** Show the skin's control bar before playback starts. */
+  controlsBeforeStart: boolean;
+  onControlsBeforeStartChange: (value: boolean) => void;
   autoplay: boolean;
   onAutoplayChange: (value: boolean) => void;
   muted: boolean;
@@ -59,6 +62,10 @@ export type OptionsPanelProps = {
   onPreloadChange: (value: PreloadValue) => void;
   captions: CaptionsMode;
   onCaptionsChange: (value: CaptionsMode) => void;
+  /** Render the media alone, in place of the skin. */
+  skinless: boolean;
+  onSkinlessChange: (value: boolean) => void;
+  skinlessDisabled: boolean;
   preferences: Preferences;
 };
 
@@ -101,6 +108,8 @@ export function OptionsPanel({
   onLocaleChange,
   accentColor,
   onAccentColorChange,
+  controlsBeforeStart,
+  onControlsBeforeStartChange,
   autoplay,
   onAutoplayChange,
   muted,
@@ -111,6 +120,9 @@ export function OptionsPanel({
   onPreloadChange,
   captions,
   onCaptionsChange,
+  skinless,
+  onSkinlessChange,
+  skinlessDisabled,
   preferences,
 }: OptionsPanelProps) {
   const { isMobile, setOpen, setOpenMobile } = useSidebar();
@@ -125,11 +137,13 @@ export function OptionsPanel({
   const directionId = useId();
   const localeId = useId();
   const accentColorId = useId();
+  const controlsBeforeStartId = useId();
   const autoplayId = useId();
   const mutedId = useId();
   const loopId = useId();
   const preloadId = useId();
   const captionsId = useId();
+  const skinlessId = useId();
 
   return (
     <Sidebar
@@ -196,6 +210,20 @@ export function OptionsPanel({
             optionGroups={SANDBOX_LOCALE_OPTION_GROUPS}
           />
           <ColorItem id={accentColorId} value={accentColor} onChange={onAccentColorChange} />
+          <SwitchItem
+            id={controlsBeforeStartId}
+            label="Controls before start"
+            checked={controlsBeforeStart}
+            onChange={onControlsBeforeStartChange}
+            disabled={skinless}
+          />
+          <SwitchItem
+            id={skinlessId}
+            label="No skin"
+            checked={skinless}
+            onChange={onSkinlessChange}
+            disabled={skinlessDisabled}
+          />
         </Section>
 
         <Section title="Playback">
@@ -382,10 +410,11 @@ function ColorItem({ id, value, onChange }: ColorItemProps) {
         <input
           type="color"
           value={pickerValue}
-          disabled={!value.trim()}
           onChange={(event) => onChange(event.target.value)}
           aria-label="Choose accent color"
-          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 disabled:cursor-default disabled:opacity-50"
+          // With no accent set, the swatch shows a stand-in color, so it fades to grey rather than look chosen.
+          data-default={value.trim() ? undefined : ''}
+          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 data-default:opacity-50 data-default:grayscale"
         />
       </div>
     </>
@@ -397,15 +426,16 @@ type SwitchItemProps = {
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 };
 
-function SwitchItem({ id, label, checked, onChange }: SwitchItemProps) {
+function SwitchItem({ id, label, checked, onChange, disabled = false }: SwitchItemProps) {
   return (
     <>
       <Label htmlFor={id} className="text-muted-foreground cursor-pointer font-normal whitespace-nowrap">
         {label}
       </Label>
-      <Switch id={id} checked={checked} onCheckedChange={onChange} className="justify-self-end" />
+      <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} className="justify-self-end" />
     </>
   );
 }

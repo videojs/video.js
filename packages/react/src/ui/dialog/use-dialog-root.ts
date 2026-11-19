@@ -5,7 +5,8 @@ import { createDialog, createTransition } from '@videojs/core/dom';
 import { useSnapshot } from '@videojs/store/react';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
-import { useDestroy } from '../../utils/use-destroy';
+import { useOptionalContainer } from '../../player/context';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { useSafeId } from '../../utils/use-safe-id';
 import type { DialogContextValue } from './context';
@@ -16,7 +17,6 @@ export interface UseDialogRootOptions extends DialogProps {
   coreFactory?: () => DialogCore;
   stateAttrMap?: StateAttrMap<DialogState>;
   idPrefix?: string;
-  interactionRoot?: HTMLElement | null;
 }
 
 export function useDialogRoot({
@@ -28,9 +28,12 @@ export function useDialogRoot({
   coreFactory = createDialogCore,
   stateAttrMap = DialogDataAttrs,
   idPrefix = 'dialog',
-  interactionRoot,
 }: UseDialogRootOptions): DialogContextValue {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   const [core] = useState(coreFactory);
+  const interactionRoot = useOptionalContainer();
 
   core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape });
 
@@ -39,7 +42,7 @@ export function useDialogRoot({
   const onOpenChangeCompleteRef = useLatestRef(onOpenChangeCompleteProp);
   const closeOnEscapeRef = useLatestRef(closeOnEscape);
 
-  const [dialog] = useState(() => {
+  const dialog = useInstance(() => {
     const instance = createDialog({
       transition: createTransition(),
       onOpenChange: (nextOpen: boolean) => onOpenChangeRef.current?.(nextOpen),
@@ -70,10 +73,8 @@ export function useDialogRoot({
   }, [controlledOpen, dialog]);
 
   useLayoutEffect(() => {
-    dialog.setInteractionRoot(interactionRoot ?? null);
+    dialog.setInteractionRoot(interactionRoot);
   }, [dialog, interactionRoot]);
-
-  useDestroy(dialog);
 
   const input = useSnapshot(dialog.input);
   const modality = useSnapshot(dialog.modality);

@@ -1,7 +1,7 @@
 // Speaks the SoundCloud Widget protocol directly rather than loading `api.js`, shaped like the other iframe adapters
 // (mirrors `playerjs-video`).
 
-import { EMPTY_TEXT_TRACKS, type MediaContentData, MediaError, type TimeRangeLike, type Video } from '@videojs/media';
+import { type MediaContentData, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -14,6 +14,7 @@ import {
   type ParsedSoundCloudSource,
   parseSoundCloudSource,
   type SoundCloudSource,
+  shouldDeferSoundCloudWidget,
   wantsSoundCloudAutoplay,
 } from './source';
 import {
@@ -54,6 +55,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   };
 
   static PLAYER_SOFTWARE_NAME = 'soundcloud-audio';
+  static readonly engineName: string = 'soundcloud';
 
   #target: HTMLIFrameElement | null = null;
   // Cancels the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
@@ -64,6 +66,8 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #loadId = 0;
   // An iframe URL rendered before the host had a source, which the first load keeps instead of reloading.
   #adoptedSrc: string | null = null;
+  // Playback was requested, so a `preload="none"` widget may be loaded.
+  #activated = false;
 
   #src = SoundCloudAdapter.defaultProps.src;
   #autoplay = SoundCloudAdapter.defaultProps.autoplay;
@@ -144,6 +148,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#target = null;
     this.#adoptedSrc = null;
     this.#playRequested = false;
+    this.#activated = false;
     this.#resetState();
   }
 
@@ -200,6 +205,14 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#resetState();
     // `emptied` announces that reset before the bails below, where the widget reports nothing further.
     this.dispatchEvent(new Event('emptied'));
+
+    // A dormant widget is loaded by `play()`. One left from an earlier source would keep playing what the host no longer
+    // tracks.
+    if (this.#isDormant()) {
+      target.removeAttribute('src');
+      return;
+    }
+
     this.#loadWidget(target);
   }
 
@@ -217,6 +230,12 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
   async play() {
     if (!this.#src || this.#error) return;
+
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
 
     if (!this.#ready) {
       this.#playRequested = true;
@@ -297,7 +316,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -322,7 +345,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -336,7 +363,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -371,11 +402,13 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   get buffered() {
     return this.#bufferedEnd > this.#bufferedStart
       ? createTimeRange(this.#bufferedStart, this.#bufferedEnd)
-      : NO_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
-    return this.#duration > 0 && Number.isFinite(this.#duration) ? createTimeRange(0, this.#duration) : NO_TIME_RANGES;
+    return this.#duration > 0 && Number.isFinite(this.#duration)
+      ? createTimeRange(0, this.#duration)
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -390,9 +423,9 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#contentData;
   }
 
-  /** Always empty: SoundCloud has no captions or other text tracks. */
+  /** Unsupported: SoundCloud has no captions or other text tracks. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   // Playback rate, picture-in-picture, and fullscreen are left out on purpose: the widget offers none of them, and a
@@ -403,7 +436,8 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     const rendered = target.getAttribute('src');
 
     if (!rendered) {
-      if (this.#src) this.#loadWidget(target);
+      // A dormant widget is loaded by `play()`.
+      if (this.#src && !this.#isDormant()) this.#loadWidget(target);
 
       return;
     }
@@ -417,6 +451,29 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#adoptedSrc = rendered;
 
     if (this.#src) void this.load();
+  }
+
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferSoundCloudWidget({
+        src: this.#src,
+        source: this.#source,
+        preload: this.#preload,
+        autoplay: this.#autoplay,
+        controls: this.#controls,
+      })
+    );
+  }
+
+  // Load a widget that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || !this.#src || this.#isDormant() || target.getAttribute('src')) return;
+
+    // The widget is loaded from the current source, so a load still waiting on its microtask has nothing left to do.
+    this.#loadId++;
+    this.#loadWidget(target);
   }
 
   #loadWidget(target: HTMLIFrameElement) {
@@ -968,9 +1025,6 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#setContentData(null);
   }
 }
-
-// Not `EMPTY_TIME_RANGES`, which tells the player this media never reports ranges, so it would stop listening for them.
-const NO_TIME_RANGES: TimeRangeLike = Object.freeze({ length: 0, start: () => 0, end: () => 0 });
 
 // The frame starts on a same-origin `about:blank`, which a post meant for the widget only warns about.
 function hasWidgetDocument(target: HTMLIFrameElement): boolean {

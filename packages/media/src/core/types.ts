@@ -192,6 +192,26 @@ export interface MediaPlaybackRateCapability {
   defaultPlaybackRate: number;
 }
 
+/**
+ * The slowest and fastest playback rates a media implementation accepts.
+ *
+ * @internal
+ */
+export interface MediaPlaybackRateRange {
+  readonly min: number;
+  readonly max: number;
+}
+
+/**
+ * Reports the playback rates a media implementation accepts, when they are narrower than the browser's. A media without
+ * it is assumed to accept the native range.
+ *
+ * @internal
+ */
+export interface MediaPlaybackRateRangeCapability {
+  readonly playbackRateRange: MediaPlaybackRateRange;
+}
+
 // ----------------------------------------
 // Buffer
 // ----------------------------------------
@@ -240,16 +260,49 @@ export interface MediaErrorCapability {
 // Text tracks
 // ----------------------------------------
 
-export interface TextCueLike {
+/**
+ * The fields every cue has, from the platform's `TextTrackCue`.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/TextTrackCue
+ */
+export interface TextTrackCueLike {
+  readonly id?: string;
   readonly startTime: number;
   readonly endTime: number;
-  readonly text?: string;
 }
 
+/**
+ * A cue that carries text, such as a caption or a chapter title.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/VTTCue
+ */
+export interface VTTCueLike extends TextTrackCueLike {
+  readonly text: string;
+}
+
+/**
+ * A cue that carries structured data. Safari's native HLS publishes ID3 and DATERANGE metadata as `DataCue`s, while
+ * hls.js sets `value` and `type` on `VTTCue`s, so one cue can match both shapes.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/DataCue
+ */
+export interface DataCueLike extends TextTrackCueLike {
+  readonly value: unknown;
+  /** What `value` holds, such as `org.id3`. */
+  readonly type?: string;
+}
+
+/** A text track cue that carries text, structured data, or both. */
+export type TextCueLike = VTTCueLike | DataCueLike;
+
+/**
+ * A track's cues. Like the platform's `TextTrackCueList`, it yields the base cue type; check for `text` or `value` to
+ * read more.
+ */
 export interface TextCueListLike {
   readonly length: number;
-  [Symbol.iterator](): Iterator<TextCueLike>;
-  getCueById?(id: string): TextCueLike | null;
+  [Symbol.iterator](): Iterator<TextTrackCueLike>;
+  getCueById?(id: string): TextTrackCueLike | null;
 }
 
 /**
@@ -267,7 +320,8 @@ export interface TextTrackLike {
   readonly src?: string;
   mode: 'showing' | 'disabled' | 'hidden';
   readonly cues: TextCueListLike | null;
-  addCue?(cue: TextCueLike): void;
+  addCue?(cue: TextTrackCueLike): void;
+  removeCue?(cue: TextTrackCueLike): void;
 }
 
 export interface TextTrackListEvents {
@@ -286,6 +340,11 @@ export interface TextTrackListLike extends EventTargetLike<TextTrackListEvents> 
 export interface MediaTextTrackCapability {
   readonly textTracks: TextTrackListLike;
   addTextTrack(kind: TextTrackKind, label?: string, language?: string): TextTrackLike;
+  /**
+   * Remove a track, where the media can. DOM media remove tracks backed by a `<track>` element; the platform's own
+   * `addTextTrack()` makes tracks that can never be removed. Media whose tracks can't be removed leave this out.
+   */
+  removeTextTrack?(track: TextTrackLike): void;
 }
 
 // ----------------------------------------
@@ -607,6 +666,13 @@ export interface Media<Events extends { [K in keyof Events]: EventLike } = Media
 // Composed shapes
 // ----------------------------------------
 
+/**
+ * `T` with the `K` members allowed to be `undefined`. A media opts out of a capability by returning `undefined` from
+ * these members, which the capability guards read as unsupported. The value, not the key, decides it: a subclass
+ * inherits the base adapter's getter, so it overrides the getter to return `undefined`.
+ */
+type OptionalMembers<T, K extends keyof T> = Omit<T, K> & { readonly [P in K]: T[P] | undefined };
+
 export interface CommonMediaEvents
   extends
     MediaEvents,
@@ -630,14 +696,14 @@ export interface CommonMedia<Events extends { [K in keyof Events]: EventLike } =
     MediaSourceCapability,
     MediaVolumeCapability,
     MediaPlaybackRateCapability,
-    MediaBufferCapability,
+    OptionalMembers<MediaBufferCapability, 'buffered' | 'seekable'>,
     MediaPlayedCapability,
     MediaErrorCapability,
-    MediaTextTrackCapability,
+    OptionalMembers<MediaTextTrackCapability, 'textTracks'>,
     MediaStreamTypeCapability,
     MediaLiveCapability,
     MediaContentDataCapability,
-    MediaRemotePlaybackCapability,
+    OptionalMembers<MediaRemotePlaybackCapability, 'remote'>,
     MediaControlsCapability,
     MediaAutoplayCapability {}
 

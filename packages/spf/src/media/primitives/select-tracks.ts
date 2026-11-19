@@ -28,8 +28,8 @@ export interface TextSelectionConfig {
   includeForcedTracks?: boolean;
 
   /**
-   * Auto-select DEFAULT track (requires DEFAULT=YES + AUTOSELECT=YES in HLS). Default: false (user opt-in, matches
-   * hls.js/http-streaming)
+   * Auto-select DEFAULT track (requires DEFAULT=YES + AUTOSELECT=YES in HLS). Off when unset; `textTracksFeature` turns
+   * it on.
    *
    * When enabled, tracks marked with both DEFAULT=YES and AUTOSELECT=YES will be automatically selected if no user
    * preference matches.

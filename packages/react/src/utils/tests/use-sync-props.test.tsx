@@ -1,4 +1,5 @@
-import { cleanup, renderHook } from '@testing-library/react';
+import { act, cleanup, render, renderHook } from '@testing-library/react';
+import { type ReactNode, startTransition, Suspense, useState } from 'react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { useSyncProps } from '../use-sync-props';
@@ -101,5 +102,80 @@ describe('useSyncProps', () => {
 
     // `volume` was set outside of props; omitting it from props never resets it.
     expect(target.volume).toBe(0.5);
+  });
+
+  it('configures the target on the first render, before ref callbacks attach it', () => {
+    const target: TargetProps = { ...defaults };
+    let srcAtAttach: string | undefined;
+
+    function Media({ src }: { src: string }): ReactNode {
+      useSyncProps(target, { src }, defaults);
+      return <video ref={(el) => void (el && (srcAtAttach = target.src))} />;
+    }
+
+    render(<Media src="video.mp4" />);
+
+    expect(srcAtAttach).toBe('video.mp4');
+  });
+
+  it('writes updated props when the render commits, not while it renders', () => {
+    const target: TargetProps = { ...defaults };
+    const srcDuringRender: string[] = [];
+    let setSrc!: (src: string) => void;
+
+    function Media(): ReactNode {
+      const [src, set] = useState('a.mp4');
+
+      setSrc = set;
+      useSyncProps(target, { src }, defaults);
+      srcDuringRender.push(target.src);
+
+      return null;
+    }
+
+    render(<Media />);
+    act(() => setSrc('b.mp4'));
+
+    // The update rendered while the target still held the committed source.
+    expect(srcDuringRender.at(-1)).toBe('a.mp4');
+    expect(target.src).toBe('b.mp4');
+  });
+
+  it('leaves the target on its committed props when a transition never commits', async () => {
+    const target: TargetProps = { ...defaults };
+    const never = new Promise<never>(() => {});
+    let rendered = '';
+    let show!: (next: { src: string; suspend: boolean }) => void;
+
+    function Suspend(): ReactNode {
+      throw never;
+    }
+
+    function Media({ src }: { src: string }): ReactNode {
+      useSyncProps(target, { src }, defaults);
+      rendered = src;
+      return null;
+    }
+
+    function Tree(): ReactNode {
+      const [state, set] = useState({ src: 'a.mp4', suspend: false });
+
+      show = set;
+
+      return (
+        <Suspense fallback={null}>
+          <Media src={state.src} />
+          {state.suspend && <Suspend />}
+        </Suspense>
+      );
+    }
+
+    render(<Tree />);
+
+    // The transition renders the new source, then suspends, so React keeps showing the committed tree.
+    await act(async () => startTransition(() => show({ src: 'b.mp4', suspend: true })));
+
+    expect(rendered).toBe('b.mp4');
+    expect(target.src).toBe('a.mp4');
   });
 });

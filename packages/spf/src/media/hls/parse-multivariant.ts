@@ -307,26 +307,27 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
     }
 
     // A rendition with no URI names media carried in the streams referencing its
-    // group. When such a stream is audio-only it is already a track of its own, so
-    // the two describe one rendition: merge rather than add a second entry that has
-    // nothing to fetch. The rendition holds the naming and selection metadata, the
-    // stream the URL and bandwidth.
-    if (!rendition.uri) {
-      const carrier = audioOnlyTracks.find((track) => track.groupId === rendition.groupId);
+    // group; one whose URI matches an audio-only stream in its group names that
+    // stream's playlist. Either way the audio-only stream is already a track of its
+    // own, so the two describe one rendition: merge rather than add a second entry
+    // that plays the same media (or has nothing to fetch). The rendition holds the
+    // naming and selection metadata, the stream the URL and bandwidth.
+    const carrier = audioOnlyTracks.find(
+      (track) => track.groupId === rendition.groupId && (!rendition.uri || track.url === rendition.uri)
+    );
 
-      if (carrier) {
-        carrier.name = rendition.name;
+    if (carrier) {
+      carrier.name = rendition.name;
 
-        if (rendition.language) carrier.language = rendition.language;
+      if (rendition.language) carrier.language = rendition.language;
 
-        if (rendition.channels) carrier.channels = rendition.channels;
+      if (rendition.channels) carrier.channels = rendition.channels;
 
-        if (rendition.default) carrier.default = rendition.default;
+      if (rendition.default) carrier.default = rendition.default;
 
-        if (rendition.autoselect) carrier.autoselect = rendition.autoselect;
+      if (rendition.autoselect) carrier.autoselect = rendition.autoselect;
 
-        return [];
-      }
+      return [];
     }
 
     const track: PartiallyResolvedAudioTrack = {

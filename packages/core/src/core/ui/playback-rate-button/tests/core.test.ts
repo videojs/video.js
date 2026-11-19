@@ -108,6 +108,18 @@ describe('PlaybackRateButtonCore', () => {
     });
   });
 
+  describe('getCSSVars', () => {
+    it.each([
+      [1, '1'],
+      [1.5, '3'],
+      [1.75, '4'],
+    ])('publishes the length of rate %s as %s', (rate, length) => {
+      const core = new PlaybackRateButtonCore();
+
+      expect(core.getCSSVars(createState({ rate }))).toEqual({ '--media-playback-rate-length': length });
+    });
+  });
+
   describe('getLabelParams', () => {
     it('returns rate for default label', () => {
       const core = new PlaybackRateButtonCore();
@@ -174,6 +186,36 @@ describe('PlaybackRateButtonCore', () => {
 
       core.cycle(media);
       expect(media.setPlaybackRate).toHaveBeenCalledWith(0.2);
+    });
+
+    it('cycles through its own rates in place of the player rates', () => {
+      const core = new PlaybackRateButtonCore({ rates: [1, 3] });
+      const media = createMediaState({ playbackRate: 1 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(3);
+    });
+
+    it('parses rates given as a space-separated list', () => {
+      const core = new PlaybackRateButtonCore({ rates: '1 3' });
+      const media = createMediaState({ playbackRate: 3 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(1);
+    });
+
+    it("keeps its own rates even when they fall outside the player's rates", () => {
+      const core = new PlaybackRateButtonCore({ rates: [1, 3, 1.5] });
+
+      expect(core.getRates(createMediaState())).toEqual([1, 3, 1.5]);
+    });
+
+    it('falls back to the player rates when its own rates hold no usable rate', () => {
+      const core = new PlaybackRateButtonCore({ rates: 'fast' });
+      const media = createMediaState({ playbackRate: 1 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(1.2);
     });
 
     it('does nothing when menuTrigger is set', () => {

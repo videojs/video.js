@@ -29,6 +29,7 @@ export {
   isInteractiveActivation,
   isInteractiveTarget,
 } from './interactive';
+export { isKeptAlive } from './keep-alive';
 export {
   type ChildMeasurement,
   type ElementOverflowMeasurement,
@@ -97,21 +98,24 @@ export {
   withInlineStyles,
 } from './style';
 export {
+  nativeHlsSupport,
   supportsAnchorPositioning,
   supportsAnimationFrame,
   supportsConstructableStyleSheets,
   supportsIdleCallback,
+  supportsMediaSource,
   supportsPopoverAPI,
 } from './supports';
 export { cloneTemplateRoot, createTemplate, getTemplateElement, getTemplateRoot, renderTemplate } from './template';
 export {
+  addRemovableTextTrack,
   type CaptionOrSubtitleKind,
   findTrackElement,
   getCaptionOrSubtitleTracks,
   getTextTrackList,
   isCaptionOrSubtitleTrack,
 } from './text-track';
-export { serializeTimeRanges } from './time-ranges';
+export { serializeTimeRanges } from '../time/ranges';
 export { containsComposed } from './tree';
 export type { CustomElement, CustomElementCallbacks } from './types';
 export { type WalkAncestorsOptions, walkAncestors } from './walk-ancestors';

@@ -3,7 +3,7 @@ import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
-import { qualityFeature } from '../quality';
+import { qualityFeature } from '../shared';
 
 class TestRenditionList extends EventTarget {
   renditions: VideoRenditionLike[];

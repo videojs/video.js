@@ -102,6 +102,7 @@ export default {
     speed: 'Velocità',
     captions: 'Sottotitoli',
     playbackRate: 'Velocità di riproduzione',
+    customRate: 'Personalizzata, {rate}',
     back: 'Indietro',
     off: 'Disattivato',
     auto: 'Auto',

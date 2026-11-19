@@ -509,6 +509,85 @@ describe('MuxDataExtension', () => {
     expect(emit).toHaveBeenCalledWith('videochange', expect.objectContaining({ video_id: 'def456' }));
   });
 
+  it('applies a metadata change to the live view', async () => {
+    const { sdk, emit, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key', metadata: { video_title: 'Video A' } });
+    const adapter = new FakeEngineAdapter();
+
+    adapter.src = 'https://stream.mux.com/abc123.m3u8';
+
+    attach(data, adapter);
+    await settle();
+    updateData.mockClear();
+
+    data.metadata = { video_title: 'Video A (edited)' };
+    await settle();
+
+    expect(updateData).toHaveBeenCalledExactlyOnceWith({ video_title: 'Video A (edited)' });
+    expect(emit).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['before', 'metadata', 'source'],
+    ['after', 'source', 'metadata'],
+  ])('carries metadata set %s a source change into the new view only', async (_, first) => {
+    const { sdk, emit, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key', metadata: { video_title: 'Video A' } });
+    const adapter = new FakeEngineAdapter();
+
+    adapter.src = 'https://stream.mux.com/abc123.m3u8';
+
+    attach(data, adapter);
+    await settle();
+    updateData.mockClear();
+
+    const changeMetadata = () => (data.metadata = { video_title: 'Video B' });
+    const changeSource = () => (adapter.src = 'https://stream.mux.com/def456.m3u8');
+
+    if (first === 'metadata') {
+      changeMetadata();
+      changeSource();
+    } else {
+      changeSource();
+      changeMetadata();
+    }
+
+    await settle();
+    adapter.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledExactlyOnceWith(
+      'videochange',
+      expect.objectContaining({ video_id: 'def456', video_title: 'Video B' })
+    );
+  });
+
+  it('holds a metadata change made while the source is cleared for the next video', async () => {
+    const { sdk, emit, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key', metadata: { video_title: 'Video A' } });
+    const adapter = new FakeEngineAdapter();
+
+    adapter.src = 'https://stream.mux.com/abc123.m3u8';
+
+    attach(data, adapter);
+    await settle();
+    updateData.mockClear();
+
+    adapter.src = '';
+    data.metadata = { video_title: 'Video B' };
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+
+    adapter.src = 'https://stream.mux.com/def456.m3u8';
+    adapter.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledWith('videochange', expect.objectContaining({ video_title: 'Video B' }));
+  });
+
   it('hooks a new engine into the live monitor instead of re-monitoring', async () => {
     const { sdk, monitor, addHLSJS, removeHLSJS, destroy } = createSdk();
     const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key' });

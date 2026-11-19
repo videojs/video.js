@@ -1,5 +1,5 @@
 import { MuxDataExtension as MuxDataExtensionBase } from '@videojs/mux-data';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxDataExtension } from '../mux-data';
 import { TestExtensionProvider } from './test-utils';
@@ -19,6 +19,22 @@ function setup() {
 
   return { provider, el };
 }
+
+function createSdk() {
+  const emit = vi.fn();
+  const updateData = vi.fn();
+
+  const sdk = {
+    monitor: vi.fn((target: HTMLVideoElement) => {
+      Object.assign(target, { mux: { deleted: false, emit, updateData, destroy: vi.fn() } });
+    }),
+    utils: { now: () => 0, generateUUID: () => 'uuid' },
+  } as unknown as NonNullable<MuxDataExtensionBase['MuxDataSdk']>;
+
+  return { sdk, emit, updateData };
+}
+
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve));
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -80,6 +96,111 @@ describe('MuxDataExtension', () => {
     el.metadata = metadata;
 
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual(metadata);
+  });
+
+  it('forwards metadata-* attributes to the extension as snake_case keys', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Attr title');
+    el.setAttribute('metadata-viewer-user-id', 'user-1');
+    await Promise.resolve();
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'Attr title',
+      viewer_user_id: 'user-1',
+    });
+    expect(el.metadata).toEqual({
+      video_title: 'Attr title',
+      viewer_user_id: 'user-1',
+    });
+  });
+
+  it('lets the metadata property override metadata-* attributes with the same key', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'From attribute');
+    el.metadata = { video_title: 'From property', video_id: 'id-1' };
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'From property',
+      video_id: 'id-1',
+    });
+  });
+
+  it('does not treat non-metadata-* attributes as metadata', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('env-key', 'test-key');
+    el.setAttribute('player-software-name', 'custom');
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
+  });
+
+  it('updates extension metadata when a metadata-* attribute changes after connect', async () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'First');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'First' });
+
+    el.setAttribute('metadata-video-title', 'Second');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({ video_title: 'Second' });
+
+    el.removeAttribute('metadata-video-title');
+    await Promise.resolve();
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toBeUndefined();
+  });
+
+  it('reads metadata-* attributes when parsed into a connected player', () => {
+    const provider = new TestExtensionProvider();
+
+    document.body.append(provider);
+    provider.innerHTML =
+      '<test-mux-data metadata-video-title="Parsed title" metadata-viewer-user-id="parsed-user"></test-mux-data>';
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual({
+      video_title: 'Parsed title',
+      viewer_user_id: 'parsed-user',
+    });
+  });
+
+  it.each([
+    ['before', 'metadata'],
+    ['after', 'src'],
+  ])('carries metadata set %s the source into the new view only', async (_, first) => {
+    const { provider, el } = setup();
+    const { sdk, emit, updateData } = createSdk();
+    const video = document.createElement('video');
+
+    el.MuxDataSdk = sdk;
+    el.metadata = { video_title: 'Video A' };
+    video.src = 'https://stream.mux.com/abc123.m3u8';
+
+    provider.extensions.attach({ media: video, container: null });
+    await settle();
+    updateData.mockClear();
+
+    const changeMetadata = () => (el.metadata = { video_title: 'Video B' });
+    const changeSource = () => (video.src = 'https://stream.mux.com/def456.m3u8');
+
+    if (first === 'metadata') {
+      changeMetadata();
+      changeSource();
+    } else {
+      changeSource();
+      changeMetadata();
+    }
+
+    await settle();
+    video.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledExactlyOnceWith(
+      'videochange',
+      expect.objectContaining({ video_id: 'def456', video_title: 'Video B' })
+    );
   });
 
   it('releases the extension when the element disconnects', () => {

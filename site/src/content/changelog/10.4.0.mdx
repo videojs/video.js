@@ -1,0 +1,31 @@
+---
+description: "Adds timed metadata, compact-player controls, and more flexible background video."
+date: 2026-11-13
+version: "10.4.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.3.0...@videojs/core@10.4.0"
+---
+
+
+Video.js 10.4.0 adds a complete timed-metadata workflow, while making video controls and background video more adaptable.
+
+## Build with timed metadata
+
+Use text tracks and cues to synchronize quizzes, product cards, ad breaks, chapters, and transcripts with playback. The player now reads structured data cues, including HLS metadata, and exposes typed track definitions and APIs for reading tracks, cues, and active cues ([#9610](https://github.com/videojs/video.js/pull/9610), [#9611](https://github.com/videojs/video.js/pull/9611), [#9612](https://github.com/videojs/video.js/pull/9612)). React adds hooks for the same work ([#9613](https://github.com/videojs/video.js/pull/9613)).
+
+Add tracks from your app, with cues in code or loaded from WebVTT and JSON files, even for embed media. App captions and subtitles also copy into compatible media so they remain available in iOS fullscreen ([#9614](https://github.com/videojs/video.js/pull/9614), [#9615](https://github.com/videojs/video.js/pull/9615), [#9616](https://github.com/videojs/video.js/pull/9616), [#9617](https://github.com/videojs/video.js/pull/9617)). Mark matching cues on the time slider with `TimeSlider.Markers` or `<media-time-slider-markers>` ([#9618](https://github.com/videojs/video.js/pull/9618)). The new [timed metadata guide](/docs/guides/timed-metadata/) and API references cover the workflow ([#9619](https://github.com/videojs/video.js/pull/9619)).
+
+## Adapt controls and background video
+
+Video skins now show a large center play button before playback starts, then reveal the remaining controls. Set `--media-controls-before-start: visible` when viewers need controls before playing ([#9696](https://github.com/videojs/video.js/pull/9696)). Default and Neutral skins also keep essential controls readable on compact players, while Compat and Scaffold hide lower-priority controls at small sizes ([#9702](https://github.com/videojs/video.js/pull/9702)). The installation preview now lets you try that setting and an accent color, and carries both into its HTML and React snippets ([#9710](https://github.com/videojs/video.js/pull/9710)).
+
+`<background-video>`, `<hls-background-video>`, and `<mux-background-video>` now share more consistent controls. Streaming background video supports `target`, `noloop`, and `noautoplay`, and its React components honor `loop={false}` and `autoPlay={false}` ([#9735](https://github.com/videojs/video.js/pull/9735)). Caption and subtitle choices with the same name now show `CC` or `SUB` badges ([#9703](https://github.com/videojs/video.js/pull/9703)).
+
+## Fixes and documentation
+
+Compat restores its older browser-support floor ([#9699](https://github.com/videojs/video.js/pull/9699)). React media props now update only when their render commits ([#9673](https://github.com/videojs/video.js/pull/9673)), and media capability checks work when a page loads more than one copy of `@videojs/media` ([#9667](https://github.com/videojs/video.js/pull/9667)). The site also prevents browser auto-darkening when you select the light theme ([#9695](https://github.com/videojs/video.js/pull/9695)).
+
+SPF now has generated contributor API reference ([#9396](https://github.com/videojs/video.js/pull/9396)), and media component references consistently cover source loading, protected content, and their APIs ([#9694](https://github.com/videojs/video.js/pull/9694)). The [skins guide](/docs/guides/skins/) now links to each preset preview ([#9749](https://github.com/videojs/video.js/pull/9749)). We also updated the [Privacy Notice](/privacy/) ([#9689](https://github.com/videojs/video.js/pull/9689)) and published a Video.js documentary post ([#9733](https://github.com/videojs/video.js/pull/9733)).
+
+Thanks to first-time contributors [@ump45nose](https://github.com/ump45nose) and [@daytime-em](https://github.com/daytime-em).

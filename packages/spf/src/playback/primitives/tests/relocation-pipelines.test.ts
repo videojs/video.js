@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../../../core/signals/primitives';
 import { initSegment, mediaSegment, trak } from '../../../media/mp4/tests/synthetic-boxes';
@@ -158,6 +158,27 @@ describe('relocatingTextPipelines', () => {
   });
 
   const cue = (startTime: number, endTime: number): Cue => ({ startTime, endTime, text: 'x' }) as unknown as Cue;
+
+  it('fetches the segment header with the mode the request policy resolves for it', async () => {
+    const resolveWithMetadata = relocatingTextPipelines<Cue>()[0]!;
+    const url = 'https://cdn.example.com/sub-0.vtt';
+    const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('WEBVTT\n\n'));
+    const resolveSegment = vi.fn(async () => []);
+    const deps = {
+      state: {},
+      context: {},
+      config: { resolveSegment, requestCredentials: () => 'include' },
+    } as unknown as TextStepDeps;
+    const frame = { op: { segment: { url } } } as unknown as TextFrame<Cue>;
+
+    try {
+      await resolveWithMetadata(frame, notAborted, deps);
+
+      expect(fetch).toHaveBeenCalledWith(url, { credentials: 'include' });
+    } finally {
+      fetch.mockRestore();
+    }
+  });
 
   it('waits for the selected A/V origin instead of shifting cues by the full map correction', async () => {
     // A/V exists but nothing selected yet — the race. Must WAIT, not resolve with 0

@@ -102,6 +102,7 @@ export default {
     speed: 'Vitesse',
     captions: 'Sous-titres',
     playbackRate: 'Vitesse de lecture',
+    customRate: 'Personnalisée, {rate}',
     back: 'Retour',
     off: 'Désactivé',
     auto: 'Auto',

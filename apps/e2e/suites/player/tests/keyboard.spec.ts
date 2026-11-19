@@ -64,6 +64,9 @@ for (const entry of PAGES as readonly PageEntry[]) {
         await expectTabFocus(page, page.locator('video').first());
       }
 
+      // Before playback starts, a mouse-driven player keeps only the centre play button as a start prompt.
+      if (!isAudio) await expectTabFocus(page, player.centerPlayButton);
+
       await expectTabFocus(page, player.playButton);
 
       if (isAudio) {
@@ -167,6 +170,19 @@ for (const entry of PAGES as readonly PageEntry[]) {
       }
     });
 
+    if (!isAudio) {
+      test('keeps focus in the player when the centre play button starts playback', async ({ page }) => {
+        await player.centerPlayButton.focus();
+        await page.keyboard.press('Enter');
+        await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
+
+        // The button hides once playback starts, except while focused, so the player's hotkeys keep working.
+        await expect(player.centerPlayButton).toBeFocused();
+        await page.keyboard.press('k');
+        await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+      });
+    }
+
     test('keeps handled arrow keys inside the player', async ({ page }) => {
       await page.evaluate(() => {
         document.body.style.height = '200vh';
@@ -213,13 +229,14 @@ for (const entry of PAGES as readonly PageEntry[]) {
 
         await page.keyboard.press('Enter');
         await expect.poll(() => player.getPlaybackRate()).toBe(Number(nextRate));
-        await expect(nextOption).toHaveAttribute('aria-checked', 'true');
         await expect(trigger).toHaveAttribute(DATA_ATTRS.rate, nextRate!);
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(trigger).toBeFocused();
 
+        // The selection closes the menu before the media reports the new rate, so check it once the menu reopens.
         await page.keyboard.press('Enter');
-        await expect(menu.getByRole('menuitemradio', { checked: true })).toBeFocused();
+        await expect(checkedOption).toHaveAttribute(DATA_ATTRS.rate, nextRate!);
+        await expect(checkedOption).toBeFocused();
         await page.keyboard.press('Tab');
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(player.muteButton).toBeFocused();

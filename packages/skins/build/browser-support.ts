@@ -18,7 +18,10 @@ const CANIUSE_FEATURES = [
   { label: 'media query ranges', id: 'css-media-range-syntax', pattern: /@media[^{]*[<>]/ },
 ] as const;
 
-/** Features with no fallback and no caniuse entry: first supporting versions from MDN browser-compat-data. */
+/**
+ * Features with no caniuse entry: first supporting versions from MDN browser-compat-data. A use inside an `@supports`
+ * check for a newer color feature is guarded, because every browser that passes the check has these too.
+ */
 const MDN_FEATURES = [
   {
     label: 'color-mix()',
@@ -27,7 +30,8 @@ const MDN_FEATURES = [
   },
   {
     label: 'oklch()',
-    pattern: /oklch\(/,
+    // Relative `oklch(from …)` colors are audited as degradations instead.
+    pattern: /oklch\((?!\s*from\b)/,
     versions: { chrome: 111, edge: 111, firefox: 113, safari: 15.4, ios_saf: 15.4 },
   },
 ] as const;
@@ -54,7 +58,8 @@ export function auditSkinCss(css: string, browsers: readonly string[]): SkinCssA
   }
 
   for (const feature of MDN_FEATURES) {
-    if (feature.pattern.test(css)) problems.push(...unsupportedByVersion(feature.label, feature.versions, browsers));
+    if (hasUnguardedColor(css, feature.pattern))
+      problems.push(...unsupportedByVersion(feature.label, feature.versions, browsers));
   }
 
   if (
@@ -121,6 +126,42 @@ function auditRules(
 
     auditRules(nested, condition ? [...conditions, condition] : conditions, problems, degraded);
   }
+}
+
+/** `@supports` conditions that only browsers with `color-mix()` and `oklch()` pass. */
+const NEWER_COLOR_CONDITION = /color-mix\(|oklch\(|light-dark\(|contrast-color\(|\bfrom\s/;
+
+/** Whether `pattern` matches outside every `@supports` block whose condition implies a newer color feature. */
+function hasUnguardedColor(css: string, pattern: RegExp): boolean {
+  const global = new RegExp(pattern.source, 'g');
+  const blocks: { start: number; end: number }[] = [];
+  const open: number[] = [];
+  let preludeStart = 0;
+
+  for (let index = 0; index < css.length; index++) {
+    const char = css[index];
+
+    if (char === '{') {
+      const prelude = css.slice(preludeStart, index).trim();
+      const isSupports = /^@supports\b/.test(prelude);
+
+      // The condition names the feature without using it.
+      if (isSupports) blocks.push({ start: preludeStart - 1, end: index });
+
+      open.push(isSupports && NEWER_COLOR_CONDITION.test(prelude) ? index : -1);
+      preludeStart = index + 1;
+    } else if (char === '}') {
+      const start = open.pop();
+
+      if (start !== undefined && start >= 0) blocks.push({ start, end: index });
+
+      preludeStart = index + 1;
+    } else if (char === ';') {
+      preludeStart = index + 1;
+    }
+  }
+
+  return [...css.matchAll(global)].some(({ index }) => !blocks.some(({ start, end }) => index > start && index < end));
 }
 
 function styleDeclarations(rule: Extract<Rule, { type: 'style' }>): Declaration[] {

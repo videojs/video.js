@@ -12,6 +12,10 @@ HLS playback with adaptive bitrate switching, WebVTT captions, and MSE support.
 - [SPF fundamentals](./docs/fundamentals.md)
 - [HLS engine composition](./docs/hls-engine.md)
 
+## Reference
+
+- [API reference](./docs/reference/README.md): every engine, feature, and behavior, generated from the source JSDoc
+
 ## Community
 
 If you need help with anything related to Video.js 10, or if you'd like to casually chat with other

@@ -124,6 +124,47 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+  # The SPF API reference is generated from the sources and committed. It also reads
+  # the declarations of the packages SPF depends on, so it runs whenever the selector
+  # marks SPF affected, which includes those packages changing. Non-blocking: a
+  # dependency's doc change should flag the stale pages, not fail its author's PR.
+  spf-reference:
+    needs: package_test_selection
+    if: needs.package_test_selection.outputs.run_spf == 'true'
+    name: SPF API reference
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Restore Vite Task cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-restore-only-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
+
+      - name: Build SPF and its dependencies
+        run: pnpm exec vp run @videojs/spf#build
+
+      - name: Check the SPF API reference is current
+        run: pnpm -F @videojs/spf docs:reference:check
+
   test:
     needs: package_test_selection
     if: needs.package_test_selection.outputs.has_standard_tests == 'true'

@@ -260,7 +260,7 @@ export interface MediaPlaybackRateState {
    */
   playbackRateAvailability: MediaFeatureAvailability;
   /**
-   * Set the playback rate.
+   * Set the playback rate, clamped to the rates the media accepts.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
    */
@@ -304,14 +304,26 @@ export interface MediaAudioTrackState {
 }
 
 /**
- * A text cue.
+ * A text cue as plain data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/VTTCue
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/DataCue
  */
-export interface MediaTextCue {
+export interface MediaTextCue<Value = unknown> {
+  /** The cue's own id, or one derived from its position in the track when it has none. */
+  id: string;
   startTime: number;
+  /** Equals `startTime` for a point. */
   endTime: number;
+  /** The cue's text, or an empty string when it carries only data. */
   text: string;
+  /**
+   * Structured data: a data cue's `value`, or JSON parsed from the text of a `metadata` cue when it is an object or
+   * array.
+   */
+  value?: Value;
+  /** What `value` holds, such as `org.id3`. */
+  type?: string;
 }
 
 /**
@@ -333,6 +345,33 @@ export interface MediaTextTrack<Kind extends string = TextTrackKind> {
   label: string;
   language: string;
   mode: TextTrackMode;
+  /** Where the track came from: the media, or the app through the player. */
+  source: TextTrackSource;
+}
+
+/** Where a text track came from: the media, or the app through the player. */
+export type TextTrackSource = 'media' | 'app';
+
+/**
+ * Picks text tracks by kind, label, or language, or with a function. Each given field must match; a kind list matches
+ * any kind in it.
+ */
+export type TextTrackFilter =
+  | {
+      kind?: TextTrackKind | readonly TextTrackKind[] | undefined;
+      label?: string | undefined;
+      language?: string | undefined;
+    }
+  | ((track: MediaTextTrack) => boolean);
+
+/** One text track's cues, as plain data. */
+export interface MediaTrackCues<Value = unknown> {
+  /** The track the cues belong to, as `textTrackList` lists it. */
+  track: MediaTextTrack;
+  /** Every cue, ordered by start time. */
+  cues: MediaTextCue<Value>[];
+  /** The cues active at the current time. A point stays active for one second. */
+  activeCues: MediaTextCue<Value>[];
 }
 
 /** The first `kind="metadata" label="thumbnails"` track. */
@@ -354,7 +393,7 @@ export interface MediaThumbnailsTrack {
  * `kind="subtitles"`, `chapters` is `kind="chapters"`, and `thumbnails` is `label="thumbnails"`.
  */
 export interface MediaTextTrackState {
-  /** All text tracks available on the media component. */
+  /** Every text track: the media's, then those the app added through the player. `source` tells them apart. */
   textTrackList: MediaTextTrack[];
   /** Whether a captions/subtitles track is showing. */
   subtitlesShowing: boolean;
@@ -366,10 +405,28 @@ export interface MediaTextTrackState {
   toggleSubtitles(forceShow?: boolean): boolean;
   /** Show the captions/subtitles track with `id`, or turn captions/subtitles off with `null`. */
   selectSubtitlesTrack(id: string | null): void;
-  /** Cues from the first `kind="chapters"` track, with cue ends clamped to a finite media duration. */
+  /**
+   * Cues from the media's first `kind="chapters"` track, with cue ends clamped to a finite media duration. When the
+   * media has none, cues from the first chapters track the app added, where a chapter without an end runs to the next
+   * one and the last to the end of the media.
+   */
   chaptersCues: MediaTextCue[];
   /** The first thumbnails track, or `null` when there is none. */
   thumbnailsTrack: MediaThumbnailsTrack | null;
+}
+
+/** Cues for the text tracks being read. */
+export interface MediaTextCuesState {
+  /**
+   * Cues for the tracks being read: `metadata` and `chapters` tracks that aren't disabled, except the thumbnails track,
+   * plus any track a `watchTextCues()` filter matches. In `textTrackList` order.
+   */
+  textCues: MediaTrackCues[];
+  /**
+   * Read cues for more tracks, such as captions for an interactive transcript. Cues are tracked until the returned
+   * function is called.
+   */
+  watchTextCues(filter: TextTrackFilter): () => void;
 }
 
 export interface MediaErrorState {

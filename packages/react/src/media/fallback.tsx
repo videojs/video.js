@@ -6,8 +6,8 @@ const MEDIA_HELP_URL = 'https://videojs.org/help';
 
 export interface MediaFallbackProps {
   /**
-   * Fallback content rendered inside the native `<video>` or `<audio>`, after `children`. Browsers show it only when
-   * they can't play media at all, so viewers never see it.
+   * Fallback content rendered inside the native `<video>` or `<audio>`, after `children`. Only browsers without media
+   * element support show it; it isn't shown when playback fails.
    *
    * Defaults to a "Video player not working?" (or "Audio player not working?") link to `https://videojs.org/help`,
    * which server-rendered pages carry in their HTML. Pass `null` to render no fallback content, or your own content to

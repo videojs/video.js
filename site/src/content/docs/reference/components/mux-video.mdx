@@ -24,11 +24,66 @@ import basicUsageHtml from "@/components/docs/demos/mux-video/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-video/html/css/BasicUsage.ts?raw";
 
-Video element for playing Mux-hosted HLS streams. Built on hls.js with Mux-specific optimizations.
+Video element for playing Mux-hosted HLS streams.
 
 ## Import
 
 <MediaImports media="mux-video" package="@videojs/mux-video" react="MuxVideo" />
+
+## Choose a playback engine
+
+The Mux video component can play your video through one of two engines: SPF or hls.js. An engine is the code that downloads the stream and feeds it to the browser. You choose one by its import path.
+
+SPF is Video.js's own engine, built for the streams Mux delivers. It's a fraction of hls.js's size, and it will become the default in an upcoming release. hls.js is mature, widely used, and plays almost any HLS stream. The default import uses hls.js today.
+
+| Import | Engine | Choose it when |
+|---|---|---|
+| `.../media/mux-video/spf` | SPF | None of the cases under "When to use hls.js" applies to you. |
+| `.../media/mux-video` | hls.js today, SPF soon | You want the recommended engine, and you're fine with it changing in a future release. |
+| `.../media/mux-video/hls-js` | hls.js | One of the cases under "When to use hls.js" applies to you. |
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { MuxVideo } from '@videojs/react/media/mux-video/spf';
+```
+
+All three imports give you a `MuxVideo` component with the same basic API.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/media/mux-video/spf';
+```
+
+All three imports register the same `<mux-video>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
+</FrameworkCase>
+
+### When to use SPF
+
+- **You want a smaller page.** SPF is about a quarter of hls.js's size, which matters most with several players on a page or on slower connections.
+- **You use AirPlay.** Starting and stopping AirPlay works smoothly on SPF. hls.js can get into a bad state when you do either.
+
+### When to use hls.js
+
+SPF is still under development. Use hls.js if any of these applies to you:
+
+- **You stream live without slates.** A slate is the image Mux shows while a broadcaster reconnects. Without one, playback stops at the point where the broadcaster dropped and came back, in the live stream and in the recording Mux makes of it.
+- **You rely on detailed Mux Data.** With SPF, Mux Data doesn't receive playback errors, or detail like quality switches and download speed.
+- **You need low latency.** SPF plays low-latency live streams with the delay of an ordinary live stream.
+- **You set quality limits on the player.** SPF doesn't let you set the lowest or highest quality the player picks on its own, or stop it from matching quality to the player's size.
+- **You support older iPhones.** SPF needs iOS 17.1 or later.
+
+### SPF limitations in detail
+
+**Live streams without slates.** When an encoder disconnects, Mux keeps the live stream open for its `reconnect_window`. With a slate, Mux fills that time with the slate image, so the stream stays continuous. Without one, no media arrives until the encoder reconnects, and Mux marks the break with `EXT-X-DISCONTINUITY`. The asset Mux records from the stream keeps the same discontinuity. SPF doesn't handle discontinuities yet, in CMAF or MPEG-TS, so playback breaks there. To avoid it, set `reconnect_window` above 0 and, for standard-latency streams, `use_slate_for_standard_latency` to `true`. [Handle live stream disconnects](https://www.mux.com/docs/guides/handle-live-stream-disconnects) covers the settings.
+
+**Mux Data.** Mux Data plugs into hls.js to collect engine-level data. It has no such integration for SPF, so it monitors the media element alone. Views, startup time, and rebuffering still come through. Errors SPF raises itself, such as a manifest that fails to load or content it can't play, don't, and neither do rendition switches or request timing and throughput.
+
+**Low-Latency HLS.** SPF skips the partial segments (`EXT-X-PART`) that make LL-HLS low latency and loads whole segments instead. The stream plays as standard-latency live, at the distance from the live edge that the playlist's `HOLD-BACK` sets. SPF logs a console warning when this happens.
+
+**Rendition limits.** `maxAutoResolution`, `minAutoResolution`, and `capRenditionToPlayerSize` are hls.js options, so the SPF flavor doesn't take them. SPF always caps the rendition to the player's size. To limit renditions on either engine, use `source.playback.maxResolution` or `source.playback.minResolution`, which Mux applies to the playlist itself.
+
+**Browsers without Media Source Extensions.** SPF plays through `MediaSource`, or `ManagedMediaSource` on iPhone, and has no fallback to the browser's own HLS playback. iPhone Safari before iOS 17.1 has neither, so SPF can't play there. The hls.js flavor falls back to native HLS.
 
 ## Load a source
 
@@ -166,6 +221,35 @@ video.source = {
 ```
 </FrameworkCase>
 
+## Protected content
+
+For [DRM-protected](https://www.mux.com/docs/guides/protect-videos-with-drm) playback, put the DRM license token on `source.drm.token`. The Mux video component derives the FairPlay, Widevine, and PlayReady license servers from it. DRM playback is always signed, so a `playback.token` belongs alongside it.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{
+    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    playback: { token: playbackToken },
+    drm: { token: drmToken },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('mux-video')!;
+video.source = {
+  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+  playback: { token: playbackToken },
+  drm: { token: drmToken },
+};
+```
+</FrameworkCase>
+
+<DocsLink slug="guides/media-sources" anchor="mux-signs-drm-with-a-token">Media sources</DocsLink> covers mixing Mux's license servers with your own.
+
 ## Analytics and casting
 
 The Mux video component plays Mux streams. It doesn't monitor them or cast them — <DocsLink slug="guides/mux-data">Mux Data</DocsLink> and <DocsLink slug="guides/casting">Google Cast</DocsLink> are separate extensions you add to the player alongside it. Mux Data needs no environment key here, since Mux attributes the views to the environment that owns the playback ID:
@@ -217,6 +301,12 @@ export function MuxPlayer() {
 
 <DocsLinkCard slug="guides/mux-data" description="Metadata, options, and configuration">Mux Data</DocsLinkCard>
 <DocsLinkCard slug="guides/casting" description="Receivers, load requests, and session state">Cast to AirPlay and Chromecast</DocsLinkCard>
+
+### Cast DRM-protected content
+
+Google's Default Media Receiver can't license DRM, so while the source has a `drm.token`, the Cast button stays disabled until the Google Cast extension's `receiver` is set. <DocsLink slug="guides/casting" anchor="cast-drm-protected-content">Cast DRM-protected content</DocsLink> covers hosting your own receiver and passing it a license server through `customData`.
+
+Build the Widevine license URL from the playback ID and DRM token: `https://license.mux.com/license/widevine/{playbackId}?token={drmToken}`. A receiver built with [Mux's Google Cast DRM guide](https://www.mux.com/docs/guides/play-drm-protected-videos-on-google-cast) reads `customData.mux` instead. For that receiver, pass `{ mux: { playbackId, tokens: { drm: drmToken } } }`, the format Mux Player sends.
 
 ## Examples
 

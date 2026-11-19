@@ -102,6 +102,7 @@ export default {
     speed: 'Hitrost',
     captions: 'Podnapisi',
     playbackRate: 'Hitrost predvajanja',
+    customRate: 'Po meri, {rate}',
     back: 'Nazaj',
     off: 'Izklopljeno',
     auto: 'Samodejno',

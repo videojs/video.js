@@ -102,6 +102,7 @@ export default {
     speed: 'Ταχύτητα',
     captions: 'Λεζάντες',
     playbackRate: 'Ρυθμός αναπαραγωγής',
+    customRate: 'Προσαρμογή, {rate}',
     back: 'Πίσω',
     off: 'Απενεργοποίηση',
     auto: 'Αυτόματα',

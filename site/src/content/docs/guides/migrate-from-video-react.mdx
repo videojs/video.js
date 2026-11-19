@@ -83,7 +83,7 @@ What changed:
 - **`src` and `playsInline` moved to the media.** `Video` renders a native `<video>`, so `<source>` and `<track>` children go inside it, as they did inside `<Player>`.
 - **`poster` stays on the player.** `VideoPlayer` holds it as metadata, and the skin renders it. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 - **No control bar children.** The skin ships its controls. A captions button appears when the media has caption or subtitle tracks, so `ClosedCaptionButton` has nothing to replace.
-- **No big play button.** The Default and Neutral video skins don't render one. Clicking the video or pressing the control bar's play button starts playback. The Compat and Scaffold video skins put large play and seek buttons in the center.
+- **The big play button comes with the skin.** Every video skin shows a large play button in the center before playback starts, smaller in narrow players. The video skins also hide their other controls until then; set `--media-controls-before-start: visible` to keep them. After that, the Default skin keeps center play and seek buttons on touch devices, the Neutral skin hides its button, and the Compat and Scaffold skins keep large play and seek buttons in the center.
 - **Set the aspect ratio yourself.** Video-React's `fluid` mode drew a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
 - **One stylesheet per skin.** Replace `video-react.css` with the skin's CSS file.
 
@@ -145,7 +145,7 @@ Video-React merged your children into the default player and control bar by type
 | `VolumeMenuButton` | `VolumePopover`, or `MuteButton` with `VolumeSlider` |
 | `CurrentTimeDisplay`, `DurationDisplay`, `RemainingTimeDisplay`, `TimeDivider` | `Time.Value` with `type="current"`, `"duration"`, or `"remaining"`, and `Time.Separator` |
 | `ProgressControl`, `SeekBar`, `PlayProgressBar`, `LoadProgressBar`, `MouseTimeDisplay` | `TimeSlider`, which shows buffered progress and a pointer preview |
-| `PlaybackRateMenuButton` | The skin's settings menu, or `PlaybackRateButton` and `PlaybackRateRadioGroup` |
+| `PlaybackRateMenuButton` | The skin's settings menu, or `PlaybackRateButton` and `PlaybackRateRadioGroup`. Its `rates` maps to `rates` on either component, or to `defaultPlaybackRates` on `Player` to set them for every control |
 | `ClosedCaptionButton` | `CaptionsButton`, and a captions submenu in the settings menu |
 | `FullscreenToggle` | `FullscreenButton` |
 | `LoadingSpinner` | `BufferingIndicator` |
@@ -416,12 +416,11 @@ These changes don't throw errors, so test for them:
 - **Controls.** They hide after 2 seconds of inactivity instead of Video-React's 3-second default, and as soon as the pointer leaves the player during playback.
 - **Fullscreen.** Fullscreen targets the skin's container, falling back to the video element on iPhone. Video-React fell back to a full-window CSS mode when the Fullscreen API was unavailable.
 - **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%.
-- **Hotkeys.** The arrow keys seek 10 seconds instead of 5, and the speed keys step through a fixed list.
+- **Hotkeys.** The arrow keys seek 10 seconds instead of 5, and the speed keys step through the player's `defaultPlaybackRates`.
 - **Play failures.** Video-React swallowed rejections from `play()`. The `play` action returns the media's promise, so catch rejections where you call it. A blocked `autoPlay` still looks like media that never started; see <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
 
 ## Known gaps
 
-- **Fixed playback rates**: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2`. `PlaybackRateMenuButton`'s `rates` has no equivalent yet ([#1404](https://github.com/videojs/v10/issues/1404)).
 - **Fixed auto-hide delay.** `ControlBar`'s `autoHideTime` has no equivalent ([#1728](https://github.com/videojs/v10/issues/1728)). For `autoHide={false}`, set `visibility="always"` on `Controls.Root` in skin source.
 - **No full-window fullscreen fallback.** Test fullscreen on your supported browsers; see <DocsLink slug="guides/browser-support">Browser support</DocsLink>.
 - **No order-based merge.** Children of a packaged skin don't join its control bar. Edit skin source to add, move, or remove controls.

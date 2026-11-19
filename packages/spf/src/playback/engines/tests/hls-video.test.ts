@@ -1324,7 +1324,7 @@ http://example.com/seg1.m4s
     engine.destroy();
   });
 
-  it('auto-selects DEFAULT text track when enableDefaultTrack is true', async () => {
+  it('auto-selects the DEFAULT=YES + AUTOSELECT=YES text track by default', async () => {
     const mockFetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
 
@@ -1368,9 +1368,7 @@ http://example.com/text-es-seg1.vtt
 
     globalThis.fetch = mockFetch;
 
-    const engine = createEngine({
-      enableDefaultTrack: true,
-    });
+    const engine = createEngine();
     const mediaElement = document.createElement('video');
 
     mediaElement.preload = 'auto';

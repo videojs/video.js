@@ -102,6 +102,7 @@ export default {
     speed: 'Velocitat',
     captions: 'Legendas',
     playbackRate: 'Velocitat de lectura',
+    customRate: 'Personalizada, {rate}',
     back: 'Retorn',
     off: 'Desactivat',
     auto: 'Automatic',

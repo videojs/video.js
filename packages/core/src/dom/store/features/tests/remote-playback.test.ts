@@ -19,10 +19,22 @@ function createRemote(overrides: Partial<RemotePlaybackLike> = {}) {
 interface RemotePlaybackLike {
   state: string;
   watchAvailability: (callback: (available: boolean) => void) => Promise<number>;
-  cancelWatchAvailability?: (id?: number) => Promise<void>;
+  cancelWatchAvailability?: (id?: number) => Promise<void> | void;
 }
 
 describe('remotePlaybackFeature', () => {
+  it('reports remote playback unsupported when the media disables it', async () => {
+    const remote = createRemote();
+    const media = Object.assign(createMockVideo(), { remote, disableRemotePlayback: true });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
+
+    store.attach({ media, container: null });
+    await Promise.resolve();
+
+    expect(remote.watchAvailability).not.toHaveBeenCalled();
+    expect(store.state.remotePlaybackAvailability).toBe('unsupported');
+  });
+
   it('cancels availability watching on abort (W3C path)', () => {
     const remote = createRemote();
     const media = Object.assign(createMockVideo(), { remote });
@@ -46,6 +58,27 @@ describe('remotePlaybackFeature', () => {
 
     // The W3C RemotePlayback object loses its method (e.g. inner video torn down).
     (remote as { cancelWatchAvailability?: unknown }).cancelWatchAvailability = undefined;
+
+    expect(await collectUncaughtExceptions(detach)).toEqual([]);
+  });
+
+  it('does not throw on abort when cancelWatchAvailability returns void', async () => {
+    const remote = createRemote({ cancelWatchAvailability: vi.fn().mockReturnValue(undefined) });
+    const media = Object.assign(createMockVideo(), { remote });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
+
+    const detach = store.attach({ media, container: null });
+
+    expect(await collectUncaughtExceptions(detach)).toEqual([]);
+    expect(remote.cancelWatchAvailability).toHaveBeenCalledOnce();
+  });
+
+  it('handles a rejected cancelWatchAvailability promise on abort', async () => {
+    const remote = createRemote({ cancelWatchAvailability: vi.fn().mockRejectedValue(new Error('cancel failed')) });
+    const media = Object.assign(createMockVideo(), { remote });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
+
+    const detach = store.attach({ media, container: null });
 
     expect(await collectUncaughtExceptions(detach)).toEqual([]);
   });

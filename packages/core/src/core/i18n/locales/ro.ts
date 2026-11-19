@@ -102,6 +102,7 @@ export default {
     speed: 'Viteză',
     captions: 'Subtitrări',
     playbackRate: 'Rată de redare',
+    customRate: 'Personalizat, {rate}',
     back: 'Înapoi',
     off: 'Dezactivat',
     auto: 'Automat',

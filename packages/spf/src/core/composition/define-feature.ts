@@ -1,9 +1,14 @@
+/**
+ * Grouping behaviors into features, with the defaults and initial state they need, and flattening features into what a
+ * composition takes.
+ */
+
 import type { AnyBehavior, Empty } from './define-behavior';
 
 /**
- * One capability of a composition: the behaviors that implement it, with the config defaults and initial state they
- * need. Removing a feature from a composition removes its behaviors and their defaults together, except behaviors
- * another composed feature also lists.
+ * A group of behaviors that together give a composition one ability, such as playing video or handling DRM, with the
+ * config defaults and initial state they need. Removing a feature from a composition removes its behaviors and their
+ * defaults together, except behaviors another composed feature also lists.
  *
  * A feature's behaviors compose in order at the feature's position, except a behavior an earlier feature already
  * listed, which composes at that earlier position. A feature that owns external inputs lists its
@@ -26,8 +31,10 @@ export interface Feature<
 type AnyFeature = Feature<readonly AnyBehavior[], any, any>;
 
 /**
- * Define a feature. An identity function: it exists so the behavior list keeps its tuple type, which composition needs
- * to derive the state, context, and config types.
+ * Define a feature: behaviors with the config defaults and initial state they need, kept as a tuple so a composition
+ * can derive its types from them.
+ *
+ * An identity function at runtime; the tuple type is what it exists for.
  *
  * `defaultConfig` may cover config keys that another feature's behaviors read; the composition checks each
  * `defaultConfig` value's type against the behavior that reads it.

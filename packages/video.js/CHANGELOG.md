@@ -1,5 +1,26 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/video.js@10.4.0...video.js@10.5.0) (2026-11-16)
+
+
+### Miscellaneous Chores
+
+* **video.js:** Synchronize videojs versions
+
+## [10.4.0](https://github.com/videojs/video.js/compare/video.js@10.3.0...video.js@10.4.0) (2026-11-13)
+
+
+### Miscellaneous Chores
+
+* **video.js:** Synchronize videojs versions
+
+## [10.3.0](https://github.com/videojs/video.js/compare/video.js@10.2.0...video.js@10.3.0) (2026-11-03)
+
+
+### Miscellaneous Chores
+
+* **video.js:** Synchronize videojs versions
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/video.js@10.1.0...video.js@10.2.0) (2026-10-22)
 
 

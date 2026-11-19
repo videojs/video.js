@@ -156,6 +156,28 @@ describe('generateReactInstallCode', () => {
 });
 
 describe('generateHTMLUsageCode', () => {
+  it('adds skin custom properties to the skin style', () => {
+    const result = generateHTMLUsageCode({
+      ...baseHTML,
+      skinProperties: { '--media-controls-before-start': 'visible', '--media-accent-color': '"red"' },
+    });
+
+    expect(result.html).toContain(
+      '<video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9; --media-controls-before-start: visible; --media-accent-color: &quot;red&quot;;">'
+    );
+  });
+
+  it('starts a skin style for unsized skins', () => {
+    const result = generateHTMLUsageCode({
+      ...baseHTML,
+      useCase: 'default-audio',
+      skin: 'audio',
+      skinProperties: { '--media-accent-color': '#f5c518' },
+    });
+
+    expect(result.html).toContain('<audio-skin style="--media-accent-color: #f5c518;">');
+  });
+
   it('imports and renders the Compat skin for HTML', () => {
     const result = generateHTMLUsageCode({ ...baseHTML, skin: 'compat-video' });
 
@@ -541,6 +563,25 @@ video-skin {
 });
 
 describe('generateReactCreateCode', () => {
+  it('adds skin custom properties to the skin style', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      skinProperties: { '--media-controls-before-start': 'visible', '--media-accent-color': "#f5c518'" },
+    })['app/page.tsx'];
+
+    expect(code).toContain("import type { CSSProperties } from 'react';");
+    expect(code).toContain(
+      `<VideoSkin style={{ width: '100%', aspectRatio: '16 / 9', '--media-controls-before-start': 'visible', '--media-accent-color': '#f5c518\\'' } as CSSProperties}>`
+    );
+  });
+
+  it('leaves the skin style alone without custom properties', () => {
+    const code = generateReactCreateCode({ ...baseReact, skinProperties: {} })['app/page.tsx'];
+
+    expect(code).not.toContain('CSSProperties');
+    expect(code).toContain(`<VideoSkin style={{ width: '100%', aspectRatio: '16 / 9' }}>`);
+  });
+
   it('generates a React page for default video', () => {
     const result = generateReactCreateCode(baseReact);
     const code = result['app/page.tsx'];

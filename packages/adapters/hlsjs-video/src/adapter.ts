@@ -394,7 +394,7 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
   async load() {
     this.#loadRequested = null;
 
-    if (this.remote.state === 'connected') {
+    if (this.remote?.state === 'connected') {
       this.dispatchEvent(new HlsMediaEvent('loadstart'));
       return super.load();
     }

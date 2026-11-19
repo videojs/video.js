@@ -1,0 +1,411 @@
+---
+title: 'Sync content with timed metadata'
+description: 'Show quizzes, product cards, ad markers, chapters, and transcripts in time with playback, from cues in the media or cues your app adds.'
+---
+
+import Demo from '@/components/docs/demos/Demo.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import StyleCase from '@/components/docs/StyleCase.astro';
+
+{/* React demos */}
+import BasicUsageDemoReact from '@/components/docs/demos/timed-metadata/react/css/BasicUsage';
+import basicUsageReactTsx from '@/components/docs/demos/timed-metadata/react/css/BasicUsage.tsx?raw';
+import basicUsageReactCss from '@/components/docs/demos/timed-metadata/react/css/BasicUsage.css?raw';
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from '@/components/docs/demos/timed-metadata/html/css/BasicUsage.astro';
+import basicUsageHtml from '@/components/docs/demos/timed-metadata/html/css/BasicUsage.html?raw';
+import basicUsageHtmlCss from '@/components/docs/demos/timed-metadata/html/css/BasicUsage.css?raw';
+import basicUsageHtmlTs from '@/components/docs/demos/timed-metadata/html/css/BasicUsage.ts?raw';
+
+Timed metadata is data tied to a span of playback: a quiz question, a product card, an ad break, or a chapter. Video.js reads it as text tracks and cues, the platform objects captions use, whether the cues come from the media or from your app.
+
+## Recommended approach
+
+<FrameworkCase frameworks={["react"]}>
+Define the track with `defineTextTrack()`, add your cues to the player with `useCreateTextTrack()`, and render the cue `useActiveTextCues()` returns.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Define the track with `defineTextTrack()`, add your cues to the player with `player.store.addTextTrack()`, and render the cue `getActiveTextCues()` returns each time the store changes.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+In your app, the cues usually come from your API or CMS. Fetch them and pass them as `cues`, or pass the file's URL as `src` and the player loads it.
+
+## How it works
+
+A text track has a `kind`, `label`, and `language`, and a list of cues. Each cue spans `startTime` to `endTime`, in seconds, and carries `text`, structured data in `value`, or both. `value` and `type` are named after the platform's `DataCue`. A cue without an `endTime` is a point, active for one second, except in a chapters track your app adds, where it runs to the next chapter.
+
+`addTextTrack()` adds the track to the player, not the media, so it works with any media, including YouTube and other embeds. The track sits next to the media's tracks in `textTrackList` with `source: 'app'`.
+
+The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink>, included in the video, audio, and live presets, reads cues from the media's `metadata` and `chapters` tracks and from the tracks your app adds, and tracks which cues are active at the current time. Tracks from either place are read the same way.
+
+`defineTextTrack<Note>()` types each cue's `value`, and works as a filter: reading through it picks the tracks with the same kind, label, and language. A plain filter, such as `{ label: 'notes' }`, works too, but its cues' `value` is `unknown`.
+
+<FrameworkCase frameworks={["react"]}>
+`useCreateTextTrack()` adds the track while the component is mounted and removes it on unmount. `useActiveTextCues()` re-renders the component as cues start and end.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`player.store.subscribe()` calls back whenever player state changes, and `getActiveTextCues()` returns the cues active at that moment.
+</FrameworkCase>
+
+Browsers never draw metadata or chapters cues, so the overlay, its styles, and its accessibility are up to your UI.
+
+## Availability and constraints
+
+- Active cues follow `currentTime`, which updates up to about four times a second. Don't rely on them for frame-accurate timing. A cue that playback passes between two updates still shows up as active once; a cue a seek jumps over doesn't.
+- `cues` are plain, JSON-serializable data, so a server-rendered page can pass them in. A `src` is fetched only once the player runs on the client, and a cross-origin file needs CORS headers.
+- Browsers load a `<track>` element's cues only while the track is `showing` or `hidden`. `default` makes a `<track kind="metadata">` `hidden`; without it, the track stays `disabled` and its cues never load.
+- `value` isn't checked at runtime unless the definition has a schema. See [Check values with a schema](#check-values-with-a-schema).
+
+<FrameworkCase frameworks={["react"]}>
+Like a `<track>` element, an app track stays through source changes until it's removed. `useCreateTextTrack()` removes its track when the component unmounts, so give the component a `key` per video to swap tracks with the video.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Like a `<track>` element, an app track stays through source changes until you remove it. When you play a different video, remove its tracks and add the new video's.
+</FrameworkCase>
+
+## Common variations
+
+<FrameworkCase frameworks={["html"]}>
+The examples below assume `player` is the `<video-player>` element, as in the recommended approach, and that the elements they update, such as `adBadge`, are queried from your page.
+</FrameworkCase>
+
+### Read cues from a WebVTT file
+
+Add a `<track kind="metadata">` to the media. Cue text that parses as a JSON object or array becomes the cue's `value`; any other text stays in `text`.
+
+```text title="notes.vtt"
+WEBVTT
+
+00:00:01.000 --> 00:00:08.000
+{ "title": "Timed metadata", "body": "This note came from a WebVTT file." }
+```
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<Video src="video.mp4" playsInline>
+  <track kind="metadata" label="notes" src="/notes.vtt" default />
+</Video>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<video src="video.mp4" playsinline>
+  <track kind="metadata" label="notes" src="/notes.vtt" default />
+</video>
+```
+</FrameworkCase>
+
+A definition with the same kind and label reads it, so the rendering code from the recommended approach works unchanged. To use the file with media that has no `<track>` support, such as an embed, pass it as `src` when you add the track instead.
+
+### Read metadata from an HLS stream
+
+When hls.js plays a stream, in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and media built on it such as <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, it publishes ID3 frames and `EXT-X-DATERANGE` tags as cues on a metadata track. Read them with <DocsLink slug="reference/api/hls-metadata-track">`hlsMetadataTrack`</DocsLink>. Each cue's `type` tells an ID3 frame from a date range attribute, and narrows its `value`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { hlsMetadataTrack, useActiveTextCues } from '@videojs/react';
+
+function AdBadge() {
+  const cues = useActiveTextCues(hlsMetadataTrack);
+  const inAd = cues.some((cue) => cue.type === 'com.apple.quicktime.HLS' && cue.value?.key === 'X-AD-ID');
+
+  return inAd ? <span className="ad-badge">Ad</span> : null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { getActiveTextCues, hlsMetadataTrack } from '@videojs/html';
+
+player.store.subscribe(() => {
+  const cues = getActiveTextCues(player.store, hlsMetadataTrack);
+  const inAd = cues.some((cue) => cue.type === 'com.apple.quicktime.HLS' && cue.value?.key === 'X-AD-ID');
+
+  adBadge.hidden = !inAd;
+});
+```
+</FrameworkCase>
+
+Where the browser plays HLS natively, as Safari does, in-band metadata arrives as `DataCue`s on the browser's own metadata tracks. Read those with a `{ kind: 'metadata' }` filter.
+
+### Mark cues on the time slider
+
+<FrameworkCase frameworks={["react"]}>
+Add `TimeSlider.Markers` to the time slider to draw a marker for each cue on the tracks a filter matches, such as the notes from the recommended approach.
+
+```tsx
+<TimeSlider.Root>
+  <TimeSlider.Track>
+    <TimeSlider.Fill />
+  </TimeSlider.Track>
+  <TimeSlider.Markers filter={notesTrack} />
+  <TimeSlider.Thumb />
+</TimeSlider.Root>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Add `<media-time-slider-markers>` to the time slider to draw a marker for each cue on the tracks its attributes match, such as the notes from the recommended approach.
+
+```html
+<media-time-slider>
+  <media-slider-track>
+    <media-slider-fill></media-slider-fill>
+  </media-slider-track>
+  <media-time-slider-markers kind="metadata" label="notes"></media-time-slider-markers>
+  <media-slider-thumb></media-slider-thumb>
+</media-time-slider>
+```
+</FrameworkCase>
+
+A point is a marker with no width, a range spans its cue, and a marker has `data-active` while its cue is active. Markers are unstyled: position each one with its `--media-slider-marker-*` custom properties. See <DocsLink slug="reference/components/time-slider-markers">the markers reference</DocsLink> for the full styling contract.
+
+### Check values with a schema
+
+Cues from a file or a stream can carry anything. Pass a `schema` to `defineTextTrack()` to check each value where it's read. Any [Standard Schema](https://standardschema.dev) works, such as one from zod or valibot, and the value type comes from the schema.
+
+```ts
+import { z } from 'zod';
+
+const NoteSchema = z.object({ title: z.string(), body: z.string() });
+
+const notesTrack = defineTextTrack({ kind: 'metadata', label: 'notes', schema: NoteSchema });
+```
+
+Readers skip cues whose value fails the schema, and warn in development. The schema must be synchronous.
+
+### Add chapters
+
+Add a `chapters` track the same way. A chapter's title is its cue `text`, and a chapter without an `endTime` runs to the next one. When the media has no chapters track of its own, the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> shows these chapters.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { type TextCueInit, useCreateTextTrack } from '@videojs/react';
+
+const chapters: TextCueInit[] = [
+  { startTime: 0, text: 'Introduction' },
+  { startTime: 95, text: 'Setup' },
+  { startTime: 410, text: 'Wrap-up' },
+];
+
+function Chapters() {
+  useCreateTextTrack({ kind: 'chapters', cues: chapters });
+
+  return null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+player.store.addTextTrack({
+  kind: 'chapters',
+  cues: [
+    { startTime: 0, text: 'Introduction' },
+    { startTime: 95, text: 'Setup' },
+    { startTime: 410, text: 'Wrap-up' },
+  ],
+});
+```
+</FrameworkCase>
+
+To load a Podcasting 2.0, Apple HLS, or JSON-LD chapters file, pass its converter as `format`, such as `podcastChapters`. Read the current chapter, with any artwork the file gives it, through <DocsLink slug="reference/api/chapters-track">`chaptersTrack`</DocsLink>.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { chaptersTrack, podcastChapters, useActiveTextCues, useCreateTextTrack } from '@videojs/react';
+
+function CurrentChapter() {
+  useCreateTextTrack({ kind: 'chapters', src: '/episodes/42/chapters.json', format: podcastChapters });
+
+  const [chapter] = useActiveTextCues(chaptersTrack);
+
+  return chapter ? <p className="current-chapter">{chapter.text}</p> : null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { chaptersTrack, getActiveTextCues, podcastChapters } from '@videojs/html';
+
+player.store.addTextTrack({ kind: 'chapters', src: '/episodes/42/chapters.json', format: podcastChapters });
+
+player.store.subscribe(() => {
+  const [chapter] = getActiveTextCues(player.store, chaptersTrack);
+  currentChapter.textContent = chapter?.text ?? '';
+});
+```
+</FrameworkCase>
+
+### Show an interactive transcript
+
+A transcript reads captions cues, which the text cues feature skips unless something asks for them.
+
+<FrameworkCase frameworks={["react"]}>
+`useTextCues()` and `useActiveTextCues()` ask for the tracks they match while the component is mounted.
+
+```tsx
+import { useActiveTextCues, useTextCues } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
+
+const captions = { kind: 'captions', language: 'en' } as const;
+
+function Transcript() {
+  const store = usePlayer();
+  const cues = useTextCues(captions);
+  const [active] = useActiveTextCues(captions);
+
+  return (
+    <ol className="transcript">
+      {cues.map((cue) => (
+        <li key={cue.id} aria-current={cue.id === active?.id}>
+          <button type="button" onClick={() => store.seek(cue.startTime)}>
+            {cue.text}
+          </button>
+        </li>
+      ))}
+    </ol>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Call `watchTextCues()` to read them, then render with `getTextCues()` and `getActiveTextCues()`.
+
+```ts
+import { getActiveTextCues, getTextCues } from '@videojs/html';
+
+const captions = { kind: 'captions', language: 'en' } as const;
+// A cue that hasn't changed stays the same object, so it keeps its line.
+const lines = new WeakMap<object, HTMLLIElement>();
+
+player.store.watchTextCues(captions);
+
+player.store.subscribe(() => {
+  const [active] = getActiveTextCues(player.store, captions);
+  const next = getTextCues(player.store, captions).map((cue) => {
+    let line = lines.get(cue);
+
+    if (!line) {
+      const button = document.createElement('button');
+
+      button.type = 'button';
+      button.textContent = cue.text;
+      button.addEventListener('click', () => player.store.seek(cue.startTime));
+
+      line = document.createElement('li');
+      line.append(button);
+      lines.set(cue, line);
+    }
+
+    if (cue.id === active?.id) line.setAttribute('aria-current', 'true');
+    else line.removeAttribute('aria-current');
+
+    return line;
+  });
+
+  // Replace the lines only when they change, so a focused button keeps focus.
+  const current = [...transcript.children];
+
+  if (next.length !== current.length || next.some((line, index) => line !== current[index])) {
+    transcript.replaceChildren(...next);
+  }
+});
+```
+</FrameworkCase>
+
+The browser loads a `<track>` element's cues only while captions are on. To show the transcript either way, add the captions track from your app instead of a `<track>` element. The player copies it into the media, so the browser still draws the captions when a viewer turns them on.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+useCreateTextTrack({ kind: 'captions', label: 'English', language: 'en', src: '/captions.vtt' });
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+player.store.addTextTrack({ kind: 'captions', label: 'English', language: 'en', src: '/captions.vtt' });
+```
+</FrameworkCase>
+
+## Troubleshooting
+
+### No cue is ever active
+
+Confirm that:
+
+- The track is one the text cues feature reads: a `metadata` or `chapters` track that isn't `disabled`. Give a `<track kind="metadata">` the `default` attribute. For other kinds, read through the hooks or call `watchTextCues()`.
+- Your filter or definition matches the track's `kind`, `label`, and `language` exactly. `getTextTracks()` lists the tracks the player has.
+- Cue times are in seconds.
+
+### A cue's value is undefined
+
+Only `metadata` cue text that parses as a JSON object or array becomes `value`; other text stays in `text`. With a schema, cues whose value fails it are skipped, with a warning in development.
+
+### An app track outlives its video
+
+<FrameworkCase frameworks={["react"]}>
+App tracks stay until they're removed, through source changes. `useCreateTextTrack()` removes its track when the component unmounts, so give the component a `key` per video.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+App tracks stay until they're removed, through source changes. Call the handle's `remove()`, or the store's `removeTextTrack()`, before adding the next video's tracks.
+</FrameworkCase>
+
+### Cues from a src never load
+
+The file failed to load, often because of a missing CORS header or a wrong URL. The track keeps any cues it already had, and a warning shows in development.
+
+## Related components
+
+- <DocsLink slug="reference/components/time-slider">Time slider</DocsLink>
+- <DocsLink slug="reference/components/time-slider-markers">Time slider markers</DocsLink>
+
+## Related API
+
+- <DocsLink slug="reference/api/feature-text-cues">Text cues feature</DocsLink>
+- <DocsLink slug="reference/api/define-text-track">defineTextTrack</DocsLink>
+- <DocsLink slug="reference/api/use-create-text-track" frameworks="react">useCreateTextTrack</DocsLink>
+- <DocsLink slug="reference/api/use-active-text-cues" frameworks="react">useActiveTextCues</DocsLink>
+- <DocsLink slug="reference/api/use-text-cues" frameworks="react">useTextCues</DocsLink>
+- <DocsLink slug="reference/api/get-active-text-cues">getActiveTextCues</DocsLink>
+- <DocsLink slug="reference/api/get-text-cues">getTextCues</DocsLink>
+- <DocsLink slug="reference/api/chapters-track">chaptersTrack</DocsLink>
+- <DocsLink slug="reference/api/hls-metadata-track">hlsMetadataTrack</DocsLink>
+
+## Related guides
+
+- <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>

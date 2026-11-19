@@ -70,6 +70,16 @@ describe('DialogCore', () => {
     expect(core.getPopupAttrs(core.getState())['aria-modal']).toBeUndefined();
   });
 
+  it('reports the scope in effect', () => {
+    const core = new DialogCore();
+
+    core.setInput(OPEN);
+    expect(core.getState().scope).toBe('document');
+
+    core.setDocumentModal(false);
+    expect(core.getState().scope).toBe('player');
+  });
+
   it('connects a trigger to the popup', () => {
     const core = new DialogCore();
 

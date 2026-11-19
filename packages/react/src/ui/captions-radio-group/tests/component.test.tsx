@@ -14,8 +14,8 @@ afterEach(() => {
 });
 
 const defaultTextTrackList = [
-  { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-  { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+  { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+  { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing', source: 'media' },
 ] as const;
 
 function renderCaptionsRadioGroup({
@@ -77,6 +77,30 @@ describe('CaptionsRadioGroup', () => {
       expect.objectContaining({ value: 'off', label: 'Off', checked: false }),
       expect.objectContaining({ value: 'subtitles-en', label: 'English', checked: false }),
       expect.objectContaining({ value: 'subtitles-es', label: 'Spanish', checked: true }),
+    ]);
+  });
+
+  it('exposes kind badges for tracks that share a label', () => {
+    const states: CaptionsRadioGroup.ItemState[] = [];
+
+    renderCaptionsRadioGroup({
+      textTrackList: [
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled' },
+      ],
+      group: (
+        <CaptionsRadioGroup.Options
+          renderItem={(props, state) => {
+            states.push(state);
+            return <Menu.RadioItem {...props} />;
+          }}
+        />
+      ),
+    });
+
+    expect(states.slice(-2)).toEqual([
+      expect.objectContaining({ value: 'captions-en', label: 'English', badge: 'CC' }),
+      expect.objectContaining({ value: 'subtitles-en', label: 'English', badge: 'SUB' }),
     ]);
   });
 

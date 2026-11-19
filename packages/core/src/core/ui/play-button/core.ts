@@ -5,6 +5,7 @@ import type { NonNullableObject } from '@videojs/utils/types';
 
 import { resolveText, type Text } from '../../i18n';
 import { pauseText, playText, replayText } from '../../i18n/text/buttons';
+import { hasPlaybackStarted } from '../playback';
 import type { ButtonState } from '../types';
 import { resolveLabel } from '../utils/resolve-label';
 
@@ -70,7 +71,7 @@ export class PlayButtonCore {
     this.state.patch({
       paused: media.paused && !media.autoplaying,
       ended: media.ended,
-      started: media.started || media.autoplaying,
+      started: hasPlaybackStarted(media),
     });
     this.state.patch({ label: resolveText(this.getLabel(this.state.current)) });
 

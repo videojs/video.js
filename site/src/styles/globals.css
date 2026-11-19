@@ -345,9 +345,13 @@ html.dark[data-tone="deep"] {
     background-color: var(--color-bright-yellow);
   }
 
-  /* On the root so the viewport scrollbar and form controls follow the theme; `color-scheme` inherits from here. */
+  /*
+   * On the root so the viewport scrollbar and form controls follow the theme; `color-scheme` inherits from here.
+   * `only` opts out of browser auto-darkening (Safari Adaptive Dark Mode), so an explicit Light choice on a dark OS
+   * stays light.
+   */
   :root {
-    color-scheme: light;
+    color-scheme: light only;
   }
 
   .dark {

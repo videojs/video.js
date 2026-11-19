@@ -1,5 +1,6 @@
 // Component state, props, and option types
 export type {
+  AddTextTrack,
   AirPlayButtonState,
   AlertDialogProps,
   AudioTrackRadioGroupOption,
@@ -13,18 +14,27 @@ export type {
   CaptionsRadioGroupProps,
   CaptionsRadioGroupState,
   CastButtonState,
+  ChapterCueValue,
+  ChapterImage,
   ControlsProps,
   ControlsState,
   ControlsVisibility,
   DeriveCustomStatus,
   DialogProps,
+  DialogScope,
   DialogState,
   FullscreenButtonState,
+  HlsDateRangeAttribute,
+  HlsMetadataCue,
+  Id3Frame,
   IndicatorCoreProps,
   IndicatorDirection,
   IndicatorLifecycleState,
   IndicatorStatus,
   IndicatorVolumeLevel,
+  InferCueValue,
+  InferSchemaOutput,
+  InferTextTrackCue,
   InputAction,
   InputActionEvent,
   InputActionSource,
@@ -63,11 +73,24 @@ export type {
   SliderSegmentRange,
   SliderSegmentState,
   SliderState,
+  StandardSchemaV1,
+  StandardSchemaV1Props,
+  StandardSchemaV1Result,
   StatusAnnouncerLabels,
   StatusAnnouncerState,
   StatusDetails,
   StatusIndicatorProps,
   StatusIndicatorState,
+  TextCueFormat,
+  TextCueFormatResult,
+  TextCueInit,
+  TextCuesSource,
+  TextTrackContent,
+  TextTrackDefinition,
+  TextTrackHandle,
+  TextTrackIdentity,
+  TextTrackInit,
+  TextTracksSource,
   ThumbnailCoords,
   ThumbnailCrossOrigin,
   ThumbnailFetchPriority,
@@ -77,6 +100,7 @@ export type {
   ThumbnailState,
   TimeProps,
   TimeSliderChapterRange,
+  TimeSliderMarkerRange,
   TimeSliderProps,
   TimeSliderState,
   TimeState,
@@ -94,6 +118,17 @@ export type {
   VolumePopoverState,
   VolumeSliderProps,
   VolumeSliderState,
+} from '@videojs/core';
+export {
+  appleHlsChapters,
+  chaptersTrack,
+  defineTextTrack,
+  getActiveTextCues,
+  getTextCues,
+  getTextTracks,
+  hlsMetadataTrack,
+  jsonLdChapters,
+  podcastChapters,
 } from '@videojs/core';
 export type { TextParams, TranslationKey, TranslationOptions } from '@videojs/core/i18n';
 export * from './constants';
@@ -132,6 +167,7 @@ export type {
   CanPlayTypeResult,
   CommonMedia,
   CommonMediaEvents,
+  DataCueLike,
   EngineAdapter,
   ErrorLike,
   EventLike,
@@ -192,11 +228,13 @@ export type {
   MediaStreamTypeState,
   MediaTargetLike,
   MediaTextCue,
+  MediaTextCuesState,
   MediaTextTrack,
   MediaTextTrackCapability,
   MediaTextTrackState,
   MediaThumbnailsTrack,
   MediaTimeState,
+  MediaTrackCues,
   MediaVideoDimensionsCapability,
   MediaVideoDimensionsEvents,
   MediaVideoRendition,
@@ -210,12 +248,16 @@ export type {
   RemotePlaybackLike,
   TextCueLike,
   TextCueListLike,
+  TextTrackCueLike,
+  TextTrackFilter,
   TextTrackKind,
   TextTrackLike,
   TextTrackListEvents,
   TextTrackListLike,
   TextTrackMode,
+  TextTrackSource,
   TimeRangeLike,
+  VTTCueLike,
   VideoEvents,
   VideoRenditionLike,
   VideoRenditionListLike,
@@ -268,6 +310,10 @@ export {
   usePlayer,
   usePlayerContext,
 } from './player/context';
+// Text tracks
+export { useCreateTextTrack } from './text-track/use-create-text-track';
+export { useActiveTextCues, useTextCues } from './text-track/use-text-cues';
+export { useTextTracks } from './text-track/use-text-tracks';
 // Player API
 export {
   type CreatePlayerConfig,
@@ -361,6 +407,7 @@ export type {
   TimeSliderChaptersProps,
   TimeSliderChaptersState,
 } from './ui/time-slider/chapters';
+export type { TimeSliderMarkerState, TimeSliderMarkersProps, TimeSliderMarkersState } from './ui/time-slider/markers';
 export { Title } from './ui/title';
 export type { TitleProps } from './ui/title/component';
 export { Tooltip, type TooltipContent, type TooltipContextValue, useTooltipContext } from './ui/tooltip';

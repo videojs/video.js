@@ -96,6 +96,7 @@ type InferredClassPropertyTypes = Readonly<Record<string, Readonly<Record<string
 
 const INFERRED_CLASS_PROPERTY_TYPES: InferredClassPropertyTypes = {
   HlsJsAdapter: { engine: 'Hls | null', error: 'MediaError | null' },
+  MixcloudAdapter: { engine: 'Window | null' },
   NativeHlsMediaBase: { engine: 'null' },
   PlayerJsAdapter: { engine: 'Window | null' },
   SoundCloudAdapter: { engine: 'Window | null' },
@@ -535,6 +536,8 @@ function applyClassMembers(
 
   for (const member of declaration.body.body) {
     if (member.type !== 'MethodDefinition' || (member.kind !== 'get' && member.kind !== 'set')) continue;
+
+    if (member.static || getJSDoc(file, member)?.tags.has('internal')) continue;
 
     const name = staticName(member.key);
     if (!name || member.key.type === 'PrivateIdentifier' || name.startsWith('_') || name === 'target') continue;
@@ -1107,6 +1110,8 @@ function extractReactReference(
         if (name === 'HTMLAudioElement') target = 'audio';
 
         if (name === 'HTMLIFrameElement') target = 'iframe';
+
+        if (name === 'HTMLDivElement') target = 'div';
       }
     }
 

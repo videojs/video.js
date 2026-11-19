@@ -30,6 +30,10 @@ export interface RadioOption {
   label: Text | string;
   /** Values interpolated into a translated label. */
   labelParams?: TextParams | undefined;
+  /** Accessible name, when it must say more than the visible label. Platforms set it as the item's `aria-label`. */
+  ariaLabel?: Text | string | undefined;
+  /** Values interpolated into a translated `ariaLabel`. */
+  ariaLabelParams?: TextParams | undefined;
   /** Whether this individual option is disabled. */
   disabled: boolean;
 }

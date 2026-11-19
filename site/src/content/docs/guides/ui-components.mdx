@@ -116,7 +116,7 @@ import '@videojs/html/icons/element';
 
 ### Style components with state
 
-Components add `data-*` attributes to describe their current state. For example, a play button adds `data-paused` while the media is paused. Use those attributes in CSS:
+Components add `data-*` attributes to describe their current state. For example, a play button adds `data-paused` while the media is paused, except while autoplay is pending, when the button shows pause. Use those attributes in CSS:
 
 ```css
 .my-play-button .pause-icon {

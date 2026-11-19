@@ -2,8 +2,8 @@ import { PLAYER_FRAME_CLASSES } from '@app/shared/player-frame';
 import type { Skin, SkinSource, Styling } from '@app/types';
 import type { AudioSkinProps } from '@videojs/react/audio';
 import type { VideoSkinProps } from '@videojs/react/video';
-import type { ComponentType, RefObject } from 'react';
-import { createElement, useEffect, useRef, useState } from 'react';
+import type { ComponentType, ReactNode, Ref, RefObject } from 'react';
+import { Children, cloneElement, createElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { applyCaptionTracks, type CaptionsMode } from '../captions';
 import { findMediaElement } from '../media-element';
@@ -185,6 +185,38 @@ async function loadSkinComponent<Props>(request: SkinRequest): Promise<Component
   }
 }
 
+interface NoSkinProps {
+  children?: ReactNode;
+  className?: string | undefined;
+  dir?: string | undefined;
+  ref?: Ref<HTMLDivElement> | undefined;
+}
+
+/**
+ * Stands in for a skin when the shell turns skins off: the media alone with its native controls, framed as a skin would
+ * be.
+ */
+function NoSkin({ children, className, dir, ref }: NoSkinProps) {
+  return (
+    <div
+      className={`relative w-full [&>video]:block [&>video]:size-full [&>video]:object-contain ${className ?? ''}`}
+      dir={dir}
+      ref={ref}
+    >
+      {Children.map(children, (child) =>
+        isValidElement<{ controls?: boolean }>(child) ? cloneElement(child, { controls: true }) : child
+      )}
+    </div>
+  );
+}
+
+function loadSelectedSkin<Props>(skinless: boolean, request: SkinRequest): Promise<ComponentType<Props>> {
+  // SAFETY: `NoSkin` takes the props every skin shares and drops the rest, such as a poster or thumbnail override.
+  if (skinless) return Promise.resolve(NoSkin as ComponentType<Props>);
+
+  return loadSkinComponent(request);
+}
+
 function useLoadedComponent<Props>(
   load: () => Promise<ComponentType<Props>>,
   deps: readonly unknown[]
@@ -247,11 +279,11 @@ export function VideoSkinComponent({
   renderThumbnail,
   ...props
 }: VideoSkinComponentProps) {
-  const { skin, styling, skins, source, captions } = useSandbox();
+  const { skin, skinless, styling, skins, source, captions } = useSandbox();
   const preset: SkinPreset = live ? 'live-video' : 'video';
   const Component = useLoadedComponent<VideoSkinProps>(
-    () => loadSkinComponent({ preset, skin, styling, source: skins }),
-    [preset, skin, styling, skins]
+    () => loadSelectedSkin(skinless, { preset, skin, styling, source: skins }),
+    [preset, skin, skinless, styling, skins]
   );
   const directionProps = useDirectionProps();
   const rootRef = useRef<HTMLElement>(null);
@@ -280,11 +312,11 @@ export function AudioSkinComponent({
   className = PLAYER_FRAME_CLASSES.audio,
   ...props
 }: AudioSkinComponentProps) {
-  const { skin, styling, skins } = useSandbox();
+  const { skin, skinless, styling, skins } = useSandbox();
   const preset: SkinPreset = live ? 'live-audio' : 'audio';
   const Component = useLoadedComponent<AudioSkinProps>(
-    () => loadSkinComponent({ preset, skin, styling, source: skins }),
-    [preset, skin, styling, skins]
+    () => loadSelectedSkin(skinless, { preset, skin, styling, source: skins }),
+    [preset, skin, skinless, styling, skins]
   );
   const directionProps = useDirectionProps();
 

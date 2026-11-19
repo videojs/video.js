@@ -1,0 +1,13 @@
+# Native toolchain for this app only — the web packages don't need a JDK or
+# CocoaPods, so this is deliberately not at the repo root. mise configs cascade
+# by directory, so these activate on `cd` into apps/react-native.
+
+[tools]
+# React Native 0.86 targets JDK 17
+java = "temurin-17.0.20+8"
+
+# Keep in sync with the Gemfile. `react-native run-ios` runs pod through
+# `bundle exec` when a Gemfile is present, so Bundler wins in that path and
+# this pin mainly covers direct `pod` invocations.
+ruby = "4"
+"gem:cocoapods" = "1.17.0"

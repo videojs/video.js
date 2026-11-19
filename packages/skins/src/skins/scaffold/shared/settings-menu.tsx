@@ -134,6 +134,7 @@ function CaptionsMenu() {
             <Template name="captions-option">
               <RadioItem>
                 <Template.Part name="label" />
+                <Template.Part name="badge" className={menuStyles.badge} />
               </RadioItem>
             </Template>
           </$.CaptionsRadioGroup.Options>
@@ -147,7 +148,7 @@ export function SettingsMenu() {
   return (
     <$.Menu.Root side="top" align="center">
       <ButtonTooltip label={<Text token={settingsText.key}>{settingsText.text}</Text>}>
-        <$.Menu.Trigger $render={Button}>
+        <$.Menu.Trigger $render={Button} className={settingsButtonStyles.root}>
           <GearIcon className={buttonStyles.icon} />
           <Text className={settingsButtonStyles.label} token={settingsText.key}>
             {settingsText.text}

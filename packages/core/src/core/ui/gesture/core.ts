@@ -18,7 +18,10 @@ export interface GestureProps {
   type: GestureType;
   /** Built-in player action or same-named custom store action to run when the gesture is recognized. */
   action: GestureActionName | (string & {});
-  /** Numeric value passed to actions such as `seekStep` and `volumeStep`. Uses their shared step when omitted. */
+  /**
+   * Numeric value passed to actions such as `seekStep`, `volumeStep`, `speedUp`, and `speedDown`. The seek and volume
+   * actions use their shared step when omitted, and the speed actions move through the player's playback rates.
+   */
   value?: number | undefined;
   /** Pointer type that may activate the gesture. All pointer types are accepted when omitted. */
   pointer?: GesturePointerType | undefined;

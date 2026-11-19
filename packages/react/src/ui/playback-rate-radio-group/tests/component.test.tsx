@@ -29,7 +29,12 @@ function renderPlaybackRateRadioGroup({
   locale?: string;
   group?: React.ReactNode;
 } = {}) {
-  const { Wrapper } = createPlayerWrapper({ playbackRates, playbackRate, playbackRateAvailability, setPlaybackRate });
+  const { Wrapper } = createPlayerWrapper({
+    playbackRates,
+    playbackRate,
+    playbackRateAvailability,
+    setPlaybackRate,
+  });
   const content = (
     <Menu.Root defaultOpen>
       <PlaybackRateRadioGroup.Root>
@@ -70,6 +75,41 @@ describe('PlaybackRateRadioGroup', () => {
       expect.objectContaining({ rate: 1.5, value: '1.5', checked: true }),
       expect.objectContaining({ rate: 2, value: '2', checked: false }),
     ]);
+  });
+
+  it('offers its own rates in place of the player rates', () => {
+    const { Wrapper } = createPlayerWrapper({
+      playbackRates: [0.5, 1, 2],
+      playbackRate: 1,
+      playbackRateAvailability: 'available',
+      setPlaybackRate: vi.fn(),
+    });
+
+    render(
+      <Menu.Root defaultOpen>
+        <PlaybackRateRadioGroup.Root rates={[1, 3]}>
+          <Menu.Popup>
+            <Menu.Content>
+              <PlaybackRateRadioGroup.Options renderItem={(props) => <Menu.RadioItem {...props} />} />
+            </Menu.Content>
+          </Menu.Popup>
+        </PlaybackRateRadioGroup.Root>
+      </Menu.Root>,
+      { wrapper: Wrapper }
+    );
+
+    expect(screen.getAllByRole('menuitemradio').map((item) => item.getAttribute('data-rate'))).toEqual(['1', '3']);
+  });
+
+  it('marks the current rate as custom when the group does not offer it', () => {
+    renderPlaybackRateRadioGroup({ playbackRates: [1, 1.5, 2], playbackRate: 1.1 });
+
+    const items = screen.getAllByRole('menuitemradio');
+
+    expect(items.map((item) => item.getAttribute('data-rate'))).toEqual(['1', '1.1', '1.5', '2']);
+    expect(items.filter((item) => item.hasAttribute('data-custom')).map((item) => item.textContent)).toEqual(['1.1×']);
+    expect(screen.getByRole('menuitemradio', { name: 'Custom, 1.1×' }).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByRole('menuitemradio', { name: '1.5×' }).hasAttribute('aria-label')).toBe(false);
   });
 
   it('sets the playback rate', () => {

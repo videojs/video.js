@@ -36,8 +36,18 @@ export interface CueSink<C extends Cue = Cue> {
  * resolver (e.g. the browser's native VTT resolver) is supplied at engine-assembly time, so this stays DOM-free. A pure
  * `url → cues` primitive (the text analog of the v/a loader's `fetchBytes`); composition-awareness lives in the
  * injected {@link TextLoadStep}s, not here.
+ *
+ * `credentials` is the mode the engine's request policy resolved for this segment; a resolver should load the segment
+ * with it so cookie-gated cross-origin text tracks load like the rest of the stream.
  */
-export type TextTrackSegmentResolver<C extends Cue = Cue> = (url: string) => Promise<C[]>;
+export type TextTrackSegmentResolver<C extends Cue = Cue> = (
+  url: string,
+  options?: TextTrackSegmentResolverOptions
+) => Promise<C[]>;
+
+export interface TextTrackSegmentResolverOptions {
+  credentials?: RequestCredentials | undefined;
+}
 
 /** Internal load-task descriptor — one segment fetch + dispatch unit. */
 export interface TextLoadTask {

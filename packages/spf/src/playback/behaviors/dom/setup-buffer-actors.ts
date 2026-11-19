@@ -1,10 +1,11 @@
 /**
- * **Per-type buffer + segment-loader actor setup.** Per available track type (video / audio), when `mediaSource` is
- * attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
+ * **Creates the `SourceBuffer` and segment loader for the selected video or audio track once the MediaSource is
+ * attached, and tears them down per source.** Per available track type (video / audio), when `mediaSource` is attached
+ * and the selected track of that type is present in the presentation with codecs (partial resolution from the
  * multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
  * creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
- * per-type actor slots. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
- * the per-type slots so the next source starts fresh.
+ * per-type actor signals. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
+ * the per-type signals so the next source starts fresh.
  *
  * Each per-type variant (`setupVideoBufferActors` / `setupAudioBufferActors`) is a single-positive-state reactor
  * (`'preconditions-unmet'` ↔ `'buffer-ready'`) gating only on its own type. No cross-type coupling in `stateKeys` —
@@ -25,8 +26,8 @@
  *    `'buffer-ready'` in the next `runPending`. Both `entry` bodies run synchronously within that iteration — both
  *    `addSourceBuffer` calls land before the iteration ends.
  * 3. **Downstream — `appendBuffer` is async.** `loadVideoSegments` / `loadAudioSegments` read the per-type
- *    `xSegmentLoaderActor` slots; their effects fire in the _next_ `runPending` and the actual `appendBuffer` requires
- *    a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
+ *    `xSegmentLoaderActor` signals; their effects fire in the _next_ `runPending` and the actual `appendBuffer`
+ *    requires a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
  *
  * The cross-tick failure mode — a user-initiated audio track switch _after_ video segments have begun appending — is
  * out of scope for this behavior and would be addressed in the buffer/segment-loading path via `changeType`-aware
@@ -37,8 +38,9 @@
  * `setupVideoBufferActors` is sole writer of `videoBufferActor` + `videoSegmentLoaderActor` (and `bandwidthState` via
  * its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor` + `audioSegmentLoaderActor`. Both
  * read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
- * `endOfStream`, `updateMediaSourceDuration`) only read these slots.
+ * `endOfStream`, `updateMediaSourceDuration`) only read these signals.
  */
+
 import { listen } from '@videojs/utils/dom';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -52,7 +54,7 @@ import { getSelectedTrack, type TrackSelectionState } from '../../../media/utils
 import { buildMimeCodec } from '../../../media/utils/tracks';
 import { hasCodecs } from '../../../media/utils/tracks';
 import type { BandwidthState } from '../../../network/bandwidth-estimator';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+import { credentialsFetch, type RequestCredentialsConfig } from '../../../network/credentials-fetch';
 import { createTrackedFetch, type FetchBytes, fetchStream } from '../../../network/fetch';
 import {
   createSegmentLoaderActor,
@@ -71,16 +73,38 @@ export interface BufferActorsState {
   presentation?: MaybeResolvedPresentation;
   selectedVideoTrackId?: string;
   selectedAudioTrackId?: string;
+  /**
+   * The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors`
+   * wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional signal;
+   * absent, it ranks on `initialBandwidth`.
+   */
   bandwidthState?: BandwidthState;
 }
 
 export interface BufferActorsContext {
   mediaSource?: MediaSource;
+  /**
+   * The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with
+   * `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both
+   * and clears the signals when that stops holding.
+   */
   videoBufferActor?: SourceBufferActor;
+  /** The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. */
   audioBufferActor?: SourceBufferActor;
+  /**
+   * The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through
+   * `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages.
+   */
   videoSegmentLoaderActor?: SegmentLoaderActor;
+  /** The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. */
   audioSegmentLoaderActor?: SegmentLoaderActor;
 }
+
+/**
+ * The MIME codec string a SourceBuffer is created with, from the track it will carry. The default is the track's own
+ * container and codecs; a transmuxing composition maps the container its bytes arrive in to the one they leave in.
+ */
+export type SourceBufferMimeCodec = (track: PartiallyResolvedTrack) => string;
 
 type BufferActorsFsmState = 'preconditions-unmet' | 'buffer-ready';
 
@@ -94,9 +118,7 @@ type BufferActorsStateMap<K extends SelectedTrackKey> = {
 
 type BufferActorsContextMap<A extends BufferActorKey, L extends SegmentLoaderActorKey> = {
   mediaSource: ReadonlySignal<BufferActorsContext['mediaSource']>;
-} & { [P in A]: Signal<SourceBufferActor | undefined> } & {
-  [P in L]: Signal<SegmentLoaderActor | undefined>;
-};
+} & { [P in A]: Signal<BufferActorsContext[P]> } & { [P in L]: Signal<BufferActorsContext[P]> };
 
 // ============================================================================
 // Specialization helper
@@ -108,9 +130,9 @@ type BufferActorsContextMap<A extends BufferActorKey, L extends SegmentLoaderAct
 // the per-type `selectedKey`, `actorKey`, `loaderKey`, `type` discriminator,
 // and `fetch` inline.
 //
-// Gating is per-type only: no cross-type coupling. See the file-level
-// JSDoc for how the Firefox `mozHasAudio` invariant survives the split
-// via SPF's effect coalescing.
+// Gating is per-type only: no cross-type coupling. See
+// `setupVideoBufferActors`'s JSDoc for how the Firefox `mozHasAudio`
+// invariant survives the split via SPF's effect coalescing.
 // ============================================================================
 
 function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey, L extends SegmentLoaderActorKey>({
@@ -126,9 +148,21 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
     actorKey: A;
     loaderKey: L;
     fetch: FetchBytes;
+    /** The MIME codec string the SourceBuffer is created with; defaults to the track's own container + codecs. */
+    sourceBufferMimeCodec?: SourceBufferMimeCodec;
   } & SegmentLoaderActorConfig;
 }): Reactor<BufferActorsFsmState | 'destroying' | 'destroyed'> {
-  const { type, selectedKey, actorKey, loaderKey, fetch, forwardBuffer, backBuffer, messagePipelines } = config;
+  const {
+    type,
+    selectedKey,
+    actorKey,
+    loaderKey,
+    fetch,
+    forwardBuffer,
+    backBuffer,
+    messagePipelines,
+    sourceBufferMimeCodec = buildMimeCodec,
+  } = config;
   const derivedStateSignal = computed<BufferActorsFsmState>(() => {
     if (!context.mediaSource.get()) return 'preconditions-unmet';
 
@@ -154,7 +188,7 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
             [selectedKey]: state[selectedKey].get(),
           };
           const track = getSelectedTrack(selection, type) as PartiallyResolvedTrack;
-          const buffer = createSourceBuffer(mediaSource, buildMimeCodec(track));
+          const buffer = createSourceBuffer(mediaSource, sourceBufferMimeCodec(track));
           const bufferActor = createSourceBufferActor(buffer);
           const segmentLoader = createSegmentLoaderActor(
             bufferActor,
@@ -165,8 +199,8 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
             { state, context, config }
           );
 
-          // Synchronous slot writes — load-bearing for the Firefox
-          // `mozHasAudio` invariant (see file-level JSDoc). Both per-type
+          // Synchronous signal writes — load-bearing for the Firefox
+          // `mozHasAudio` invariant (see `setupVideoBufferActors`'s JSDoc). Both per-type
           // entries' `addSourceBuffer` calls must land in the same
           // `runPending` iteration; synchronous writes keep the contiguous
           // JS frame. Downstream `loadXSegments` effects fire in the
@@ -223,13 +257,18 @@ export const setupVideoBufferActors = defineBehavior({
       bandwidthState: Signal<BufferActorsState['bandwidthState']>;
     };
     context: BufferActorsContextMap<'videoBufferActor', 'videoSegmentLoaderActor'>;
-    config?: SegmentLoaderActorConfig & {
-      getCdnId?: GetCdnId;
-      /** The `credentials` mode segment requests are made with; absent → the platform default. */
-      requestCredentials?: RequestCredentialsPolicy;
-      /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
-      videoMessagePipelines?: MessagePipelines;
-    };
+    config?: SegmentLoaderActorConfig &
+      RequestCredentialsConfig & {
+        /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
+        getCdnId?: GetCdnId;
+        /**
+         * Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append
+         * as-is.
+         */
+        videoMessagePipelines?: MessagePipelines;
+        /** The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). */
+        sourceBufferMimeCodec?: SourceBufferMimeCodec;
+      };
   }) => {
     // Bandwidth-sampling fetch. The factory accumulates EWMA state
     // internally; the callback bridges samples to engine state for ABR.
@@ -270,7 +309,7 @@ export const setupVideoBufferActors = defineBehavior({
  * touching the shared helper. See `internal/design/spf/features/audio-abr.md` for the design surface (bandwidth-state
  * sharing, multi-writer coordination, EWMA mixed- source sampling).
  *
- * **Mid-stream audio track switching is NOT this behavior's concern.** Slot writes to `selectedAudioTrackId` (default
+ * **Mid-stream audio track switching is NOT this behavior's concern.** Writes to `selectedAudioTrackId` (default
  * selection, programmatic filter-driven, future ABR) are owned by `switchAudioTrack` / future `switchAudioQuality` in
  * `track-switching.ts`. Flush orchestration on track change is dispatched from there via `audioBufferActor.send(...)` —
  * keeping this setup behavior focused on per-source actor lifecycle.
@@ -285,13 +324,18 @@ export const setupAudioBufferActors = defineBehavior({
   }: {
     state: BufferActorsStateMap<'selectedAudioTrackId'>;
     context: BufferActorsContextMap<'audioBufferActor', 'audioSegmentLoaderActor'>;
-    config?: SegmentLoaderActorConfig & {
-      getCdnId?: GetCdnId;
-      /** The `credentials` mode segment requests are made with; absent → the platform default. */
-      requestCredentials?: RequestCredentialsPolicy;
-      /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
-      audioMessagePipelines?: MessagePipelines;
-    };
+    config?: SegmentLoaderActorConfig &
+      RequestCredentialsConfig & {
+        /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
+        getCdnId?: GetCdnId;
+        /**
+         * Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append
+         * as-is.
+         */
+        audioMessagePipelines?: MessagePipelines;
+        /** The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). */
+        sourceBufferMimeCodec?: SourceBufferMimeCodec;
+      };
   }) => {
     // Key order mirrors setupVideoBufferActors.
     const typeConfig = { ...AUDIO_TYPE_CONFIG, ...config };

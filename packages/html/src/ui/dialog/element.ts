@@ -12,11 +12,13 @@ import {
   createDialog,
   createTransition,
   type DialogApi,
+  type DialogModality,
 } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
-import { ContextProvider } from '@videojs/element/context';
+import { ContextConsumer, ContextProvider } from '@videojs/element/context';
 import { SnapshotController } from '@videojs/store/html';
 
+import { containerContext } from '../../player/context';
 import { PositionController } from '../position-controller';
 import { UIElement } from '../ui-element';
 import { dialogContext } from './context';
@@ -47,6 +49,7 @@ export class DialogElementBase extends UIElement {
   readonly #stateAttrMap: StateAttrMap<DialogState>;
   readonly #provider = new ContextProvider(this, { context: dialogContext });
   readonly #position = new PositionController(this);
+  readonly #container = new ContextConsumer(this, { context: containerContext, subscribe: true });
   readonly #popupId: string;
   readonly #titleId: string;
   readonly #descriptionId: string;
@@ -54,6 +57,7 @@ export class DialogElementBase extends UIElement {
 
   #dialog: DialogApi | null = null;
   #snapshot: SnapshotController<DialogInput> | null = null;
+  #modalitySnapshot: SnapshotController<DialogModality> | null = null;
   #triggerAbort: AbortController | null = null;
   #triggerElement: HTMLElement | null = null;
 
@@ -96,6 +100,12 @@ export class DialogElementBase extends UIElement {
     } else {
       this.#snapshot = new SnapshotController(this, this.#dialog.input);
     }
+
+    if (this.#modalitySnapshot) {
+      this.#modalitySnapshot.track(this.#dialog.modality);
+    } else {
+      this.#modalitySnapshot = new SnapshotController(this, this.#dialog.modality);
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -118,6 +128,7 @@ export class DialogElementBase extends UIElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed);
     this.#core.setProps(this);
+    this.#dialog?.setInteractionRoot(this.#container.value?.container ?? null);
 
     if (this.#dialog && changed.has('open')) {
       const { active: inputOpen } = this.#dialog.input.current;
@@ -141,6 +152,7 @@ export class DialogElementBase extends UIElement {
     const input = this.#dialog.input.current;
 
     this.#core.setInput(input);
+    this.#core.setDocumentModal(this.#dialog.modality.current.documentModal);
     const state = this.#core.getState();
 
     applyStateDataAttrs(this, state, this.#stateAttrMap);

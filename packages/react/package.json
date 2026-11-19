@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react",
-  "version": "10.2.0",
+  "version": "10.5.0",
   "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
     "audio",
@@ -79,6 +79,11 @@
       "development": "./dist/dev/media/mux-audio/spf.js",
       "default": "./dist/default/media/mux-audio/spf.js"
     },
+    "./media/lazy/*": {
+      "types": "./dist/dev/media/lazy/*.d.ts",
+      "development": "./dist/dev/media/lazy/*.js",
+      "default": "./dist/default/media/lazy/*.js"
+    },
     "./media/*": {
       "types": "./dist/dev/media/*/index.d.ts",
       "development": "./dist/dev/media/*/index.js",
@@ -144,6 +149,11 @@
       "development": "./dist/dev/i18n/index.js",
       "default": "./dist/default/i18n/index.js"
     },
+    "./i18n/locales/*/register": {
+      "types": "./dist/dev/i18n/locales/*/register.d.ts",
+      "development": "./dist/dev/i18n/locales/*/register.js",
+      "default": "./dist/default/i18n/locales/*/register.js"
+    },
     "./i18n/locales/*": {
       "types": "./dist/dev/i18n/locales/*.d.ts",
       "development": "./dist/dev/i18n/locales/*.js",
@@ -179,10 +189,13 @@
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
@@ -203,9 +216,12 @@
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
@@ -225,13 +241,22 @@
     "@videojs/cloudflare-video": {
       "optional": true
     },
+    "@videojs/dailymotion-video": {
+      "optional": true
+    },
     "@videojs/dash-video": {
+      "optional": true
+    },
+    "@videojs/google-analytics": {
       "optional": true
     },
     "@videojs/google-cast": {
       "optional": true
     },
     "@videojs/hlsjs-video": {
+      "optional": true
+    },
+    "@videojs/mixcloud-audio": {
       "optional": true
     },
     "@videojs/mux-audio": {

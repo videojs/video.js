@@ -104,7 +104,7 @@ The preset also exports a `usePlayer` hook typed to `liveVideoFeatures`. Use it 
 | --- | --- | --- |
 | `content-title` | `contentTitle` | The title to display. Takes precedence over the title the media reports. |
 | `poster` | `poster` | The poster to display. Takes precedence over the poster the media reports. |
-| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+| `keep-alive` | — | Keeps the player, its store, and the UI elements inside it alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
 
 `content-title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>. The element's read-only `store` property returns its player store.
 
@@ -113,7 +113,7 @@ The preset root also exports a `PlayerController` bound to the live video player
 
 ## Feature bundle
 
-`liveVideoFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. It is the <DocsLink slug="reference/api/preset-video" anchor="feature-bundle">video preset's</DocsLink> `videoFeatures` without playback rate, quality, and audio-track selection, plus the <DocsLink slug="reference/api/feature-live">live feature</DocsLink>:
+`liveVideoFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. It is the <DocsLink slug="reference/api/preset-video" anchor="feature-bundle">video preset's</DocsLink> `videoFeatures` without playback rate, plus the <DocsLink slug="reference/api/feature-live">live feature</DocsLink>:
 
 <PresetFeatures preset="live-video" />
 

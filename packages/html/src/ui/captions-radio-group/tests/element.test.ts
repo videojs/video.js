@@ -39,7 +39,7 @@ async function waitForAssertion(assertion: () => void): Promise<void> {
 }
 
 function createTextTrackStore({
-  textTrackList = [{ id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled' }],
+  textTrackList = [{ id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled', source: 'media' }],
   subtitlesShowing = false,
   selectSubtitlesTrack = vi.fn(),
 }: {
@@ -140,7 +140,9 @@ describe('CaptionsRadioGroupElement', () => {
 
   it('uses a custom track formatter', async () => {
     const { menu, options } = setup('en', {
-      textTrackList: [{ id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' }],
+      textTrackList: [
+        { id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
+      ],
     });
 
     options.formatTrack = (track) => `${track.language.toUpperCase()} subtitles`;
@@ -151,6 +153,50 @@ describe('CaptionsRadioGroupElement', () => {
     const items = [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
 
     expect(items.map((item) => item.textContent)).toEqual(['Off', 'ES subtitles']);
+  });
+
+  it('renders kind badges for tracks that share a label', async () => {
+    const { menu, options } = setup('en', {
+      textTrackList: [
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
+      ],
+    });
+    const template = document.createElement('template');
+
+    template.innerHTML =
+      '<media-menu-radio-item><span data-part="label"></span><span data-part="badge"></span></media-menu-radio-item>';
+    options.append(template);
+
+    await waitForAssertion(() => {
+      const items = [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+      const badges = items.map((item) => item.querySelector<HTMLElement>('[data-part~="badge"]'));
+
+      expect(items.map((item) => item.querySelector('[data-part~="label"]')?.textContent)).toEqual([
+        'Off',
+        'English',
+        'English',
+        'Spanish',
+      ]);
+      expect(badges.map((badge) => badge?.textContent)).toEqual(['', 'CC', 'SUB', '']);
+      expect(badges.map((badge) => badge?.hidden)).toEqual([true, false, false, true]);
+    });
+  });
+
+  it('appends kind badges to item text without a template', async () => {
+    const { menu, options } = setup('en', {
+      textTrackList: [
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+      ],
+    });
+
+    await options.updateComplete;
+
+    const items = [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+
+    expect(items.map((item) => item.textContent)).toEqual(['Off', 'English CC', 'English SUB']);
   });
 
   it('applies group disabled semantics when captions are unavailable', async () => {
@@ -169,7 +215,9 @@ describe('CaptionsRadioGroupElement', () => {
   it('selects a captions option by normalized value', async () => {
     const selectSubtitlesTrack = vi.fn();
     const { options } = setup('en', {
-      textTrackList: [{ id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' }],
+      textTrackList: [
+        { id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
+      ],
       selectSubtitlesTrack,
     });
 

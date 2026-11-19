@@ -1,25 +1,3 @@
-/**
- * Establish the presentation's coordinate origin — the `startTime` / `startMediaTime` / `startDate` triple — once per
- * source, so every track lands on one 0-based presentation timeline. One establishment unit with an internal order: the
- * wall-clock **anchor** settles (live PDT sources), gated parses align to it, then `startMediaTime` latches — see
- * `internal/design/spf/live-presentation-timeline-model.md`.
- *
- * The two coordinate stamps it owns:
- *
- * - **`startDate` (wall-clock anchor).** The designated _reference track_ (selected video, else audio) resolves first;
- *   its parser-computed `startDate` — PDT at presentation-0 — is frozen as the anchor and stamped onto every other
- *   track that lacks one, so their first parses place via `placeOnAnchor` (the pre-applied-anchor path in
- *   `parse-media-playlist`) and later-selected renditions resolve already aligned. Ordering is enforced by
- *   {@link gateFirstParseOnAnchor}, which `resolve-track` awaits through its injected gate seam. Absent PDT (ordinary
- *   VOD), no anchor is stamped and local-from-0 placement is already correct.
- * - **`startMediaTime` (decode origin).** Runs the injected {@link DeriveStartMediaTime} seam over the transient
- *   `mediaContainerData` slot (owned here; `inactive` clears it per source) and stamps the settled value onto the model
- *   until `established`. The byte-level discover/stamp steps that fill the slot are a separate, config
- *   `messagePipelines` array (`primitives/relocation-pipelines`); the two coordinate only through the shared
- *   `state.mediaContainerData` slot, never by import. See `internal/design/spf/presentation-timeline-model.md`.
- *
- * DOM-free reactor; sticky per source (`inactive → monitoring → established`).
- */
 import type { Behavior } from '../../core/composition/define-behavior';
 import { createMachineReactor, type Reactor } from '../../core/reactors/create-machine-reactor';
 import { type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
@@ -181,7 +159,7 @@ export interface EstablishStartMediaTimeConfig {
 }
 
 // ============================================================================
-// REACTOR (owns the transient slot; derives + consumes onto the model)
+// REACTOR (owns the transient signal; derives + consumes onto the model)
 // ============================================================================
 
 /**
@@ -273,7 +251,7 @@ function establishStartMediaTimeSetup({
       return established() ? 'established' : 'monitoring';
     },
     states: {
-      // Fresh per source: clear the transient slot so a new source re-discovers.
+      // Fresh per source: clear the transient signal so a new source re-discovers.
       inactive: { entry: () => state.mediaContainerData.set(undefined) },
       // The establishment order, as two effects: anchor first, derive second.
       // Both stamps are sticky per source — disabled on entry to `established`,
@@ -302,7 +280,7 @@ function establishStartMediaTimeSetup({
             );
           },
           // Derive: reduce the accumulating container data into per-track startMediaTime
-          // and stamp it onto the model. Re-runs as discover fills the slot; the update
+          // and stamp it onto the model. Re-runs as discover fills the signal; the update
           // reads presentation untracked, so no self-loop.
           () => {
             const containerData = state.mediaContainerData.get();
@@ -324,6 +302,28 @@ function establishStartMediaTimeSetup({
   });
 }
 
+/**
+ * Establish the presentation's coordinate origin — the `startTime` / `startMediaTime` / `startDate` triple — once per
+ * source, so every track lands on one 0-based presentation timeline. One establishment unit with an internal order: the
+ * wall-clock **anchor** settles (live PDT sources), gated parses align to it, then `startMediaTime` latches — see
+ * `internal/design/spf/live-presentation-timeline-model.md`.
+ *
+ * The two coordinate stamps it owns:
+ *
+ * - **`startDate` (wall-clock anchor).** The designated _reference track_ (selected video, else audio) resolves first;
+ *   its parser-computed `startDate` — PDT at presentation-0 — is frozen as the anchor and stamped onto every other
+ *   track that lacks one, so their first parses place via `placeOnAnchor` (the pre-applied-anchor path in
+ *   `parse-media-playlist`) and later-selected renditions resolve already aligned. Ordering is enforced by
+ *   {@link gateFirstParseOnAnchor}, which `resolve-track` awaits through its injected gate seam. Absent PDT (ordinary
+ *   VOD), no anchor is stamped and local-from-0 placement is already correct.
+ * - **`startMediaTime` (decode origin).** Runs the injected {@link DeriveStartMediaTime} seam over the transient
+ *   `mediaContainerData` signal (owned here; `inactive` clears it per source) and stamps the settled value onto the
+ *   model until `established`. The byte-level discover/stamp steps that fill the signal are a separate, config
+ *   `messagePipelines` array (`primitives/relocation-pipelines`); the two coordinate only through the shared
+ *   `state.mediaContainerData` signal, never by import. See `internal/design/spf/presentation-timeline-model.md`.
+ *
+ * DOM-free reactor; sticky per source (`inactive → monitoring → established`).
+ */
 export const establishStartMediaTime: Behavior<
   {
     presentation: Signal<EstablishStartMediaTimeState['presentation']>;

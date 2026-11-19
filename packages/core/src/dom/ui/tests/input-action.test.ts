@@ -43,7 +43,9 @@ describe('getMediaSnapshot', () => {
           playbackRate: 1.5,
           isFullscreen: true,
           subtitlesShowing: true,
-          textTrackList: [{ id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'showing' }],
+          textTrackList: [
+            { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'showing', source: 'media' },
+          ],
           isPictureInPicture: false,
           currentTime: 30,
           duration: 120,
@@ -69,6 +71,15 @@ describe('getMediaSnapshot', () => {
     expect(getMediaSnapshot(mockStore({ paused: true, ended: false, started: false, autoplaying: true })).paused).toBe(
       false
     );
+  });
+
+  it('reports whether playback has started, counting a pending autoplay', () => {
+    const snapshot = (started: boolean, autoplaying: boolean) =>
+      getMediaSnapshot(mockStore({ paused: true, ended: false, started, autoplaying })).started;
+
+    expect(snapshot(false, false)).toBe(false);
+    expect(snapshot(false, true)).toBe(true);
+    expect(snapshot(true, false)).toBe(true);
   });
 });
 

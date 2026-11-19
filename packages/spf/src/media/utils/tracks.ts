@@ -127,6 +127,15 @@ export function findResolvedAudioTrack(
 }
 
 /**
+ * Whether a resolved audio or video track has no separate init segment, so its decoder configuration travels in its
+ * media segments (MPEG-TS, packed audio). Surfacing such a track's metadata takes one media segment. Text tracks have
+ * no init concept and answer `false`.
+ */
+export function carriesInitInSegments(track: Pick<ResolvedTrack, 'type' | 'initialization'>): boolean {
+  return track.type !== 'text' && !track.initialization?.url;
+}
+
+/**
  * Whether a track carries a non-empty `codecs` array. Both partially- resolved and fully-resolved tracks may carry
  * codecs — they come from the multivariant playlist's `EXT-X-STREAM-INF` line, not from the per-type media playlist —
  * so this works at either resolution stage.

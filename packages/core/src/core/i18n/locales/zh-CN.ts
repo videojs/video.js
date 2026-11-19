@@ -100,6 +100,7 @@ export default {
     speed: '速度',
     captions: '字幕',
     playbackRate: '播放速度',
+    customRate: '自定义，{rate}',
     back: '返回',
     off: '关闭',
     auto: '自动',

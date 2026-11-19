@@ -23,8 +23,11 @@ export default styles({
         // The container is also a grid item of the skin host, so it must not inherit `min-*: auto` from its content.
         'shadow-dom': [
           'min-h-0 min-w-0',
-          '[&>slot::slotted(video)]:m-0 [&>slot::slotted(video)]:block [&>slot::slotted(video)]:h-full [&>slot::slotted(video)]:w-full',
+          '[&>slot::slotted(video)]:m-0 [&>slot::slotted(video)]:block [&>slot::slotted(video)]:w-full',
           '[&>slot::slotted(video)]:max-w-full [&>slot::slotted(video)]:rounded-[inherit] [&>slot::slotted(video)]:object-media',
+          // Page resets such as Tailwind's `video { height: auto }` outrank normal slotted styles, which leaves the
+          // video at its natural height at the top of a container the page has given a different shape.
+          '[&>slot::slotted(video)]:h-full!',
         ],
       },
     },

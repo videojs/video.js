@@ -3,6 +3,7 @@ import * as caniuse from 'caniuse-lite';
 import caniusePackage from 'caniuse-lite/package.json' with { type: 'json' };
 
 import rootPackage from '../../../package.json' with { type: 'json' };
+import { compatSkinBrowserslist } from '../../../packages/skins/build/compat-browsers.ts';
 
 /** The browsers the support policy names, in the order the docs list them. */
 export const SUPPORT_BROWSERS = [
@@ -27,6 +28,8 @@ export interface CssRequirement {
   kind: CssRequirementKind;
   /** What a reader sees in a browser without the feature. */
   effect: string;
+  /** How the Compat skin differs, when it depends on the feature less than the other skins. */
+  compat?: string;
 }
 
 /**
@@ -46,12 +49,19 @@ export const CSS_REQUIREMENTS: readonly CssRequirement[] = [
     effect: 'Packaged skins use :where() selectors instead; registry CSS skins need it',
   },
   { id: 'css-cascade-layers', label: '@layer', kind: 'required', effect: 'No component styling' },
-  { id: 'css-has', label: ':has()', kind: 'required', effect: 'Menu and slider focus states are lost' },
+  {
+    id: 'css-has',
+    label: ':has()',
+    kind: 'required',
+    effect: 'Menu and slider focus states are lost',
+    compat: 'Compat loses only the time slider preview on keyboard focus',
+  },
   {
     id: 'css-container-queries',
     label: '@container',
     kind: 'required',
     effect: 'Controls do not adapt to player width',
+    compat: 'Compat keeps its narrow layout, without the center controls or the duration',
   },
   {
     id: 'css-media-range-syntax',
@@ -77,7 +87,13 @@ export const CSS_REQUIREMENTS: readonly CssRequirement[] = [
     kind: 'degrades',
     effect: 'Menus show default scrollbars',
   },
-  { id: 'css-backdrop-filter', label: 'backdrop-filter', kind: 'degrades', effect: 'Surfaces lose their blur' },
+  {
+    id: 'css-backdrop-filter',
+    label: 'backdrop-filter',
+    kind: 'degrades',
+    effect: 'Surfaces lose their blur',
+    compat: 'Compat does not use it',
+  },
   {
     id: 'css-anchor-positioning',
     label: 'Anchor positioning',
@@ -99,6 +115,9 @@ export interface ResolvedBrowser {
 
 /** The browserslist query the repository builds against, from the root `package.json`. */
 export const BROWSERSLIST_QUERY: readonly string[] = rootPackage.browserslist;
+
+/** The older browsers the Compat skin stylesheets render in, which the skins build audits. Scaffold reaches them too. */
+export const COMPAT_BROWSERSLIST_QUERY: readonly string[] = compatSkinBrowserslist;
 
 /** Numeric sort key for caniuse version strings such as `17.4`, `150`, or `15.0-15.1`. */
 export function versionNumber(version: string): number {

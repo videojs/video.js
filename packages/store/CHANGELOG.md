@@ -1,5 +1,59 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/store@10.4.0...@videojs/store@10.5.0) (2026-11-16)
+
+
+### Miscellaneous Chores
+
+* **@videojs/store:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.5.0
+  * devDependencies
+    * @videojs/element bumped to 10.5.0
+  * peerDependencies
+    * @videojs/element bumped to 10.5.0
+
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/store@10.3.0...@videojs/store@10.4.0) (2026-11-13)
+
+
+### Miscellaneous Chores
+
+* **@videojs/store:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.4.0
+  * devDependencies
+    * @videojs/element bumped to 10.4.0
+  * peerDependencies
+    * @videojs/element bumped to 10.4.0
+
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/store@10.2.0...@videojs/store@10.3.0) (2026-11-03)
+
+
+### Miscellaneous Chores
+
+* **@videojs/store:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+  * devDependencies
+    * @videojs/element bumped to 10.3.0
+  * peerDependencies
+    * @videojs/element bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/store@10.1.0...@videojs/store@10.2.0) (2026-10-22)
 
 

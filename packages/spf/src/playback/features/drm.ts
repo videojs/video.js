@@ -24,6 +24,7 @@ import { reportUnsupportedTrackConditionsWithDrm } from '../primitives/report-tr
 import { excludeRefusedKeySystems } from '../primitives/selection-rules';
 
 // Typed as the runtime shapes the behaviors read, so a caller's config can override them.
+/** No license servers configured. */
 const noLicenseServers: DrmSystemsConfig = {};
 // The literal tuple, so a config that omits `keySystems` is checked against the default systems' ids.
 const defaultKeySystems: typeof DEFAULT_KEY_SYSTEMS = DEFAULT_KEY_SYSTEMS;
