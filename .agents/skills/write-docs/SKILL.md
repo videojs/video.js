@@ -30,7 +30,7 @@ Before drafting, write down the shape (how-to or concept), the reader's question
    - Code or error examples: the matching file in `patterns/`
    - New artifact scaffold: the matching file in `templates/`
 4. Lead with the user outcome or concept. Use complete, verified examples and explain only non-obvious parts.
-5. Reread the draft against `references/diataxis.md`: every heading and sentence form matches the shape you chose. Move passages that read like another shape to the page that owns them and leave a link.
+5. Reread the draft against `references/diataxis.md`: every heading and sentence form matches the shape you chose. Move passages that read like another shape to the page that owns them and leave a link. For a how-to, read the reference pages it links and cut anything it restates.
 6. Add the sidebar entry and framework/style restrictions for new site pages. When a page changes slug, add a `[[redirects]]` rule for the old URL and its `.md` twin to `site/netlify.toml`, above the section-wide rules.
 7. Run examples or relevant tests where practical, run `pnpm -F site test diataxis` for site pages, and render affected MDX for every supported variant.
 

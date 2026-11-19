@@ -100,3 +100,131 @@ export function findDiataxisIssues(page: DocPage): DiataxisIssue[] {
 export function findTaskHeadings(page: DocPage): string[] {
   return headings(page.body).filter((heading) => TASK_VERBS.has(heading.split(/\s+/)[0]?.toLowerCase() ?? ''));
 }
+
+/** A guide passage that repeats one on a reference page. */
+export interface ReferenceDuplicate {
+  /** The guide that repeats the passage. */
+  id: string;
+  /** The reference page it repeats. */
+  referenceId: string;
+  /** The repeated passage, or the first cells of the repeated table rows. */
+  excerpt: string;
+}
+
+/** Shorter prose passages are too generic to call a copy ("It renders nothing."). */
+const MIN_PASSAGE_LENGTH = 80;
+/** Fewer shared rows than this, under the same columns, is a coincidence rather than a copied lookup table. */
+const MIN_SHARED_TABLE_ROWS = 4;
+
+const CODE_FENCE = /^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm;
+const JSX_ONLY_LINE = /^\s*(<\/?[A-Z][^>]*>|\{\/\*.*\*\/\})\s*$/;
+const TABLE_RULE = /^\|?[\s:|-]+\|?$/;
+
+interface Table {
+  header: string;
+  /** First-column cells of the body rows. */
+  rows: string[];
+}
+
+interface Passages {
+  prose: Set<string>;
+  tables: Table[];
+}
+
+function normalize(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+function cells(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\||\|$/g, '')
+    .split('|')
+    .map(normalize);
+}
+
+function toTable(lines: string[]): Table {
+  const [header = '', ...body] = lines.filter((line) => !TABLE_RULE.test(line.trim()));
+
+  return { header: cells(header).join('|'), rows: body.map((line) => cells(line)[0] ?? '').filter(Boolean) };
+}
+
+/**
+ * Prose paragraphs, list items, and table first columns, the parts of a page that state facts. Code is left out because
+ * a guide may show the same snippet its reference does, and so are imports, headings, and component tags.
+ */
+function passages(body: string): Passages {
+  const result: Passages = { prose: new Set(), tables: [] };
+  const lines = body.replace(CODE_FENCE, '').split('\n');
+  const blocks: string[][] = [[]];
+
+  for (const line of lines) {
+    if (line.trim() === '' || JSX_ONLY_LINE.test(line) || /^(import |#{1,6} )/.test(line)) {
+      blocks.push([]);
+      continue;
+    }
+
+    blocks.at(-1)!.push(line);
+  }
+
+  for (const block of blocks) {
+    // Component markup, such as a multi-line `<Demo files={[…]}>`, is wiring rather than a statement of fact.
+    if (block.length === 0 || /^\s*[<{]/.test(block[0]!)) continue;
+
+    if (block[0]!.trim().startsWith('|')) {
+      result.tables.push(toTable(block));
+      continue;
+    }
+
+    const items = /^\s*([-*]|\d+\.)\s/.test(block[0]!)
+      ? block.join('\n').split(/\n(?=\s*(?:[-*]|\d+\.)\s)/)
+      : [block.join(' ')];
+
+    for (const item of items) {
+      const text = normalize(item.replace(/^\s*([-*]|\d+\.)\s+/, ''));
+
+      // Measured without tags, so a list of links such as "Related guides" doesn't count as prose.
+      if (text.replace(/<[^>]+>/g, '').length >= MIN_PASSAGE_LENGTH) result.prose.add(text);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Report guide passages that repeat a reference page: the same paragraph or list item, or a table with the same columns
+ * whose rows name the same entries. Reference owns exact options, values, and lookup tables, so a guide links to them
+ * instead. Code examples are exempt.
+ */
+export function findReferenceDuplicates(pages: DocPage[]): ReferenceDuplicate[] {
+  const references = pages
+    .filter((page) => page.type === 'reference')
+    .map((page) => ({ id: page.id, ...passages(page.body) }));
+  const duplicates: ReferenceDuplicate[] = [];
+
+  for (const page of pages) {
+    if (page.type === 'reference') continue;
+
+    const guide = passages(page.body);
+
+    for (const reference of references) {
+      for (const text of guide.prose) {
+        if (reference.prose.has(text)) duplicates.push({ id: page.id, referenceId: reference.id, excerpt: text });
+      }
+
+      for (const table of guide.tables) {
+        for (const referenceTable of reference.tables) {
+          if (table.header !== referenceTable.header) continue;
+
+          const shared = table.rows.filter((row) => referenceTable.rows.includes(row));
+
+          if (shared.length >= MIN_SHARED_TABLE_ROWS) {
+            duplicates.push({ id: page.id, referenceId: reference.id, excerpt: `table rows ${shared.join(', ')}` });
+          }
+        }
+      }
+    }
+  }
+
+  return duplicates;
+}
