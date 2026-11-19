@@ -43,6 +43,13 @@ function setFullscreenElement(value: Element | null) {
   });
 }
 
+function setVideoDimensions(video: HTMLVideoElement, width: number, height: number) {
+  Object.defineProperties(video, {
+    videoWidth: { value: width, writable: true, configurable: true },
+    videoHeight: { value: height, writable: true, configurable: true },
+  });
+}
+
 // Stores keep document-level fullscreen listeners until destroyed, so an
 // undestroyed store from an earlier test reacts to later dispatches.
 const stores: { destroy(): void }[] = [];
@@ -94,6 +101,152 @@ describe('orientationLockFeature', () => {
 
     await vi.waitFor(() => {
       expect(orientation.lock).toHaveBeenCalledWith('portrait');
+    });
+  });
+
+  it.each([
+    { width: 1920, height: 1080, expected: 'landscape' },
+    { width: 1080, height: 1920, expected: 'portrait' },
+  ])('resolves auto to $expected for $width by $height video', async ({ width, height, expected }) => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, width, height);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('auto');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith(expected);
+    });
+  });
+
+  it('does not lock square video in auto mode', () => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, 1080, 1080);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('auto');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    expect(orientation.lock).not.toHaveBeenCalled();
+  });
+
+  it('unlocks when video dimensions become square during fullscreen', async () => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, 1920, 1080);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('auto');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('landscape');
+    });
+
+    setVideoDimensions(video, 1080, 1080);
+    video.dispatchEvent(new Event('resize'));
+
+    await vi.waitFor(() => {
+      expect(orientation.unlock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('waits for video dimensions and locks when metadata loads', async () => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, 0, 0);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('auto');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    expect(orientation.lock).not.toHaveBeenCalled();
+
+    setVideoDimensions(video, 1920, 1080);
+    video.dispatchEvent(new Event('loadedmetadata'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('landscape');
+    });
+  });
+
+  it('updates the resolved orientation when video dimensions change during fullscreen', async () => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, 1080, 1920);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('auto');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('portrait');
+    });
+
+    setVideoDimensions(video, 1920, 1080);
+    video.dispatchEvent(new Event('resize'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('landscape');
+    });
+  });
+
+  it('resolves auto when the setting changes during fullscreen', async () => {
+    const orientation = stubOrientation();
+    const video = createMockVideo();
+
+    setVideoDimensions(video, 1920, 1080);
+
+    const container = document.createElement('div');
+    const store = createOrientationStore();
+
+    store.setOrientationLockType('portrait');
+    store.attach({ media: video, container });
+
+    setFullscreenElement(container);
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('portrait');
+    });
+
+    store.setOrientationLockType('auto');
+
+    await vi.waitFor(() => {
+      expect(orientation.lock).toHaveBeenCalledWith('landscape');
     });
   });
 
@@ -187,10 +340,13 @@ describe('orientationLockFeature', () => {
   it('unlocks when fullscreen exits', async () => {
     const orientation = stubOrientation();
     const video = createMockVideo();
+
+    setVideoDimensions(video, 1080, 1920);
     const container = document.createElement('div');
 
     const store = createOrientationStore();
 
+    store.setOrientationLockType('auto');
     store.attach({ media: video, container });
 
     setFullscreenElement(container);
@@ -294,6 +450,7 @@ describe('orientationLockFeature', () => {
       lock: vi.fn<ScreenOrientation['lock']>().mockRejectedValue(new Error('NotSupportedError')),
       unlock: vi.fn<ScreenOrientation['unlock']>(),
     });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const video = createMockVideo();
     const container = document.createElement('div');
 
@@ -307,6 +464,12 @@ describe('orientationLockFeature', () => {
 
     await vi.waitFor(() => {
       expect(orientation.lock).toHaveBeenCalledTimes(1);
+    });
+    await vi.waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('Could not lock screen orientation'),
+        expect.any(Error)
+      );
     });
 
     // The feature subscribes to the whole store, and a real player publishes

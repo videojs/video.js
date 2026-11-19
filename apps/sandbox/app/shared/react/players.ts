@@ -1,11 +1,11 @@
-import { createPlayer } from '@videojs/react';
+import { createPlayer, features } from '@videojs/react';
 import { audioFeatures } from '@videojs/react/audio';
 import { backgroundFeatures } from '@videojs/react/background';
 import { liveAudioFeatures } from '@videojs/react/live-audio';
 import { liveVideoFeatures } from '@videojs/react/live-video';
 import { videoFeatures } from '@videojs/react/video';
 
-export const { Player: VideoPlayer } = createPlayer({ features: videoFeatures });
+export const { Player: VideoPlayer } = createPlayer({ features: [...videoFeatures, features.orientationLock] });
 
 export const { Player: AudioPlayer } = createPlayer({
   features: audioFeatures,

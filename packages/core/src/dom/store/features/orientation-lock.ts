@@ -1,3 +1,4 @@
+import { isMediaVideoDimensionsCapable } from '@videojs/media';
 import { createSelector } from '@videojs/store';
 import { listen, type WebKitVideoElement } from '@videojs/utils/dom';
 import { isNull } from '@videojs/utils/predicate';
@@ -13,22 +14,22 @@ const DEFAULT_ORIENTATION_LOCK_TYPE: ScreenOrientationLockType = 'landscape';
 
 /** Orientation lock configuration and its user-config writer. */
 export interface OrientationLockState {
-  /** Screen orientation type locked while fullscreen is active. */
-  orientationLockType: ScreenOrientationLockType;
+  /** Orientation locked while fullscreen is active, or `auto` to follow the video's dimensions. */
+  orientationLockType: ScreenOrientationLockType | 'auto';
   /** Sets the locked orientation type. A missing value, including an empty one, restores the default. */
-  setOrientationLockType(value: ScreenOrientationLockType | null | undefined): void;
+  setOrientationLockType(value: ScreenOrientationLockType | 'auto' | null | undefined): void;
 }
 
 /**
- * Locks screen orientation while fullscreen is active.
+ * Locks screen orientation while fullscreen is active. The `auto` type follows the attached video's dimensions.
  *
  * The orientation type is provider configuration, so it can change during the player's lifetime. Unsupported browsers
- * and rejected lock requests are ignored.
+ * and rejected lock requests are ignored, with a development warning.
  */
 export const orientationLockFeature = definePlayerFeature({
   name: 'orientationLock',
   config: {
-    /** Screen orientation type to lock while fullscreen is active. */
+    /** Orientation to lock while fullscreen is active, or `auto` to follow the video's dimensions. */
     orientationLockType: {
       action: 'setOrientationLockType',
       state: 'orientationLockType',
@@ -43,7 +44,14 @@ export const orientationLockFeature = definePlayerFeature({
 
   attach({ target, signal, get, store }) {
     const { media, container } = target;
-    const orientationLock = createScreenOrientationLock();
+    const orientationLock = createScreenOrientationLock((type, error) => {
+      if (!__DEV__) return;
+
+      console.warn(
+        `[vjs-core] Could not lock screen orientation to "${type}".`,
+        ...(error === undefined ? [] : [error])
+      );
+    });
 
     // Type that should be held right now, or null when not fullscreen.
     let synced: ScreenOrientationLockType | null = null;
@@ -53,7 +61,22 @@ export const orientationLockFeature = definePlayerFeature({
     // Comparing the resolved value is what keeps the store subscription below
     // from re-issuing a platform request on every unrelated state change.
     const sync = () => {
-      const next = isFullscreen(container, media) ? get().orientationLockType : null;
+      const { orientationLockType } = get();
+      let next: ScreenOrientationLockType | 'auto' | null = isFullscreen(container, media) ? orientationLockType : null;
+
+      if (next === 'auto') {
+        next = null;
+
+        if (
+          isMediaVideoDimensionsCapable(media) &&
+          media.videoWidth > 0 &&
+          media.videoHeight > 0 &&
+          media.videoWidth !== media.videoHeight
+        ) {
+          next = media.videoWidth > media.videoHeight ? 'landscape' : 'portrait';
+        }
+      }
+
       if (next === synced) return;
 
       synced = next;
@@ -69,6 +92,8 @@ export const orientationLockFeature = definePlayerFeature({
 
     listen(document, 'fullscreenchange', sync, { signal });
     listen(document, 'webkitfullscreenchange', sync, { signal });
+    listen(media, 'loadedmetadata', sync, { signal });
+    listen(media, 'resize', sync, { signal });
 
     // iOS Safari presentation mode change (covers fullscreen)
     const video = media as WebKitVideoElement;

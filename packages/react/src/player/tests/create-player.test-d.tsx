@@ -56,13 +56,8 @@ describe('createPlayer', () => {
   });
 
   it('infers config props from selected features', () => {
-    const withVideo = createPlayer({ features: videoFeatures });
     const withMetadata = createPlayer({ features: [metadataFeature] });
     const withoutMetadata = createPlayer({ features: [features.playback] });
-
-    <withVideo.Player enableAdaptiveFullScreen={true}>
-      <div />
-    </withVideo.Player>;
 
     <withMetadata.Player title="Title">
       <div />
@@ -81,6 +76,10 @@ describe('createPlayer', () => {
     assertType<CreatePlayerResult<PlayerStore<[typeof features.orientationLock]>>>(withOrientationLock);
 
     <withOrientationLock.Player orientationLockType="portrait">
+      <div />
+    </withOrientationLock.Player>;
+
+    <withOrientationLock.Player orientationLockType="auto">
       <div />
     </withOrientationLock.Player>;
 
