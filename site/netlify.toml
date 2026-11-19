@@ -1754,13 +1754,8 @@
   to = "https://legacy.videojs.org/blog/"
   status = 307
 
-# Netlify matches redirect paths case-sensitively, so blog-lowercase.ts lowercases capitalized blog slugs before these
-# rules run. One post's rule below spells its slug in camelCase, so it needs a lowercase twin.
-[[redirects]]
-  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createlogger"
-  to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createlogger/"
-  status = 308
-
+# Netlify matches redirect paths case-sensitively, so blog-lowercase.ts lowercases capitalized blog slugs before the
+# rules below run, and every slug in them is lowercase.
 # Pre-v10 blog posts live on the legacy site. Each post has a .md twin.
 # legacy.videojs.org serves two posts under slugs its build prefixed with the previous post's filename.
 [[redirects]]
@@ -2394,12 +2389,12 @@
   status = 308
 
 [[redirects]]
-  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createLogger"
+  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createlogger"
   to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createlogger/"
   status = 308
 
 [[redirects]]
-  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createLogger.md"
+  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createlogger.md"
   to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createlogger/"
   status = 308
 

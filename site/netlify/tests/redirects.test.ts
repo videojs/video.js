@@ -42,6 +42,14 @@ describe('netlify.toml redirects', () => {
     expect(missingSlash).toEqual([]);
   });
 
+  it('spells blog paths in lowercase, as blog-lowercase.ts redirects capitalized ones before any rule matches', () => {
+    const capitalized = redirects
+      .map((rule) => rule.from)
+      .filter((from) => from.startsWith('/blog/') && /[A-Z]/.test(from.replace(/%[0-9A-F]{2}/g, '')));
+
+    expect(capitalized).toEqual([]);
+  });
+
   it('sends permanent redirects to their destination in one hop', () => {
     const chained = redirects
       .filter((rule) => PERMANENT.has(rule.status ?? 301) && rule.to.startsWith('/') && !rule.to.includes(':'))
