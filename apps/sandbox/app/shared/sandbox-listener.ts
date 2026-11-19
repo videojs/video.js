@@ -228,6 +228,11 @@ function parseAccent(value: unknown): string | undefined {
   return isString(value) ? value.trim() : undefined;
 }
 
+/** A preference flag arrives as `1` in the query string or as a boolean from the shell. */
+function parsePreferenceFlag(value: unknown): boolean | undefined {
+  return isBoolean(value) ? value : isString(value) ? value === '1' : undefined;
+}
+
 /** A width arrives as a query string or as a number from the shell; either way it is CSS pixels. */
 function parseWidth(value: unknown): number | undefined {
   const width = isString(value) ? Number.parseInt(value, 10) : isNumber(value) ? value : Number.NaN;
@@ -265,6 +270,12 @@ const { style } = document.documentElement;
 preference('accent', parseAccent, (accent) => {
   if (accent) style.setProperty('--media-accent-color', accent);
   else style.removeProperty('--media-accent-color');
+});
+
+// The skins show only the center play button until playback starts; the switch keeps the control bar.
+preference('prestart', parsePreferenceFlag, (prestart) => {
+  if (prestart) style.setProperty('--media-controls-before-start', 'visible');
+  else style.removeProperty('--media-controls-before-start');
 });
 
 // The templates cap the player at `--sandbox-player-width`, falling back to the skin's own width when unset.

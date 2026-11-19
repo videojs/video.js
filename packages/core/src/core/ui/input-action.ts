@@ -24,6 +24,8 @@ export interface InputActionEvent {
 
 export interface MediaSnapshot {
   paused?: boolean | undefined;
+  /** Whether playback has started or the media is trying to autoplay. */
+  started?: boolean | undefined;
   volume?: number | undefined;
   muted?: boolean | undefined;
   playbackRate?: number | undefined;

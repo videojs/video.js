@@ -1,0 +1,36 @@
+---
+description: "Adds lazy media loading and Mux MPEG-TS playback, and keeps tracks and components reliable."
+date: 2026-11-16
+version: "10.5.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.4.0...@videojs/core@10.5.0"
+---
+
+Video.js 10.5.0 gives you more control over what your player loads, and extends Mux playback to MPEG-TS renditions.
+
+## Load media on demand
+
+`LazyVideo` and `LazyAudio` resolve a source to the media component that can play it, then load only that component's code. They support URLs and structured sources, including Mux playback IDs, and let you provide an ordered list of media for your own setup ([#9583](https://github.com/videojs/video.js/pull/9583)). See the [LazyVideo](/docs/framework/html/reference/components/lazy-video/) and [LazyAudio](/docs/framework/html/reference/components/lazy-audio/) reference for HTML and React APIs.
+
+HTML analytics extensions now accept `metadata-*` attributes, mapping them to snake_case metadata keys. A `metadata` property still takes precedence when both set the same key, so you can use Mux Player-style markup with `<mux-data>` and `<google-analytics>` ([#9756](https://github.com/videojs/video.js/pull/9756)).
+
+## Play Mux MPEG-TS renditions
+
+SPF-backed Mux media can now play Mux's MPEG-TS renditions through opt-in transmux engines, including audio and background video. This support targets the MPEG-TS formats Mux packages; use `hls.js` for general MPEG-TS playback ([#9554](https://github.com/videojs/video.js/pull/9554)). Switching between audio tracks now removes stale audio, including tracks that share a language but have different names ([#9730](https://github.com/videojs/video.js/pull/9730)).
+
+## Keep tracks and components reliable
+
+`hls.js` text tracks now stay attached to their source through media-error recovery, preserving their cues and selected modes. Updating `hls.js` to 1.7.4 also keeps segmented subtitle cues loading after recovery ([#9750](https://github.com/videojs/video.js/pull/9750), [#9751](https://github.com/videojs/video.js/pull/9751)).
+
+React now recreates player and UI instances that React `<Activity>` destroys while hidden, so they work again when shown, including after Next.js Back navigation ([#9768](https://github.com/videojs/video.js/pull/9768)). Thumbnail tracks also resolve relative image URLs correctly through media adapters ([#9765](https://github.com/videojs/video.js/pull/9765)).
+
+The migration guides now describe the timed-metadata APIs for chapters, cue points, active cues, and time-slider markers. Read the [timed metadata guide](/docs/guides/timed-metadata/) for the current workflow ([#9754](https://github.com/videojs/video.js/pull/9754)).
+
+## In development
+
+The React Native package is not published yet, but it keeps taking shape. It now exposes W3C-compatible seeking, error, buffering, seekable-range, time, ready-state, and playback-rate APIs. Its player also adopts core playback, error, buffer, time, metadata, and playback-rate features for inline VOD controls ([#9741](https://github.com/videojs/video.js/pull/9741), [#9743](https://github.com/videojs/video.js/pull/9743), [#9744](https://github.com/videojs/video.js/pull/9744)).
+
+## New contributors
+
+Thanks to first-time contributor [@pjborowiecki](https://github.com/pjborowiecki).

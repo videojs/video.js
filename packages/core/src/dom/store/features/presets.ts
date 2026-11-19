@@ -62,11 +62,12 @@ export const backgroundFeatures: BackgroundFeatures = [];
 
 /**
  * Features for a live video player. Mirrors {@link videoFeatures} but drops {@link playbackRateFeature} (not meaningful
- * for live) along with {@link qualityFeature} and {@link audioTrackFeature}, and adds {@link liveFeature} so store
- * consumers can read `liveEdgeStart` and `targetLiveWindow`.
+ * for live) and adds {@link liveFeature} so store consumers can read `liveEdgeStart` and `targetLiveWindow`.
  */
 export const liveVideoFeatures: LiveVideoFeatures = [
   playbackFeature,
+  qualityFeature,
+  audioTrackFeature,
   volumeFeature,
   timeFeature,
   sourceFeature,

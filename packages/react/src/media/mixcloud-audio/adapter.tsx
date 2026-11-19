@@ -1,6 +1,11 @@
 'use client';
 
-import { buildMixcloudIframeSrc, MixcloudAdapter, type MixcloudAdapterProps } from '@videojs/mixcloud-audio';
+import {
+  buildMixcloudIframeSrc,
+  MixcloudAdapter,
+  type MixcloudAdapterProps,
+  shouldDeferMixcloudWidget,
+} from '@videojs/mixcloud-audio';
 import { type CSSProperties, forwardRef, type IframeHTMLAttributes, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -28,8 +33,11 @@ export const MixcloudAudio = forwardRef<HTMLIFrameElement, MixcloudAudioProps>(f
   const media = useMediaInstance(MixcloudAdapter);
   const props: Partial<MixcloudAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a show, so honor it when `src` is absent.
-    buildMixcloudIframeSrc(props.src || props.source?.src || '', props)
+    // A deferred widget renders an empty frame; the media loads it when playback is requested.
+    shouldDeferMixcloudWidget(props)
+      ? ''
+      : // `source.src` is the only other way to name a show, so honor it when `src` is absent.
+        buildMixcloudIframeSrc(props.src || props.source?.src || '', props)
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<MixcloudAdapterProps, Record<string, unknown>>(media, props, MixcloudAdapter.defaultProps),

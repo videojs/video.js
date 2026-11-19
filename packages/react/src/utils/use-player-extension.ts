@@ -1,10 +1,10 @@
 'use client';
 
 import type { PlayerExtension } from '@videojs/core/dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useExtensionRegistrar } from '../player/context';
-import { useDestroy } from './use-destroy';
+import { useInstance } from './use-instance';
 
 /**
  * Create a player extension and register it with the surrounding player.
@@ -20,9 +20,7 @@ export function usePlayerExtension<Extension extends PlayerExtension & { destroy
   ExtensionClass: new () => Extension
 ): Extension {
   const registerExtension = useExtensionRegistrar();
-  const [extension] = useState(() => new ExtensionClass());
-
-  useDestroy(extension);
+  const extension = useInstance(() => new ExtensionClass());
 
   useEffect(() => registerExtension?.(extension), [registerExtension, extension]);
 

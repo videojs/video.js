@@ -17,7 +17,7 @@ import { PlayerExtensionElement } from '../player-extension-element';
  *   ```html
  *   <video-player>
  *     <video src="https://example.com/video.mp4"></video>
- *     <google-analytics></google-analytics>
+ *     <google-analytics metadata-video-title="My Video"></google-analytics>
  *   </video-player>
  *   ```;
  *
@@ -61,13 +61,17 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
     this.extension.debug = value;
   }
 
-  /** Video metadata and custom dimensions reported with GA4 events. */
+  /**
+   * Video metadata and custom dimensions reported with GA4 events. Set `metadata-*` attributes for markup-only values;
+   * the property overrides attribute keys with the same name.
+   */
   get metadata(): GoogleAnalyticsProps['metadata'] {
-    return this.extension.metadata;
+    // SAFETY: Attribute keys are merged into the same metadata record shape the extension already accepts.
+    return this.getResolvedMetadata() as GoogleAnalyticsProps['metadata'];
   }
 
   set metadata(value: GoogleAnalyticsProps['metadata']) {
-    this.extension.metadata = value;
+    this.setMetadataFromProperty(value);
   }
 
   /** Optional callback to intercept dispatched events. */

@@ -156,7 +156,8 @@ Engine options win over the parameters of a widget embed URL, which win over the
 - `autoplay` starts playback once the widget is ready. Browsers can still refuse it, as they do for any embed. The widget's own `auto_play` parameter does the same and is never written to the widget URL, so the volume always applies first.
 - `buffered` is the stretch the widget reports as loaded, from where playback last started or landed.
 - The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
-- `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
+- With `preload="none"`, nothing is fetched from SoundCloud until playback is requested: the widget loads on `play()`. `autoplay`, the widget's `auto_play` parameter, or `controls` loads it at once, since each asks to play or shows the widget's own play button.
+- `playsinline` and `poster` are accepted for parity with `<audio>` but have no effect.
 - A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize. A widget that has not finished loading after 5 seconds reports a `MEDIA_ERR_NETWORK` error. An error the widget reports during playback fires a non-fatal `error` event but leaves `error` empty, because a set moves on to its next track by itself.
 
 ## SoundCloud's terms of use

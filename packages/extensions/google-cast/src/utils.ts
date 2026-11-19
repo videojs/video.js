@@ -6,41 +6,7 @@ export class NotFoundError extends Error {}
 
 export const GOOGLE_CAST_FRAMEWORK_URL = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
 
-const HLS_RESPONSE_HEADERS = ['application/x-mpegURL', 'application/vnd.apple.mpegurl', 'audio/mpegurl'];
-
-export class IterableWeakSet<T extends WeakKey> {
-  readonly #refs = new Set<WeakRef<T>>();
-  readonly #seen = new WeakMap<T, WeakRef<T>>();
-
-  add(value: T): this {
-    if (this.#seen.has(value)) return this;
-
-    const ref = new WeakRef(value);
-
-    this.#seen.set(value, ref);
-    this.#refs.add(ref);
-
-    return this;
-  }
-
-  delete(value: T): boolean {
-    const ref = this.#seen.get(value);
-    if (!ref) return false;
-
-    this.#seen.delete(value);
-
-    return this.#refs.delete(ref);
-  }
-
-  forEach(fn: (value: T) => void): void {
-    for (const ref of this.#refs) {
-      const value = ref.deref();
-
-      if (value) fn(value);
-      else this.#refs.delete(ref);
-    }
-  }
-}
+const HLS_CONTENT_TYPES = ['application/x-mpegurl', 'application/vnd.apple.mpegurl', 'audio/mpegurl'];
 
 export function onCastApiAvailable(callback: () => void) {
   const whenDefined = () => customElements.whenDefined('google-cast-button').then(callback);
@@ -73,8 +39,15 @@ export function currentSession() {
   return getCastContext()?.getCurrentSession();
 }
 
+/**
+ * The session's current media. A session can list several, idle ones included, so this is the first one still active,
+ * as the SDK picks it. Once all are idle, such as after the media ended, the latest stands in so its idle reason can
+ * still be read.
+ */
 export function currentMedia() {
-  return currentSession()?.getSessionObj().media[0] ?? undefined;
+  const session = currentSession();
+
+  return session?.getMediaSession() ?? session?.getSessionObj().media.at(-1) ?? undefined;
 }
 
 export function editTracksInfo(request: chrome.cast.media.EditTracksInfoRequest) {
@@ -103,58 +76,54 @@ export function setPlaybackRate(rate: number) {
   });
 }
 
-export type CastOptions = cast.framework.CastOptions;
-
-export function setCastOptions(options: Partial<CastOptions>) {
+export function setCastOptions(options: Partial<cast.framework.CastOptions>) {
   getCastContext()!.setOptions({
-    ...getDefaultCastOptions(),
-    ...options,
-  });
-}
-
-export function getDefaultCastOptions(): CastOptions {
-  return {
     receiverApplicationId: 'CC1AD845',
     autoJoinPolicy:
       globalThis.chrome?.cast?.AutoJoinPolicy?.ORIGIN_SCOPED ?? ('origin_scoped' as chrome.cast.AutoJoinPolicy),
     androidReceiverCompatible: false,
     language: 'en-US',
     resumeSavedSession: true,
-  };
+    ...options,
+  });
 }
 
-function getFormat(segment: string | undefined) {
-  if (!segment) return undefined;
-
-  const regex = /\.([a-zA-Z0-9]+)(?:\?.*)?$/;
-  const match = segment.match(regex);
-
-  return match ? match[1] : null;
+/** The first URI a playlist lists: a variant playlist in a multivariant playlist, otherwise a segment. */
+function getFirstUri(playlist: string) {
+  return playlist
+    .split('\n')
+    .map((line) => line.trim())
+    .find((line) => line && !line.startsWith('#'));
 }
 
-function parsePlaylistUrls(playlistContent: string) {
-  const lines = playlistContent.split('\n');
-  const urls: string[] = [];
+/** The URI of a multivariant playlist's first audio rendition. */
+function getAudioRenditionUri(playlist: string) {
+  for (const line of playlist.split('\n')) {
+    const trimmed = line.trim();
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!.trim();
-
-    if (line.startsWith('#EXT-X-STREAM-INF')) {
-      const nextLine = lines[i + 1] ? lines[i + 1]!.trim() : '';
-
-      if (nextLine && !nextLine.startsWith('#')) {
-        urls.push(nextLine);
-      }
+    if (trimmed.startsWith('#EXT-X-MEDIA') && /TYPE=AUDIO/i.test(trimmed)) {
+      const uri = trimmed.match(/URI="([^"]+)"/i)?.[1];
+      if (uri) return uri;
     }
   }
 
-  return urls;
+  return undefined;
 }
 
-function parseSegment(playlistContent: string) {
-  const lines = playlistContent.split('\n');
+/** The file extension of the first segment a media playlist lists, such as `ts` or `m4s`. */
+function getSegmentFormat(playlist: string, playlistUrl: string | URL) {
+  const uri = getFirstUri(playlist);
+  if (!uri) return undefined;
 
-  return lines.find((line) => !line.trim().startsWith('#') && line.trim() !== '');
+  // Read the extension from the path alone, so a query or fragment can't supply one.
+  const file = new URL(uri, playlistUrl).pathname.split('/').pop() ?? '';
+  const dot = file.lastIndexOf('.');
+
+  return dot > 0 ? file.slice(dot + 1).toLowerCase() : undefined;
+}
+
+async function fetchText(url: string | URL) {
+  return (await fetch(url)).text();
 }
 
 export async function isHls(url: string) {
@@ -169,34 +138,47 @@ export async function isHls(url: string) {
     const contentType = response.headers.get('Content-Type');
     if (!contentType) return false;
 
-    const normalizedContentType = contentType.toLowerCase().split(';')[0]!.trim();
-
-    return HLS_RESPONSE_HEADERS.some((header) => normalizedContentType === header.toLowerCase());
+    return HLS_CONTENT_TYPES.includes(contentType.toLowerCase().split(';')[0]!.trim());
   } catch (err) {
     console.error('Error while trying to get the Content-Type of the manifest', err);
     return false;
   }
 }
 
-export async function getPlaylistSegmentFormat(url: string) {
+interface PlaylistSegmentFormat {
+  videoFormat: string | undefined;
+  audioFormat: string | undefined;
+}
+
+/**
+ * Reads the segment file extensions of the first video variant and, when the multivariant playlist declares one, the
+ * first audio rendition. Audio falls back to the video format when it is muxed or its playlist can't be read.
+ */
+export async function getPlaylistSegmentFormat(url: string): Promise<PlaylistSegmentFormat> {
+  if (!url || url.startsWith('blob:')) return { videoFormat: undefined, audioFormat: undefined };
+
   try {
-    const mainManifestContent = await (await fetch(url)).text();
-    let availableChunksContent = mainManifestContent;
+    const playlist = await fetchText(url);
+    const variantUri = playlist.includes('#EXT-X-STREAM-INF') ? getFirstUri(playlist) : undefined;
+    const videoUrl = variantUri ? new URL(variantUri, url) : url;
+    const videoFormat = getSegmentFormat(variantUri ? await fetchText(videoUrl) : playlist, videoUrl);
 
-    const playlists = parsePlaylistUrls(mainManifestContent);
+    const audioUri = getAudioRenditionUri(playlist);
+    let audioFormat = videoFormat;
 
-    if (playlists.length > 0) {
-      const chosenPlaylistUrl = new URL(playlists[0]!, url).toString();
+    if (audioUri) {
+      try {
+        const audioUrl = new URL(audioUri, url);
 
-      availableChunksContent = await (await fetch(chosenPlaylistUrl)).text();
+        audioFormat = getSegmentFormat(await fetchText(audioUrl), audioUrl) ?? videoFormat;
+      } catch (err) {
+        console.error('Error while trying to parse the audio rendition playlist', err);
+      }
     }
 
-    const segment = parseSegment(availableChunksContent);
-    const format = getFormat(segment);
-
-    return format;
+    return { videoFormat, audioFormat };
   } catch (err) {
     console.error('Error while trying to parse the manifest playlist', err);
-    return undefined;
+    return { videoFormat: undefined, audioFormat: undefined };
   }
 }

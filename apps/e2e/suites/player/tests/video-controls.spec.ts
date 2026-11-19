@@ -50,6 +50,27 @@ for (const { name, path, skipBrowsers } of ALL_VIDEO_PAGES as readonly PageEntry
       await expect(player.controls).toBeAttached();
     });
 
+    // --- Before playback starts ---
+
+    test('shows only the centre play button until playback starts', async ({ page }) => {
+      // The test app keeps the controls visible on every page; clearing the property restores the default.
+      await page.addStyleTag({ content: ':root { --media-controls-before-start: initial; }' });
+
+      await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.started);
+      await expect(player.centerPlayButton).toBeVisible();
+      await expect(player.fullscreenButton).toBeHidden();
+
+      await player.play();
+
+      await expect(player.controls).toHaveAttribute(DATA_ATTRS.started, '');
+      await expect(player.fullscreenButton).toBeVisible();
+    });
+
+    test('keeps the controls before playback starts when the skin opts out', async () => {
+      await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.started);
+      await expect(player.fullscreenButton).toBeVisible();
+    });
+
     // --- Play / Pause ---
 
     test('play button starts playback', async () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
-import { forwardRef, type ReactNode, useState } from 'react';
+import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -34,10 +34,11 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
       defaultMuted: !!(props.defaultMuted || props.muted),
     })
   );
-  const { ref: eventsRef, props: iframeProps } = useMediaEvents(
+  const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<TikTokAdapterProps, Record<string, unknown>>(media, props, TikTokAdapter.defaultProps),
     media
   );
+  const { style, ...iframeProps } = elementProps as Record<string, unknown> & { style?: CSSProperties };
   const attachRef = useAttachMedia(media);
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
@@ -56,11 +57,10 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
       width="100%"
       height="100%"
       referrerPolicy={props.source?.engine?.tiktok?.referrerPolicy}
-      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
-      // skin above it sees hover and clicks. `preload="none"` leaves TikTok's player dormant, and then the frame's own
-      // controls are the only thing that can still start it.
-      style={{ pointerEvents: props.controls || props.preload === 'none' ? undefined : 'none' }}
       {...iframeProps}
+      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
+      // skin above it sees hover and clicks. Merged so a consumer's own styles survive without undoing it.
+      style={props.controls ? style : { ...style, pointerEvents: 'none' }}
       ref={composedRef}
     >
       {children}

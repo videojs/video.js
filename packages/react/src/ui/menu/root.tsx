@@ -14,7 +14,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'reac
 
 import { useOptionalContainer, useOptionalPlayer } from '../../player/context';
 import { useOptionalPopupGroup } from '../../player/popup-group-context';
-import { useDestroy } from '../../utils/use-destroy';
+import { useInstance } from '../../utils/use-instance';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { useSafeId } from '../../utils/use-safe-id';
 import { useOptionalControlsContext } from '../controls/context';
@@ -40,6 +40,9 @@ export function MenuRoot({
   children,
   ...coreProps
 }: MenuRootProps): ReactNode {
+  // React Compiler cannot track state read through the mutable core instance.
+  'use no memo';
+
   // Detect if we are nested inside a parent Menu.Content — if so, operate as
   // a submenu: no popover positioning, Trigger acts as a parent item.
   const parentMenu = useOptionalMenuContext();
@@ -65,7 +68,7 @@ export function MenuRoot({
   const popupGroupRef = useLatestRef(popupGroup);
   const isSubmenuRef = useLatestRef(isSubmenu);
 
-  const [menu] = useState(() => {
+  const menu = useInstance(() => {
     const instance = createMenu({
       transition: createTransition(),
       onOpenChange(nextOpen, details) {
@@ -99,8 +102,6 @@ export function MenuRoot({
 
     menu.close('imperative-action');
   }, [controls?.state.visible, isSubmenu, menu]);
-
-  useDestroy(menu);
 
   const input = useSnapshot(menu.input);
 

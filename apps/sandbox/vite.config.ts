@@ -172,6 +172,15 @@ function sandboxTemplateSyncPlugin(): Plugin {
   };
 }
 
+/**
+ * Pages that report the JavaScript they load. One multi-page build shares chunks across pages, so these pages would
+ * also load code only other pages use; each builds alone instead, resolving the package builds an app ships.
+ */
+const ISOLATED_ENTRIES: Readonly<Record<string, string>> = {
+  // Vite environment names are identifiers, so each page is keyed by one.
+  lazyMedia: 'lazy-media',
+};
+
 /** Discover sandbox entries by finding subdirectories of src/ that contain an index.html. */
 function getSandboxEntries(): Record<string, string> {
   const srcDir = resolve(__dirname, 'src');
@@ -191,6 +200,53 @@ function getSandboxEntries(): Record<string, string> {
   }
 
   return entries;
+}
+
+/**
+ * Builds the shell and the sandboxes together as the `client` environment, then each isolated page as an environment of
+ * its own, writing its chunks under `<page>/assets`. Environments take their Vite defaults for anything they don't set,
+ * so the isolated pages resolve production package builds where the shared build resolves development ones.
+ */
+function sandboxEntriesPlugin(): Plugin {
+  return {
+    name: 'sandbox-entries',
+    config(_, { command }) {
+      if (command !== 'build') return;
+
+      const entries = getSandboxEntries();
+      const pages = new Set(Object.values(ISOLATED_ENTRIES));
+      const shared = Object.fromEntries(Object.entries(entries).filter(([page]) => !pages.has(page)));
+      const isolated = Object.entries(ISOLATED_ENTRIES).filter(([, page]) => entries[page]);
+
+      return {
+        builder: {
+          async buildApp(builder) {
+            for (const name of ['client', ...isolated.map(([name]) => name)]) {
+              await builder.build(builder.environments[name]!);
+            }
+          },
+        },
+        environments: {
+          client: {
+            build: { rolldownOptions: { input: { main: resolve(__dirname, 'src/index.html'), ...shared } } },
+          },
+          ...Object.fromEntries(
+            isolated.map(([name, page]) => [
+              name,
+              {
+                consumer: 'client' as const,
+                build: {
+                  emptyOutDir: false,
+                  assetsDir: `${page}/assets`,
+                  rolldownOptions: { input: { [page]: entries[page]! } },
+                },
+              },
+            ])
+          ),
+        },
+      };
+    },
+  };
 }
 
 function serveAppShell(): Plugin {
@@ -252,6 +308,82 @@ function sandboxHeadPlugin(): Plugin {
           injectTo: 'head',
         },
       ];
+    },
+  };
+}
+
+/**
+ * Writes `chunk-packages.json` beside each isolated page's chunks: for each JavaScript chunk, how many rendered bytes
+ * each package contributes, keyed by the nearest `package.json` name. The pages read it to group the JavaScript they
+ * load by package.
+ */
+function chunkPackagesPlugin(): Plugin {
+  const names = new Map<string, string>();
+
+  // Nested `package.json` files that only set `type`, as some `dist/` folders have, don't name a package.
+  function readPackageName(dir: string): string | undefined {
+    const manifest = resolve(dir, 'package.json');
+    if (!existsSync(manifest)) return undefined;
+
+    // SAFETY: npm requires `name` to be a string when present.
+    return (JSON.parse(readFileSync(manifest, 'utf8')) as { name?: string }).name || undefined;
+  }
+
+  function packageOf(id: string): string {
+    if (id.startsWith('\0')) return 'virtual';
+
+    const visited: string[] = [];
+    let dir = dirname(id.split('?', 1)[0]!);
+    let name = names.get(dir);
+
+    while (!name) {
+      visited.push(dir);
+      name = readPackageName(dir);
+
+      const parent = dirname(dir);
+      if (name || parent === dir) break;
+
+      dir = parent;
+      name = names.get(dir);
+    }
+
+    const resolved = name ?? 'unknown';
+
+    for (const path of visited) names.set(path, resolved);
+
+    return resolved;
+  }
+
+  return {
+    name: 'sandbox-chunk-packages',
+    apply: 'build',
+    applyToEnvironment(environment) {
+      return Object.hasOwn(ISOLATED_ENTRIES, environment.name);
+    },
+    generateBundle(_, bundle) {
+      const chunks: Record<string, Record<string, number>> = {};
+
+      for (const output of Object.values(bundle)) {
+        if (output.type !== 'chunk') continue;
+
+        const sizes: Record<string, number> = {};
+
+        for (const [id, { renderedLength }] of Object.entries(output.modules)) {
+          if (!renderedLength) continue;
+
+          const name = packageOf(id);
+
+          sizes[name] = (sizes[name] ?? 0) + renderedLength;
+        }
+
+        chunks[output.fileName] = sizes;
+      }
+
+      this.emitFile({
+        type: 'asset',
+        fileName: `${this.environment.config.build.assetsDir}/chunk-packages.json`,
+        source: JSON.stringify(chunks),
+      });
     },
   };
 }
@@ -340,6 +472,8 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
       react({ jsxImportSource: 'react' }),
       serveAppShell(),
       sandboxHeadPlugin(),
+      sandboxEntriesPlugin(),
+      chunkPackagesPlugin(),
     ],
     resolve: {
       alias: [
@@ -470,10 +604,6 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
         // processing time is attributed to the plugin rather than its fast hooks.
         checks: {
           pluginTimings: false,
-        },
-        input: {
-          main: resolve(__dirname, 'src/index.html'),
-          ...getSandboxEntries(),
         },
         onwarn(warning, defaultHandler) {
           if (warning.code === 'COMMONJS_VARIABLE_IN_ESM') return;

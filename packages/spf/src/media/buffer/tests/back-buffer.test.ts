@@ -174,7 +174,7 @@ describe('calculateBackBufferFlushPoint', () => {
   });
 
   describe('configuration', () => {
-    it('should allow keeping 0 segments (flush everything)', () => {
+    it("flushes everything but the playhead segment's predecessor when keeping 0 segments", () => {
       const segments: Segment[] = [createSegment(0, 6), createSegment(6, 6), createSegment(12, 6)];
 
       const currentTime = 12;
@@ -185,8 +185,17 @@ describe('calculateBackBufferFlushPoint', () => {
 
       const flushEnd = calculateBackBufferFlushPoint(segments, currentTime, config);
 
-      expect(flushEnd).toBe(12);
+      expect(flushEnd).toBe(6);
     });
+
+    it.each([0, 1])(
+      'keeps the predecessor whose tail can cover a playhead just past a boundary (keepSegments %i)',
+      (keepSegments) => {
+        const segments: Segment[] = [createSegment(0, 6), createSegment(6, 6), createSegment(12, 6)];
+
+        expect(calculateBackBufferFlushPoint(segments, 12.01, { keepSegments })).toBe(6);
+      }
+    );
 
     it('should allow keeping many segments', () => {
       const segments: Segment[] = [

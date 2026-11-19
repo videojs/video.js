@@ -20,6 +20,8 @@ export const errorFeature = definePlayerFeature({
 
     const syncError = () => set({ error: media.error });
 
+    syncError();
+
     listen(media, 'error', syncError, { signal });
 
     // Reset error state when a new source is loaded.

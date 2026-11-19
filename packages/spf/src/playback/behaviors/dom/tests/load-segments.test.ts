@@ -10,6 +10,7 @@ import { createSegmentLoaderActor, type SegmentLoaderActor } from '../../../acto
 import { createSourceBufferActor, type SourceBufferActor } from '../../../actors/dom/source-buffer';
 import { makeSourceBuffer } from '../../../actors/dom/tests/segment-loader-fixtures';
 import type { TextTrackSegmentLoaderActor } from '../../../actors/text-track-segment-loader';
+import { type CreateLoadStart, coveringSegmentLoadStart } from '../../../primitives/load-start';
 import {
   loadAudioSegments,
   loadVideoSegments,
@@ -62,7 +63,7 @@ function makeSegment(id: string, startTime: number, duration = 10): Segment {
   return { id, url: `http://example.com/${id}.m4s`, startTime, duration };
 }
 
-function makeResolvedVideoTrack(segments: Segment[]) {
+function makeResolvedVideoTrack(segments: Segment[], initialization = { url: 'http://example.com/init.mp4' }) {
   return {
     type: 'video' as const,
     id: 'track-1',
@@ -70,7 +71,7 @@ function makeResolvedVideoTrack(segments: Segment[]) {
     mimeType: 'video/mp4',
     codecs: ['avc1.42E01E'],
     bandwidth: 1_000_000,
-    initialization: { url: 'http://example.com/init.mp4' },
+    initialization,
     segments,
     startTime: 0,
     duration: segments.reduce((acc, s) => acc + s.duration, 0),
@@ -107,7 +108,8 @@ function setupLoadSegments(
   initialState: SegmentLoadingState,
   bufferActor: SourceBufferActor,
   type: 'video' | 'audio',
-  fetchFn: FetchBytes = fetchStream
+  fetchFn: FetchBytes = fetchStream,
+  config: { createLoadStart?: CreateLoadStart } = {}
 ) {
   const state = makeState(initialState);
   const loaderActor = createSegmentLoaderActor(bufferActor, fetchFn);
@@ -118,7 +120,9 @@ function setupLoadSegments(
       : { audioBufferActor: bufferActor, audioSegmentLoaderActor: loaderActor }
   );
   const reactor =
-    type === 'video' ? loadVideoSegments.setup({ state, context }) : loadAudioSegments.setup({ state, context });
+    type === 'video'
+      ? loadVideoSegments.setup({ state, context, config })
+      : loadAudioSegments.setup({ state, context, config });
   const cleanup = () => {
     reactor.destroy();
     loaderActor.destroy();
@@ -211,7 +215,7 @@ describe('loadVideoSegments', () => {
 // ---------------------------------------------------------------------------
 
 describe('loadVideoSegments', () => {
-  function makePresentation(segments: Segment[]) {
+  function makePresentation(segments: Segment[], initialization?: { url: string }) {
     return {
       id: 'p1',
       url: 'http://example.com/playlist.m3u8',
@@ -221,11 +225,46 @@ describe('loadVideoSegments', () => {
         {
           id: 'ss1',
           type: 'video' as const,
-          switchingSets: [{ id: 'sw1', type: 'video' as const, tracks: [makeResolvedVideoTrack(segments)] }],
+          switchingSets: [
+            { id: 'sw1', type: 'video' as const, tracks: [makeResolvedVideoTrack(segments, initialization)] },
+          ],
         },
       ],
     };
   }
+
+  it('loads exactly the segment at currentTime for preload="metadata" when the track has no init segment', async () => {
+    // MPEG-TS and packed audio carry their decoder configuration in the media
+    // segments, so one segment is what surfaces metadata.
+    const segments = [makeSegment('s1', 0, 10), makeSegment('s2', 10, 10), makeSegment('s3', 20, 10)];
+    const fetchedUrls: string[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+
+      fetchedUrls.push(url);
+      return Promise.resolve(new Response(new ArrayBuffer(100)));
+    });
+
+    const { actor } = makeSourceBufferWithActor();
+    const { cleanup } = setupLoadSegments(
+      {
+        preload: 'metadata',
+        currentTime: 15,
+        selectedVideoTrackId: 'track-1',
+        presentation: makePresentation(segments, { url: '' }),
+      },
+      actor,
+      'video'
+    );
+
+    await vi.waitFor(() => expect(fetchedUrls).toContain('http://example.com/s2.m4s'), { timeout: 2000 });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(fetchedUrls.filter((url) => url.endsWith('.m4s'))).toEqual(['http://example.com/s2.m4s']);
+
+    cleanup();
+  });
 
   it('loads init segment but not media segments for preload="metadata"', async () => {
     const segments = [makeSegment('s1', 0, 10), makeSegment('s2', 10, 10)];
@@ -623,6 +662,43 @@ describe('loadVideoSegments', () => {
       'http://example.com/b5.m4s',
       'http://example.com/b6.m4s',
     ]);
+
+    cleanup();
+  });
+
+  it.each([
+    { name: 'starts the load at the previous segment', createLoadStart: coveringSegmentLoadStart, start: 0 },
+    { name: 'starts the load at the playhead without createLoadStart', createLoadStart: undefined, start: 10.01 },
+  ])('$name when the segment at the playhead starts after it', async ({ createLoadStart, start }) => {
+    const track = makeResolvedVideoTrack([makeSegment('s1', 0), makeSegment('s2', 10), makeSegment('s3', 20)]);
+    const actor = createSourceBufferActor(makeSourceBuffer([], [[10.03, 20]]), {
+      initTrackId: 'track-1',
+      segments: [{ id: 's2', startTime: 10, duration: 10, trackId: 'track-1' }],
+      bufferedRanges: [{ start: 10.03, end: 20 }],
+    });
+    const { send, cleanup } = setupLoadSegments(
+      {
+        preload: 'auto',
+        loadActivated: true,
+        currentTime: 10.01,
+        selectedVideoTrackId: 'track-1',
+        presentation: {
+          id: 'p1',
+          url: 'http://example.com/playlist.m3u8',
+          startTime: 0,
+          duration: 30,
+          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
+        },
+      },
+      actor,
+      'video',
+      fetchStream,
+      { createLoadStart }
+    );
+
+    await vi.waitFor(() =>
+      expect(send).toHaveBeenLastCalledWith({ type: 'load', track, range: { start, end: 40.01 } })
+    );
 
     cleanup();
   });

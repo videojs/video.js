@@ -1,4 +1,21 @@
-import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEvents } from '@videojs/media';
+import type {
+  EventLike,
+  Media,
+  MediaBufferCapability,
+  MediaBufferEvents,
+  MediaContentDataCapability,
+  MediaContentDataEvents,
+  MediaErrorCapability,
+  MediaErrorEvents,
+  MediaEvents,
+  MediaPauseCapability,
+  MediaPauseEvents,
+  MediaPlaybackRateCapability,
+  MediaPlaybackRateEvents,
+  MediaSeekCapability,
+  MediaSeekEvents,
+  MediaSourceEvents,
+} from '@videojs/media';
 
 // ----------------------------------------
 //  Native-App Media Capabilities
@@ -15,7 +32,23 @@ import type { EventLike, Media, MediaEvents, MediaPauseCapability, MediaPauseEve
 //  as this project is early and mostly exploratory for now
 // ----------------------------------------
 
-export interface NativeEvents extends MediaEvents, MediaPauseEvents {}
+export interface NativeEvents
+  extends
+    MediaEvents,
+    MediaPauseEvents,
+    MediaSeekEvents,
+    MediaSourceEvents,
+    MediaBufferEvents,
+    MediaErrorEvents,
+    MediaPlaybackRateEvents,
+    MediaContentDataEvents {}
 
 export interface NativeMedia<Events extends { [K in keyof Events]: EventLike } = NativeEvents>
-  extends Media<Events>, MediaPauseCapability {}
+  extends
+    Media<Events>,
+    MediaPauseCapability,
+    MediaSeekCapability,
+    MediaBufferCapability,
+    MediaErrorCapability,
+    MediaPlaybackRateCapability,
+    MediaContentDataCapability {}

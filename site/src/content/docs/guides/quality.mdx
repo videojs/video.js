@@ -90,7 +90,6 @@ Selecting "Auto" keeps adaptive bitrate switching active: the engine picks the b
 
 ## Availability and constraints
 
-- The live preset omits `qualityFeature` and cannot accept extra features. To add a quality menu to a live player, use `createPlayer` with `[...liveVideoFeatures, qualityFeature]`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink> for custom player setup.
 - Quality availability is `'unavailable'` for media that doesn't offer a choice — progressive files, streams before the manifest loads, and single-rendition streams. Render quality UI conditionally on that value.
 - Renditions come from the streaming engine, so the list depends on what the manifest declares.
 - Pinning a high rendition on a slow connection causes buffering: the engine can no longer step down. Keep "Auto" the default.
@@ -187,7 +186,7 @@ updateButton();
 
 ### The quality menu doesn't render
 
-Confirm that the player includes `qualityFeature`. The live preset omits it; compose a custom player as described above.
+Confirm that the player includes `qualityFeature`. The audio and live audio presets omit it; a custom player built with `createPlayer` must add it.
 
 <FrameworkCase frameworks={["react"]}>
 Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media component doesn't support renditions. Use a streaming media component such as <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>.

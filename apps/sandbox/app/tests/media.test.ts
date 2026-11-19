@@ -3,7 +3,15 @@ import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { hasSkinChoice, hasTailwindSkin, landingSource, MEDIA, MEDIA_IDS, mediaSources } from '../media';
+import {
+  hasNoSkinChoice,
+  hasSkinChoice,
+  hasTailwindSkin,
+  landingSource,
+  MEDIA,
+  MEDIA_IDS,
+  mediaSources,
+} from '../media';
 import {
   DAILYMOTION_SOURCE_IDS,
   DASH_SOURCE_IDS,
@@ -240,6 +248,20 @@ describe('hasTailwindSkin', () => {
 describe('hasSkinChoice', () => {
   it('leaves only the background media without one', () => {
     expect(MEDIA_IDS.filter((id) => !hasSkinChoice(id))).toEqual([
+      'background-video',
+      'hls-background-video',
+      'mux-background-video',
+    ]);
+  });
+});
+
+describe('hasNoSkinChoice', () => {
+  it('leaves out the background and native audio media', () => {
+    expect(MEDIA_IDS.filter((id) => !hasNoSkinChoice(id))).toEqual([
+      'mux-audio',
+      'mux-audio-spf',
+      'hls-audio',
+      'audio',
       'background-video',
       'hls-background-video',
       'mux-background-video',

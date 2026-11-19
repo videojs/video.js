@@ -17,7 +17,10 @@ export default function ResponsivePlayer() {
   return (
     <Player>
       <ControlsLock />
-      <VideoSkin className="aspect-video w-full">
+      <VideoSkin
+        className="aspect-video w-full"
+        style={{ '--media-controls-before-start': 'visible' } as React.CSSProperties}
+      >
         <CosmicDawnVideo />
       </VideoSkin>
     </Player>

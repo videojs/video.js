@@ -106,6 +106,8 @@ export type BackgroundFeatures = [];
  */
 export type LiveVideoFeatures = [
   PlayerFeature<MediaPlaybackState>,
+  PlayerFeature<MediaQualityState>,
+  PlayerFeature<MediaAudioTrackState>,
   PlayerFeature<MediaVolumeState>,
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,

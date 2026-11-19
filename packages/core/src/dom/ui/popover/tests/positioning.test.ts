@@ -1,4 +1,4 @@
-import { supportsPopoverAPI } from '@videojs/utils/dom';
+import { supportsAnchorPositioning, supportsPopoverAPI } from '@videojs/utils/dom';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { PopoverCSSVars } from '../../../../core/ui/popover/vars';
@@ -6,6 +6,7 @@ import {
   getAnchorPositionStyle,
   getFixedContainingBlockOrigin,
   getPopupPositionRect,
+  hasTransformedAncestor,
   type PositioningOffsets,
   resolveOffsets,
 } from '../positioning';
@@ -595,5 +596,82 @@ describe('getFixedContainingBlockOrigin', () => {
 
   it('uses the viewport for a popup outside the document tree', () => {
     expect(getFixedContainingBlockOrigin(document.createElement('div'))).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe('hasTransformedAncestor', () => {
+  it('finds a transformed ancestor', () => {
+    const outer = document.createElement('div');
+    const inner = document.createElement('div');
+    const trigger = document.createElement('button');
+
+    outer.style.transform = 'translate(-50%, -50%)';
+    inner.append(trigger);
+    outer.append(inner);
+    document.body.append(outer);
+
+    expect(hasTransformedAncestor(trigger)).toBe(true);
+
+    outer.style.transform = 'none';
+
+    expect(hasTransformedAncestor(trigger)).toBe(false);
+
+    outer.remove();
+  });
+
+  it('ignores the transform of the element itself', () => {
+    const trigger = document.createElement('button');
+
+    trigger.style.transform = 'scale(0.95)';
+    document.body.append(trigger);
+
+    expect(hasTransformedAncestor(trigger)).toBe(false);
+
+    trigger.remove();
+  });
+
+  it('looks past shadow roots', () => {
+    const outer = document.createElement('div');
+    const host = document.createElement('div');
+    const trigger = document.createElement('button');
+
+    outer.style.transform = 'scale(1.5)';
+    host.attachShadow({ mode: 'open' }).append(trigger);
+    outer.append(host);
+    document.body.append(outer);
+
+    expect(hasTransformedAncestor(trigger)).toBe(true);
+
+    outer.remove();
+  });
+});
+
+describe('getAnchorPositionStyle with anchor positioning turned off', () => {
+  it('uses manual coordinates and clears anchor-only properties', () => {
+    vi.mocked(supportsAnchorPositioning).mockReturnValue(true);
+
+    const trigger = makeDOMRect(100, 200, 120, 40);
+    const popup = makeDOMRect(0, 0, 200, 80);
+    const style = getAnchorPositionStyle(
+      'a',
+      { side: 'top', align: 'center' },
+      trigger,
+      popup,
+      undefined,
+      undefined,
+      undefined,
+      false
+    );
+
+    vi.mocked(supportsAnchorPositioning).mockReturnValue(false);
+
+    expect(style.bottom).toBe('calc(100% - 200px + 0px)');
+    expect(style.left).toBe('60px');
+    expect(style.translate).toBe('none');
+    expect(style.justifySelf).toBe('normal');
+    expect(style.alignSelf).toBe('normal');
+    expect(style.marginInlineStart).toBe('0');
+    expect(style.marginBlockStart).toBe('0');
+    expect(Object.values(style).some((value) => value?.includes('anchor('))).toBe(false);
   });
 });
