@@ -17,8 +17,10 @@ vi.mock('../registry', async (importOriginal) => {
 
   return {
     ...original,
-    get castFramework() {
-      return mocks.castFramework;
+    whenCastFramework: (callback: (framework: typeof cast.framework) => void) => {
+      if (mocks.castFramework) callback(mocks.castFramework);
+
+      return () => {};
     },
     ensureCastFramework: vi.fn(() => Promise.resolve({} as typeof cast.framework)),
   };
@@ -100,8 +102,13 @@ function createCastSdk() {
     getSessionObj: () => ({ media: mediaList }),
     getMediaSession: () => mediaList.find((entry) => !entry.idleReason) ?? null,
   };
+  const contextListeners = new Map<string, () => unknown>();
   const context = {
     sessionState: 'SESSION_STARTED',
+    addEventListener: vi.fn((type: string, listener: () => unknown) => contextListeners.set(type, listener)),
+    removeEventListener: vi.fn((type: string) => contextListeners.delete(type)),
+    /** Run the provider's listener for `type`, returning what it returns so async ones can be awaited. */
+    emit: (type: string) => contextListeners.get(type)?.(),
     setOptions: vi.fn(),
     requestSession: vi.fn(async () => {}),
     getCurrentSession: () => session,
@@ -140,7 +147,7 @@ function createCastSdk() {
     ) {}
   }
 
-  // SAFETY: covers every framework member `onCastFrameworkAvailable`, `requestCastSession`, and `load` touch.
+  // SAFETY: covers every framework member the provider's init, `requestCastSession`, and `load` touch.
   const framework = {
     // `currentMedia()` reaches the context through `utils`' own `currentSession()`, which the module mock can't replace.
     CastContext: { getInstance: () => context },
@@ -158,6 +165,7 @@ function createCastSdk() {
       IS_MEDIA_LOADED_CHANGED: 'isMediaLoadedChanged',
     },
     CastState: { NO_DEVICES_AVAILABLE: 'NO_DEVICES_AVAILABLE', CONNECTING: 'CONNECTING', CONNECTED: 'CONNECTED' },
+    CastContextEventType: { CAST_STATE_CHANGED: 'caststatechanged', SESSION_STATE_CHANGED: 'sessionstatechanged' },
     SessionState: { SESSION_RESUMED: 'SESSION_RESUMED' },
   } as unknown as typeof cast.framework;
 
@@ -372,6 +380,19 @@ describe('GoogleCastProvider', () => {
     expect(provider.target).toBeNull();
   });
 
+  it('stops listening to the cast context on destroy', () => {
+    const sdk = installCastSdk();
+    const provider = new GoogleCastProvider({});
+
+    expect(sdk.context.addEventListener).toHaveBeenCalledTimes(2);
+
+    provider.destroy();
+
+    for (const [type, listener] of sdk.context.addEventListener.mock.calls) {
+      expect(sdk.context.removeEventListener).toHaveBeenCalledWith(type, listener);
+    }
+  });
+
   describe('load', () => {
     it('claims the source before the load request is awaited', async () => {
       const config: GoogleCastExtensionProps = {};
@@ -499,7 +520,7 @@ describe('GoogleCastProvider', () => {
       const provider = new GoogleCastProvider({ src: SRC });
 
       provider.attach(target);
-      await provider.onSessionStateChanged();
+      await sdk.context.emit('sessionstatechanged');
 
       return { provider, sdk };
     }
