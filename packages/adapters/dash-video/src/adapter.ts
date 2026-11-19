@@ -49,6 +49,8 @@ class DashAdapterCore
   #engine: dashjs.MediaPlayerClass;
   #src = DashAdapterCore.defaultProps.src;
   #source: DashSource | null = DashAdapterCore.defaultProps.source;
+  /** Whether `detach()` cleared the source from dash.js, so the next `attach()` has to load it again. */
+  #sourceDetached = false;
 
   constructor() {
     super();
@@ -59,6 +61,10 @@ class DashAdapterCore
   attach(target: HTMLVideoElement) {
     super.attach(target);
     this.#engine.attachView(target);
+
+    if (this.#sourceDetached) this.#engine.attachSource(this.#src);
+
+    this.#sourceDetached = false;
   }
 
   detach() {
@@ -66,7 +72,17 @@ class DashAdapterCore
     if (!this.target) return;
 
     super.detach();
-    // dash.js types don't reflect null support, but null is valid for detaching
+
+    // Tear playback down while dash.js still holds the element. It removes its media element listeners through the
+    // view, so `attachView(null)` alone strands them on the element, where the next `progress` event throws into the
+    // reset player.
+    if (this.#src) {
+      // SAFETY: dash.js accepts null to clear the source; its types omit it.
+      this.#engine.attachSource(null as unknown as string);
+      this.#sourceDetached = true;
+    }
+
+    // SAFETY: dash.js accepts null to detach the view; its types omit it.
     this.#engine.attachView(null as unknown as HTMLVideoElement);
   }
 
@@ -127,7 +143,10 @@ class DashAdapterCore
 
     if (configChanged) this.#applyEngineConfig(source?.engine?.dashJs);
 
-    if (srcChanged) this.#engine.attachSource(src);
+    if (srcChanged) {
+      this.#engine.attachSource(src);
+      this.#sourceDetached = false;
+    }
 
     this.dispatchEvent(new Event('sourcechange'));
   }

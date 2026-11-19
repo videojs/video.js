@@ -154,6 +154,51 @@ describe('DashAdapter', () => {
       expect(engine.attachView).toHaveBeenCalledWith(null);
       expect(engine.attachView.mock.invocationCallOrder[0]).toBeLessThan(engine.destroy.mock.invocationCallOrder[0]!);
     });
+
+    it('clears the source before the view, while dash.js can still unbind from the element', () => {
+      const { media, engine } = setup();
+
+      media.src = MANIFEST;
+      engine.attachSource.mockClear();
+      engine.attachView.mockClear();
+
+      media.destroy();
+
+      expect(engine.attachSource).toHaveBeenCalledExactlyOnceWith(null);
+      expect(engine.attachSource.mock.invocationCallOrder[0]).toBeLessThan(
+        engine.attachView.mock.invocationCallOrder[0]!
+      );
+    });
+  });
+
+  describe('attach', () => {
+    it('reloads the source on the element it is attached to after a detach', () => {
+      const { media, engine } = setup();
+      const next = document.createElement('video');
+
+      media.src = MANIFEST;
+      media.detach();
+      engine.attachSource.mockClear();
+
+      media.attach(next);
+
+      expect(engine.attachView).toHaveBeenLastCalledWith(next);
+      expect(engine.attachSource).toHaveBeenCalledExactlyOnceWith(MANIFEST);
+    });
+
+    it('does not reload a source that changed while detached', () => {
+      const { media, engine } = setup();
+
+      media.src = MANIFEST;
+      media.detach();
+      media.src = OTHER_MANIFEST;
+      engine.attachSource.mockClear();
+
+      media.attach(document.createElement('video'));
+
+      // dash.js already holds the new source and loads it once the view is set.
+      expect(engine.attachSource).not.toHaveBeenCalled();
+    });
   });
 
   describe('source', () => {
