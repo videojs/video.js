@@ -85,8 +85,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   video: {
-    width: 320,
-    height: 180,
+    width: '100%',
+    flexDirection: 'row',
+    aspectRatio: 16 / 9,
     backgroundColor: 'black',
   },
   surface: {
