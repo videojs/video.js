@@ -8,7 +8,7 @@ import FeatureReference from "@/components/docs/api-reference/FeatureReference.a
 import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
-Locks screen orientation while fullscreen is active.
+Locks screen orientation while fullscreen is active. Set the type to `auto` to choose landscape or portrait from the attached video's dimensions.
 
 ## Import
 
@@ -46,11 +46,11 @@ customElements.define('my-player', MyPlayer);
 
 ### Orientation type
 
-The feature locks to `landscape` unless the provider sets another Screen Orientation API type. The value can change while the player is running; if the screen is already locked, it re-locks to the new type.
+The feature locks to `landscape` unless the provider sets another orientation type. The value can change while the player is running; if the screen is already locked, it re-locks to the new type. `auto` selects `landscape` when `videoWidth` is greater than `videoHeight`, and `portrait` when `videoHeight` is greater. It waits for nonzero video dimensions and follows dimension changes while fullscreen is active. Equal dimensions, including square video, do not request an orientation lock.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<Player orientationLockType="portrait">
+<Player orientationLockType="auto">
   <Container>
     <Video src="/video.mp4" />
   </Container>
@@ -60,7 +60,7 @@ The feature locks to `landscape` unless the provider sets another Screen Orienta
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<my-player orientation-lock-type="portrait">
+<my-player orientation-lock-type="auto">
   <video src="/video.mp4"></video>
 </my-player>
 ```
@@ -69,7 +69,7 @@ The attribute only exists on a player that selected the feature. Setting it on
 an element built from `videoFeatures` alone does nothing.
 </FrameworkCase>
 
-Clearing the value restores `landscape`.
+Use an explicit Screen Orientation API value such as `portrait` when the orientation should not depend on video dimensions. Clearing the value restores `landscape`.
 
 ### Selector
 
@@ -113,4 +113,4 @@ class OrientationToggle extends UIElement {
 ```
 </FrameworkCase>
 
-Unsupported browsers and rejected lock requests are ignored.
+Unsupported browsers and rejected lock requests leave the device orientation unchanged. A warning is logged in development builds only.

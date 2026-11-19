@@ -66,15 +66,12 @@ describe('createPlayer', () => {
 
   it('infers config properties from selected features', () => {
     const withMetadata = createPlayer({ features: [metadataFeature] });
-    const withVideo = createPlayer({ features: videoFeatures });
     const withoutMetadata = createPlayer({ features: [features.playback] });
     const metadataPlayer = new withMetadata.PlayerElement();
-    const videoPlayer = new withVideo.PlayerElement();
     const plainPlayer = new withoutMetadata.PlayerElement();
 
     // The store calls this `title`; on an element that name is the tooltip.
     assertType<string | null | undefined>(metadataPlayer.contentTitle);
-    assertType<boolean | null | undefined>(videoPlayer.enableAdaptiveFullScreen);
 
     // @ts-expect-error metadata properties are absent when the feature is absent.
     plainPlayer.contentTitle;
@@ -97,7 +94,7 @@ describe('createPlayer', () => {
     const plainPlayer = new withoutOrientationLock.PlayerElement();
 
     assertType<CreatePlayerResult<PlayerStore<[typeof features.orientationLock]>>>(withOrientationLock);
-    assertType<ScreenOrientationLockType | null | undefined>(orientationPlayer.orientationLockType);
+    assertType<ScreenOrientationLockType | 'auto' | null | undefined>(orientationPlayer.orientationLockType);
 
     // @ts-expect-error orientation lock properties are absent when the feature is absent.
     plainPlayer.orientationLockType;

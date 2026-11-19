@@ -416,10 +416,10 @@ describe('createPlayer', () => {
 
     const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
 
-    player.setAttribute('orientation-lock-type', 'portrait');
+    player.setAttribute('orientation-lock-type', 'auto');
     document.body.append(player);
 
-    expect(player.store.orientationLockType).toBe('portrait');
+    expect(player.store.orientationLockType).toBe('auto');
 
     player.orientationLockType = 'natural';
     await player.updateComplete;
@@ -430,27 +430,6 @@ describe('createPlayer', () => {
     await player.updateComplete;
 
     expect(player.store.orientationLockType).toBe('landscape');
-
-    player.remove();
-  });
-
-  it('applies adaptive fullscreen configuration through attributes and properties', async () => {
-    const { PlayerElement } = createPlayer({ features: videoFeatures });
-    const tagName = `test-adaptive-fullscreen-player-${tagCounter++}`;
-
-    customElements.define(tagName, PlayerElement);
-
-    const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
-
-    player.setAttribute('enable-adaptive-full-screen', '');
-    document.body.append(player);
-
-    expect(player.store.enableAdaptiveFullScreen).toBe(true);
-
-    player.enableAdaptiveFullScreen = false;
-    await player.updateComplete;
-
-    expect(player.store.enableAdaptiveFullScreen).toBe(false);
 
     player.remove();
   });
