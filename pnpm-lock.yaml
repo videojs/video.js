@@ -1513,9 +1513,6 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../utils
-      react-compiler-runtime:
-        specifier: ^1.0.0
-        version: 1.0.0(react@19.3.0)
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.3

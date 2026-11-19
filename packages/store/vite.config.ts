@@ -2,7 +2,6 @@ import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
-import { reactCompilerPlugin } from '../../build/react-compiler.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
@@ -12,7 +11,6 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     html: './src/html/index.ts',
     react: './src/react/index.ts',
   },
-  plugins: [reactCompilerPlugin({ include: /[/\\]src[/\\]react[/\\]/ })],
 });
 
 export default defineConfig({
