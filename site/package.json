@@ -81,6 +81,7 @@
     "oxc-parser": "0.146.0",
     "oxc-transform-react": "0.152.0",
     "oxc-walker": "^1.1.1",
+    "smol-toml": "^1.9.1",
     "tsx": "^4.23.1",
     "turndown": "^7.2.2",
     "typescript": "npm:@typescript/typescript6@^6.0.0",
