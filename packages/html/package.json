@@ -53,6 +53,11 @@
       "development": "./dist/dev/icons/index.js",
       "default": "./dist/default/icons/index.js"
     },
+    "./icons/element/*": {
+      "types": "./dist/dev/icons/element/*/index.d.ts",
+      "development": "./dist/dev/icons/element/*/index.js",
+      "default": "./dist/default/icons/element/*/index.js"
+    },
     "./icons/*": {
       "types": "./dist/dev/icons/*/index.d.ts",
       "development": "./dist/dev/icons/*/index.js",
@@ -123,6 +128,11 @@
       "development": "./dist/dev/define/feature/*.js",
       "default": "./dist/default/define/feature/*.js"
     },
+    "./extensions/*": {
+      "types": "./dist/dev/define/extensions/*.d.ts",
+      "development": "./dist/dev/define/extensions/*.js",
+      "default": "./dist/default/define/extensions/*.js"
+    },
     "./media/lazy/*": {
       "types": "./dist/dev/media/lazy/*.d.ts",
       "development": "./dist/dev/media/lazy/*.js",
@@ -133,10 +143,30 @@
       "development": "./dist/dev/define/media/mux-video/index.js",
       "default": "./dist/default/define/media/mux-video/index.js"
     },
+    "./media/mux-video/hls-js": {
+      "types": "./dist/dev/define/media/mux-video/hls-js.d.ts",
+      "development": "./dist/dev/define/media/mux-video/hls-js.js",
+      "default": "./dist/default/define/media/mux-video/hls-js.js"
+    },
+    "./media/mux-video/spf": {
+      "types": "./dist/dev/define/media/mux-video/spf.d.ts",
+      "development": "./dist/dev/define/media/mux-video/spf.js",
+      "default": "./dist/default/define/media/mux-video/spf.js"
+    },
     "./media/mux-audio": {
       "types": "./dist/dev/define/media/mux-audio/index.d.ts",
       "development": "./dist/dev/define/media/mux-audio/index.js",
       "default": "./dist/default/define/media/mux-audio/index.js"
+    },
+    "./media/mux-audio/hls-js": {
+      "types": "./dist/dev/define/media/mux-audio/hls-js.d.ts",
+      "development": "./dist/dev/define/media/mux-audio/hls-js.js",
+      "default": "./dist/default/define/media/mux-audio/hls-js.js"
+    },
+    "./media/mux-audio/spf": {
+      "types": "./dist/dev/define/media/mux-audio/spf.d.ts",
+      "development": "./dist/dev/define/media/mux-audio/spf.js",
+      "default": "./dist/default/define/media/mux-audio/spf.js"
     },
     "./media/*": {
       "types": "./dist/dev/define/media/*.d.ts",
@@ -147,6 +177,11 @@
       "types": "./dist/dev/i18n/index.d.ts",
       "development": "./dist/dev/i18n/index.js",
       "default": "./dist/default/i18n/index.js"
+    },
+    "./i18n/locales/*/register": {
+      "types": "./dist/dev/i18n/locales/*/register.d.ts",
+      "development": "./dist/dev/i18n/locales/*/register.js",
+      "default": "./dist/default/i18n/locales/*/register.js"
     },
     "./i18n/locales/*": {
       "types": "./dist/dev/i18n/locales/*.d.ts",

@@ -149,6 +149,11 @@
       "development": "./dist/dev/i18n/index.js",
       "default": "./dist/default/i18n/index.js"
     },
+    "./i18n/locales/*/register": {
+      "types": "./dist/dev/i18n/locales/*/register.d.ts",
+      "development": "./dist/dev/i18n/locales/*/register.js",
+      "default": "./dist/default/i18n/locales/*/register.js"
+    },
     "./i18n/locales/*": {
       "types": "./dist/dev/i18n/locales/*.d.ts",
       "development": "./dist/dev/i18n/locales/*.js",
