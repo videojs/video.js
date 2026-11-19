@@ -215,6 +215,29 @@ describe('GoogleCastProvider', () => {
     expect(remove).toHaveBeenCalledWith('change', add.mock.calls[0]![1]);
   });
 
+  it('removes the text track change listener when the target drops its text tracks before detach', () => {
+    const provider = new GoogleCastProvider({});
+    const { target, textTracks } = createTarget();
+    const add = vi.spyOn(textTracks, 'addEventListener');
+    const remove = vi.spyOn(textTracks, 'removeEventListener');
+
+    provider.attach(target);
+    Object.assign(target, { textTracks: undefined });
+
+    expect(() => provider.detach()).not.toThrow();
+    expect(remove).toHaveBeenCalledWith('change', add.mock.calls[0]![1]);
+  });
+
+  it('attaches to a target without text tracks', () => {
+    const provider = new GoogleCastProvider({});
+    const { target } = createTarget();
+
+    Object.assign(target, { textTracks: undefined });
+
+    expect(() => provider.attach(target)).not.toThrow();
+    expect(() => provider.detach()).not.toThrow();
+  });
+
   it('removes the text track change listener on destroy', () => {
     const provider = new GoogleCastProvider({});
     const { target, textTracks } = createTarget();

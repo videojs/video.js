@@ -31,6 +31,8 @@ type GoogleCastConfig = GoogleCastExtensionProps;
  */
 export class GoogleCastProvider {
   target: HTMLMediaTargetLike | null = null;
+  // The list subscribed on attach; the target may drop or swap its own before detach.
+  #textTracks: HTMLMediaTargetLike['textTracks'] | null = null;
   #googleCast: GoogleCastConfig;
   #loadedSrc: string | null = null;
   #hooks: Partial<RemotePlaybackHooks> = {};
@@ -71,11 +73,13 @@ export class GoogleCastProvider {
 
   attach(target: HTMLMediaTargetLike) {
     this.target = target;
-    target.textTracks.addEventListener('change', this.#onTextTrackChange);
+    this.#textTracks = target.textTracks ?? null;
+    this.#textTracks?.addEventListener('change', this.#onTextTrackChange);
   }
 
   detach() {
-    this.target?.textTracks.removeEventListener('change', this.#onTextTrackChange);
+    this.#textTracks?.removeEventListener('change', this.#onTextTrackChange);
+    this.#textTracks = null;
     this.target = null;
   }
 
