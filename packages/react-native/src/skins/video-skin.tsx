@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Container, type ContainerProps } from '../player/container';
 import { BufferingIndicator } from '../ui/buffering-indicator';
+import { Controls } from '../ui/controls';
 import { InlineError } from '../ui/inline-error';
 import { PlayButton } from '../ui/play-button';
 import { Poster } from '../ui/poster';
@@ -22,8 +23,7 @@ export interface VideoSkinProps extends ContainerProps {
  * display state (poster, buffering, error) ignore touches so the controls beneath them stay usable. The error renders
  * last so it sits above the controls.
  *
- * The controls are always visible: auto-hide needs the `controls` feature, which cannot attach until the player target
- * accepts a react-native container. See `NativePlayerTarget`.
+ * The controls hide after a moment of playback without touches; a tap on the video toggles them.
  *
  * ```tsx
  * <VideoSkin>
@@ -37,19 +37,21 @@ export function VideoSkin({ children, ...props }: VideoSkinProps): ReactNode {
       {children}
       <Poster />
       <BufferingIndicator />
-      {/* The bar is the title's own padding and background, so a player without a title shows no empty strip. */}
-      <Title style={styles.title} />
-      <View style={styles.buttonContainer}>
-        <View style={styles.buttons}>
-          <SeekButton seconds={-10} />
-          <PlayButton />
-          <SeekButton seconds={10} />
+      <Controls>
+        {/* The bar is the title's own padding and background, so a player without a title shows no empty strip. */}
+        <Title style={styles.title} />
+        <View style={styles.buttonContainer}>
+          <View style={styles.buttons}>
+            <SeekButton seconds={-10} />
+            <PlayButton />
+            <SeekButton seconds={10} />
+          </View>
         </View>
-      </View>
-      <View pointerEvents="box-none" style={styles.bottom}>
-        <TimeLabel type="current" />
-        <TimeSlider style={styles.slider} />
-      </View>
+        <View pointerEvents="box-none" style={styles.bottom}>
+          <TimeLabel type="current" />
+          <TimeSlider style={styles.slider} />
+        </View>
+      </Controls>
       {/* Above the controls so its message is not dimmed or crossed by them; it ignores touches. */}
       <InlineError />
     </Container>

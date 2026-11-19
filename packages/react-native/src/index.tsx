@@ -31,6 +31,7 @@ export { VideoSkin, type VideoSkinProps } from './skins/video-skin';
 export type { NativePlayerTarget } from './store/native-player-target';
 export {
   selectBuffer,
+  selectControls,
   selectError,
   selectMetadata,
   selectPlayback,
@@ -38,6 +39,7 @@ export {
   selectTime,
 } from './store/selectors';
 export { BufferingIndicator, type BufferingIndicatorProps } from './ui/buffering-indicator';
+export { Controls, type ControlsProps } from './ui/controls';
 export { InlineError, type InlineErrorProps } from './ui/inline-error';
 export { PlayButton, type PlayButtonProps } from './ui/play-button';
 export { Poster, type PosterProps } from './ui/poster';

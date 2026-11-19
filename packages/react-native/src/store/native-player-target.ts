@@ -19,9 +19,9 @@ export interface NativePlayerTarget {
    * `MediaContainerLike` the way `Media` was carved out of `HTMLMediaElement`, or by making `PlayerTarget` generic over
    * its container type.
    *
-   * Until then the features that read `target.container` — controls auto-hide, fullscreen, picture-in-picture,
-   * orientation lock, remote playback — cannot run here. Playback needs only the `media` half, so nothing in the
-   * current feature set misses it.
+   * Until then the web features that read `target.container` — fullscreen, picture-in-picture, orientation lock, remote
+   * playback — cannot run here. Controls auto-hide is covered by `nativeControlsFeature`, which takes activity from the
+   * `Controls` component instead of a container.
    */
   container: null;
 }

@@ -8,6 +8,7 @@ import {
 } from '@videojs/core';
 import type { ComponentProps } from 'react';
 
+import { nativeControlsFeature } from '../store/features/controls';
 import { createPlayer } from './create-player';
 
 /**
@@ -22,11 +23,13 @@ export type NativeVideoFeatures = [
   typeof errorFeature,
   typeof metadataFeature,
   typeof playbackRateFeature,
+  typeof nativeControlsFeature,
 ];
 
 /**
  * Features for a react-native video player. Core's platform-neutral features attach to the react-native target as-is,
- * since `ReactNativeMedia` passes the capability checks they open with.
+ * since `ReactNativeMedia` passes the capability checks they open with. `controls` is react-native's own, because the
+ * web feature tracks activity on a DOM container.
  */
 export const nativeVideoFeatures: NativeVideoFeatures = [
   playbackFeature,
@@ -35,6 +38,7 @@ export const nativeVideoFeatures: NativeVideoFeatures = [
   errorFeature,
   metadataFeature,
   playbackRateFeature,
+  nativeControlsFeature,
 ];
 
 /**
