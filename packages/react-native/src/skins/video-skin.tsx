@@ -7,6 +7,7 @@ import { InlineError } from '../ui/inline-error';
 import { PlayButton } from '../ui/play-button';
 import { Poster } from '../ui/poster';
 import { SeekButton } from '../ui/seek-button';
+import { TimeLabel } from '../ui/time-label';
 import { TimeSlider } from '../ui/time-slider';
 import { Title } from '../ui/title';
 
@@ -46,6 +47,7 @@ export function VideoSkin({ children, ...props }: VideoSkinProps): ReactNode {
         </View>
       </View>
       <View pointerEvents="box-none" style={styles.bottom}>
+        <TimeLabel type="current" />
         <TimeSlider style={styles.slider} />
       </View>
       {/* Above the controls so its message is not dimmed or crossed by them; it ignores touches. */}
@@ -73,10 +75,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 12,
-    paddingBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   slider: {
+    flex: 1,
     marginHorizontal: 4,
   },
   buttonContainer: {
