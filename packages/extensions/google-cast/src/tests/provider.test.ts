@@ -300,6 +300,30 @@ function createTrackTarget() {
   return { target, addTrack, removeTrack };
 }
 
+/** Runs `action`, then collects any rejection it left unhandled. */
+async function collectUnhandledRejections(action: () => unknown): Promise<unknown[]> {
+  // SAFETY: tests run on Node, and the test types omit Node's globals.
+  const { process } = globalThis as unknown as {
+    process: {
+      on(type: string, fn: (reason: unknown) => void): void;
+      off(type: string, fn: (reason: unknown) => void): void;
+    };
+  };
+  const reasons: unknown[] = [];
+  const onRejection = (reason: unknown) => reasons.push(reason);
+
+  process.on('unhandledRejection', onRejection);
+
+  try {
+    await action();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  } finally {
+    process.off('unhandledRejection', onRejection);
+  }
+
+  return reasons;
+}
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((r) => {
@@ -369,6 +393,43 @@ describe('GoogleCastProvider', () => {
 
     provider.detach();
     expect(remove).toHaveBeenCalledWith('change', add.mock.calls[0]![1]);
+  });
+
+  it('removes the text track change listener when the target drops its text tracks before detach', () => {
+    const provider = new GoogleCastProvider({});
+    const { target, textTracks } = createTarget();
+    const add = vi.spyOn(textTracks, 'addEventListener');
+    const remove = vi.spyOn(textTracks, 'removeEventListener');
+
+    provider.attach(target);
+    Object.assign(target, { textTracks: undefined });
+
+    expect(() => provider.detach()).not.toThrow();
+    expect(remove).toHaveBeenCalledWith('change', add.mock.calls[0]![1]);
+  });
+
+  it('attaches to a target without text tracks', () => {
+    const provider = new GoogleCastProvider({});
+    const { target } = createTarget();
+
+    Object.assign(target, { textTracks: undefined });
+
+    expect(() => provider.attach(target)).not.toThrow();
+    expect(() => provider.detach()).not.toThrow();
+  });
+
+  it('syncs remote text tracks without error when the target has no text tracks', async () => {
+    const { target } = createTarget();
+
+    Object.assign(target, { textTracks: undefined });
+    const { sdk } = await createCastingProvider({}, target);
+
+    sdk.player.isMediaLoaded = true;
+    const reasons = await collectUnhandledRejections(() =>
+      sdk.player.controller!.listeners.get('isMediaLoadedChanged')!()
+    );
+
+    expect(reasons).toEqual([]);
   });
 
   it('removes the text track change listener on destroy', () => {

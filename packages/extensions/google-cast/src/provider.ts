@@ -32,6 +32,8 @@ type GoogleCastConfig = GoogleCastExtensionProps;
  */
 export class GoogleCastProvider {
   target: HTMLMediaTargetLike | null = null;
+  // The list subscribed on attach; the target may drop or swap its own before detach.
+  #textTracks: HTMLMediaTargetLike['textTracks'] | null = null;
   #googleCast: GoogleCastConfig;
   #canCast: () => boolean;
   #loadedSrc: string | null = null;
@@ -88,17 +90,17 @@ export class GoogleCastProvider {
 
   attach(target: HTMLMediaTargetLike) {
     this.target = target;
-    target.textTracks.addEventListener('change', this.#onTextTrackChange);
-    target.textTracks.addEventListener('addtrack', this.#onTextTrackListChange);
-    target.textTracks.addEventListener('removetrack', this.#onTextTrackListChange);
+    this.#textTracks = target.textTracks ?? null;
+    this.#textTracks?.addEventListener('change', this.#onTextTrackChange);
+    this.#textTracks?.addEventListener('addtrack', this.#onTextTrackListChange);
+    this.#textTracks?.addEventListener('removetrack', this.#onTextTrackListChange);
   }
 
   detach() {
-    const textTracks = this.target?.textTracks;
-
-    textTracks?.removeEventListener('change', this.#onTextTrackChange);
-    textTracks?.removeEventListener('addtrack', this.#onTextTrackListChange);
-    textTracks?.removeEventListener('removetrack', this.#onTextTrackListChange);
+    this.#textTracks?.removeEventListener('change', this.#onTextTrackChange);
+    this.#textTracks?.removeEventListener('addtrack', this.#onTextTrackListChange);
+    this.#textTracks?.removeEventListener('removetrack', this.#onTextTrackListChange);
+    this.#textTracks = null;
     this.target = null;
   }
 
@@ -624,7 +626,7 @@ export class GoogleCastProvider {
 
   /** The receiver's text tracks paired with the local tracks they show. */
   #pairTextTracks() {
-    const localSubs = [...(this.target?.textTracks ?? [])].filter(isCaptionOrSubtitleTrack);
+    const localSubs = [...(this.#textTracks ?? [])].filter(isCaptionOrSubtitleTrack);
 
     return getRemoteTextTracks().flatMap(({ language, name, trackId }) => {
       const local = localSubs.find((l) => l.language === language && l.label === name);
@@ -653,9 +655,10 @@ export class GoogleCastProvider {
 
   /** Show `active` and turn the other local captions off. */
   #showLocalTextTrack(active: TextTrackLike | undefined) {
-    if (!this.target) return;
+    const textTracks = this.#textTracks;
+    if (!textTracks) return;
 
-    for (const track of [...this.target.textTracks].filter(isCaptionOrSubtitleTrack)) {
+    for (const track of [...textTracks].filter(isCaptionOrSubtitleTrack)) {
       if (track === active) track.mode = 'showing';
       else if (track.mode === 'showing') track.mode = 'disabled';
     }
@@ -663,7 +666,7 @@ export class GoogleCastProvider {
 
   async #updateRemoteTextTrack() {
     // Media that isn't loaded can't change tracks; loading it syncs them.
-    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !this.target) return;
+    if (!this.#isCasting || !this.#remotePlayer.isMediaLoaded || !this.#textTracks) return;
 
     const matched = this.#pairTextTracks().map(({ trackId, local }) => ({ trackId, mode: local.mode }));
 
