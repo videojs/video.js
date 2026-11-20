@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Adds live audio playback and live track selection, with more reliable casting and player setup."
 date: 2026-11-20
 version: "10.6.0"
 prerelease: false
@@ -7,42 +7,30 @@ breaking: false
 compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.5.0...@videojs/core@10.6.0"
 ---
 
+Video.js 10.6.0 expands live playback and makes common streaming, casting, and installation paths more reliable.
 
-### 🚀 Features
-- *(spf)* Play live streams on the audio engines ([#9779](https://github.com/videojs/video.js/pull/9779)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- Add quality and audio track selection to live video ([#9798](https://github.com/videojs/video.js/pull/9798)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(hyperframes-video)* Add hyperframes composition media ([#9719](https://github.com/videojs/video.js/pull/9719)) by [@luwes](https://github.com/luwes)
+## Play live audio and choose live tracks
 
-### 🐛 Bug Fixes
-- *(spf)* Fail the source when its manifest does not load ([#9776](https://github.com/videojs/video.js/pull/9776)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(hlsjs-video)* Surface fatal errors raised while media is attaching ([#9729](https://github.com/videojs/video.js/pull/9729)) by [@siam923](https://github.com/siam923)
-- *(spf)* Surface metadata before play for tracks without an init segment ([#9778](https://github.com/videojs/video.js/pull/9778)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(core)* Position popovers manually under a transformed ancestor ([#9762](https://github.com/videojs/video.js/pull/9762)) by [@vladosskins178](https://github.com/vladosskins178)
-- *(ci)* Gate agent workflows against untrusted issue content ([#9801](https://github.com/videojs/video.js/pull/9801)) by [@luwes](https://github.com/luwes)
-- *(spf)* Load the previous segment when a seek lands before a segment's first frame, and stop shifting MPEG-TS off the playlist ([#9774](https://github.com/videojs/video.js/pull/9774)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(google-cast)* Detect separate hls audio segment formats when casting ([#9788](https://github.com/videojs/video.js/pull/9788)) by [@luwes](https://github.com/luwes)
-- *(google-cast)* Keep receiver text tracks in sync with sidecar tracks ([#9789](https://github.com/videojs/video.js/pull/9789)) by [@luwes](https://github.com/luwes)
-- *(google-cast)* Disable DRM casts to the default receiver and document DRM casting ([#9794](https://github.com/videojs/video.js/pull/9794)) by [@luwes](https://github.com/luwes)
-- *(html,react)* Add explicit exports for nested public subpaths ([#9804](https://github.com/videojs/video.js/pull/9804)) by [@luwes](https://github.com/luwes)
-- *(google-cast)* Keep text track listeners on the list they were added to ([#9807](https://github.com/videojs/video.js/pull/9807)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(site)* Shorten redirect chains and fix 404s that Search Console reports ([#9647](https://github.com/videojs/video.js/pull/9647)) by [@decepulis](https://github.com/decepulis)
-- *(store)* Stop installing react into plain html projects ([#9819](https://github.com/videojs/video.js/pull/9819)) by [@luwes](https://github.com/luwes)
-- *(dash-video)* Clear the source before detaching so dash.js unbinds from the element ([#9814](https://github.com/videojs/video.js/pull/9814)) by [@luwes](https://github.com/luwes)
-- *(google-cast)* Unload the receiver when the source is cleared ([#9726](https://github.com/videojs/video.js/pull/9726)) by [@SrkianFardin25](https://github.com/SrkianFardin25)
-- *(html)* Make iframe embeds fill the player ([#9821](https://github.com/videojs/video.js/pull/9821)) by [@sampotts](https://github.com/sampotts)
+SPF audio engines now play live CMAF and MPEG-TS streams, with the same live state and controls as video playback ([#9779](https://github.com/videojs/video.js/pull/9779)). Live video presets now include quality and audio-track selection, so viewers can choose a rendition or language on multi-track HLS streams ([#9798](https://github.com/videojs/video.js/pull/9798)).
 
-### 🚜 Refactor
-- *(google-cast)* Trim the extension and let providers listen to the cast context ([#9791](https://github.com/videojs/video.js/pull/9791)) by [@luwes](https://github.com/luwes)
+SPF now reports a failed manifest as a playback error ([#9776](https://github.com/videojs/video.js/pull/9776)), loads enough MPEG-TS media for `preload="metadata"` to reach `loadedmetadata` before playback ([#9778](https://github.com/videojs/video.js/pull/9778)), and preserves media at segment boundaries when seeking. MPEG-TS playback also now stays on the playlist timeline and reaches the end of short final segments ([#9774](https://github.com/videojs/video.js/pull/9774)). The Mux media references now explain when to choose SPF or hls.js: see [Mux Video](/docs/framework/html/reference/components/mux-video/) and [Mux Audio](/docs/framework/html/reference/components/mux-audio/) ([#9787](https://github.com/videojs/video.js/pull/9787)). SPF documentation also corrects details about Mux MPEG-TS packaging and live TS coverage ([#9777](https://github.com/videojs/video.js/pull/9777)).
 
-### 📚 Documentation
-- *(spf)* Correct what Mux packages as MPEG-TS and what live TS covers ([#9777](https://github.com/videojs/video.js/pull/9777)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(site)* Add changelog prose for 10.5.0 ([#9781](https://github.com/videojs/video.js/pull/9781)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(site)* Document Mux media playback engines ([#9787](https://github.com/videojs/video.js/pull/9787)) by [@decepulis](https://github.com/decepulis)
+## Play HyperFrames compositions
 
-### 🧪 Testing
-- *(test)* Cover source churn, unmounting, and remounting against real engines ([#9815](https://github.com/videojs/video.js/pull/9815)) by [@luwes](https://github.com/luwes)
+`@videojs/hyperframes-video` adds HyperFrames compositions as player media. Use a HyperFrames file or author the composition inline with a `<template>` in HTML or JSX in React; player controls, the time slider, and hotkeys drive it like other media ([#9719](https://github.com/videojs/video.js/pull/9719)).
 
-### New Contributors
-* @SrkianFardin25 made their first contribution in [#9726](https://github.com/videojs/video.js/pull/9726)
-* @vladosskins178 made their first contribution in [#9762](https://github.com/videojs/video.js/pull/9762)
-* @siam923 made their first contribution in [#9729](https://github.com/videojs/video.js/pull/9729)
+## Keep casting in sync
+
+Google Cast now detects separate HLS audio segment formats, keeps sidecar text tracks and caption selections in sync with the receiver, and unloads receiver media when you clear the local source ([#9788](https://github.com/videojs/video.js/pull/9788), [#9789](https://github.com/videojs/video.js/pull/9789), [#9726](https://github.com/videojs/video.js/pull/9726)). It also cleans up text-track listeners when a player unmounts ([#9807](https://github.com/videojs/video.js/pull/9807)). A Google Cast refactor also recognizes CRLF-terminated playlists when it detects their segment format ([#9791](https://github.com/videojs/video.js/pull/9791)).
+
+The Default Media Receiver cannot play DRM-protected content, so the Cast button now stays disabled for a protected source until you configure a custom receiver. The [casting guide](/docs/guides/casting/#cast-drm-protected-content) explains how to pass DRM configuration to one ([#9794](https://github.com/videojs/video.js/pull/9794)).
+
+## Installation and player fixes
+
+HTML-only installs no longer pull in React, and documented nested HTML and React import paths now resolve in tools that do not support multi-segment export wildcards ([#9819](https://github.com/videojs/video.js/pull/9819), [#9804](https://github.com/videojs/video.js/pull/9804)). Iframe embeds now fill video skins and retain their aspect ratio outside a skin ([#9821](https://github.com/videojs/video.js/pull/9821)).
+
+Fatal hls.js errors during media attachment now reach the player error state ([#9729](https://github.com/videojs/video.js/pull/9729)). Dash.js releases its media element correctly when a player unmounts ([#9814](https://github.com/videojs/video.js/pull/9814)), and popovers position correctly inside transformed ancestors ([#9762](https://github.com/videojs/video.js/pull/9762)). The site also shortens legacy redirect chains and restores redirects for documented paths that previously reached 404 pages ([#9647](https://github.com/videojs/video.js/pull/9647)).
+
+## New contributors
+
+Thanks to first-time contributors [@SrkianFardin25](https://github.com/SrkianFardin25), [@vladosskins178](https://github.com/vladosskins178), and [@siam923](https://github.com/siam923).
