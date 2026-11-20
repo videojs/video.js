@@ -8,8 +8,13 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
-/** Static `import`/`export … from`, and dynamic `import()`, specifiers. */
-const SPECIFIER = /(?:\bfrom|\bimport)\s*\(?\s*["']([^"']+)["']/g;
+/**
+ * Static `import`/`export … from`, and dynamic `import()`, specifiers.
+ *
+ * Rolldown quotes dynamic imports with backticks (`` import(`./zh-1P3ErJe9.js`) ``). Backticks only count right after
+ * `import(`, because minified bundles also hold template literals that follow the word `from`.
+ */
+const SPECIFIER = /(?:\bfrom|\bimport)\s*\(?\s*["']([^"']+)["']|\bimport\s*\(\s*`([^`]+)`/g;
 
 /**
  * JSDoc blocks, dropped before the scan.
@@ -33,7 +38,7 @@ function isLikelySpecifier(value: string): boolean {
 
 export function collectSpecifiers(code: string): string[] {
   return [...code.replace(JSDOC_BLOCK, '').matchAll(SPECIFIER)]
-    .map((match) => match[1] as string)
+    .map((match) => match[1] ?? match[2] ?? '')
     .filter(isLikelySpecifier);
 }
 
