@@ -136,6 +136,43 @@ describe('findReferenceDuplicates', () => {
     expect(findReferenceDuplicates([guide, ref])).toEqual([]);
   });
 
+  it('measures prose as read, so a shared list of links is not a copy', () => {
+    const link = '- [Mux Data metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata)';
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: link });
+
+    expect(findReferenceDuplicates([page({ body: link }), ref])).toEqual([]);
+  });
+
+  it('skips indented code fences, such as one inside a numbered list', () => {
+    const install = [
+      '1. Install the packages:',
+      '',
+      '   ```bash',
+      '   pnpm add @videojs/react @videojs/mux-video @videojs/mux-data @videojs/google-analytics @videojs/google-cast',
+      '   ```',
+    ].join('\n');
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: install });
+
+    expect(findReferenceDuplicates([page({ body: install }), ref])).toEqual([]);
+  });
+
+  it('reads prose that follows a table without a blank line, and paragraphs that open with a component', () => {
+    const sentence =
+      'Changing the SDK, the beacon domain, debug, or cookies restarts monitoring, which ends the current view.';
+    const linked = `<DocsLink slug="reference/x">MuxData</DocsLink> ${sentence}`;
+    const guide = page({ body: ['| A | B |', '|---|---|', '| a | b |', sentence, '', linked].join('\n') });
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: [sentence, '', linked].join('\n\n') });
+
+    expect(findReferenceDuplicates([guide, ref]).map((duplicate) => duplicate.excerpt)).toEqual([sentence, linked]);
+  });
+
+  it('leaves the writing-style pages, which quote reference prose as examples, unchecked', () => {
+    const text = 'A long enough sentence that a writing-style page quotes from a reference page to show its tone.';
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: text });
+
+    expect(findReferenceDuplicates([page({ id: 'writing-style/write-references', body: text }), ref])).toEqual([]);
+  });
+
   it('ignores passages shared only between guides', () => {
     const text = 'A long enough sentence that two guides happen to share, which is a separate problem from this check.';
 

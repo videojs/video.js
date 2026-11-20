@@ -116,7 +116,9 @@ const MIN_PASSAGE_LENGTH = 80;
 /** Fewer shared rows than this, under the same columns, is a coincidence rather than a copied lookup table. */
 const MIN_SHARED_TABLE_ROWS = 4;
 
-const CODE_FENCE = /^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm;
+// Fences may be indented, such as one inside a numbered list.
+const CODE_FENCE = /^[ \t]*(`{3,}|~{3,})[^\n]*\n[\s\S]*?^[ \t]*\1[ \t]*$/gm;
+const MARKDOWN_LINK = /\[([^\]]*)\]\([^)]*\)/g;
 const JSX_ONLY_LINE = /^\s*(<\/?[A-Z][^>]*>|\{\/\*.*\*\/\})\s*$/;
 const TABLE_RULE = /^\|?[\s:|-]+\|?$/;
 
@@ -167,13 +169,21 @@ function passages(body: string): Passages {
     blocks.at(-1)!.push(line);
   }
 
-  for (const block of blocks) {
-    // Component markup, such as a multi-line `<Demo files={[…]}>`, is wiring rather than a statement of fact.
-    if (block.length === 0 || /^\s*[<{]/.test(block[0]!)) continue;
+  for (const lines of blocks) {
+    let block = lines;
+    // Component markup, such as a multi-line `<Demo files={[…]}>`, is wiring rather than a statement of fact. A paragraph
+    // that opens with an inline component, such as `<DocsLink>…</DocsLink> renders…`, closes it on the same line.
+    if (block.length === 0 || (/^\s*[<{]/.test(block[0]!) && !block[0]!.includes('</'))) continue;
 
     if (block[0]!.trim().startsWith('|')) {
-      result.tables.push(toTable(block));
-      continue;
+      const end = block.findIndex((line) => !line.trim().startsWith('|'));
+
+      result.tables.push(toTable(end === -1 ? block : block.slice(0, end)));
+
+      if (end === -1) continue;
+
+      // Prose that follows a table without a blank line is still prose.
+      block = block.slice(end);
     }
 
     const items = /^\s*([-*]|\d+\.)\s/.test(block[0]!)
@@ -183,8 +193,9 @@ function passages(body: string): Passages {
     for (const item of items) {
       const text = normalize(item.replace(/^\s*([-*]|\d+\.)\s+/, ''));
 
-      // Measured without tags, so a list of links such as "Related guides" doesn't count as prose.
-      if (text.replace(/<[^>]+>/g, '').length >= MIN_PASSAGE_LENGTH) result.prose.add(text);
+      // Measured as read, without tags or link targets, so a list of links such as "Related guides" isn't prose.
+      if (text.replace(/<[^>]+>/g, '').replace(MARKDOWN_LINK, '$1').length >= MIN_PASSAGE_LENGTH)
+        result.prose.add(text);
     }
   }
 
@@ -192,9 +203,10 @@ function passages(body: string): Passages {
 }
 
 /**
- * Report guide passages that repeat a reference page: the same paragraph or list item, or a table with the same columns
- * whose rows name the same entries. Reference owns exact options, values, and lookup tables, so a guide links to them
- * instead. Code examples are exempt.
+ * Report guide passages that repeat a reference page verbatim: the same paragraph or list item, or a table with the
+ * same columns whose rows name the same entries. Reference owns exact options, values, and lookup tables, so a guide
+ * links to them instead. Code examples are exempt, and restatements in other words are left to review. Only pages under
+ * `guides/` are checked; the writing-style pages quote reference prose as examples.
  */
 export function findReferenceDuplicates(pages: DocPage[]): ReferenceDuplicate[] {
   const references = pages
@@ -203,7 +215,7 @@ export function findReferenceDuplicates(pages: DocPage[]): ReferenceDuplicate[] 
   const duplicates: ReferenceDuplicate[] = [];
 
   for (const page of pages) {
-    if (page.type === 'reference') continue;
+    if (!page.id.startsWith('guides/')) continue;
 
     const guide = passages(page.body);
 
