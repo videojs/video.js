@@ -58,6 +58,8 @@ import '@videojs/html/media/mux-video/spf';
 All three imports register the same `<mux-video>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
 </FrameworkCase>
 
+Both engines play through Media Source Extensions: `MediaSource`, or `ManagedMediaSource` on iPhone. A browser without either, such as iPhone Safari before iOS 17.1, plays the stream with its own HLS support instead, whichever flavor you import. So does a source that isn't HLS, such as a static MP4 rendition. To choose native playback yourself, set `source.preferPlayback` to `'native'`.
+
 ### When to use SPF
 
 - **You want a smaller page.** SPF is about a quarter of hls.js's size, which matters most with several players on a page or on slower connections.
@@ -71,7 +73,6 @@ SPF is still under development. Use hls.js if any of these applies to you:
 - **You rely on detailed Mux Data.** With SPF, Mux Data doesn't receive playback errors, or detail like quality switches and download speed.
 - **You need low latency.** SPF plays low-latency live streams with the delay of an ordinary live stream.
 - **You set quality limits on the player.** SPF doesn't let you set the lowest or highest quality the player picks on its own, or stop it from matching quality to the player's size.
-- **You support older iPhones.** SPF needs iOS 17.1 or later.
 
 ### SPF limitations in detail
 
@@ -82,8 +83,6 @@ SPF is still under development. Use hls.js if any of these applies to you:
 **Low-Latency HLS.** SPF skips the partial segments (`EXT-X-PART`) that make LL-HLS low latency and loads whole segments instead. The stream plays as standard-latency live, at the distance from the live edge that the playlist's `HOLD-BACK` sets. SPF logs a console warning when this happens.
 
 **Rendition limits.** `maxAutoResolution`, `minAutoResolution`, and `capRenditionToPlayerSize` are hls.js options, so the SPF flavor doesn't take them. SPF always caps the rendition to the player's size. To limit renditions on either engine, use `source.playback.maxResolution` or `source.playback.minResolution`, which Mux applies to the playlist itself.
-
-**Browsers without Media Source Extensions.** SPF plays through `MediaSource`, or `ManagedMediaSource` on iPhone, and has no fallback to the browser's own HLS playback. iPhone Safari before iOS 17.1 has neither, so SPF can't play there. The hls.js flavor falls back to native HLS.
 
 ## Load a source
 
