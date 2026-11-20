@@ -15,9 +15,11 @@ class CloudflareCustomMediaElement extends CustomMediaElement('iframe', Cloudfla
       <style>
         :host {
           display: inline-block;
-          min-width: 300px;
-          min-height: 150px;
           position: relative;
+          /* Size like a replaced <video>: 300px wide by default, and an author-set width alone keeps the
+             ratio. A skin stretches the host over its media box. */
+          width: 300px;
+          aspect-ratio: 16 / 9;
         }
         iframe {
           position: absolute;

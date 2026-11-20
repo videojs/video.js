@@ -15,10 +15,13 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
           display: inline-block;
           /* TikTok videos are portrait, and the player refuses to draw its chrome
              below 325x578, so that is where this host starts rather than the
-             300x150 the landscape embeds use. */
+             300px width the landscape embeds use. */
           min-width: 325px;
           min-height: 578px;
           position: relative;
+          /* Size like a replaced <video>: an author-set width alone keeps the ratio. A skin
+             stretches the host over its media box. */
+          aspect-ratio: 9 / 16;
         }
         iframe {
           position: absolute;
