@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { MEDIA } from '../../../shared/fixtures/resources';
 import { DATA_ATTRS } from '../../../shared/fixtures/selectors';
 import { PlayerPage } from '../../../shared/page-objects/player';
 
@@ -157,6 +158,46 @@ test.describe('React Mouse Gestures', () => {
 });
 
 // --- Touch gestures (pointer="touch") ---
+
+test.describe('Touch controls without a skin', () => {
+  test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });
+
+  test('tap reveals hidden controls without activating the button underneath', async ({ page }) => {
+    const player = new PlayerPage(page);
+
+    // No double-tap binding or skin transition may defer showing the controls until after the browser's click.
+    await page.goto(`/touch-controls.html?src=${encodeURIComponent(MEDIA.mp4.url)}`);
+    await player.waitForMediaReady();
+    await player.playMedia();
+    await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.visible);
+
+    const box = await player.playButton.boundingBox();
+    if (!box) throw new Error('Play button has no layout');
+
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+
+    await page.touchscreen.tap(x, y);
+    await expect(player.controls).toHaveAttribute(DATA_ATTRS.visible, '');
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
+
+    // Require continued playback, rather than observing the state before a delayed click handler has run.
+    const afterTap = await player.getCurrentTime();
+
+    await player.waitForPlayback(afterTap + 0.25);
+    await page.touchscreen.tap(x, y);
+    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+
+    // A touch gesture must not suppress later mouse clicks or keyboard activation on the same control.
+    await page.mouse.click(x, y);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
+    await player.playButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+    await page.keyboard.press('Space');
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
+  });
+});
 
 test.describe('Touch Gestures', () => {
   test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });

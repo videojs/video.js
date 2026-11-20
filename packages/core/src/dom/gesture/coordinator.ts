@@ -109,11 +109,24 @@ export class GestureCoordinator {
     const { signal } = this.#disconnect;
 
     let pointerDownTime = 0;
+    let preventTouchClick = false;
+    let multitouch = false;
+
+    listen(
+      this.#target,
+      'touchstart',
+      (event) => {
+        multitouch = event.touches.length > 1;
+      },
+      { signal, passive: true }
+    );
 
     listen(
       this.#target,
       'pointerdown',
       (event) => {
+        preventTouchClick = false;
+
         if (isInteractionLocked(this.#target)) {
           pointerDownTime = 0;
           return;
@@ -152,11 +165,42 @@ export class GestureCoordinator {
           resolve: (type) => matchBindings(bindings, type, pointerType, clientX, target),
         };
 
+        preventTouchClick =
+          !multitouch &&
+          pointerType === 'touch' &&
+          (matches.resolve('tap').length > 0 || matches.resolve('doubletap').length > 0);
+
         for (const recognizer of this.#recognizers) {
           recognizer.handleUp(matches, event);
         }
       },
       { signal }
+    );
+
+    // Cancelling pointerup does not prevent click. Cancel the touchend for a claimed tap so controls revealed by the
+    // gesture cannot also receive that touch's browser-generated click. Taps starting on controls remain native.
+    listen(
+      this.#target,
+      'touchend',
+      (event) => {
+        if (preventTouchClick && event.touches.length === 0) event.preventDefault();
+
+        preventTouchClick = false;
+
+        if (event.touches.length === 0) multitouch = false;
+      },
+      { signal, passive: false }
+    );
+
+    listen(
+      this.#target,
+      'touchcancel',
+      (event) => {
+        preventTouchClick = false;
+
+        if (event.touches.length === 0) multitouch = false;
+      },
+      { signal, passive: true }
     );
   }
 
