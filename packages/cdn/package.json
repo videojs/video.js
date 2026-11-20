@@ -90,6 +90,7 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/html": "workspace:*",
+    "@videojs/hyperframes-video": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
