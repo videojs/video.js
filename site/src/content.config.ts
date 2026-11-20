@@ -105,6 +105,11 @@ const docs = defineCollection({
     // exact `@videojs/...` entry points (every export), or `*` module patterns (each default export). Read by
     // `scripts/check-api-stability.ts`, which fails on entries that match nothing.
     apis: z.array(z.string()).optional(),
+    // Sections that left this page, keyed by their old heading id, mapped to a docs slug with an optional `#anchor`.
+    // A reader arriving on an old fragment is sent there, since fragments never reach a server-side redirect.
+    movedAnchors: z
+      .record(z.string().regex(/^[\w-]+$/), z.string().regex(/^(guides|reference)\/[\w/-]+(#[\w-]+)?$/))
+      .optional(),
   }),
 });
 
