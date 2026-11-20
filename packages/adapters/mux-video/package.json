@@ -48,6 +48,7 @@
   "dependencies": {
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/media": "workspace:*",
+    "@videojs/native-hls-video": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/utils": "workspace:*"
   },

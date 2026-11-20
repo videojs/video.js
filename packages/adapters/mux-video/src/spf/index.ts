@@ -11,4 +11,7 @@
 export type { MuxContentData, MuxSourceBase } from '@videojs/mux';
 export type { MuxAdapterAPI, MuxAdapterProps } from './mixin';
 export { MuxMixin } from './mixin';
+export type { MuxSource, MuxVideoAdapterProps } from './adapter';
 export { MuxVideoAdapter } from './adapter';
+export type { SpfPlaybackType, SpfVideoAdapterProps, SpfVideoSource } from './playback';
+export { SpfVideoAdapter } from './playback';

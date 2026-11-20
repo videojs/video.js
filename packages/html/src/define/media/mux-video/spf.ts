@@ -5,8 +5,14 @@ export type {
   MuxAdapterAPI,
   MuxAdapterProps,
   MuxContentData,
+  MuxSource,
   MuxSourceBase,
   MuxVideoAdapter,
+  MuxVideoAdapterProps,
+  SpfPlaybackType,
+  SpfVideoAdapter,
+  SpfVideoAdapterProps,
+  SpfVideoSource,
 } from '@videojs/mux-video/spf';
 
 export class MuxVideoElement extends MuxVideo {
