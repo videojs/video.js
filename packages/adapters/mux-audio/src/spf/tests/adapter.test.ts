@@ -34,6 +34,13 @@ describe('MuxAudioAdapter', () => {
     expect(new MuxAudioAdapter().source).toBe(null);
   });
 
+  it('defaults preload to metadata, which is what the engine does', () => {
+    const media = new MuxAudioAdapter();
+
+    expect(media.preload).toBe('metadata');
+    expect(media.engine.state.preload.get()).toBe('metadata');
+  });
+
   it('derives src from source.playbackId', () => {
     const media = new MuxAudioAdapter();
 
