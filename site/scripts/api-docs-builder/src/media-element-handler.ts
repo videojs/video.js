@@ -113,6 +113,7 @@ interface MediaElementSource {
   hostClassName: string;
   mediaType: 'video' | 'audio';
   targetTag: MediaTargetTag;
+  elementAttributes: Record<string, HostPropertyDef>;
 }
 
 interface StaticMediaProperty {
@@ -194,6 +195,8 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
       }
     }
 
+    Object.assign(customAttributes, source.elementAttributes);
+
     const files = [...new Set(host.files)];
     const fires = collectFires(files, project);
     const dispatched = collectDispatchedEvents(files, project);
@@ -238,7 +241,10 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
       platforms: {
         html: {
           target: source.targetTag,
-          attributes: { standard: standardAttributes.sort(), custom: customAttributes },
+          attributes: {
+            standard: standardAttributes.filter((attribute) => !(attribute in customAttributes)).sort(),
+            custom: customAttributes,
+          },
           properties: { definitions: propertyDefinitions, native: nativeProperties },
           events: { standard: standardEvents, custom: customEvents },
           methods,
@@ -303,6 +309,7 @@ function discoverMediaElements(monorepoRoot: string, project: OxcProject): Media
           hostClassName,
           mediaType: composition.mediaType,
           targetTag: composition.targetTag,
+          elementAttributes: extractElementAttributes(file, declaration, project),
         });
       }
     }
@@ -384,6 +391,98 @@ function findCustomMediaComposition(
   }
 
   return undefined;
+}
+
+/**
+ * Collect attributes an element adds on its own, declared with `@attr {type} name - Description` on a class in the
+ * element's own chain — the registered class, its media class, or one of their mixins — or on one of its members,
+ * typically `static get observedAttributes()`. The walk stops at `CustomMediaElement`, whose shared attributes come
+ * from its static properties instead.
+ */
+function extractElementAttributes(
+  file: SourceFile,
+  declaration: Class,
+  project: OxcProject
+): Record<string, HostPropertyDef> {
+  const attributes: Record<string, HostPropertyDef> = {};
+
+  walkElementClass(file, declaration, project, attributes, new Set());
+
+  return attributes;
+}
+
+function walkElementClass(
+  file: SourceFile,
+  declaration: Class,
+  project: OxcProject,
+  attributes: Record<string, HostPropertyDef>,
+  visited: Set<Class>
+): void {
+  if (visited.has(declaration)) return;
+
+  visited.add(declaration);
+
+  for (const node of [declaration, ...declaration.body.body]) {
+    for (const value of getJSDoc(file, node)?.tags.get('attr') ?? []) {
+      // `[name]` and `[name=default]` are JSDoc's optional-name forms.
+      const match = value.match(/^(?:\{([^}]*)\}\s*)?(?:\[([^\]=]+)(?:=([^\]]*))?\]|(\S+))\s*(?:-\s*)?(.*)$/s);
+      if (!match) continue;
+
+      const [, type, optionalName, defaultValue, requiredName, description] = match.map((part) => part?.trim());
+      const name = optionalName ?? requiredName;
+      if (!name || Object.hasOwn(attributes, name)) continue;
+
+      const definition: HostPropertyDef = { type: type || 'string', readonly: false };
+
+      if (defaultValue) definition.default = defaultValue;
+
+      if (description) definition.description = description;
+
+      attributes[name] = definition;
+    }
+  }
+
+  if (declaration.superClass) {
+    walkElementExtends(
+      resolveLocalExpression(file, declaration.superClass, project),
+      file,
+      project,
+      attributes,
+      visited
+    );
+  }
+}
+
+function walkElementExtends(
+  expression: Expression,
+  file: SourceFile,
+  project: OxcProject,
+  attributes: Record<string, HostPropertyDef>,
+  visited: Set<Class>
+): void {
+  if (expression.type === 'Identifier') {
+    const resolved = project.resolveName(file.filePath, expression.name);
+
+    if (resolved?.declaration.type === 'ClassDeclaration') {
+      walkElementClass(resolved.file, resolved.declaration, project, attributes, visited);
+    }
+
+    return;
+  }
+
+  if (expression.type !== 'CallExpression') return;
+
+  const { mixins, base } = unwindMixinChain(expression);
+
+  for (const name of mixins) {
+    if (name === 'CustomMediaElement') continue;
+
+    const mixin = resolveMixin(file.filePath, name, project);
+
+    if (mixin) walkElementClass(mixin.file, mixin.declaration, project, attributes, visited);
+  }
+
+  walkElementExtends(resolveLocalExpression(file, base, project), file, project, attributes, visited);
 }
 
 function extractHostProperties(
