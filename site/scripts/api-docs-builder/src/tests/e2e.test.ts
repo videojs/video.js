@@ -1715,7 +1715,8 @@ describe('Preset pipeline (end-to-end)', () => {
 //   - Tag name from the element class's static tagName
 //   - Host properties by following the CustomMediaElement(tag, Host) call to the
 //     host class and walking its getter/setter pairs
-//   - Standard/custom attributes from static properties and host accessors
+//   - Standard/custom attributes from static properties and host accessors,
+//     plus @attr-tagged attributes an element's own class chain adds
 //   - Platform metadata from the matching React component conventions
 //   - Events and CSS vars for the HTML custom element
 //   - JSDoc descriptions from host getter/setter pairs
@@ -2287,6 +2288,9 @@ describe('Media component pipeline (end-to-end)', () => {
   //     overridden without JSDoc by MixinB)
   //   - Element-specific event extraction via this.dispatchEvent(new Event(...))
   //     in mixin code (foochange dispatched by MixinAFooMixin)
+  //   - An attribute the element adds on its own, declared with `@attr` on an
+  //     element mixin's `observedAttributes` (poster-frame — mirrors
+  //     MuxVideoMixin's poster-time)
 
   describe('MixinVideo (mixin chain)', () => {
     it('extracts the tag name', () => {
@@ -2380,6 +2384,24 @@ describe('Media component pipeline (end-to-end)', () => {
       const props = findElement('MixinVideo')!.reference.platforms.html.properties.definitions;
 
       expect(props.foo.default).toBe("''");
+    });
+
+    it('documents an @attr-tagged attribute the element adds on its own', () => {
+      // poster-frame is declared by an element mixin, not by CustomMediaElement's
+      // static properties, so only its @attr tag can surface it.
+      const attributes = findElement('MixinVideo')!.reference.platforms.html.attributes;
+
+      expect(attributes.standard).not.toContain('poster-frame');
+      expect(attributes.custom['poster-frame']).toEqual({
+        type: 'number',
+        readonly: false,
+        description:
+          'The time, in seconds, of the frame to show as the poster.\nSee [Add a poster](https://videojs.org/docs/guides/poster).',
+      });
+    });
+
+    it('does not add element attributes to elements that declare none', () => {
+      expect(findElement('SimpleVideo')!.reference.platforms.html.attributes.custom['poster-frame']).toBeUndefined();
     });
   });
 

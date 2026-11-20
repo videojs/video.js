@@ -32,10 +32,15 @@ interface MuxVideoElementLike extends HTMLElement {
  */
 export function MuxVideoMixin<Class extends AnyConstructor<HTMLElement>>(BaseClass: Class): Class {
   class MuxVideoElement extends (BaseClass as unknown as Constructor<MuxVideoElementLike>) {
-    // Declared here rather than in `static properties` because it does not map to a
-    // adapter property of its own: it feeds `source.poster.time`. The generic path
-    // would also coerce a removed attribute to `0`, which is a valid poster time.
+    /**
+     * @attr {number} poster-time - The time, in seconds, of the video frame Mux uses for the poster image.
+     * Reflects to `source.poster.time` and is re-applied when `src` changes. Removing the attribute clears it.
+     * See [Play Mux videos](https://videojs.org/docs/guides/mux#choose-the-poster-and-storyboard).
+     */
     static get observedAttributes(): string[] {
+      // Declared here rather than in `static properties` because it does not map to an
+      // adapter property of its own: it feeds `source.poster.time`. The generic path
+      // would also coerce a removed attribute to `0`, which is a valid poster time.
       const inherited = (BaseClass as unknown as { observedAttributes?: string[] }).observedAttributes ?? [];
 
       return [...inherited, 'poster-time'];
