@@ -8,27 +8,44 @@ import {
   parseMuxVideoURL,
   toMuxContentData,
 } from '@videojs/mux';
-import { shallowEqual } from '@videojs/utils/object';
+import { omit, shallowEqual } from '@videojs/utils/object';
 import type { Constructor } from '@videojs/utils/types';
 
 import { createMuxDrmSystems } from '../drm';
 
-export interface MuxAdapterProps {
+export interface MuxAdapterProps<Source extends MuxSourceBase = MuxSourceBase> {
   src: string;
-  source: MuxSourceBase | null;
+  source: Source | null;
 }
 
-export interface MuxAdapterAPI extends MuxAdapterProps {
+export interface MuxAdapterAPI<Source extends MuxSourceBase = MuxSourceBase> extends MuxAdapterProps<Source> {
   readonly contentData: MuxContentData;
 }
+
+/**
+ * Named on the error copy when an SPF Media can't play a source: the hls.js-backed Mux Media plays what these flavors
+ * still refuse (a protected asset on the audio flavor, codecs the transmuxer doesn't cover), and it backs both
+ * `<mux-video>` and `<mux-audio>`.
+ *
+ * Names the flavor rather than an import path, because one Media is reached through three of them — `@videojs/html`,
+ * `@videojs/react`, and this package — and each has a different counterpart. The flavor suffix is the one thing common
+ * to the layers a consumer imports elements and components from.
+ *
+ * @internal
+ */
+export const MUX_ALTERNATIVE_MEDIA_SUGGESTION =
+  'Try the hls.js-backed Mux media instead: import the `hls-js` flavor in place of the `spf` one.';
 
 /**
  * Mux identity over any SPF Media: the structured `source`, the `src` derived from it, and the image URLs it describes.
  *
  * Everything here is Mux identity, so it carries no engine and both flavors get it unchanged — the video Media over the
- * full HLS engine, the audio-only Media over the subtractive one. A mixin rather than a shared base class because each
- * flavor extends a different SPF Media, so there is no common class to put this on, only a common `src` accessor to
- * write through.
+ * full HLS engine (or the browser's own HLS where there is no MSE), the audio-only Media over the subtractive one. What
+ * the base's own `source` takes beyond `src` and `drm`, such as the video Media's `preferPlayback`, passes through
+ * untouched.
+ *
+ * A mixin rather than a shared base class because each flavor extends a different SPF Media, so there is no common
+ * class to put this on, only a common `src` accessor to write through.
  *
  * Unlike the hls.js-backed `MuxVideoAdapter`, there is no inherited `source` to delegate to — the SPF Medias know only
  * `src` — so this owns the structured source and dispatches `sourcechange` itself.
@@ -40,26 +57,19 @@ export interface MuxAdapterAPI extends MuxAdapterProps {
  *   new value.
  * @fires contentdatachange - Fired when `contentData` changes: the derived URLs with `source`, and the metadata once it
  *   loads. Read `contentData` for the new value.
+ * @typeParam Source - The structured source the Media takes: Mux identity, plus the playback options its base reads.
  * @internal
  */
-export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
+export function MuxMixin<Base extends Constructor<any>, Source extends MuxSourceBase = MuxSourceBase>(BaseClass: Base) {
   class MuxImpl extends BaseClass {
     static readonly defaultProps: MuxAdapterProps = {
       src: '',
       source: null,
     };
 
-    /**
-     * Named on the error copy when this engine can't play a source: the hls.js-backed Mux Media plays what these
-     * flavors still refuse (a protected asset on the audio flavor, codecs the transmuxer doesn't cover), and it backs
-     * both `<mux-video>` and `<mux-audio>`.
-     *
-     * Names the flavor rather than an import path, because one Media is reached through three of them —
-     * `@videojs/html`, `@videojs/react`, and this package — and each has a different counterpart. The flavor suffix is
-     * the one thing common to the layers a consumer imports elements and components from.
-     */
+    /** See {@link MUX_ALTERNATIVE_MEDIA_SUGGESTION}. */
     static get alternativeMediaSuggestion(): string | undefined {
-      return 'Try the hls.js-backed Mux media instead: import the `hls-js` flavor in place of the `spf` one.';
+      return MUX_ALTERNATIVE_MEDIA_SUGGESTION;
     }
 
     #source: MuxSourceBase | null = MuxImpl.defaultProps.source;
@@ -78,8 +88,9 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * `.m3u8` extension) extracts the playback ID and query params into `source`; other URLs are kept as a plain
      * `source.src`.
      *
-     * Only playback options carry over. Mux identity comes from the URL, and the signed `poster`, `storyboard`, and
-     * `drm` tokens are scoped to a playback ID, so carrying them onto a different source would build rejected URLs.
+     * Only playback options, such as `preferPlayback`, carry over. Mux identity comes from the URL, and the signed
+     * `poster`, `storyboard`, and `drm` tokens are scoped to a playback ID, so carrying them onto a different source
+     * would build rejected URLs.
      */
     get src(): string {
       return super.src;
@@ -93,13 +104,18 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
       // would drop the params a Mux URL does not carry, such as `poster`.
       if (super.src === (createMuxVideoURL(parsed) ?? value)) return;
 
-      this.source = parsed ?? (value ? { src: value } : null);
+      const source: MuxSourceBase = {
+        ...playbackOptions(this.#source),
+        ...(parsed ?? (value ? { src: value } : null)),
+      };
+
+      this.source = Object.keys(source).length > 0 ? source : null;
     }
 
     /**
      * Structured Mux source. Setting it derives `src` from the playback ID, custom domain, and `playback` params
      * (appended as `snake_case` query params). A `playback.token` replaces all other params — signed URLs bake them
-     * into the token.
+     * into the token. Playback options the base takes, such as `preferPlayback`, are handed down as given.
      */
     get source(): MuxSourceBase | null {
       return this.#source;
@@ -127,6 +143,7 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
       super.source = source
         ? {
+            ...playbackOptions(source),
             src: (createMuxVideoURL(source) ?? source.src) || '',
             ...(Object.keys(drm).length > 0 && { drm }),
           }
@@ -178,11 +195,19 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
   // Statics are otherwise sourced from `Base`, so this mixin's own need adding
   // back to the type or callers can't read them.
   return MuxImpl as unknown as Constructor<
-    Omit<InstanceType<Base>, 'source'> & MuxAdapterAPI,
+    Omit<InstanceType<Base>, 'source'> & MuxAdapterAPI<Source>,
     ConstructorParameters<Base>
   > &
     Omit<Base, 'prototype' | 'defaultProps'> & {
       readonly alternativeMediaSuggestion: string | undefined;
-      readonly defaultProps: MuxAdapterProps;
+      readonly defaultProps: MuxAdapterProps<Source>;
     };
+}
+
+/** The fields of a source that name the asset — Mux identity, and the URL derived from it. */
+const IDENTITY_KEYS = ['src', 'playbackId', 'customDomain', 'playback', 'poster', 'storyboard', 'drm'] as const;
+
+/** Everything in `source` that isn't Mux identity or the URL derived from it. */
+function playbackOptions(source: MuxSourceBase | null): Omit<MuxSourceBase, (typeof IDENTITY_KEYS)[number]> {
+  return omit({ ...source }, IDENTITY_KEYS);
 }

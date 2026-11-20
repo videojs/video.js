@@ -686,6 +686,9 @@ importers:
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media
+      '@videojs/native-hls-video':
+        specifier: workspace:*
+        version: link:../native-hls-video
       '@videojs/spf':
         specifier: workspace:*
         version: link:../../spf

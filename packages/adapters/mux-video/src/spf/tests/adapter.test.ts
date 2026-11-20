@@ -1,11 +1,11 @@
-import { createEngine } from '@videojs/spf/engines/hls-video-mpeg-ts';
+import type { MuxSourceBase } from '@videojs/mux';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
 /**
  * SPF-backed MuxVideoAdapter tests.
  *
  * Mirrors the coverage of the hls.js-backed `MuxVideoAdapter`
- * (`packages/adapters/mux-video/src/tests/adapter.test.ts`), minus everything that flavor's `engine` / `preferPlayback`
- * options carry — this source is Mux identity and nothing else.
+ * (`packages/adapters/mux-video/src/tests/adapter.test.ts`), minus everything that flavor's `engine` options carry.
+ * Which engine plays — SPF or the browser's own HLS — is `SpfVideoAdapter`'s, covered in `playback.test.ts`.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -24,6 +24,7 @@ function fakeJwt(payload: Record<string, unknown>): string {
 interface ProjectedSource {
   src?: string | undefined;
   drm?: DrmSystemsConfig | undefined;
+  preferPlayback?: 'mse' | 'native' | undefined;
 }
 
 /**
@@ -56,7 +57,9 @@ class RecordingBase {
   }
 }
 
-const ProbeMuxVideoAdapter = MuxMixin(RecordingBase);
+const ProbeMuxVideoAdapter = MuxMixin<typeof RecordingBase, MuxSourceBase & Pick<ProjectedSource, 'preferPlayback'>>(
+  RecordingBase
+);
 
 type ProbeAdapter = InstanceType<typeof ProbeMuxVideoAdapter>;
 
@@ -107,8 +110,10 @@ function flush() {
 }
 
 // Every Mux source fetches its metadata, so no test here reaches the network.
+// jsdom has no MediaSource; standing one in keeps these sources on SPF.
 beforeEach(() => {
   stubFetch();
+  vi.stubGlobal('MediaSource', class {});
 });
 
 afterEach(() => {
@@ -117,12 +122,31 @@ afterEach(() => {
 });
 
 describe('MuxVideoAdapter', () => {
-  it('builds its engine with the MPEG-TS video engine', () => {
-    expect(MuxVideoAdapter.createEngine).toBe(createEngine);
+  it('plays through the MPEG-TS video engine', () => {
+    const media = new MuxVideoAdapter();
+
+    media.source = { playbackId: 'abc123' };
+
+    expect(media.engineName).toBe('spf-hls-video-mpeg-ts');
   });
 
   it('defaults source to null', () => {
     expect(new MuxVideoAdapter().source).toBe(null);
+  });
+
+  it('defaults preload to metadata, as the hls.js-backed flavor does', () => {
+    expect(new MuxVideoAdapter().preload).toBe('metadata');
+    expect(MuxVideoAdapter.defaultProps.preload).toBe('metadata');
+  });
+
+  it('carries preferPlayback over to the next src', () => {
+    const media = new MuxVideoAdapter();
+
+    media.source = { playbackId: 'abc123', preferPlayback: 'native', poster: { time: 5 } };
+    media.src = 'https://stream.mux.com/def456';
+
+    expect(media.source).toEqual({ playbackId: 'def456', preferPlayback: 'native' });
+    expect(media.engineName).toBe('browser');
   });
 
   it('derives src from source.playbackId', () => {
@@ -317,13 +341,13 @@ describe('MuxVideoAdapter', () => {
     const media = new MuxVideoAdapter();
 
     media.source = { playbackId: 'abc123' };
-    const presentation = media.engine.state.presentation.get();
+    const presentation = media.engine!.state.presentation.get();
 
     // What `poster-time` does through the element: same stream, new object.
     media.source = { playbackId: 'abc123', poster: { time: 3 } };
 
     expect(media.contentData.poster).toBe('https://image.mux.com/abc123/thumbnail.webp?time=3');
-    expect(media.engine.state.presentation.get()).toBe(presentation);
+    expect(media.engine!.state.presentation.get()).toBe(presentation);
   });
 
   it('points unplayable-source copy at the hls.js-backed Media', () => {
@@ -481,6 +505,14 @@ describe('MuxMixin', () => {
     expect(licenseUrl(media, 'com.microsoft.playready')).toBe(
       `https://license.mux.com/license/playready/abc123?token=${token}`
     );
+  });
+
+  it('hands playback options down with the derived src', () => {
+    const media = new ProbeMuxVideoAdapter();
+
+    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
+
+    expect(media.projected).toEqual({ src: 'https://stream.mux.com/abc123.m3u8', preferPlayback: 'native' });
   });
 
   it('follows the source when projecting license servers', () => {

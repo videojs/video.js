@@ -20,6 +20,9 @@
       "path": "../mux"
     },
     {
+      "path": "../native-hls-video"
+    },
+    {
       "path": "../../spf"
     },
     {
