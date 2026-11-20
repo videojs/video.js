@@ -73,6 +73,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
     this.#provider?.updateAvailability();
     target.addEventListener('loadstart', this.#onLoadStart);
     target.addEventListener('sourcechange', this.#onSourceChange);
+    target.addEventListener('emptied', this.#onEmptied);
 
     // A media swapped in mid-session may have started loading before the player attached it, so its `loadstart` has
     // already fired; follow its source now rather than waiting for one that may never come.
@@ -83,6 +84,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
   detach() {
     this.#media?.removeEventListener('loadstart', this.#onLoadStart);
     this.#media?.removeEventListener('sourcechange', this.#onSourceChange);
+    this.#media?.removeEventListener('emptied', this.#onEmptied);
     this.#media = null;
     this.#provider?.detach();
   }
@@ -136,6 +138,14 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
   #onLoadStart = () => {
     this.#bindProvider();
     this.#followSource();
+  };
+
+  /** The media dropped its source. While casting, take it off the receiver too unless a castable source remains. */
+  #onEmptied = () => {
+    const provider = this.#provider;
+    if (!provider || !this.#connected || !provider.loadedSrc || this.src) return;
+
+    void provider.load();
   };
 
   /**
