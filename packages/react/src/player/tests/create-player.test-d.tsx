@@ -4,6 +4,7 @@ import {
   definePlayerFeature,
   features,
   metadataFeature,
+  type OrientationLockType,
   type PlayerStore,
   type PlayerTarget,
   type VideoPlayerStore,
@@ -74,8 +75,13 @@ describe('createPlayer', () => {
     const withoutOrientationLock = createPlayer({ features: [features.playback] });
 
     assertType<CreatePlayerResult<PlayerStore<[typeof features.orientationLock]>>>(withOrientationLock);
+    assertType<OrientationLockType>('auto');
 
     <withOrientationLock.Player orientationLockType="portrait">
+      <div />
+    </withOrientationLock.Player>;
+
+    <withOrientationLock.Player orientationLockType="auto">
       <div />
     </withOrientationLock.Player>;
 
