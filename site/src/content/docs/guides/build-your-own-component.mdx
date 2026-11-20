@@ -280,6 +280,65 @@ Your element needs to be inside <DocsLink slug="reference/components/player">`<v
 
 </FrameworkCase>
 
+## Add your component to a skin's controls
+
+Packaged skins don't accept extra controls. To put your component in the control bar, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the source for the closest skin</DocsLink> to your project, then place your component next to the built-in buttons. Reuse the skin's button styles and tooltip so it matches them, and drop the positioning CSS from the full example, because the control bar lays out its children.
+
+<FrameworkCase frameworks={["react"]}>
+
+The skin source includes the `Button` and `ButtonTooltip` components that the built-in controls use. Render your button with them in the controls file, such as `components/videojs/video/layout/controls.tsx`:
+
+```tsx
+import { Button } from '@/components/videojs/ui/button';
+import { ButtonTooltip } from '@/components/videojs/ui/button-tooltip';
+import { usePlayer } from '@videojs/react/video';
+
+export function SkipIntroButton() {
+  const store = usePlayer();
+
+  return (
+    <ButtonTooltip side="top" label="Skip intro">
+      <Button aria-label="Skip intro" onClick={() => store.seek(30)}>
+        <svg className="size-media-icon" viewBox="0 0 18 18" aria-hidden="true">…</svg>
+      </Button>
+    </ButtonTooltip>
+  );
+}
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+Give your element the `media-button` class, put a `<media-icon>` inside it, and point a `<media-tooltip>` at it by `id`, as the built-in buttons in `skin.html` do:
+
+```html
+<skip-intro-button id="skip-intro-trigger" class="media-button">
+  <media-icon name="skip-intro" class="media-button-icon"></media-icon>
+</skip-intro-button>
+<media-tooltip
+  trigger="skip-intro-trigger"
+  side="top"
+  class="media-popup media-popup-safe-area media-popup-transition media-popup-surface media-tooltip"
+>
+  <media-tooltip-label>Skip intro</media-tooltip-label>
+</media-tooltip>
+```
+
+The skin's `skin.ts` registers only the icons its own controls use, so `<media-icon>` renders nothing for any other name. Register the icons your component needs in the same file, using a name the skin doesn't already use:
+
+```ts
+import { registerIcons } from '@videojs/html/icons';
+
+registerIcons('default', {
+  'skip-intro': '<svg viewBox="0 0 18 18" aria-hidden="true">…</svg>',
+});
+```
+
+Register into the family the skin uses, such as `neutral` or `compat` for those skins. See <DocsLink slug="reference/components/icons" anchor="registericons">`registerIcons`</DocsLink>.
+
+</FrameworkCase>
+
 ## How it works
 
 Custom components read player state and dispatch actions through <DocsLink slug="guides/features">features</DocsLink>. Each feature exposes a set. Here are some features you might reach for first:
