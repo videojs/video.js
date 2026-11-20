@@ -213,8 +213,13 @@ function listPublicPackages() {
     .sort();
 }
 
+/**
+ * The registry's CDN caches responses, 404s included, for up to 5 minutes, so a package published moments ago can still
+ * read as missing. A unique query string skips the cached copy.
+ */
 async function existsOnRegistry(name) {
-  const response = await fetch(`${REGISTRY}/${name.replace('/', '%2f')}`, {
+  const response = await fetch(`${REGISTRY}/${name.replace('/', '%2f')}?t=${Date.now()}`, {
+    cache: 'no-store',
     headers: { accept: 'application/vnd.npm.install-v1+json' },
   });
   if (response.status === 404) return false;
