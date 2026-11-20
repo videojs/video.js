@@ -1407,6 +1407,9 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../utils
+      react-native-svg:
+        specifier: ^15.16.0
+        version: 15.16.1(react-native@0.86.2(@babel/core@7.29.0(supports-color@8.1.1))(@react-native-community/cli@20.2.0(supports-color@8.1.1)(typescript@6.0.3))(@react-native/metro-config@0.86.2(@babel/core@7.29.0(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)
     devDependencies:
       '@babel/runtime':
         specifier: ^7.25.0
@@ -1432,9 +1435,6 @@ importers:
       react-native-builder-bob:
         specifier: ^0.43.0
         version: 0.43.2(supports-color@8.1.1)
-      react-native-svg:
-        specifier: ^15.16.0
-        version: 15.16.1(react-native@0.86.2(@babel/core@7.29.0(supports-color@8.1.1))(@react-native-community/cli@20.2.0(supports-color@8.1.1)(typescript@6.0.3))(@react-native/metro-config@0.86.2(@babel/core@7.29.0(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
