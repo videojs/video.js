@@ -320,6 +320,8 @@ describe('generateHTMLUsageCode', () => {
 
     expect(result.html).toContain(INSTALLATION_DEMO_SOURCES.videoMp4);
     expect(result.html).toContain('<mux-data></mux-data>');
+    expect(result.html).toContain('playback ID in the stream.mux.com URL');
+    expect(result.html).not.toContain('selected by default');
   });
 
   it('adds Google Analytics with a note that the page needs a GA4 tag', () => {

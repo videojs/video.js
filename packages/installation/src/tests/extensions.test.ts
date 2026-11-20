@@ -27,9 +27,13 @@ describe('installationExtensionsFor', () => {
     expect(installationExtensionsFor('default-video', 'video', 'hls')).toContain('mux-data');
     expect(installationExtensionsFor('default-video', 'none', 'dash')).toContain('mux-data');
     expect(installationExtensionsFor('default-audio', 'audio', 'html5-audio')).toContain('mux-data');
-    expect(installationExtensionsFor('background-video', 'video', 'hls-background-video')).toContain('mux-data');
     expect(installationExtensionsFor('default-video', 'video', 'youtube')).not.toContain('mux-data');
     expect(installationExtensionsFor('default-audio', 'audio', 'spotify')).not.toContain('mux-data');
+  });
+
+  it('offers no analytics for a decorative background video', () => {
+    expect(installationExtensionsFor('background-video', 'video', 'mux-background-video')).toEqual([]);
+    expect(installationExtensionsFor('background-video', 'video', 'hls-background-video')).toEqual([]);
   });
 
   it('offers Google Analytics for every player except background video', () => {
@@ -48,6 +52,8 @@ describe('muxDataNeedsEnvKey', () => {
     expect(muxDataNeedsEnvKey('html5-video', 'https://stream.mux.com/abc123/highest.mp4')).toBe(false);
     expect(muxDataNeedsEnvKey('hls', 'https://cdn.example.com/video.m3u8')).toBe(true);
     expect(muxDataNeedsEnvKey('hls', 'not a url')).toBe(true);
+    // The extension reads a playback ID only from an `https://stream.` URL.
+    expect(muxDataNeedsEnvKey('html5-video', 'http://stream.mux.com/abc123/highest.mp4')).toBe(true);
   });
 });
 

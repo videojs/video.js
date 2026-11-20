@@ -14,6 +14,7 @@ import {
   getAdapterPackage,
   getInstallationRenderer,
   getMediaSubpath,
+  isMuxRenderer,
   isPresetRenderer,
   isVideoLikeRenderer,
   type Renderer,
@@ -227,7 +228,7 @@ function generateMediaMarkup(
   src: string,
   playsInline: string,
   extensions: readonly InstallationExtension[],
-  envKeyRequired: boolean,
+  muxData: MuxDataSetup,
   indent: string
 ): string {
   return generateMediaMarkupWithSource(
@@ -235,7 +236,7 @@ function generateMediaMarkup(
     `src="${escapeHTMLAttribute(src)}"`,
     playsInline,
     extensions,
-    envKeyRequired,
+    muxData,
     indent
   );
 }
@@ -243,18 +244,37 @@ function generateMediaMarkup(
 const MUX_DATA_ENV_KEY_PLACEHOLDER = 'YOUR_ENV_KEY';
 const MUX_DATA_ENV_KEY_URL = 'https://dashboard.mux.com/settings/data';
 
+/**
+ * How generated Mux Data markup finds its environment: `default` for Mux media, which selects Mux Data by default;
+ * `playback-id` for other media playing a `stream.mux.com` URL; `env-key` for a source Mux can't attribute on its own.
+ */
+type MuxDataSetup = 'default' | 'playback-id' | 'env-key';
+
+function muxDataSetupFor(renderer: Renderer, source: string): MuxDataSetup {
+  if (isMuxRenderer(renderer)) return 'default';
+
+  return muxDataNeedsEnvKey(renderer, source) ? 'env-key' : 'playback-id';
+}
+
 /** Comment lines that explain an extension in generated code, or none when the markup speaks for itself. */
-function extensionComment(extension: InstallationExtension, envKeyRequired: boolean): readonly string[] {
+function extensionComment(extension: InstallationExtension, muxData: MuxDataSetup): readonly string[] {
   if (extension === 'google-analytics') {
     return ['Google Analytics sends video events to the gtag.js or', 'Google Tag Manager setup already on your page.'];
   }
 
   if (extension !== 'mux-data') return [];
 
-  if (envKeyRequired) {
+  if (muxData === 'env-key') {
     return [
       `Mux Data needs your environment key for sources Mux doesn't host.`,
       `Replace ${MUX_DATA_ENV_KEY_PLACEHOLDER} with the key from ${MUX_DATA_ENV_KEY_URL}`,
+    ];
+  }
+
+  if (muxData === 'playback-id') {
+    return [
+      'Mux Data monitors playback quality. Mux finds your',
+      'environment from the playback ID in the stream.mux.com URL.',
     ];
   }
 
@@ -278,15 +298,16 @@ function generateMediaMarkupWithSource(
   sourceAttribute: string,
   playsInline: string,
   extensions: readonly InstallationExtension[],
-  envKeyRequired: boolean,
+  muxData: MuxDataSetup,
   indent: string
 ): string {
   const mediaEl = `${indent}<${tag} ${sourceAttribute}${playsInline}>${generateMediaFallback(tag)}</${tag}>`;
   const extensionMarkup = extensions.map((extension) => {
     const { htmlTag } = getInstallationExtension(extension);
-    const envKey = extension === 'mux-data' && envKeyRequired ? ` env-key="${MUX_DATA_ENV_KEY_PLACEHOLDER}"` : '';
+    const envKey =
+      extension === 'mux-data' && muxData === 'env-key' ? ` env-key="${MUX_DATA_ENV_KEY_PLACEHOLDER}"` : '';
     const element = `${indent}<${htmlTag}${envKey}></${htmlTag}>`;
-    const comment = extensionComment(extension, envKeyRequired);
+    const comment = extensionComment(extension, muxData);
     if (comment.length === 0) return element;
 
     return `${indent}<!--
@@ -312,10 +333,10 @@ function generateHTMLMarkup(
   const tag = getRendererTag(renderer);
   const src = resolveInstallationSourceUrl(url, renderer, useCase);
   const playsInline = isVideoLikeRenderer(renderer) ? ' playsinline' : '';
-  const envKeyRequired = muxDataNeedsEnvKey(renderer, src);
+  const muxData = muxDataSetupFor(renderer, src);
   const mediaMarkup = (indent: string) =>
     mediaSlot === undefined
-      ? generateMediaMarkup(tag, src, playsInline, extensions, envKeyRequired, indent)
+      ? generateMediaMarkup(tag, src, playsInline, extensions, muxData, indent)
       : indentBlock(mediaSlot, indent);
 
   const skinMediaComment = `    <!--
@@ -597,7 +618,7 @@ export function generateVueUsageCode(
   const tag = getRendererTag(opts.media);
   const playsInline = isVideoLikeRenderer(opts.media) ? ' playsinline' : '';
   const extensions = opts.extensions ?? defaultInstallationExtensions(opts.media);
-  const media = generateMediaMarkup(tag, source, playsInline, extensions, muxDataNeedsEnvKey(opts.media, source), '');
+  const media = generateMediaMarkup(tag, source, playsInline, extensions, muxDataSetupFor(opts.media, source), '');
 
   return {
     'App.vue': `<script setup lang="ts">
@@ -648,7 +669,7 @@ export function generateSvelteUsageCode(
     `src={${JSON.stringify(source)}}`,
     playsInline,
     extensions,
-    muxDataNeedsEnvKey(opts.media, source),
+    muxDataSetupFor(opts.media, source),
     ''
   );
   const component = (path: string) => `<script lang="ts">
@@ -727,14 +748,14 @@ function formatObjectFields(fields: Record<string, string | number | boolean | u
 function generateReactMediaJsx(
   rendererJsx: string,
   extensions: readonly InstallationExtension[],
-  envKeyRequired: boolean,
+  muxData: MuxDataSetup,
   indent: string
 ): string {
   const extensionJsx = extensions.map((extension) => {
     const { reactComponent } = getInstallationExtension(extension);
-    const envKey = extension === 'mux-data' && envKeyRequired ? ` envKey="${MUX_DATA_ENV_KEY_PLACEHOLDER}"` : '';
+    const envKey = extension === 'mux-data' && muxData === 'env-key' ? ` envKey="${MUX_DATA_ENV_KEY_PLACEHOLDER}"` : '';
     const element = `${indent}<${reactComponent}${envKey} />`;
-    const [first, ...rest] = extensionComment(extension, envKeyRequired);
+    const [first, ...rest] = extensionComment(extension, muxData);
     if (first === undefined) return element;
 
     return `${indent}{/* ${[first, ...rest.map((line) => `${indent}    ${line}`)].join('\n')} */}
@@ -753,7 +774,7 @@ export function generateReactCreateCode(
   const rendererComponent = getRendererComponent(renderer);
   const playerComponent = getPresetPlayer(useCase);
   const source = resolveInstallationSourceUrl(opts.sourceUrl, renderer, useCase);
-  const envKeyRequired = muxDataNeedsEnvKey(renderer, source);
+  const muxData = muxDataSetupFor(renderer, source);
 
   const isBackgroundVideo = useCase === 'background-video';
   const isNoSkin = skin === 'none';
@@ -808,12 +829,12 @@ export function generateReactCreateCode(
   const playerJsx = skinComponent
     ? `    <${playerComponent}>
       <${skinComponent}${skinLayout}>
-        ${generateReactMediaJsx(rendererJsx, extensions, envKeyRequired, '        ')}
+        ${generateReactMediaJsx(rendererJsx, extensions, muxData, '        ')}
       </${skinComponent}>
     </${playerComponent}>`
     : `    <${playerComponent}>
       <Container${containerLayout}>
-        ${generateReactMediaJsx(rendererJsx, extensions, envKeyRequired, '        ')}
+        ${generateReactMediaJsx(rendererJsx, extensions, muxData, '        ')}
       </Container>
     </${playerComponent}>`;
 
@@ -851,7 +872,7 @@ export function generateSourceReactCreateCode(
   const playerComponent = getPresetPlayer(useCase);
   const rendererComponent = getRendererComponent(renderer);
   const source = resolveInstallationSourceUrl(opts.sourceUrl, renderer, useCase);
-  const envKeyRequired = muxDataNeedsEnvKey(renderer, source);
+  const muxData = muxDataSetupFor(renderer, source);
   // A registry theme changes the source behind the stable item name. Every theme's catalog exports the same local
   // component (`VideoSkin`, `AudioSkin`, and so on).
   const skinComponent = `${preset.componentPrefix}Skin`;
@@ -888,7 +909,7 @@ export default function Page() {
   return (
     <${playerComponent}>
       <${skinComponent}${skinLayout}>
-        ${generateReactMediaJsx(rendererJsx, extensions, envKeyRequired, '        ')}
+        ${generateReactMediaJsx(rendererJsx, extensions, muxData, '        ')}
       </${skinComponent}>
     </${playerComponent}>
   );
@@ -924,7 +945,7 @@ export function generateSourceHTMLUsageCode(
   const mediaSubpath = getMediaSubpath(renderer);
   const tag = getRendererTag(renderer);
   const source = resolveInstallationSourceUrl(opts.sourceUrl, renderer, useCase);
-  const envKeyRequired = muxDataNeedsEnvKey(renderer, source);
+  const muxData = muxDataSetupFor(renderer, source);
   const playsInline = isVideoLikeRenderer(renderer) ? ' playsinline' : '';
   const skinFile = `${opts.componentsDirectory ?? 'components'}/videojs/${preset.flag}/skin.html`;
   const skinPlaceholder = `<!-- Paste the contents of ${skinFile} here. -->`;
@@ -939,7 +960,7 @@ export function generateSourceHTMLUsageCode(
 
   return {
     imports,
-    media: generateMediaMarkup(tag, source, playsInline, extensions, envKeyRequired, ''),
+    media: generateMediaMarkup(tag, source, playsInline, extensions, muxData, ''),
     container: isSizedVideoPlayer(useCase)
       ? { anchor: '<media-container', code: `<media-container${htmlVideoLayout}` }
       : null,

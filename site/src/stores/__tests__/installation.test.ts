@@ -55,8 +55,9 @@ describe('useCase', () => {
       await settleUrl();
 
       expect(replaceState).toHaveBeenCalledOnce();
-      expect(replaceState.mock.calls[0]?.[2]).toBe('/docs/guides/installation/react?preset=audio');
-      expect(window.location.search).toBe('?preset=audio');
+      // HTML5 audio's demo is a stream.mux.com file, so Mux Data, defaulted for Mux video, needs no key and stays.
+      expect(replaceState.mock.calls[0]?.[2]).toBe('/docs/guides/installation/react?preset=audio&extensions=mux-data');
+      expect(window.location.search).toBe('?preset=audio&extensions=mux-data');
     } finally {
       replaceState.mockRestore();
     }
@@ -101,18 +102,47 @@ describe('useCase', () => {
     expect(extensions.get()).toEqual([]);
   });
 
-  it('drops a default extension with the media that chose it, but keeps one the reader added', () => {
+  it('drops a default Mux Data when the new source needs an environment key', () => {
     window.history.replaceState(null, '', '/docs/guides/installation/react?media=mux-video');
     syncInstallationSelectionFromUrl();
 
     expect(extensions.get()).toEqual(['mux-data']);
 
+    try {
+      sourceUrl.set('https://cdn.example.com/stream.m3u8');
+      media.set('hls');
+
+      expect(extensions.get()).toEqual([]);
+    } finally {
+      sourceUrl.set('');
+    }
+  });
+
+  it('keeps a default Mux Data on the HLS demo, which is a stream.mux.com stream', () => {
+    window.history.replaceState(null, '', '/docs/guides/installation/react?media=mux-video');
+    syncInstallationSelectionFromUrl();
+
     media.set('hls');
 
-    expect(extensions.get()).toEqual([]);
+    expect(extensions.get()).toEqual(['mux-data']);
+  });
+
+  it('keeps a default Mux Data when the new source is a stream.mux.com file', () => {
+    window.history.replaceState(null, '', '/docs/guides/installation/react?media=mux-video');
+    syncInstallationSelectionFromUrl();
+
+    media.set('html5-video');
+
+    expect(extensions.get()).toEqual(['mux-data']);
+  });
+
+  it('keeps an extension the reader added across media changes', () => {
+    window.history.replaceState(null, '', '/docs/guides/installation/react?media=hls');
+    syncInstallationSelectionFromUrl();
 
     extensions.set(['mux-data']);
-    media.set('dash');
+    media.set('mux-video');
+    media.set('hls');
 
     expect(extensions.get()).toEqual(['mux-data']);
   });

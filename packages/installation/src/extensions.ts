@@ -16,7 +16,7 @@ export interface InstallationExtensionDefinition {
 export const INSTALLATION_EXTENSION_DEFINITIONS = {
   'google-analytics': {
     label: 'Google Analytics',
-    description: 'Send video events to the GA4 tag on your page.',
+    description: 'Send video events to the GA4 tag.',
     packageName: '@videojs/google-analytics',
     htmlSubpath: 'google-analytics',
     htmlTag: 'google-analytics',
@@ -59,8 +59,11 @@ export function installationExtensionsFor(
   const extensions: InstallationExtension[] = [];
   const preset = getInstallationPreset(useCase);
 
-  // A decorative video autoplays and loops, so it would report a start and a completion on every loop.
-  if (useCase !== 'background-video') extensions.push('google-analytics');
+  // A decorative video autoplays and loops on every page load, which analytics would count as views. Readers who want
+  // to measure one can still add an extension by hand.
+  const decorative = useCase === 'background-video';
+
+  if (!decorative) extensions.push('google-analytics');
 
   if (
     preset.mediaType === 'video' &&
@@ -71,20 +74,22 @@ export function installationExtensionsFor(
     extensions.push('google-cast');
   }
 
-  if (isMediaElementRenderer(renderer)) extensions.push('mux-data');
+  if (!decorative && isMediaElementRenderer(renderer)) extensions.push('mux-data');
 
   return extensions;
 }
 
 /**
  * Whether generated Mux Data markup needs an environment key. Mux files a view under the environment that owns its
- * playback ID, which it reads only from a Mux source or a `stream.mux.com` URL.
+ * playback ID, which the extension reads only from a Mux source or an `https://stream.mux.com` URL.
  */
 export function muxDataNeedsEnvKey(renderer: Renderer, sourceUrl: string): boolean {
   if (isMuxRenderer(renderer)) return false;
 
   try {
-    return new URL(sourceUrl).hostname !== 'stream.mux.com';
+    const url = new URL(sourceUrl);
+
+    return url.protocol !== 'https:' || url.hostname !== 'stream.mux.com';
   } catch {
     return true;
   }
