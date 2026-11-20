@@ -5,7 +5,9 @@ export type {
   MuxAdapterAPI,
   MuxAdapterProps,
   MuxAudioAdapter,
+  MuxAudioAdapterProps,
   MuxContentData,
+  MuxSource,
   MuxSourceBase,
 } from '@videojs/mux-audio/spf';
 

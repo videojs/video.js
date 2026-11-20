@@ -1,14 +1,29 @@
+import { HTMLVideoAdapter } from '@videojs/media/dom';
 import type { MuxSourceBase } from '@videojs/mux';
+import { HlsVideoMpegTsAdapter } from '@videojs/spf/adapters/hls-video-mpeg-ts';
 
-import { MuxMixin } from './mixin';
-import { type SpfVideoAdapterProps, type SpfVideoSource, SpfVideoAdapter } from './playback';
+import { MUX_ALTERNATIVE_MEDIA_SUGGESTION, MuxMixin } from './mixin';
+import { type SpfPlaybackProps, type SpfPlaybackSource, SpfPlaybackMixin } from './playback';
+
+/** The SPF Media `SpfVideoAdapter` plays through, with the Mux error copy pointing at the hls.js-backed flavor. */
+class SpfVideoDelegate extends HlsVideoMpegTsAdapter {
+  static override get alternativeMediaSuggestion(): string | undefined {
+    return MUX_ALTERNATIVE_MEDIA_SUGGESTION;
+  }
+}
+
+/** {@link SpfPlaybackMixin} over the SPF MPEG-TS video engine. */
+export class SpfVideoAdapter extends SpfPlaybackMixin<typeof HTMLVideoAdapter, HlsVideoMpegTsAdapter>(
+  HTMLVideoAdapter,
+  SpfVideoDelegate
+) {}
 
 /**
  * Structured Mux source for the SPF-backed Media: Mux identity and params from {@link MuxSourceBase}, plus how to play
  * it — `type` and `preferPlayback`, as on the hls.js-backed flavor. SPF publishes no engine-shaped config, so there is
  * no `engine`.
  */
-export interface MuxSource extends MuxSourceBase, Pick<SpfVideoSource, 'type' | 'preferPlayback'> {}
+export interface MuxSource extends MuxSourceBase, Pick<SpfPlaybackSource, 'type' | 'preferPlayback'> {}
 
 export interface MuxVideoAdapterProps {
   src: string;
@@ -32,7 +47,7 @@ export interface MuxVideoAdapterProps {
  * `@videojs/spf/adapters/hls-video-mpeg-ts`, where the plain `<hls-video>` refuses them.
  */
 export class MuxVideoAdapter extends MuxMixin<typeof SpfVideoAdapter, MuxSource>(SpfVideoAdapter) {
-  static override readonly defaultProps: Omit<SpfVideoAdapterProps, 'src' | 'source'> & MuxVideoAdapterProps = {
+  static override readonly defaultProps: Omit<SpfPlaybackProps, 'src' | 'source'> & MuxVideoAdapterProps = {
     ...SpfVideoAdapter.defaultProps,
     src: '',
     source: null,

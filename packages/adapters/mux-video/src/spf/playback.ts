@@ -1,25 +1,23 @@
 import {
   adapterTypeForMimeType,
   type DrmSystemsConfig,
+  type ErrorLike,
   type MediaCrossOriginType,
   type MediaStreamType,
   MediaStreamTypes,
   resolveMimeType,
   toMediaCrossOrigin,
 } from '@videojs/media';
-import { getMediaEngineName, HTMLVideoAdapter } from '@videojs/media/dom';
+import { type AnyHTMLMediaAdapter, getMediaEngineName } from '@videojs/media/dom';
 import { NativeHlsAdapter } from '@videojs/native-hls-video';
-import type { HlsVideoAdapterAPI } from '@videojs/spf/adapters/hls-video';
-import { HlsVideoMpegTsAdapter } from '@videojs/spf/adapters/hls-video-mpeg-ts';
 import { supportsMediaSource } from '@videojs/utils/dom';
-
-import { MUX_ALTERNATIVE_MEDIA_SUGGESTION } from './mixin';
+import type { Constructor } from '@videojs/utils/types';
 
 /** How a source plays: through SPF over Media Source Extensions, or the browser's own HLS support. */
 export type SpfPlaybackType = 'mse' | 'native';
 
-/** Structured source for {@link SpfVideoAdapter}: which source to play, plus how to play it. */
-export interface SpfVideoSource {
+/** Structured source for a Media built with {@link SpfPlaybackMixin}: which source to play, plus how to play it. */
+export interface SpfPlaybackSource {
   /** Manifest URL. Mirrors the host's `src` property. */
   src?: string | undefined;
   /**
@@ -34,28 +32,86 @@ export interface SpfVideoSource {
   preferPlayback?: SpfPlaybackType | undefined;
   /**
    * License servers for protected content, keyed by EME key system id. Engine neutral: SPF negotiates every system
-   * named here, and native playback negotiates the `com.apple.fps` entry itself.
+   * named here that its engine composes, and native playback negotiates the `com.apple.fps` entry itself.
    */
   drm?: DrmSystemsConfig | undefined;
 }
 
-export interface SpfVideoAdapterProps {
+export interface SpfPlaybackProps {
   src: string;
-  source: SpfVideoSource | null;
+  source: SpfPlaybackSource | null;
   preload: '' | 'none' | 'metadata' | 'auto';
   crossOrigin: MediaCrossOriginType | '' | null;
   disableRemotePlayback: boolean;
   streamType: MediaStreamType;
 }
 
-/** The SPF Media this adapter delegates to, with the Mux error copy pointing at the hls.js-backed flavor. */
-class SpfDelegate extends HlsVideoMpegTsAdapter {
-  static override get alternativeMediaSuggestion(): string | undefined {
-    return MUX_ALTERNATIVE_MEDIA_SUGGESTION;
-  }
+/** What {@link SpfPlaybackMixin} needs from the SPF Media it plays through: the surface every SPF adapter has. */
+export interface SpfAdapterLike extends EventTarget {
+  src: string;
+  set source(value: Pick<SpfPlaybackSource, 'src' | 'drm'> | null);
+  preload: SpfPlaybackProps['preload'];
+  crossOrigin: MediaCrossOriginType | '' | null;
+  disableRemotePlayback: boolean;
+  streamType: MediaStreamType;
+  readonly engine: unknown;
+  readonly error: ErrorLike | null;
+  readonly liveEdgeStart: number;
+  readonly targetLiveWindow: number;
+  attach(mediaElement: HTMLMediaElement): void;
+  detach(): void;
+  destroy(): void;
+  play(): Promise<void>;
 }
 
-type Delegate = SpfDelegate | NativeHlsAdapter;
+/** A track list the SPF Media has, or `undefined` for one it doesn't (the audio-only Media has no video tracks). */
+type TrackListOf<Spf, Key extends string> = Spf extends { readonly [K in Key]: infer List }
+  ? List | undefined
+  : undefined;
+
+export interface SpfPlaybackAPI<Spf extends SpfAdapterLike> extends Omit<SpfPlaybackProps, 'crossOrigin'> {
+  get crossOrigin(): MediaCrossOriginType | null;
+  set crossOrigin(value: SpfPlaybackProps['crossOrigin']);
+  /**
+   * Underlying playback engine — the SPF composition while SPF plays, otherwise `null`. An advanced escape hatch for
+   * direct engine access; normal playback is driven through this element's own properties and methods.
+   */
+  readonly engine: Spf['engine'] | null;
+  /**
+   * Engine this media is playing through, reported to analytics such as Mux Data: SPF's engine name via MSE, `browser`
+   * for native HLS, or `undefined` until a source loads. Read from the instance because the engine is picked per
+   * source.
+   */
+  readonly engineName: string | undefined;
+  readonly error: Spf['error'] | null;
+  /** Presentation time marking the start of the live edge window; `NaN` when nothing plays or the stream isn't live. */
+  readonly liveEdgeStart: number;
+  /**
+   * Seekable range size for live content. `0` for standard live, `Infinity` for DVR, `NaN` for on-demand or unknown.
+   * Fires `targetlivewindowchange` when the value changes (bridged from the delegate).
+   */
+  readonly targetLiveWindow: number;
+  /** Populated only while SPF plays; otherwise `undefined`. */
+  readonly videoTracks: TrackListOf<Spf, 'videoTracks'>;
+  /** Populated only while SPF plays; otherwise `undefined`. */
+  readonly audioTracks: TrackListOf<Spf, 'audioTracks'>;
+  /** Selectable quality levels, populated only while SPF plays; otherwise `undefined`. */
+  readonly videoRenditions: TrackListOf<Spf, 'videoRenditions'>;
+  /** Selectable audio variants, populated only while SPF plays; otherwise `undefined`. */
+  readonly audioRenditions: TrackListOf<Spf, 'audioRenditions'>;
+  /** SPF's `play()` also tells the engine playback was asked for, which loads a `preload="none"` source. */
+  play(): Promise<void>;
+}
+
+/** The default props every Media built with {@link SpfPlaybackMixin} starts from. */
+const DEFAULT_PROPS: SpfPlaybackProps = {
+  src: '',
+  source: null,
+  preload: 'metadata',
+  crossOrigin: null,
+  disableRemotePlayback: false,
+  streamType: MediaStreamTypes.UNKNOWN,
+};
 
 /**
  * SPF where it can play, the browser's own HLS where it can't — the SPF counterpart of `HlsJsAdapter`, which makes the
@@ -66,262 +122,297 @@ type Delegate = SpfDelegate | NativeHlsAdapter;
  * source, and the delegate behind it is kept for as long as the choice holds: SPF recycles one engine across sources,
  * so only switching paths builds a new one.
  *
+ * A mixin over the host adapter and the SPF Media, so the video and audio Medias share it: each plays through its own
+ * SPF engine, and native playback is the same for both.
+ *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
  * @fires streamtypechange - Fired when the detected stream type changes. Read `streamType` for the new value.
  * @fires targetlivewindowchange - Fired when the target live window changes. Read `targetLiveWindow` for the new value.
+ * @internal
  */
-export class SpfVideoAdapter extends HTMLVideoAdapter implements SpfVideoAdapterProps {
-  static readonly defaultProps: SpfVideoAdapterProps = {
-    src: '',
-    source: null,
-    preload: 'metadata',
-    crossOrigin: null,
-    disableRemotePlayback: false,
-    streamType: MediaStreamTypes.UNKNOWN,
-  };
+export function SpfPlaybackMixin<Base extends Constructor<AnyHTMLMediaAdapter>, Spf extends SpfAdapterLike>(
+  BaseClass: Base,
+  SpfAdapter: new () => Spf
+) {
+  type Delegate = Spf | NativeHlsAdapter;
 
-  #delegate: Delegate | null = null;
-  #mediaElement: HTMLVideoElement | null = null;
-  #source: SpfVideoSource | null = SpfVideoAdapter.defaultProps.source;
-  #preload = SpfVideoAdapter.defaultProps.preload;
-  #streamType: MediaStreamType = SpfVideoAdapter.defaultProps.streamType;
-  #isUserStreamType = false;
-  /** Kept here rather than read off the element, so it survives until there is one; SPF reads it per request. */
-  #crossOrigin: MediaCrossOriginType | null = toMediaCrossOrigin(SpfVideoAdapter.defaultProps.crossOrigin);
-  /**
-   * The author's value, kept for a delegate that doesn't exist yet. SPF manages the element's `disableRemotePlayback`
-   * itself, so the author's intent has to reach SPF rather than the element.
-   */
-  #authorDisableRemotePlayback?: boolean;
+  // SAFETY: `Base` is constrained to a constructor of `AnyHTMLMediaAdapter`; the
+  // widening only lets the class body call that surface through `super`.
+  class SpfPlaybackImpl extends (BaseClass as Constructor<AnyHTMLMediaAdapter>) {
+    static readonly defaultProps: SpfPlaybackProps = DEFAULT_PROPS;
 
-  attach(target: HTMLVideoElement) {
-    this.#mediaElement = target;
-    super.attach(target);
+    #delegate: Delegate | null = null;
+    #mediaElement: HTMLMediaElement | null = null;
+    #source: SpfPlaybackSource | null = DEFAULT_PROPS.source;
+    #preload = DEFAULT_PROPS.preload;
+    #streamType: MediaStreamType = DEFAULT_PROPS.streamType;
+    #isUserStreamType = false;
+    /** Kept here rather than read off the element, so it survives until there is one; SPF reads it per request. */
+    #crossOrigin: MediaCrossOriginType | null = toMediaCrossOrigin(DEFAULT_PROPS.crossOrigin);
+    /**
+     * The author's value, kept for a delegate that doesn't exist yet. SPF manages the element's `disableRemotePlayback`
+     * itself, so the author's intent has to reach SPF rather than the element.
+     */
+    #authorDisableRemotePlayback?: boolean;
 
-    // Most-recent-wins on attach, as SPF does: an element authored with
-    // `crossorigin` is the intent; otherwise what was set before attach reaches
-    // the element now.
-    this.#crossOrigin = toMediaCrossOrigin(target.crossOrigin) ?? this.#crossOrigin;
-    target.crossOrigin = this.#crossOrigin;
+    attach(target: HTMLMediaElement) {
+      this.#mediaElement = target;
+      super.attach(target);
 
-    this.#delegate?.attach(target);
-  }
+      // Most-recent-wins on attach, as SPF does: an element authored with
+      // `crossorigin` is the intent; otherwise what was set before attach reaches
+      // the element now.
+      this.#crossOrigin = toMediaCrossOrigin(target.crossOrigin) ?? this.#crossOrigin;
+      target.crossOrigin = this.#crossOrigin;
 
-  detach() {
-    this.#delegate?.detach();
-    super.detach();
-    this.#mediaElement = null;
-  }
-
-  destroy() {
-    this.detach();
-    this.#destroyDelegate();
-    super.destroy();
-  }
-
-  /**
-   * Underlying playback engine — the SPF composition while SPF plays, otherwise `null`. An advanced escape hatch for
-   * direct engine access; normal playback is driven through this element's own properties and methods.
-   */
-  get engine(): HlsVideoAdapterAPI['engine'] | null {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.engine : null;
-  }
-
-  /**
-   * Engine this media is playing through, reported to analytics such as Mux Data: SPF's engine name via MSE, `browser`
-   * for native HLS, or `undefined` until a source loads. Read from the instance because the engine is picked per
-   * source.
-   */
-  get engineName(): string | undefined {
-    return getMediaEngineName(this.#delegate);
-  }
-
-  get error() {
-    return this.#delegate?.error ?? null;
-  }
-
-  /** Populated only while SPF plays; otherwise `undefined`. */
-  get videoTracks() {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.videoTracks : undefined;
-  }
-
-  /** Populated only while SPF plays; otherwise `undefined`. */
-  get audioTracks() {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.audioTracks : undefined;
-  }
-
-  /** Selectable quality levels, populated only while SPF plays; otherwise `undefined`. */
-  get videoRenditions() {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.videoRenditions : undefined;
-  }
-
-  /** Selectable audio variants, populated only while SPF plays; otherwise `undefined`. */
-  get audioRenditions() {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.audioRenditions : undefined;
-  }
-
-  /**
-   * Media source URL. Assigning it replaces the identity half of `source` and leaves `type` and `preferPlayback`
-   * intact, so changing the URL never changes how it plays.
-   */
-  get src() {
-    return this.#source?.src ?? '';
-  }
-
-  set src(src: string) {
-    const { type, preferPlayback } = this.#source ?? {};
-    const next: SpfVideoSource = {
-      ...(type && { type }),
-      ...(preferPlayback && { preferPlayback }),
-      ...(src && { src }),
-    };
-
-    this.source = Object.keys(next).length > 0 ? next : null;
-  }
-
-  /**
-   * Structured source: what to play (`src`, an optional `type`) plus how to play it (`preferPlayback`, `drm`).
-   * Assigning it derives `src`. Assigning the same object back costs nothing — changing anything takes a new one.
-   */
-  get source(): SpfVideoSource | null {
-    return this.#source;
-  }
-
-  set source(value: SpfVideoSource | null) {
-    const source = value ?? null;
-    if (source === this.#source) return;
-
-    this.#source = source;
-    this.#syncDelegate();
-
-    this.dispatchEvent(new Event('sourcechange'));
-  }
-
-  /** Preload type (`'none'` / `'metadata'` / `'auto'`). */
-  get preload() {
-    return this.#preload;
-  }
-
-  set preload(value) {
-    this.#preload = value;
-
-    if (this.#delegate) this.#delegate.preload = value;
-  }
-
-  /** The element's CORS-settings attribute. Under SPF, `use-credentials` also sends cookies with its own requests. */
-  get crossOrigin(): MediaCrossOriginType | null {
-    return this.#crossOrigin;
-  }
-
-  set crossOrigin(value: MediaCrossOriginType | '' | null) {
-    // The attribute keeps the author's spelling; the getter and SPF see the
-    // canonical keyword.
-    this.#crossOrigin = toMediaCrossOrigin(value);
-
-    if (this.#delegate instanceof SpfDelegate) this.#delegate.crossOrigin = value;
-    else if (this.#mediaElement) this.#mediaElement.crossOrigin = value;
-  }
-
-  /** Whether remote playback (AirPlay, Google Cast) is disabled for this media. */
-  get disableRemotePlayback() {
-    return this.#delegate instanceof SpfDelegate ? this.#delegate.disableRemotePlayback : super.disableRemotePlayback;
-  }
-
-  set disableRemotePlayback(value: boolean) {
-    this.#authorDisableRemotePlayback = value;
-
-    if (this.#delegate instanceof SpfDelegate) this.#delegate.disableRemotePlayback = value;
-    else super.disableRemotePlayback = value;
-  }
-
-  /** Current stream type (`'on-demand'` / `'live'` / `'unknown'`). */
-  get streamType(): MediaStreamType {
-    return this.#delegate?.streamType ?? this.#streamType;
-  }
-
-  set streamType(value: MediaStreamType) {
-    this.#isUserStreamType = value !== MediaStreamTypes.UNKNOWN;
-
-    if (this.#delegate) {
-      this.#delegate.streamType = value;
-      this.#streamType = this.#delegate.streamType;
-      return;
+      this.#attachDelegate(target);
     }
 
-    if (this.#streamType === value) return;
-
-    this.#streamType = value;
-    this.dispatchEvent(new Event('streamtypechange'));
-  }
-
-  /** Presentation time marking the start of the live edge window; `NaN` when nothing plays or the stream isn't live. */
-  get liveEdgeStart() {
-    return this.#delegate?.liveEdgeStart ?? Number.NaN;
-  }
-
-  /**
-   * Seekable range size for live content. `0` for standard live, `Infinity` for DVR, `NaN` for on-demand or unknown.
-   * Fires `targetlivewindowchange` when the value changes (bridged from the delegate).
-   */
-  get targetLiveWindow() {
-    return this.#delegate?.targetLiveWindow ?? Number.NaN;
-  }
-
-  /** SPF's `play()` also tells the engine playback was asked for, which loads a `preload="none"` source. */
-  play() {
-    return this.#delegate?.play() ?? super.play();
-  }
-
-  /**
-   * Hand the source to the delegate that can play it, replacing the delegate only when the path changes. A cleared
-   * source goes to whichever delegate is there, so it unloads without deciding anything.
-   */
-  #syncDelegate() {
-    const { src, type, preferPlayback, drm } = this.#source ?? {};
-
-    if (src) {
-      const useSpf = supportsMediaSource() && isHlsSource(src, type) && preferPlayback !== 'native';
-
-      if (this.#delegate && this.#delegate instanceof SpfDelegate !== useSpf) this.#destroyDelegate();
-
-      this.#delegate ??= this.#createDelegate(useSpf);
+    detach() {
+      this.#delegate?.detach();
+      super.detach();
+      this.#mediaElement = null;
     }
 
-    if (this.#delegate) this.#delegate.source = src ? { src, ...(drm && { drm }) } : null;
-  }
+    destroy() {
+      this.detach();
+      this.#destroyDelegate();
+      super.destroy();
+    }
 
-  #createDelegate(useSpf: boolean): Delegate {
-    const delegate = useSpf ? new SpfDelegate() : new NativeHlsAdapter();
+    /**
+     * Underlying playback engine — the SPF composition while SPF plays, otherwise `null`. An advanced escape hatch for
+     * direct engine access; normal playback is driven through this element's own properties and methods.
+     */
+    get engine(): Spf['engine'] | null {
+      return this.#delegate instanceof SpfAdapter ? this.#delegate.engine : null;
+    }
 
-    bridgeDelegateEvents(delegate, this);
+    /**
+     * Engine this media is playing through, reported to analytics such as Mux Data: SPF's engine name via MSE,
+     * `browser` for native HLS, or `undefined` until a source loads. Read from the instance because the engine is
+     * picked per source.
+     */
+    get engineName(): string | undefined {
+      return getMediaEngineName(this.#delegate);
+    }
 
-    // Before `attach()`, so native playback doesn't detect a stream type first and
-    // announce a transient one.
-    if (this.#isUserStreamType) delegate.streamType = this.#streamType;
+    get error(): Spf['error'] | NativeHlsAdapter['error'] {
+      return this.#delegate?.error ?? null;
+    }
 
-    delegate.preload = this.#preload;
+    /** Populated only while SPF plays; otherwise `undefined`. */
+    get videoTracks() {
+      const delegate = this.#delegate;
 
-    if (delegate instanceof SpfDelegate) {
-      delegate.crossOrigin = this.#crossOrigin;
+      return delegate instanceof SpfAdapter && 'videoTracks' in delegate ? delegate.videoTracks : undefined;
+    }
 
-      if (this.#authorDisableRemotePlayback !== undefined) {
-        delegate.disableRemotePlayback = this.#authorDisableRemotePlayback;
+    /** Populated only while SPF plays; otherwise `undefined`. */
+    get audioTracks() {
+      const delegate = this.#delegate;
+
+      return delegate instanceof SpfAdapter && 'audioTracks' in delegate ? delegate.audioTracks : undefined;
+    }
+
+    /** Selectable quality levels, populated only while SPF plays; otherwise `undefined`. */
+    get videoRenditions() {
+      const delegate = this.#delegate;
+
+      return delegate instanceof SpfAdapter && 'videoRenditions' in delegate ? delegate.videoRenditions : undefined;
+    }
+
+    /** Selectable audio variants, populated only while SPF plays; otherwise `undefined`. */
+    get audioRenditions() {
+      const delegate = this.#delegate;
+
+      return delegate instanceof SpfAdapter && 'audioRenditions' in delegate ? delegate.audioRenditions : undefined;
+    }
+
+    /**
+     * Media source URL. Assigning it replaces the identity half of `source` and leaves `type` and `preferPlayback`
+     * intact, so changing the URL never changes how it plays.
+     */
+    get src() {
+      return this.#source?.src ?? '';
+    }
+
+    set src(src: string) {
+      const { type, preferPlayback } = this.#source ?? {};
+      const next: SpfPlaybackSource = {
+        ...(type && { type }),
+        ...(preferPlayback && { preferPlayback }),
+        ...(src && { src }),
+      };
+
+      this.source = Object.keys(next).length > 0 ? next : null;
+    }
+
+    /**
+     * Structured source: what to play (`src`, an optional `type`) plus how to play it (`preferPlayback`, `drm`).
+     * Assigning it derives `src`. Assigning the same object back costs nothing — changing anything takes a new one.
+     */
+    get source(): SpfPlaybackSource | null {
+      return this.#source;
+    }
+
+    set source(value: SpfPlaybackSource | null) {
+      const source = value ?? null;
+      if (source === this.#source) return;
+
+      this.#source = source;
+      this.#syncDelegate();
+
+      this.dispatchEvent(new Event('sourcechange'));
+    }
+
+    /** Preload type (`'none'` / `'metadata'` / `'auto'`). */
+    get preload(): SpfPlaybackProps['preload'] {
+      return this.#preload;
+    }
+
+    set preload(value: SpfPlaybackProps['preload']) {
+      this.#preload = value;
+
+      if (this.#delegate) this.#delegate.preload = value;
+    }
+
+    /** The element's CORS-settings attribute. Under SPF, `use-credentials` also sends cookies with its own requests. */
+    get crossOrigin(): MediaCrossOriginType | null {
+      return this.#crossOrigin;
+    }
+
+    set crossOrigin(value: MediaCrossOriginType | '' | null) {
+      // The attribute keeps the author's spelling; the getter and SPF see the
+      // canonical keyword.
+      this.#crossOrigin = toMediaCrossOrigin(value);
+
+      if (this.#delegate instanceof SpfAdapter) this.#delegate.crossOrigin = value;
+      else if (this.#mediaElement) this.#mediaElement.crossOrigin = value;
+    }
+
+    /** Whether remote playback (AirPlay, Google Cast) is disabled for this media. */
+    get disableRemotePlayback() {
+      return this.#delegate instanceof SpfAdapter ? this.#delegate.disableRemotePlayback : super.disableRemotePlayback;
+    }
+
+    set disableRemotePlayback(value: boolean) {
+      this.#authorDisableRemotePlayback = value;
+
+      if (this.#delegate instanceof SpfAdapter) this.#delegate.disableRemotePlayback = value;
+      else super.disableRemotePlayback = value;
+    }
+
+    /** Current stream type (`'on-demand'` / `'live'` / `'unknown'`). */
+    get streamType(): MediaStreamType {
+      return this.#delegate?.streamType ?? this.#streamType;
+    }
+
+    set streamType(value: MediaStreamType) {
+      this.#isUserStreamType = value !== MediaStreamTypes.UNKNOWN;
+
+      if (this.#delegate) {
+        this.#delegate.streamType = value;
+        this.#streamType = this.#delegate.streamType;
+        return;
       }
+
+      if (this.#streamType === value) return;
+
+      this.#streamType = value;
+      this.dispatchEvent(new Event('streamtypechange'));
     }
 
-    if (this.#mediaElement) delegate.attach(this.#mediaElement);
+    /** Presentation time marking the start of the live edge window; `NaN` when nothing plays or the stream isn't live. */
+    get liveEdgeStart() {
+      return this.#delegate?.liveEdgeStart ?? Number.NaN;
+    }
 
-    return delegate;
+    /**
+     * Seekable range size for live content. `0` for standard live, `Infinity` for DVR, `NaN` for on-demand or unknown.
+     * Fires `targetlivewindowchange` when the value changes (bridged from the delegate).
+     */
+    get targetLiveWindow() {
+      return this.#delegate?.targetLiveWindow ?? Number.NaN;
+    }
+
+    /** SPF's `play()` also tells the engine playback was asked for, which loads a `preload="none"` source. */
+    play() {
+      return this.#delegate?.play() ?? super.play();
+    }
+
+    /**
+     * Hand the source to the delegate that can play it, replacing the delegate only when the path changes. A cleared
+     * source goes to whichever delegate is there, so it unloads without deciding anything.
+     */
+    #syncDelegate() {
+      const { src, type, preferPlayback, drm } = this.#source ?? {};
+
+      if (src) {
+        const useSpf = supportsMediaSource() && isHlsSource(src, type) && preferPlayback !== 'native';
+
+        if (this.#delegate && this.#delegate instanceof SpfAdapter !== useSpf) this.#destroyDelegate();
+
+        this.#delegate ??= this.#createDelegate(useSpf);
+      }
+
+      if (this.#delegate) this.#delegate.source = src ? { src, ...(drm && { drm }) } : null;
+    }
+
+    #createDelegate(useSpf: boolean): Delegate {
+      const delegate: Delegate = useSpf ? new SpfAdapter() : new NativeHlsAdapter();
+
+      bridgeDelegateEvents(delegate, this);
+
+      // Before `attach()`, so native playback doesn't detect a stream type first and
+      // announce a transient one.
+      if (this.#isUserStreamType) delegate.streamType = this.#streamType;
+
+      delegate.preload = this.#preload;
+
+      if (delegate instanceof SpfAdapter) {
+        delegate.crossOrigin = this.#crossOrigin;
+
+        if (this.#authorDisableRemotePlayback !== undefined) {
+          delegate.disableRemotePlayback = this.#authorDisableRemotePlayback;
+        }
+      }
+
+      this.#delegate = delegate;
+
+      if (this.#mediaElement) this.#attachDelegate(this.#mediaElement);
+
+      return delegate;
+    }
+
+    #destroyDelegate() {
+      this.#delegate?.destroy();
+      this.#delegate = null;
+
+      // Delegate teardown already emits `streamtypechange` (bridged); only sync the cache.
+      if (!this.#isUserStreamType) this.#streamType = MediaStreamTypes.UNKNOWN;
+    }
+
+    /** Native playback takes a video adapter; it reads only what every media element has, so an `<audio>` plays too. */
+    #attachDelegate(target: HTMLMediaElement) {
+      // SAFETY: `NativeHlsAdapter` reads only `HTMLMediaElement` members of its
+      // target, which the hls.js-backed audio flavor relies on as well.
+      this.#delegate?.attach(target as HTMLVideoElement);
+    }
   }
 
-  #destroyDelegate() {
-    this.#delegate?.destroy();
-    this.#delegate = null;
-
-    // Delegate teardown already emits `streamtypechange` (bridged); only sync the cache.
-    if (!this.#isUserStreamType) this.#streamType = MediaStreamTypes.UNKNOWN;
-  }
+  // `MixinReturn` would intersect the base's media surface with this one's,
+  // which disagree on `error`, `crossOrigin`, and `engine`; this surface replaces
+  // the base's instead.
+  //
+  // SAFETY: `SpfPlaybackImpl` implements every member of `SpfPlaybackAPI<Spf>`,
+  // over a `BaseClass` instance.
+  return SpfPlaybackImpl as unknown as Constructor<
+    Omit<InstanceType<Base>, keyof SpfPlaybackAPI<Spf>> & SpfPlaybackAPI<Spf>,
+    ConstructorParameters<Base>
+  > &
+    Omit<Base, 'prototype' | 'defaultProps'> & { readonly defaultProps: SpfPlaybackProps };
 }
 
 /**
