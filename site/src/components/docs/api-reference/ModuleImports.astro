@@ -2,10 +2,9 @@
 import type { BundledLanguage } from 'shiki';
 
 import ServerCode from '@/components/Code/ServerCode.astro';
-import CodeFrame from '@/components/typography/CodeFrame.astro';
-import P from '@/components/typography/P.astro';
+import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs.tsx';
 import { VJS10_CDN_BASE } from '@/consts';
-import DocsLink from '../DocsLink.astro';
+import { kebabCase } from 'es-toolkit/string';
 import FrameworkCase from '../FrameworkCase.astro';
 
 interface Props {
@@ -25,44 +24,48 @@ const { name, package: pkg, packageOnlyInstall = false, react, subpath } = Astro
 
 const cdnCode = `<script type="module" src="${VJS10_CDN_BASE}/${subpath}/${name}.js"></script>`;
 
-const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledLanguage }> = [
-  ...(pkg
-    ? packageOnlyInstall
-      ? [
-          { code: `pnpm add ${pkg}`, framework: 'react' as const, lang: 'bash' as const },
-          { code: `pnpm add ${pkg}`, framework: 'html' as const, lang: 'bash' as const },
-        ]
-      : [
-          { code: `pnpm add @videojs/react ${pkg}`, framework: 'react' as const, lang: 'bash' as const },
-          { code: `pnpm add @videojs/html ${pkg}`, framework: 'html' as const, lang: 'bash' as const },
-        ]
-    : []),
-  {
-    code: `import { ${react} } from '@videojs/react/${subpath}/${name}';`,
-    framework: 'react',
-    lang: 'tsx',
-  },
-  {
-    code: `import '@videojs/html/${subpath}/${name}';`,
-    framework: 'html',
-    lang: 'ts',
-  },
-];
+type Framework = 'react' | 'html';
+type ImportTab = { label: string; code: string; lang: BundledLanguage };
+
+const install = (framework: Framework): ImportTab[] => {
+  if (!pkg) return [];
+
+  const code = packageOnlyInstall ? `pnpm add ${pkg}` : `pnpm add @videojs/${framework} ${pkg}`;
+
+  return [{ label: 'Install', code, lang: 'bash' }];
+};
+
+// One tabbed frame per framework keeps the Import section short, so the Guides list stays near the top of the page.
+const tabs: Record<Framework, ImportTab[]> = {
+  react: [
+    ...install('react'),
+    { label: 'Import', code: `import { ${react} } from '@videojs/react/${subpath}/${name}';`, lang: 'tsx' },
+  ],
+  html: [
+    ...install('html'),
+    { label: 'Import', code: `import '@videojs/html/${subpath}/${name}';`, lang: 'ts' },
+    { label: 'CDN', code: cdnCode, lang: 'html' },
+  ],
+};
 ---
 
 {
-  imports.map(({ code, framework, lang }) => (
+  (['react', 'html'] as const).map((framework) => (
     <FrameworkCase frameworks={[framework]}>
-      <CodeFrame lang={lang}>
-        <ServerCode code={code} lang={lang} />
-      </CodeFrame>
+      <TabsRoot client:idle>
+        <TabsList client:idle label={`${name} import code`}>
+          {tabs[framework].map(({ label }, index) => (
+            <Tab client:idle value={kebabCase(label)} initial={index === 0}>
+              {label}
+            </Tab>
+          ))}
+        </TabsList>
+        {tabs[framework].map(({ label, code, lang }, index) => (
+          <TabsPanel client:idle value={kebabCase(label)} initial={index === 0}>
+            <ServerCode code={code} lang={lang} />
+          </TabsPanel>
+        ))}
+      </TabsRoot>
     </FrameworkCase>
   ))
 }
-
-<FrameworkCase frameworks={['html']}>
-  <P>Or load it from the <DocsLink slug="guides/cdn">CDN</DocsLink>:</P>
-  <CodeFrame lang="html">
-    <ServerCode code={cdnCode} lang="html" />
-  </CodeFrame>
-</FrameworkCase>

@@ -29,31 +29,13 @@ Audio component for Mux-hosted streams. From a playback ID it derives the stream
 
 <MediaImports media="mux-audio" package="@videojs/mux-audio" react="MuxAudio" />
 
-The Mux audio component plays through one of two engines, chosen by import path: SPF, Video.js's own engine, or hls.js. The default import uses hls.js today and will switch to SPF in an upcoming release.
-
-| Import | Engine |
-|---|---|
-| `.../media/mux-audio/spf` | SPF |
-| `.../media/mux-audio` | hls.js today, SPF in an upcoming release |
-| `.../media/mux-audio/hls-js` | hls.js |
-
 <FrameworkCase frameworks={["react"]}>
-```tsx
-import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
-```
-
-All three imports give you a `MuxAudio` component with the same basic API.
+The import path picks the engine: `.../media/mux-audio/spf` plays through SPF, `.../media/mux-audio/hls-js` through hls.js, and `.../media/mux-audio` through hls.js today and SPF in an upcoming release. All three export the same `MuxAudio` component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-```ts
-import '@videojs/html/media/mux-audio/spf';
-```
-
-All three imports register the same `<mux-audio>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
+The import path picks the engine: `.../media/mux-audio/spf` plays through SPF, `.../media/mux-audio/hls-js` through hls.js, and `.../media/mux-audio` through hls.js today and SPF in an upcoming release. All three register the same `<mux-audio>` tag, and the first one loaded claims it.
 </FrameworkCase>
-
-<DocsLink slug="guides/mux" anchor="choose-a-playback-engine">Play Mux videos</DocsLink> covers when to use each engine.
 
 ## Guides
 
