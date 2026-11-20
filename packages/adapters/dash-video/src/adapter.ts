@@ -102,8 +102,7 @@ class DashAdapterCore
    * Structured source: the MPD URL in `src`, plus dash.js settings in `engine.dashJs`. Replacing it re-derives `src`.
    *
    * Dash.js takes settings on a live player, so changing `engine.dashJs` re-applies them in place instead of recreating
-   * the engine. [Media sources](https://videojs.org/docs/guides/media-sources) explains how engine options fit into a
-   * source.
+   * the engine.
    */
   get source(): DashSource | null {
     return this.#source;

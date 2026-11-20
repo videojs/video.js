@@ -540,7 +540,6 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * takes a new one.
      *
      * `drm` names license servers by key system; see [Play DRM-protected content](https://videojs.org/docs/guides/drm).
-     * [Media sources](https://videojs.org/docs/guides/media-sources) explains how `src` and `source` relate.
      *
      * @fires sourcechange - Fired when `source` changes. Read `source` for the new value.
      */

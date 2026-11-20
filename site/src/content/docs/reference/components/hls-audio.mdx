@@ -23,7 +23,7 @@ import basicUsageHtml from "@/components/docs/demos/hls-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/hls-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/hls-audio/html/css/BasicUsage.ts?raw";
 
-Audio-only HLS component that plays only the audio rendition of an HLS stream, even from a mixed audio and video manifest, so no video data is downloaded. It runs on the same engine as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> and takes the same `source`, so one object serves both. For Mux-hosted audio, use the <DocsLink slug="reference/components/mux-audio">Mux audio component</DocsLink>.
+Audio-only HLS component that plays only the audio rendition of an HLS stream, even from a mixed audio and video manifest, so no video data is downloaded. It runs on SPF, the same engine as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>, and takes the same `source`. The <DocsLink slug="reference/components/mux-audio">Mux audio component</DocsLink> plays Mux playback IDs.
 
 ## Import
 
@@ -31,7 +31,7 @@ Audio-only HLS component that plays only the audio rendition of an HLS stream, e
 
 ## Guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/hls">Play HLS streams</DocsLink>
 - <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
 - <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 

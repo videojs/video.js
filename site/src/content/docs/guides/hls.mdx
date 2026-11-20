@@ -1,0 +1,87 @@
+---
+title: Play HLS streams
+description: Choose the HLS media component that fits your streams and devices, then play the stream
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+Video.js plays HLS through three media components. Pick the one your streams and target devices need, then set the stream URL as `src`.
+
+## Choose a media component
+
+<FrameworkCase frameworks={["react"]}>
+| If your streams or devices need… | Use |
+|---|---|
+| The smallest bundle that plays HLS in every modern browser | <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> |
+| MPEG-TS segments, low-latency HLS, or iPhones before iOS 17.1 | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> |
+| No streaming engine, in browsers with built-in HLS such as Safari | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| If your streams or devices need… | Use |
+|---|---|
+| The smallest bundle that plays HLS in every modern browser | <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> |
+| MPEG-TS segments, low-latency HLS, or iPhones before iOS 17.1 | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> |
+| No streaming engine, in browsers with built-in HLS such as Safari | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink> |
+</FrameworkCase>
+
+What each one plays:
+
+| | HLS video (SPF) | hls.js video | Native HLS video |
+|---|---|---|---|
+| Engine | SPF, Video.js's own | hls.js | The browser's |
+| Size | About a quarter of hls.js | Largest | Smallest |
+| Browsers | Any with Media Source Extensions, iOS 17.1 and later | All; the browser's own HLS where Media Source Extensions are missing | Those with built-in HLS, such as Safari and iOS |
+| Segments | fMP4 (CMAF) | fMP4 and MPEG-TS | What the browser plays |
+| Low-latency HLS | Plays at standard latency | Yes | What the browser supports |
+| DRM | FairPlay, Widevine, PlayReady | FairPlay, Widevine, PlayReady | FairPlay |
+
+Hosting on Mux? Use <DocsLink slug="guides/mux">Play Mux videos</DocsLink> instead.
+
+## Play the stream
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import '@videojs/react/video/skin.css';
+import { VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { HlsVideo } from '@videojs/react/media/hls-video';
+
+export function MyPlayer() {
+  return (
+    <VideoPlayer>
+      <VideoSkin style={{ aspectRatio: '16 / 9' }}>
+        <HlsVideo src="https://example.com/stream.m3u8" playsInline />
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+Swap `HlsVideo` for `HlsJsVideo` (from `@videojs/react/media/hlsjs-video`) or `NativeHlsVideo` (from `@videojs/react/media/native-hls-video`). They take the same `src`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<video-player>
+  <video-skin style="aspect-ratio: 16 / 9">
+    <hls-video src="https://example.com/stream.m3u8" playsinline></hls-video>
+  </video-skin>
+</video-player>
+
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/video/skin';
+  import '@videojs/html/media/hls-video';
+</script>
+```
+
+Swap `<hls-video>` for `<hlsjs-video>` (from `@videojs/html/media/hlsjs-video`) or `<native-hls-video>` (from `@videojs/html/media/native-hls-video`). They take the same `src`.
+</FrameworkCase>
+
+## Next steps
+
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
+- <DocsLink slug="guides/quality">Let viewers choose quality</DocsLink>

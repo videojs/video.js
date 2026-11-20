@@ -101,7 +101,7 @@ A `vimeo.com/event/<id>` URL plays that event through Vimeo's event embed, and i
 
 <MediaReference media="VimeoVideo">
   <Fragment slot="engine-vimeo">
-    Pass [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) under `source.engine.vimeo`, spelled exactly as Vimeo spells them. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+    Pass [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) under `source.engine.vimeo`, spelled exactly as Vimeo spells them.
 
     These options are typed from Vimeo's own SDK, so your editor completes every parameter and rejects one Vimeo doesn't have. That also means the list covers Vimeo's oEmbed API alongside the player: `id` and `url` both override the video `src` names, and `width`, `height`, `maxwidth`, `maxheight`, and `responsive` size an oEmbed response rather than this element. Pass the video through `src`, and size the element with CSS.
 

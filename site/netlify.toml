@@ -440,23 +440,48 @@
   status = 301
 
 [[redirects]]
+  from = "/docs/framework/react/guides/media-sources"
+  to = "/docs/framework/react/reference/components/media"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/react/guides/media-sources.md"
+  to = "/docs/framework/react/reference/components/media.md"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/html/guides/media-sources"
+  to = "/docs/framework/html/reference/components/media"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/html/guides/media-sources.md"
+  to = "/docs/framework/html/reference/components/media.md"
+  status = 301
+
+[[redirects]]
+  from = "/docs/guides/media-sources"
+  to = "/docs/reference/components/media"
+  status = 301
+
+[[redirects]]
   from = "/docs/framework/react/concepts/media-sources"
-  to = "/docs/framework/react/guides/media-sources"
+  to = "/docs/framework/react/reference/components/media"
   status = 301
 
 [[redirects]]
   from = "/docs/framework/react/concepts/media-sources.md"
-  to = "/docs/framework/react/guides/media-sources.md"
+  to = "/docs/framework/react/reference/components/media.md"
   status = 301
 
 [[redirects]]
   from = "/docs/framework/html/concepts/media-sources"
-  to = "/docs/framework/html/guides/media-sources"
+  to = "/docs/framework/html/reference/components/media"
   status = 301
 
 [[redirects]]
   from = "/docs/framework/html/concepts/media-sources.md"
-  to = "/docs/framework/html/guides/media-sources.md"
+  to = "/docs/framework/html/reference/components/media.md"
   status = 301
 
 [[redirects]]

@@ -299,8 +299,7 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
    * Sources are compared structurally, so reassigning an equivalent object is a no-op. Only a change to the engine
    * options (or to the resolved content type) recreates the playback engine.
    *
-   * [Media sources](https://videojs.org/docs/guides/media-sources) explains each option. `drm` names license servers by
-   * key system; see [Play DRM-protected content](https://videojs.org/docs/guides/drm).
+   * `drm` names license servers by key system; see [Play DRM-protected content](https://videojs.org/docs/guides/drm).
    */
   get source(): HlsSource | null {
     return this.#source;

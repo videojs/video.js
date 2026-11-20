@@ -205,7 +205,7 @@ describe('React registry output', () => {
       expect(items.get('container')?.docs).toContain('/docs/framework/react/reference/player-container/');
       expect(items.get('button')?.docs).toContain('/docs/framework/react/how-to/customize-skins/');
       expect(items.get('_style-theme')?.docs).toContain(`data-theme="${items.get('_style-theme')?.meta?.theme}"`);
-      expect(items.get('video')?.docs).toContain('/docs/framework/react/concepts/media-sources/');
+      expect(items.get('video')?.docs).toContain('/docs/framework/react/reference/components/media/');
     }
   });
 

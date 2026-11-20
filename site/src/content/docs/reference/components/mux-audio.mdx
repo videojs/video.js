@@ -23,7 +23,7 @@ import basicUsageHtml from "@/components/docs/demos/mux-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-audio/html/css/BasicUsage.ts?raw";
 
-Audio component for Mux-hosted streams. Give it a playback ID and it builds the stream URL, and it plays signed assets from their tokens. It plays through SPF, Video.js's own engine, or through hls.js like the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink>, depending on which entry point you import. For video, use the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink>. Start with <DocsLink slug="guides/mux">Play Mux videos</DocsLink> for playback IDs and signed playback, then add <DocsLink slug="guides/mux-data">Mux Data</DocsLink> to monitor playback.
+Audio component for Mux-hosted streams. From a playback ID it derives the stream URL, and it plays signed assets from their tokens. It plays through SPF, Video.js's own engine, or through hls.js, depending on the import path. The <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> plays video.
 
 ## Import
 
