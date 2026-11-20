@@ -239,7 +239,7 @@ Use these three pieces when deciding where each Mux Player setting belongs:
 **The player** is the outer React component. It holds state, hands that state to everything inside it, and renders no DOM of its own. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from.
 </FrameworkCase>
 
-**The media** is the thing that plays the video. Use Mux media for Mux playback IDs and source settings. Choose another <DocsLink slug="guides/media-sources">media component</DocsLink> when changing providers, and check which capabilities it exposes.
+**The media** is the thing that plays the video. Use Mux media for Mux playback IDs and source settings. Choose another <DocsLink slug="reference/components/media">media component</DocsLink> when changing providers, and check which capabilities it exposes.
 
 **The skin** is the UI: the controls, the poster, the captions, the settings menu, the keyboard shortcuts. <DocsLink slug="guides/skins">Skins</DocsLink> are pre-built arrangements of smaller components, and you can use one as-is, restyle it, or add its source to your project and edit it.
 
@@ -690,7 +690,7 @@ Store actions throw until the media attaches. Call fullscreen actions from a use
 
 ## Which Mux media should you use?
 
-The Mux video and Mux audio components can play through hls.js or through SPF, and you choose by import path. Read <DocsLink slug="reference/components/mux-video" anchor="choose-a-playback-engine">Choose a playback engine</DocsLink> before you pick one, and test it with your own assets.
+The Mux video and Mux audio components can play through hls.js or through SPF, and you choose by import path. Read <DocsLink slug="guides/mux" anchor="choose-a-playback-engine">Choose a playback engine</DocsLink> before you pick one, and test it with your own assets.
 
 ## Live streams
 
@@ -912,6 +912,8 @@ For DRM on either Mux media flavor, supply a license token. Video.js derives the
 DRM playback is always signed, so set both `source.drm.token` and `source.playback.token`. For content Mux does not license, add your own license servers to `source.drm`, keyed by key system. For each key system you configure, your server replaces the derived server.
 
 The SPF flavor supports FairPlay, Widevine, and PlayReady through its EME license pipeline. DRM availability still depends on the browser, key system, and asset configuration.
+
+<DocsLink slug="guides/mux">Play Mux videos</DocsLink> covers signed playback and the DRM token in full, and <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink> covers what each engine can license.
 
 ## Access the media and playback engine
 

@@ -2,8 +2,12 @@ import { Marked, type MarkedExtension, type Tokens } from 'marked';
 
 import { getLinkDestination } from '@/components/typography/linkDestination';
 import { shared } from '@/components/typography/styles';
+import type { SupportedFramework } from '@/types/docs';
 import { withMuxAttribution } from '@/utils/mux/attribution';
 import { twMerge } from '@/utils/twMerge';
+
+import { resolveDocsHref } from './routing';
+import { findGuideBySlug } from './sidebar';
 
 const classes = {
   p: 'mt-3 first:mt-0',
@@ -15,6 +19,31 @@ const classes = {
   em: shared.em,
   a: shared.a,
 } as const;
+
+/**
+ * A framework-agnostic link to a docs page, the form JSDoc uses because it can't know which framework renders it:
+ * `https://videojs.org/docs/guides/drm` or `/docs/guides/drm`, with an optional `#anchor`.
+ */
+const AGNOSTIC_DOCS_LINK = /^(?:https:\/\/videojs\.org)?\/docs\/((?:guides|reference)\/[\w/-]+?)\/?(#[\w-]+)?$/;
+
+let linkFramework: SupportedFramework | null = null;
+
+/**
+ * Point an agnostic docs link at the page being rendered's framework. Without one, the link keeps its agnostic path and
+ * carries `data-docs-slug`, which `ResolveDocsLinks` upgrades in the browser. Throws on a slug no page has, so a broken
+ * JSDoc link fails the build like a broken `<DocsLink>` does.
+ */
+function resolveAgnosticDocsLink(href: string): { href: string; slug?: string } {
+  const match = href.match(AGNOSTIC_DOCS_LINK);
+  if (!match) return { href };
+
+  const [, slug, hash = ''] = match;
+  if (!findGuideBySlug(slug!)) throw new Error(`No guide found with slug "${slug}" (linked as ${href})`);
+
+  if (linkFramework) return { href: resolveDocsHref({ slug: slug!, framework: linkFramework }) + hash };
+
+  return { href: `/docs/${slug}${hash}`, slug };
+}
 
 function escapeHtmlCarets(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -62,12 +91,14 @@ const renderer: MarkedExtension['renderer'] = {
   },
 
   link({ href, tokens }) {
-    const destination = getLinkDestination(href);
+    const docs = resolveAgnosticDocsLink(href);
+    const destination = getLinkDestination(docs.href);
     const destinationAttribute = destination ? ` data-ph-capture-attribute-destination="${destination}"` : '';
+    const slugAttribute = docs.slug ? ` data-docs-slug="${docs.slug}"` : '';
     // Inline Markdown renders reference and guide text, never blog posts.
-    const target = destination === 'mux' ? withMuxAttribution(href, 'docs-content') : href;
+    const target = destination === 'mux' ? withMuxAttribution(docs.href, 'docs-content') : docs.href;
 
-    return `<a href="${target}" class="${classes.a}"${destinationAttribute}>${this.parser.parseInline(tokens)}</a>`;
+    return `<a href="${target}" class="${classes.a}"${destinationAttribute}${slugAttribute}>${this.parser.parseInline(tokens)}</a>`;
   },
 
   // --- Unsupported elements — downgrade or suppress ---
@@ -138,9 +169,19 @@ function unwrapSingleParagraph(html: string): string {
   return trimmed;
 }
 
-export function renderInlineMarkdown(markdown: string, { highlight = false }: { highlight?: boolean } = {}): string {
-  const raw = (highlight ? highlightedMarked : marked).parse(markdown);
-  if (typeof raw !== 'string') return markdown;
+export function renderInlineMarkdown(
+  markdown: string,
+  { highlight = false, framework = null }: { highlight?: boolean; framework?: SupportedFramework | null } = {}
+): string {
+  // Parsing is synchronous, so the link renderer reads this framework for this call only.
+  linkFramework = framework;
 
-  return unwrapSingleParagraph(raw);
+  try {
+    const raw = (highlight ? highlightedMarked : marked).parse(markdown);
+    if (typeof raw !== 'string') return markdown;
+
+    return unwrapSingleParagraph(raw);
+  } finally {
+    linkFramework = null;
+  }
 }

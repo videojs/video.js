@@ -162,7 +162,7 @@ Use `src` and `contentType` when the receiver should load a different source tha
 
 ### Cast DRM-protected content
 
-The Default Media Receiver can't license DRM-protected content, because it has no way to receive a license server from the sender. Register and host your own receiver ([Google's guide](https://developers.google.com/cast/codelabs/cast-receiver)), then set `receiver` to its application ID and pass the license server in `customData`. Use the same shape as a source's <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">`drm`</DocsLink>, keyed by EME key system id. Cast devices license with Widevine, so that's the key system to pass:
+The Default Media Receiver can't license DRM-protected content, because it has no way to receive a license server from the sender. Register and host your own receiver ([Google's guide](https://developers.google.com/cast/codelabs/cast-receiver)), then set `receiver` to its application ID and pass the license server in `customData`. Use the same shape as a source's <DocsLink slug="guides/drm">`drm`</DocsLink>, keyed by EME key system id. Cast devices license with Widevine, so that's the key system to pass:
 
 <FrameworkCase frameworks={["react"]}>
 
@@ -261,4 +261,4 @@ For Google Cast, track the `promptRemotePlayback()` promise separately from `rem
 
 ## Related guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="reference/components/media">Media components</DocsLink>
