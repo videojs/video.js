@@ -667,6 +667,7 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     on('bufferstart', () => emit('waiting'));
     on('play', () => {
       this.#paused = false;
+      this.#ended = false;
       emit('play');
     });
     on('playing', () => {
@@ -678,8 +679,12 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
       this.#seeking = true;
       emit('seeking');
     });
-    on('seeked', () => {
+    on('seeked', ({ seconds, duration }) => {
       this.#seeking = false;
+
+      // Like a native media element, a seek back from the end leaves the ended state.
+      if (seconds < duration) this.#ended = false;
+
       emit('seeked');
     });
     on('pause', () => {

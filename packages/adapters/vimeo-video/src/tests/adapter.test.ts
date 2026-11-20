@@ -784,6 +784,24 @@ describe('VimeoAdapter', () => {
     expect(media.ended).toBe(true);
   });
 
+  it('clears ended when playback restarts or seeks back from the end', async () => {
+    const media = new VimeoAdapter();
+    const { player } = await attachAndLoad(media);
+
+    player.emit('ended', { seconds: 60, duration: 60, percent: 1 });
+    expect(media.ended).toBe(true);
+
+    player.emit('play', { seconds: 0, duration: 60, percent: 0 });
+    expect(media.ended).toBe(false);
+
+    player.emit('ended', { seconds: 60, duration: 60, percent: 1 });
+    player.emit('seeked', { seconds: 60, duration: 60, percent: 1 });
+    expect(media.ended).toBe(true);
+
+    player.emit('seeked', { seconds: 20, duration: 60, percent: 1 / 3 });
+    expect(media.ended).toBe(false);
+  });
+
   it('forwards play() and pause() to the player', async () => {
     const media = new VimeoAdapter();
     const { player } = await attachAndLoad(media);
