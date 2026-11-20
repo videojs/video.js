@@ -20,14 +20,9 @@ export interface SeekButtonProps extends UIComponentProps<'button', SeekButtonSt
  *   ```tsx
  *   <SeekButton seconds={-10} />
  *
- *   <SeekButton
- *   seconds={30}
- *   render={(props, state) => (
- *   <button {...props}>
- *   {state.direction === 'backward' ? <RewindIcon /> : <FastForwardIcon />}
- *   </button>
- *   )}
- *   />
+ *   <SeekButton seconds={30}>
+ *     <FastForwardIcon />
+ *   </SeekButton>
  *   ```;
  */
 export const SeekButton = createMediaButton<SeekButtonCore, SeekButtonProps>({
