@@ -332,9 +332,9 @@ const MEDIA_MAP = {
     fixedSource: WISTIA_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
   },
-  // A composition rather than a stream, so it plays the one file the sandbox serves. The inline-markup paths, a
-  // `<template>` child and JSX children with a timeline, have their own pages: `/hyperframes-video-html/` and
-  // `/hyperframes-video-react/`.
+  // A composition rather than a stream, so it plays the one composition document the sandbox serves. Inline
+  // compositions, a `<template>` child and JSX children with a timeline, have their own pages:
+  // `/hyperframes-inline-composition-html/` and `/hyperframes-inline-composition-react/`.
   'hyperframes-video': {
     label: 'HyperFrames Video',
     player: 'video',

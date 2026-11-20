@@ -2,7 +2,7 @@ import { MediaError } from '@videojs/media';
 import { afterEach, describe, expect, it, type Mock, vi } from 'vite-plus/test';
 
 import { HyperFramesAdapter, type HyperFramesSource, type HyperFramesTimeline } from '..';
-import { DEFAULT_RUNTIME_SRC } from '../source';
+import { DEFAULT_RUNTIME_INTEGRITY, DEFAULT_RUNTIME_SRC } from '../source';
 
 const MEDIA_EVENTS = [
   'emptied',
@@ -168,9 +168,11 @@ describe('HyperFramesAdapter', () => {
       // The runtime drives the timeline from its own clock.
       expect(timeline.pause).toHaveBeenCalled();
       expect((frameOf(iframe) as Window & { __timelines: object }).__timelines).toEqual({ intro: timeline });
-      expect([...doc.head.querySelectorAll('script[src]')].map((script) => script.getAttribute('src'))).toEqual([
-        DEFAULT_RUNTIME_SRC,
-      ]);
+      const scripts = [...doc.head.querySelectorAll<HTMLScriptElement>('script[src]')];
+
+      expect(scripts.map((script) => script.getAttribute('src'))).toEqual([DEFAULT_RUNTIME_SRC]);
+      expect(scripts[0]!.integrity).toBe(DEFAULT_RUNTIME_INTEGRITY);
+      expect(scripts[0]!.crossOrigin).toBe('anonymous');
     });
 
     it('mounts through a function and waits for it before building the timeline', async () => {
@@ -288,8 +290,9 @@ describe('HyperFramesAdapter', () => {
       await flush();
 
       expect(iframe.getAttribute('sandbox')).toBe('allow-scripts');
-      expect(iframe.srcdoc).toMatch(
-        new RegExp(`<head><base href="[^"]+" /><script src="${DEFAULT_RUNTIME_SRC}"></script>`)
+      expect(iframe.srcdoc).toMatch(/<head><base href="[^"]+" \/><script /);
+      expect(iframe.srcdoc).toContain(
+        `<script src="${DEFAULT_RUNTIME_SRC}" integrity="${DEFAULT_RUNTIME_INTEGRITY}" crossorigin="anonymous"></script>`
       );
     });
 
@@ -306,9 +309,40 @@ describe('HyperFramesAdapter', () => {
       await flush();
       await vi.waitFor(() => expect(iframe.srcdoc).not.toBe(''));
 
-      expect(fetch).toHaveBeenCalledWith('https://example.com/intro/index.html');
+      expect(fetch).toHaveBeenCalledWith(
+        'https://example.com/intro/index.html',
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      );
       expect(iframe.srcdoc).toContain('<base href="https://example.com/intro/index.html" />');
       expect(media.src).toBe('https://example.com/intro/index.html');
+    });
+
+    it('cancels the fetch of a src replaced before it loads, without failing', async () => {
+      let fetchSignal: AbortSignal | undefined;
+
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((_url: string, init?: RequestInit) => {
+          fetchSignal = init?.signal ?? undefined;
+          return new Promise<Response>((_resolve, reject) => {
+            fetchSignal?.addEventListener('abort', () => reject(fetchSignal?.reason));
+          });
+        })
+      );
+
+      const iframe = createFrame();
+      const media = new HyperFramesAdapter();
+
+      media.src = 'https://example.com/slow.html';
+      media.attach(iframe);
+      await vi.waitFor(() => expect(fetchSignal).toBeDefined());
+
+      media.source = { content: '<p>next</p>' };
+      await flush();
+
+      expect(fetchSignal?.aborted).toBe(true);
+      expect(media.error).toBe(null);
+      expect(iframe.srcdoc).toContain('<p>next</p>');
     });
 
     it('fails a src that does not load', async () => {
@@ -576,6 +610,20 @@ describe('HyperFramesAdapter', () => {
       expect(controls.actions().filter((action) => action !== 'tick')).toEqual(['seek', 'play']);
       expect(events).toEqual(['seeking', 'seeked']);
       expect([media.paused, media.ended]).toEqual([false, false]);
+    });
+
+    it('loops a paused seek to the end back to the start, still paused', async () => {
+      const { iframe, media, controls } = await createReadyMedia();
+
+      media.loop = true;
+      media.currentTime = 8;
+      reportState(iframe, 8, { ended: true });
+      reportState(iframe, 8, { ended: true });
+      reportState(iframe, 0);
+
+      expect(controls.named('seek').map((control) => control.timeSeconds)).toEqual([8, 0]);
+      expect(controls.named('play')).toHaveLength(0);
+      expect([media.paused, media.ended, media.currentTime]).toEqual([true, false, 0]);
     });
   });
 

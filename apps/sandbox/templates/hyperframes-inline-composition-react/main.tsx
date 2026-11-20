@@ -3,7 +3,7 @@ import { HyperFramesVideo } from '@videojs/react/media/hyperframes-video';
 
 import '@videojs/react/video/skin.css';
 // HyperFrames composition sandbox — React
-// http://localhost:5173/hyperframes-video-react/
+// http://localhost:5173/hyperframes-inline-composition-react/
 //
 // The composition is the JSX children: clips timed with `data-start`/`data-duration`, rendered into the composition
 // frame through a portal and animated by a GSAP timeline built from the composition root.

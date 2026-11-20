@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
   buildCompositionDocument,
   buildInlineDocument,
+  DEFAULT_RUNTIME_INTEGRITY,
+  DEFAULT_RUNTIME_SRC,
   getMountContainer,
+  getRuntimeIntegrity,
   getSourceSrc,
   isSameSource,
   resolveCompositionRoot,
@@ -109,5 +112,12 @@ describe('resolveCompositionRoot', () => {
     expect(root.getAttribute('data-composition-id')).toBe('mine');
     expect(container.hasAttribute('data-composition-id')).toBe(false);
     expect([container.style.width, container.style.height]).toEqual(['640px', '360px']);
+  });
+});
+
+describe('getRuntimeIntegrity', () => {
+  it('pins the default runtime build and leaves a page-chosen runtime unchecked', () => {
+    expect(getRuntimeIntegrity(DEFAULT_RUNTIME_SRC)).toBe(DEFAULT_RUNTIME_INTEGRITY);
+    expect(getRuntimeIntegrity(RUNTIME)).toBe(null);
   });
 });

@@ -2,20 +2,32 @@ import { isFunction } from '@videojs/utils/predicate';
 import { escapeHtml } from '@videojs/utils/string';
 
 /**
- * A seekable timeline the HyperFrames runtime can drive. GSAP's `gsap.timeline()` is one; the runtime pauses it and
- * seeks it to the playhead on every frame, so it never plays on its own clock.
+ * A seekable animation timeline the HyperFrames runtime drives. HyperFrames animates compositions with
+ * [GSAP](https://gsap.com/docs/v3/GSAP/Timelines/), and a `gsap.timeline()` satisfies this interface as is; any object
+ * with the same three methods works. The runtime pauses the timeline and seeks it to the playhead on every frame, so it
+ * never plays on its own clock, and its `duration()` is the composition's duration. See [GSAP animation in
+ * HyperFrames](https://hyperframes.heygen.com/guides/gsap-animation).
  *
  * @internal
  */
 export interface HyperFramesTimeline {
+  /** Length of the animation in seconds. */
   duration(): number;
+  /** Move the animation to `time` seconds. */
   seek(time: number, suppressEvents?: boolean): unknown;
+  /** Stop the animation advancing on its own. */
   pause(): unknown;
 }
 
 /**
  * Builds the timeline once the markup is in the composition document. `root` is the composition root, so selectors
  * scoped to it (`root.querySelector('.title')`) only ever reach this composition.
+ *
+ * @example
+ *   ```ts
+ *   const timeline: HyperFramesTimelineFactory = (root) =>
+ *     gsap.timeline().from(root.querySelector('.title'), { opacity: 0, y: 40, duration: 1 });
+ *   ```;
  *
  * @internal
  */
@@ -36,18 +48,8 @@ export type HyperFramesMount = (root: HTMLElement) => void | Promise<void>;
  */
 export type HyperFramesContent = string | HTMLTemplateElement | HyperFramesMount;
 
-/**
- * What plays: a HyperFrames composition, written inline or loaded as a document. Exactly one of `content`, `html`, and
- * `src` names it; when more than one is set, they are read in that order.
- *
- * - `content` is markup the page owns. It plays in a same-origin frame, so `timeline` can build its animation from the
- *   page's own GSAP.
- * - `html` and `src` are whole composition documents with their own scripts. They play in an opaque frame, which keeps
- *   their scripts away from the page, so they register their own timelines the way HyperFrames compositions do.
- *
- * @internal
- */
-export interface HyperFramesSource {
+/** @internal */
+export interface HyperFramesSourceBase {
   /**
    * Names the composition. It is what `src` and `currentSrc` report for inline content (`hyperframes:<id>`), and the
    * `data-composition-id` the composition root takes when its markup does not set one. A source with a new `id` is a
@@ -55,19 +57,49 @@ export interface HyperFramesSource {
    * Defaults to `main`.
    */
   id?: string;
-  /** Inline markup for the composition. */
-  content?: HyperFramesContent;
-  /** Builds the composition's timeline from its root. Only read for `content`. */
-  timeline?: HyperFramesTimelineFactory;
-  /** A whole composition document. */
-  html?: string;
-  /** URL of a composition document. It is fetched, so a cross-origin one needs CORS. */
-  src?: string;
   /** Composition width in pixels, when the markup does not declare `data-width`. Defaults to 1920. */
   width?: number;
   /** Composition height in pixels, when the markup does not declare `data-height`. Defaults to 1080. */
   height?: number;
 }
+
+/**
+ * Markup the page owns. It plays in a same-origin frame, so `timeline` can build its animation from the page's own
+ * GSAP.
+ *
+ * @internal
+ */
+export interface HyperFramesInlineSource extends HyperFramesSourceBase {
+  /** Inline markup for the composition. */
+  content: HyperFramesContent;
+  /** Builds the composition's timeline from its root. */
+  timeline?: HyperFramesTimelineFactory | undefined;
+  html?: never;
+  src?: never;
+}
+
+/**
+ * A whole composition document with its own scripts, given as `html` or fetched from `src`. It plays in an opaque
+ * frame, which keeps its scripts away from the page, so it registers its own timeline the way HyperFrames compositions
+ * do. With both set, `html` is played and `src` is the URL its relative URLs resolve against.
+ *
+ * @internal
+ */
+export interface HyperFramesDocumentSource extends HyperFramesSourceBase {
+  /** A whole composition document. */
+  html?: string;
+  /** URL of a composition document. It is fetched, so a cross-origin one needs CORS. */
+  src?: string;
+  content?: never;
+  timeline?: never;
+}
+
+/**
+ * What plays: a HyperFrames composition, written inline or loaded as a document.
+ *
+ * @internal
+ */
+export type HyperFramesSource = HyperFramesInlineSource | HyperFramesDocumentSource;
 
 /** @internal */
 export type HyperFramesSourceKind = 'inline' | 'document';
@@ -88,6 +120,24 @@ export const DEFAULT_COMPOSITION_HEIGHT = 1080;
  */
 export const DEFAULT_RUNTIME_SRC =
   'https://cdn.jsdelivr.net/npm/@hyperframes/core@0.9.17/dist/hyperframe.runtime.iife.js';
+
+/**
+ * Subresource integrity of `DEFAULT_RUNTIME_SRC`, so a CDN serving anything other than the pinned build is refused.
+ * Update it with the version: `curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A`.
+ *
+ * @internal
+ */
+export const DEFAULT_RUNTIME_INTEGRITY = 'sha384-olUEqFPokiLvFDblRAb9k6r7Cqj4P55jAaFErnlhPFU8LjAZm+9DpLREdu2lj0P+';
+
+/**
+ * The integrity the runtime script is loaded with: the pinned hash for the default build, and none for a runtime the
+ * page chose, whose contents the adapter cannot know.
+ *
+ * @internal
+ */
+export function getRuntimeIntegrity(runtimeSrc: string): string | null {
+  return runtimeSrc === DEFAULT_RUNTIME_SRC ? DEFAULT_RUNTIME_INTEGRITY : null;
+}
 
 /** @internal */
 export function getSourceKind(source: HyperFramesSource): HyperFramesSourceKind | null {
@@ -210,9 +260,11 @@ export function buildCompositionDocument(html: string, runtimeSrc: string, baseU
   const head = /<head(?:\s[^>]*)?>/i.exec(html);
   const hasBase = /<base\s/i.test(html);
   const hasRuntime = /hyperframe\.runtime\.iife\.js|__hyperframes\s*=/.test(html);
+  const integrity = getRuntimeIntegrity(runtimeSrc);
+  const integrityAttrs = integrity ? ` integrity="${integrity}" crossorigin="anonymous"` : '';
   const injected =
     (hasBase ? '' : `<base href="${escapeHtml(baseUrl)}" />`) +
-    (hasRuntime ? '' : `<script src="${escapeHtml(runtimeSrc)}"></script>`);
+    (hasRuntime ? '' : `<script src="${escapeHtml(runtimeSrc)}"${integrityAttrs}></script>`);
   if (!injected) return html;
 
   if (head) return html.slice(0, head.index + head[0].length) + injected + html.slice(head.index + head[0].length);

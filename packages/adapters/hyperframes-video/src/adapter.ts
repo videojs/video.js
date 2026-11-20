@@ -25,6 +25,7 @@ import {
   DEFAULT_COMPOSITION_WIDTH,
   DEFAULT_RUNTIME_SRC,
   getMountContainer,
+  getRuntimeIntegrity,
   getSourceKind,
   getSourceSrc,
   type HyperFramesSource,
@@ -59,14 +60,15 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   static readonly engineName: string = 'hyperframes';
 
   #target: HTMLIFrameElement | null = null;
-  // Cancels the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
-  #listeners: AbortController | null = null;
+  // Removes the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
+  #disconnect: AbortController | null = null;
   #resizeObserver: ResizeObserver | null = null;
   #loadComplete = createPublicPromise<void>();
-  // Identifies the current load; anything a replaced load still has in flight checks it and stands down.
-  #loadId = 0;
-  // The inline load waiting on its frame's `load` to mount its markup and inject the runtime.
-  #pendingInline: number | null = null;
+  // Aborted once the current load is replaced or the frame detached: its fetch is cancelled, and anything else it still
+  // has in flight checks the signal and stands down.
+  #loadAbort: AbortController | null = null;
+  // The signal of the inline load waiting on its frame's `load` to mount its markup and inject the runtime.
+  #pendingInline: AbortSignal | null = null;
   #loadTimeout: ReturnType<typeof setTimeout> | undefined;
   #tickFrame: number | undefined;
 
@@ -137,10 +139,11 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (!target) return;
 
     this.#post('pause');
-    this.#loadId++;
+    this.#loadAbort?.abort();
+    this.#loadAbort = null;
     this.#pendingInline = null;
-    this.#listeners?.abort();
-    this.#listeners = null;
+    this.#disconnect?.abort();
+    this.#disconnect = null;
     this.#resizeObserver?.disconnect();
     this.#resizeObserver = null;
     this.#target = null;
@@ -205,7 +208,10 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     const target = this.#target;
     if (!target) return;
 
-    const loadId = ++this.#loadId;
+    this.#loadAbort?.abort();
+    this.#loadAbort = new AbortController();
+
+    const { signal } = this.#loadAbort;
     const hadMedia = this.#readyState > READY_STATE_HAVE_NOTHING || !!this.#error;
 
     this.#loadComplete.resolve();
@@ -220,7 +226,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     // Wait a microtask so a framework's prop writes all land before the frame is written, once.
     await Promise.resolve();
 
-    if (loadId !== this.#loadId || this.#target !== target) return;
+    if (signal.aborted) return;
 
     const source = this.#source;
     const kind = source && getSourceKind(source);
@@ -237,7 +243,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     target.style.visibility = 'hidden';
     this.#fitFrame();
     this.#loadTimeout = setTimeout(() => {
-      if (loadId === this.#loadId && this.#readyState === READY_STATE_HAVE_NOTHING) {
+      if (!signal.aborted && this.#readyState === READY_STATE_HAVE_NOTHING) {
         this.#fail(
           new MediaError('The HyperFrames composition did not report a timeline.', MEDIA_ERR_SRC_NOT_SUPPORTED)
         );
@@ -250,7 +256,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
       // Same origin, so the markup can be mounted from here and its timeline built from the page's GSAP.
       target.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-      this.#pendingInline = loadId;
+      this.#pendingInline = signal;
       target.srcdoc = buildInlineDocument(markup, globalThis.document?.baseURI ?? '');
       return;
     }
@@ -260,12 +266,12 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     if (!html) {
       try {
-        const response = await fetch(baseUrl);
+        const response = await fetch(baseUrl, { signal });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         html = await response.text();
       } catch (error) {
-        if (loadId === this.#loadId) {
+        if (!signal.aborted) {
           this.#fail(
             new MediaError(`Could not load the HyperFrames composition at ${baseUrl}: ${error}`, MEDIA_ERR_NETWORK)
           );
@@ -274,7 +280,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
         return;
       }
 
-      if (loadId !== this.#loadId || this.#target !== target) return;
+      if (signal.aborted) return;
     }
 
     // Opaque: a composition document brings its own scripts, which must not reach the page.
@@ -488,9 +494,9 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     const win = globalThis.window;
     if (!win) return;
 
-    this.#listeners = new AbortController();
+    this.#disconnect = new AbortController();
 
-    const { signal } = this.#listeners;
+    const { signal } = this.#disconnect;
 
     win.addEventListener('message', (event) => this.#onMessage(event, target), { signal });
     target.addEventListener('load', () => this.#onFrameLoad(target), { signal });
@@ -507,11 +513,11 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   // An inline composition's document has loaded: mount the markup, register the timeline, then bring in the runtime,
   // which binds what it finds.
   async #onFrameLoad(target: HTMLIFrameElement) {
-    const loadId = this.#pendingInline;
+    const signal = this.#pendingInline;
     // Read now rather than when the load began: an update to the same composition (a timeline set after the markup was
     // parsed, a re-render's mount function) is not a new load, and the latest one is what gets built.
     const source = this.#source;
-    if (loadId === null || loadId !== this.#loadId || !source) return;
+    if (!signal || signal.aborted || !source) return;
 
     const doc = target.contentDocument;
     const win = target.contentWindow as (Window & { __timelines?: Record<string, unknown> }) | null;
@@ -524,7 +530,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     try {
       if (isFunction(source.content)) await source.content(container);
 
-      if (loadId !== this.#loadId) return;
+      if (signal.aborted) return;
 
       const root = resolveCompositionRoot(container, source);
 
@@ -537,7 +543,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
         win.__timelines[root.getAttribute('data-composition-id')!] = timeline;
       }
     } catch (error) {
-      if (loadId === this.#loadId) {
+      if (!signal.aborted) {
         this.#fail(
           new MediaError(`The HyperFrames composition could not be built: ${error}`, MediaError.MEDIA_ERR_CUSTOM, true)
         );
@@ -550,9 +556,16 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     const script = doc.createElement('script');
 
+    const integrity = getRuntimeIntegrity(this.#runtimeSrc);
+
+    if (integrity) {
+      script.integrity = integrity;
+      script.crossOrigin = 'anonymous';
+    }
+
     script.src = this.#runtimeSrc;
     script.addEventListener('error', () => {
-      if (loadId === this.#loadId) {
+      if (!signal.aborted) {
         this.#fail(new MediaError(`The HyperFrames runtime failed to load from ${script.src}.`, MEDIA_ERR_NETWORK));
       }
     });
@@ -684,10 +697,10 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #onEnded() {
     this.#awaitingPlay = false;
 
-    // A looping media element never ends: the composition goes back to the start and plays again.
+    // A looping media element never ends: the composition goes back to the start, and plays on only if it was playing.
+    // `#seek` resumes when not paused, so a paused seek to the end stays paused at the start.
     if (this.#loop) {
       this.#seek(0);
-      this.#resumeAfterSeek = true;
       return;
     }
 
@@ -697,6 +710,8 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('ended'));
   }
 
+  // Callers settle the end first: `play()` rewinds an ended composition, and a seek that lands at the end ends there
+  // rather than playing on, which would have the runtime start over on its own.
   #startPlayback() {
     this.#awaitingPlay = true;
     this.#post('play');

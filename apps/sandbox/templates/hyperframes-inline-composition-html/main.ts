@@ -1,6 +1,6 @@
 import '@app/styles.css';
 // HyperFrames composition sandbox — HTML
-// http://localhost:5173/hyperframes-video-html/
+// http://localhost:5173/hyperframes-inline-composition-html/
 //
 // The composition is the `<template>` child: clips timed with `data-start`/`data-duration`, animated by a GSAP
 // timeline the page builds from the composition root.
