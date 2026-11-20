@@ -145,7 +145,7 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
    *
    * The same object is handed back until something in it changes, and `contentdatachange` announces it when it does.
    * Nothing here is applied for you, apart from the thumbnail track `<mux-video>` adds from `storyboard` (and drops for
-   * live streams). See [Play Mux videos](https://videojs.org/docs/guides/mux#choose-the-poster-and-storyboard).
+   * live streams). See [Play Mux videos](https://videojs.org/docs/guides/mux#choose-the-poster-frame).
    */
   get contentData(): MuxContentData {
     return this.#contentData;

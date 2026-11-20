@@ -114,8 +114,7 @@ class NativeHlsAdapterCore extends HTMLVideoAdapter implements Omit<NativeHlsAda
    * emits its own `sourcechange` and forwards the native playback events.
    *
    * `engine.nativeHls.drmSystems` names FairPlay license servers; see [Play DRM-protected
-   * content](https://videojs.org/docs/guides/drm). [Media sources](https://videojs.org/docs/guides/media-sources)
-   * explains how `src` and `source` relate.
+   * content](https://videojs.org/docs/guides/drm).
    */
   get source(): NativeHlsSource | null {
     return this.#source;

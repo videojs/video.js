@@ -31,7 +31,7 @@ import basicUsageHtml from "@/components/docs/demos/video/html/css/BasicUsage.ht
 import basicUsageHtmlCss from "@/components/docs/demos/video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/video/html/css/BasicUsage.ts?raw";
 
-The browser's native `<video>` as a Video.js media component. Video.js doesn't replace the native API: set `src` or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates, add [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) for captions, and listen for native media events. It plays what the browser plays on its own. For HLS in every browser, DASH, Mux, or an embedded provider, use a streaming media component instead; see <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+The browser's native `<video>` as a Video.js media component. It keeps the native API: `src`, child [`<source>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) and [`<track>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) elements, and native media events. It plays what the browser plays on its own. <DocsLink slug="reference/components/media">Media components</DocsLink> lists the components for streaming formats and hosting providers.
 
 <FrameworkCase frameworks={["react"]}>
 `Video` forwards native attributes, event handlers, and children to the underlying `<video>`, and becomes the media of the player it's placed in.
@@ -59,6 +59,12 @@ import '@videojs/html/video/player';
 ```
 </FrameworkCase>
 
+## Guides
+
+- <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>
+- <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>
+- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
+
 ## Anatomy
 
 <FrameworkCase frameworks={["react"]}>
@@ -79,12 +85,15 @@ import '@videojs/html/video/player';
 ```
 </FrameworkCase>
 
-## Guides
+<FrameworkCase frameworks={["react"]}>
+Inside a `VideoPlayer`, or another Video.js `Player` configured for video, `Video` becomes the player's media. Outside a player, it's a standalone native `<video>`.
+</FrameworkCase>
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
-- <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>
-- <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>
-- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
+<FrameworkCase frameworks={["html"]}>
+Inside `<video-player>`, a native `<video>` becomes the player's media.
+</FrameworkCase>
+
+`<track>` elements carry captions, subtitles, chapters, descriptions, or metadata.
 
 ## Examples
 

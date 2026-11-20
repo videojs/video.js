@@ -20,7 +20,7 @@ import basicUsageHtml from '@/components/docs/demos/quality-radio-group/html/css
 import basicUsageHtmlCss from '@/components/docs/demos/quality-radio-group/html/css/BasicUsage.css?raw';
 import basicUsageHtmlTs from '@/components/docs/demos/quality-radio-group/html/css/BasicUsage.ts?raw';
 
-Quality selection applies to streaming sources. A progressive MP4 plays at one fixed quality and exposes no renditions; HLS and DASH streams offer several. See <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+Quality selection applies to streaming sources. A progressive MP4 plays at one fixed quality and exposes no renditions; HLS and DASH streams offer several. See <DocsLink slug="reference/components/media">Media components</DocsLink>.
 
 <CustomUiNote />
 
@@ -103,7 +103,7 @@ If you don't want to expose manual selection, do nothing: adaptive selection is 
 
 ### Pin quality programmatically
 
-Call `selectVideoRendition` to hold one rendition until the user selects "Auto". To limit resolution while keeping automatic switching, set `maxAutoResolution` on the source. It needs the hls.js engine; native HLS playback ignores it. See <DocsLink slug="guides/media-sources" anchor="options-videojs-normalizes">Options Video.js normalizes</DocsLink>.
+Call `selectVideoRendition` to hold one rendition until the user selects "Auto". To limit resolution while keeping automatic switching, set `maxAutoResolution` on the source. It needs the hls.js engine; native HLS playback ignores it. See the `source` row of the <DocsLink slug="reference/components/hlsjs-video" anchor="api-reference">HlsJsVideo reference</DocsLink>.
 
 <FrameworkCase frameworks={["react"]}>
 
@@ -219,4 +219,4 @@ The pinned rendition exceeds available bandwidth. Selecting "Auto" lets the engi
 
 ## Related guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/hls">Play HLS streams</DocsLink>

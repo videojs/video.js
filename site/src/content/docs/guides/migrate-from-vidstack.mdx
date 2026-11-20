@@ -50,7 +50,7 @@ Video.js 10 splits those jobs:
 
 **The player** holds state and hands it to everything inside it. It draws nothing and takes no layout. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from.
 
-**The media** plays the video. This is where Vidstack's *provider* went, except you choose it yourself: a plain `<video>` for progressive files, or a <DocsLink slug="guides/media-sources">media component</DocsLink> for HLS, DASH, YouTube, Vimeo, and Mux. There's no `<media-provider>`; the media component sits inside the skin.
+**The media** plays the video. This is where Vidstack's *provider* went, except you choose it yourself: a plain `<video>` for progressive files, or a <DocsLink slug="reference/components/media">media component</DocsLink> for HLS, DASH, YouTube, Vimeo, and Mux. There's no `<media-provider>`; the media component sits inside the skin.
 
 **The skin** is the UI, and it's where Vidstack's *layout* went. Every skin renders a container, the box that sizes the player, goes fullscreen, and receives gestures and hotkeys.
 
@@ -415,7 +415,7 @@ media.source = { src: '/stream.m3u8', engine: { hlsJs: { maxBufferLength: 60 } }
 `source` is a property only; there's no `source` attribute.
 </FrameworkCase>
 
-`source` is replaced, not merged. Changing hls.js options rebuilds the engine; dash.js and Shaka apply new settings to the running one. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for the options every engine shares, such as `preferPlayback`, rendition caps, and DRM.
+`source` is replaced, not merged. Changing hls.js options rebuilds the engine; dash.js and Shaka apply new settings to the running one. Each media component's reference lists the `source` options it reads, such as `preferPlayback`, rendition caps, and DRM.
 
 <FrameworkCase frameworks={["react"]}>
 Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Outside the player, pass `mediaRef` to `HlsJsVideo` instead: it receives the same `HlsJsAdapter`, so `mediaRef.current?.engine` is already typed as the hls.js instance. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
@@ -1414,6 +1414,6 @@ Ordered roughly by how likely each is to block a Vidstack migration. Follow [Vid
 
 - <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink>
 - <DocsLink slug="guides/features">Features</DocsLink> and <DocsLink slug="guides/presets">Presets</DocsLink>
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="reference/components/media">Media components</DocsLink>
 - <DocsLink slug="guides/skins">Skins</DocsLink> and <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>
 - <DocsLink slug="guides/migrate-from-plyr">Migrate from Plyr</DocsLink>

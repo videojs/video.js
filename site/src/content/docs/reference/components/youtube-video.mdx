@@ -84,7 +84,7 @@ A few things work differently from a native `<video>` element, because the IFram
 
 <MediaReference media="YouTubeVideo">
   <Fragment slot="engine-youtube">
-    Pass [YouTube player parameters](https://developers.google.com/youtube/player_parameters) under `source.engine.youtube`, spelled exactly as YouTube spells them. They're serialized onto the embed URL untouched, and the embed reads them once, when its URL is built. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+    Pass [YouTube player parameters](https://developers.google.com/youtube/player_parameters) under `source.engine.youtube`, spelled exactly as YouTube spells them. They're serialized onto the embed URL untouched, and the embed reads them once, when its URL is built.
 
     `autoplay`, `controls`, and `playsinline` come from the props of the same name, so they have no `engine.youtube` spelling. Parameters YouTube has deprecated are absent as well: `modestbranding`, `showinfo`, `autohide`, `theme`, and `listType: 'search'`. Anything YouTube adds next passes through the same way.
 

@@ -62,7 +62,7 @@ Each entry names one key system:
 
 Each entry takes a `licenseUrl`, where the browser's content decryption module (CDM) POSTs its license request. FairPlay also needs `serverCertificateUrl`, the DRM server (application) certificate, unless its CDM is pre-provisioned. Widevine and PlayReady ignore it.
 
-The browser decides which key system it uses, which is why you name all of them. `drm` sits on `source` rather than inside an engine's options because which engine plays the manifest can be decided later, and every engine reads it. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for how `source` fits together.
+The browser decides which key system it uses, which is why you name all of them. `drm` sits on `source` rather than inside an engine's options because which engine plays the manifest can be decided later, and every engine reads it.
 
 ## Availability and constraints
 
@@ -170,5 +170,5 @@ Most license servers authenticate the request. A `licenseUrl` can carry a token 
 ## Related guides
 
 - <DocsLink slug="guides/mux">Play Mux videos</DocsLink>
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/hls">Play HLS streams</DocsLink>
 - <DocsLink slug="guides/playback-errors">Playback errors</DocsLink>

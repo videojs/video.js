@@ -448,8 +448,6 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * can be handed to both flavors — and because Mux encrypts video renditions and leaves audio clear, so a protected
      * playback ID plays here regardless.
      *
-     * [Media sources](https://videojs.org/docs/guides/media-sources) explains how `src` and `source` relate.
-     *
      * @fires sourcechange - Fired when `source` changes. Read `source` for the new value.
      */
     get source(): HlsVideoSource | null {

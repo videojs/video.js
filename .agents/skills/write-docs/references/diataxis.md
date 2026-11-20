@@ -13,6 +13,10 @@ The compass (action vs. cognition, study vs. work) also works at the sentence an
 - Reference page: no instruction, persuasion, or opinion. Describe the machinery; do not walk the reader through tasks or argue for approaches. Link how-to guides for tasks and concept pages for rationale.
 - Tutorial: we deliberately publish none yet. If we add true tutorials later: no alternatives and minimal explanation, and the writer carries the lesson — every step must work, produce a visible result quickly, and lead to the next.
 
+## Provider and format guides
+
+Guides for a hosting provider or stream format (Play Mux videos, Play HLS streams) admit a section only when its steps exist because of that provider or format. A non-Mux reader following the same steps means the content belongs in a shared guide, linked in one line. Shared guides link back to a provider guide at most once and never repeat its steps. Write provider guides video-first; audio differences go in the audio component's reference rows. Anything a provider derives (URLs, token audiences) is description, so it lives in the component's reference rows, not the guide.
+
 ## The language of each type
 
 Each mode has characteristic sentence forms. When your sentences read like a different mode, the content is probably in the wrong place.

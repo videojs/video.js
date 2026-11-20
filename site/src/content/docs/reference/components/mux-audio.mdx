@@ -4,13 +4,13 @@ frameworkTitle:
   html: mux-audio
 description: Audio element for Mux-hosted HLS streams
 movedAnchors:
-  load-a-source: guides/mux#how-it-works
+  load-a-source: guides/mux#play-a-playback-id
   signed-playback: guides/mux#play-signed-assets
-  analytics-and-casting: guides/mux#monitor-playback-with-mux-data
+  analytics-and-casting: guides/mux-data
   choose-a-playback-engine: guides/mux#choose-a-playback-engine
-  when-to-use-spf: guides/mux#when-to-use-spf
-  when-to-use-hlsjs: guides/mux#when-to-use-hlsjs
-  spf-limitations-in-detail: guides/mux#spf-limitations-in-detail
+  when-to-use-spf: guides/mux#choose-a-playback-engine
+  when-to-use-hlsjs: guides/mux#choose-a-playback-engine
+  spf-limitations-in-detail: guides/mux#choose-a-playback-engine
 ---
 
 import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
@@ -31,37 +31,19 @@ import basicUsageHtml from "@/components/docs/demos/mux-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-audio/html/css/BasicUsage.ts?raw";
 
-Audio component for Mux-hosted streams. Give it a playback ID and it builds the stream URL, and it plays signed assets from their tokens. It plays through SPF, Video.js's own engine, or through hls.js like the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink>, depending on which entry point you import. For video, use the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink>. Start with <DocsLink slug="guides/mux">Play Mux videos</DocsLink> for playback IDs and signed playback, then add <DocsLink slug="guides/mux-data">Mux Data</DocsLink> to monitor playback.
+Audio component for Mux-hosted streams. From a playback ID it derives the stream URL, and it plays signed assets from their tokens. It plays through SPF, Video.js's own engine, or through hls.js, depending on the import path. The <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> plays video.
 
 ## Import
 
 <MediaImports media="mux-audio" package="@videojs/mux-audio" react="MuxAudio" />
 
-The Mux audio component plays through one of two engines, chosen by import path: SPF, Video.js's own engine, or hls.js. The default import uses hls.js today and will switch to SPF in an upcoming release.
-
-| Import | Engine |
-|---|---|
-| `.../media/mux-audio/spf` | SPF |
-| `.../media/mux-audio` | hls.js today, SPF in an upcoming release |
-| `.../media/mux-audio/hls-js` | hls.js |
-
 <FrameworkCase frameworks={["react"]}>
-```tsx
-import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
-```
-
-All three imports give you a `MuxAudio` component with the same basic API.
+The import path picks the engine: `.../media/mux-audio/spf` plays through SPF, `.../media/mux-audio/hls-js` through hls.js, and `.../media/mux-audio` through hls.js today and SPF in an upcoming release. All three export the same `MuxAudio` component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-```ts
-import '@videojs/html/media/mux-audio/spf';
-```
-
-All three imports register the same `<mux-audio>` tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
+The import path picks the engine: `.../media/mux-audio/spf` plays through SPF, `.../media/mux-audio/hls-js` through hls.js, and `.../media/mux-audio` through hls.js today and SPF in an upcoming release. All three register the same `<mux-audio>` tag, and the first one loaded claims it.
 </FrameworkCase>
-
-<DocsLink slug="guides/mux" anchor="choose-a-playback-engine">Play Mux videos</DocsLink> covers when to use each engine.
 
 ## Guides
 
@@ -69,6 +51,7 @@ All three imports register the same `<mux-audio>` tag with the same basic API. L
 - <DocsLink slug="guides/mux" anchor="play-signed-assets">Play signed assets</DocsLink>
 - <DocsLink slug="guides/mux" anchor="use-a-custom-domain">Use a custom domain</DocsLink>
 - <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>
+- <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>
 - <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
 ## Examples

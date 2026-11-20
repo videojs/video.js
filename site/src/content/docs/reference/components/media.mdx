@@ -1,0 +1,147 @@
+---
+title: Media components
+description: Every media component, what it plays, and the engine it plays through
+movedAnchors:
+  where-source-options-belong: reference/components/hlsjs-video#api-reference
+  src-and-source-stay-in-sync: reference/components/hlsjs-video#api-reference
+  assigning-source-replaces-it: reference/components/hlsjs-video#api-reference
+  equivalent-sources-cost-nothing: reference/components/hlsjs-video#api-reference
+  engine-options: reference/components/hlsjs-video#api-reference
+  options-videojs-normalizes: reference/components/hlsjs-video#api-reference
+  capping-to-the-players-size: reference/components/hlsjs-video#api-reference
+  four-things-that-sound-alike: reference/components/hlsjs-video#api-reference
+  drm-protected-sources: guides/drm
+  what-each-path-can-license: guides/drm#availability-and-constraints
+  licensing-one-engine-differently: guides/drm#license-one-engine-differently
+  mux-sources-name-a-playback-id: guides/mux
+  mux-signs-drm-with-a-token: guides/mux#play-drm-protected-assets
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+A media component plays the content inside a player. Each one plays a format or a provider through one engine.
+
+## Files the browser plays
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/video">Video</DocsLink> | Any file the browser plays, such as MP4 and WebM, and HLS in browsers with built-in HLS | The browser |
+| <DocsLink slug="reference/components/audio">Audio</DocsLink> | Any audio file the browser plays, such as MP3 and AAC | The browser |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/video">`<video>`</DocsLink> | Any file the browser plays, such as MP4 and WebM, and HLS in browsers with built-in HLS | The browser |
+| <DocsLink slug="reference/components/audio">`<audio>`</DocsLink> | Any audio file the browser plays, such as MP3 and AAC | The browser |
+</FrameworkCase>
+
+## HLS and DASH streams
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> | HLS with fMP4 (CMAF) segments | SPF |
+| <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> | HLS with fMP4 or MPEG-TS segments | hls.js, or the browser's own HLS where Media Source Extensions are missing |
+| <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> | HLS, in browsers with built-in HLS | The browser |
+| <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | The audio of an HLS stream | SPF |
+| <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | MPEG-DASH | dash.js |
+| <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | MPEG-DASH, HLS, and files, with DRM | Shaka Player |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> | HLS with fMP4 (CMAF) segments | SPF |
+| <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> | HLS with fMP4 or MPEG-TS segments | hls.js, or the browser's own HLS where Media Source Extensions are missing |
+| <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink> | HLS, in browsers with built-in HLS | The browser |
+| <DocsLink slug="reference/components/hls-audio">`<hls-audio>`</DocsLink> | The audio of an HLS stream | SPF |
+| <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | MPEG-DASH | dash.js |
+| <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | MPEG-DASH, HLS, and files, with DRM | Shaka Player |
+</FrameworkCase>
+
+## Mux
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink> | Mux video from a playback ID | hls.js or SPF, by import path |
+| <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | Mux audio from a playback ID | hls.js or SPF, by import path |
+| <DocsLink slug="reference/components/mux-background-video">MuxBackgroundVideo</DocsLink> | Mux video as a muted, looping background | SPF |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> | Mux video from a playback ID | hls.js or SPF, by import path |
+| <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | Mux audio from a playback ID | hls.js or SPF, by import path |
+| <DocsLink slug="reference/components/mux-background-video">`<mux-background-video>`</DocsLink> | Mux video as a muted, looping background | SPF |
+</FrameworkCase>
+
+## Background video
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/background-video">BackgroundVideo</DocsLink> | A file as a muted, looping background | The browser |
+| <DocsLink slug="reference/components/hls-background-video">HlsBackgroundVideo</DocsLink> | HLS as a muted, looping background | SPF |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/background-video">`<background-video>`</DocsLink> | A file as a muted, looping background | The browser |
+| <DocsLink slug="reference/components/hls-background-video">`<hls-background-video>`</DocsLink> | HLS as a muted, looping background | SPF |
+</FrameworkCase>
+
+## Embedded players
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> | YouTube videos and playlists | YouTube's IFrame player |
+| <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> | Vimeo videos and live events | Vimeo's player |
+| <DocsLink slug="reference/components/wistia-video">WistiaVideo</DocsLink> | Wistia videos | Wistia's web component |
+| <DocsLink slug="reference/components/cloudflare-video">CloudflareVideo</DocsLink> | Cloudflare Stream videos | Cloudflare's Stream player |
+| <DocsLink slug="reference/components/dailymotion-video">DailymotionVideo</DocsLink> | Dailymotion videos | Dailymotion's player |
+| <DocsLink slug="reference/components/twitch-video">TwitchVideo</DocsLink> | Twitch videos and live channels | Twitch's embed player |
+| <DocsLink slug="reference/components/tiktok-video">TikTokVideo</DocsLink> | TikTok videos | TikTok's embed player |
+| <DocsLink slug="reference/components/playerjs-video">PlayerJsVideo</DocsLink> | Any embed that implements player.js, such as Gumlet and Bunny Stream | The embed's player |
+| <DocsLink slug="reference/components/soundcloud-audio">SoundCloudAudio</DocsLink> | SoundCloud tracks and sets | SoundCloud's widget |
+| <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> | Spotify tracks, episodes, playlists, and shows | Spotify's embed |
+| <DocsLink slug="reference/components/mixcloud-audio">MixcloudAudio</DocsLink> | Mixcloud shows | Mixcloud's widget |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/youtube-video">`<youtube-video>`</DocsLink> | YouTube videos and playlists | YouTube's IFrame player |
+| <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | Vimeo videos and live events | Vimeo's player |
+| <DocsLink slug="reference/components/wistia-video">`<wistia-video>`</DocsLink> | Wistia videos | Wistia's web component |
+| <DocsLink slug="reference/components/cloudflare-video">`<cloudflare-video>`</DocsLink> | Cloudflare Stream videos | Cloudflare's Stream player |
+| <DocsLink slug="reference/components/dailymotion-video">`<dailymotion-video>`</DocsLink> | Dailymotion videos | Dailymotion's player |
+| <DocsLink slug="reference/components/twitch-video">`<twitch-video>`</DocsLink> | Twitch videos and live channels | Twitch's embed player |
+| <DocsLink slug="reference/components/tiktok-video">`<tiktok-video>`</DocsLink> | TikTok videos | TikTok's embed player |
+| <DocsLink slug="reference/components/playerjs-video">`<playerjs-video>`</DocsLink> | Any embed that implements player.js, such as Gumlet and Bunny Stream | The embed's player |
+| <DocsLink slug="reference/components/soundcloud-audio">`<soundcloud-audio>`</DocsLink> | SoundCloud tracks and sets | SoundCloud's widget |
+| <DocsLink slug="reference/components/spotify-audio">`<spotify-audio>`</DocsLink> | Spotify tracks, episodes, playlists, and shows | Spotify's embed |
+| <DocsLink slug="reference/components/mixcloud-audio">`<mixcloud-audio>`</DocsLink> | Mixcloud shows | Mixcloud's widget |
+</FrameworkCase>
+
+## Picked from the source
+
+<FrameworkCase frameworks={["react"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/lazy-video">LazyVideo</DocsLink> | Any video source; loads the component that source needs | That component's engine |
+| <DocsLink slug="reference/components/lazy-audio">LazyAudio</DocsLink> | Any audio source; loads the component that source needs | That component's engine |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Component | Plays | Engine |
+|---|---|---|
+| <DocsLink slug="reference/components/lazy-video">`<lazy-video>`</DocsLink> | Any video source; loads the component that source needs | That component's engine |
+| <DocsLink slug="reference/components/lazy-audio">`<lazy-audio>`</DocsLink> | Any audio source; loads the component that source needs | That component's engine |
+</FrameworkCase>

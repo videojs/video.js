@@ -31,7 +31,7 @@ import basicUsageHtml from "@/components/docs/demos/audio/html/css/BasicUsage.ht
 import basicUsageHtmlCss from "@/components/docs/demos/audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/audio/html/css/BasicUsage.ts?raw";
 
-The browser's native `<audio>` as a Video.js media component. Video.js doesn't replace the native API: set `src` or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates, and listen for native media events. It plays what the browser plays on its own. For HLS in every browser, Mux, or an embedded provider, use a streaming media component instead; see <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+The browser's native `<audio>` as a Video.js media component. It keeps the native API: `src`, child [`<source>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) elements, and native media events. It plays what the browser plays on its own. <DocsLink slug="reference/components/media">Media components</DocsLink> lists the components for streaming formats and hosting providers.
 
 <FrameworkCase frameworks={["react"]}>
 `Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`, and becomes the media of the player it's placed in.
@@ -59,6 +59,10 @@ import '@videojs/html/audio/player';
 ```
 </FrameworkCase>
 
+## Guides
+
+- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
+
 ## Anatomy
 
 <FrameworkCase frameworks={["react"]}>
@@ -77,10 +81,13 @@ import '@videojs/html/audio/player';
 ```
 </FrameworkCase>
 
-## Guides
+<FrameworkCase frameworks={["react"]}>
+Inside a `AudioPlayer`, or another Video.js `Player` configured for audio, `Audio` becomes the player's media. Outside a player, it's a standalone native `<audio>`.
+</FrameworkCase>
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
-- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
+<FrameworkCase frameworks={["html"]}>
+Inside `<audio-player>`, a native `<audio>` becomes the player's media.
+</FrameworkCase>
 
 ## Examples
 

@@ -4,7 +4,7 @@ frameworkTitle:
   html: native-hls-video
 description: HLS video element using the browser's built-in HLS support
 movedAnchors:
-  load-a-source: guides/media-sources
+  load-a-source: guides/hls#play-the-stream
   protected-content: guides/drm
 ---
 
@@ -26,7 +26,7 @@ import basicUsageHtml from "@/components/docs/demos/native-hls-video/html/css/Ba
 import basicUsageHtmlCss from "@/components/docs/demos/native-hls-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/native-hls-video/html/css/BasicUsage.ts?raw";
 
-HLS video component that hands playback to the browser's built-in HLS support, as in Safari. It adds no streaming engine, so it's the smallest HLS option, and it only plays where the browser supports HLS. For HLS in every browser, use the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> or the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>. It licenses DRM through FairPlay only; see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>.
+HLS video component that hands playback to the browser's built-in HLS support, as in Safari. It adds no streaming engine, so it's the smallest HLS option, and it only plays where the browser supports HLS. It licenses DRM through FairPlay only. The <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> and the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> play HLS in every modern browser.
 
 ## Import
 
@@ -34,7 +34,7 @@ HLS video component that hands playback to the browser's built-in HLS support, a
 
 ## Guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/hls">Play HLS streams</DocsLink>
 - <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
 - <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
@@ -67,7 +67,7 @@ HLS video component that hands playback to the browser's built-in HLS support, a
 
 <MediaReference media="NativeHlsVideo">
   <Fragment slot="engine-nativeHls">
-    This element hands playback to the browser, so there's no JavaScript engine to configure. This carries the one thing native playback still needs from you. <DocsLink slug="guides/media-sources">Media sources</DocsLink> covers how engine options fit into a structured source.
+    This element hands playback to the browser, so there's no JavaScript engine to configure. This carries the one thing native playback still needs from you.
 
     <FrameworkCase frameworks={["react"]}>
     ```tsx

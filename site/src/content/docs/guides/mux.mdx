@@ -1,13 +1,12 @@
 ---
 title: Play Mux videos
-description: Play Mux-hosted video and audio from a playback ID, with signed playback, posters, storyboards, DRM, and Mux Data
+description: Play Mux-hosted video from a playback ID, with playback options, signed playback, DRM, and a custom domain
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
-import Aside from '@/components/Aside.astro';
 
-Give a Mux media component your playback ID and it builds the stream, poster, and storyboard URLs for you. The same component plays signed and DRM-protected assets once you hand it the tokens.
+Give a Mux media component your playback ID, and it plays the stream with the asset's poster and timeline thumbnails.
 
 ## Installation
 
@@ -23,7 +22,7 @@ pnpm add @videojs/html @videojs/mux-video
 ```
 </FrameworkCase>
 
-## Recommended approach
+## Play a playback ID
 
 <FrameworkCase frameworks={["react"]}>
 Put <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink> inside a player and set `source.playbackId`:
@@ -73,45 +72,18 @@ Put <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> ins
 ```
 </FrameworkCase>
 
-That's a complete player. The skin shows the asset's poster while it loads and storyboard thumbnails when you hover the time slider.
+Keep `crossorigin="anonymous"` (`crossOrigin` in React): the timeline thumbnails don't load without it.
 
-<FrameworkCase frameworks={["react"]}>
-For audio-only assets, use <DocsLink slug="reference/components/mux-audio">`MuxAudio`</DocsLink> with the audio player and skin. It takes the same `source`, minus the poster and storyboard.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-For audio-only assets, use <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> with the audio player and skin. It takes the same `source`, minus the poster and storyboard.
-</FrameworkCase>
-
-## How it works
-
-`source.playbackId` names the asset. The component derives three URLs from it:
-
-| URL | Built from | Used for |
-|---|---|---|
-| `https://stream.mux.com/{playbackId}.m3u8` | `playbackId`, `customDomain`, `playback` | The HLS stream |
-| `https://image.mux.com/{playbackId}/thumbnail.webp` | `playbackId`, `customDomain`, `poster` | The poster the skin shows |
-| `https://image.mux.com/{playbackId}/storyboard.vtt` | `playbackId`, `customDomain`, `storyboard` | Time slider thumbnails (video only) |
-
-Setting a Mux stream URL as `src` works too: the component parses the playback ID, domain, and query params back out into `source`. That's how HTML pages set most of what this guide covers without script.
-
-The stream plays through the engine you import: hls.js by default, or SPF. See [Choose a playback engine](#choose-a-playback-engine).
-
-The storyboard is a cross-origin `<track>`, so it only loads when the media component is CORS-enabled. Keep `crossorigin="anonymous"` (`crossOrigin` in React) on it unless your stream needs cookies.
-
-Mux also publishes a small metadata document for each asset. Once it loads, `contentData.title` holds the asset's title from the Mux dashboard, and the player uses it when you don't set a title yourself.
+For an audio-only asset, use <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> with the audio player. It takes the same `source`.
 
 ## Set playback options
 
-`source.playback` takes [Mux's playback query params](https://www.mux.com/docs/api-reference/stream/streaming/get-hls-manifest) in camelCase, so `max_resolution` becomes `maxResolution`. Mux applies them to the playlist itself, so they work on either engine:
+Pass [Mux's playback modifiers](https://www.mux.com/docs/api-reference/stream/streaming/get-hls-manifest) on `source.playback`, in camelCase:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <MuxVideo
-  source={{
-    playbackId,
-    playback: { maxResolution: '720p', renditionOrder: 'desc' },
-  }}
+  source={{ playbackId, playback: { maxResolution: '720p' } }}
   playsInline
   crossOrigin="anonymous"
 />
@@ -123,45 +95,27 @@ Write them into `src` as Mux's own query params:
 
 ```html
 <mux-video
-  src="https://stream.mux.com/PLAYBACK_ID.m3u8?max_resolution=720p&rendition_order=desc"
+  src="https://stream.mux.com/PLAYBACK_ID.m3u8?max_resolution=720p"
   playsinline
   crossorigin="anonymous"
 ></mux-video>
 ```
-
-Or set them on `source.playback` from script:
-
-```ts
-video.source = {
-  playbackId,
-  playback: { maxResolution: '720p', renditionOrder: 'desc' },
-};
-```
 </FrameworkCase>
 
-`maxResolution` trims the playlist, so viewers can't pick a higher rendition by hand either. To cap only what the player picks on its own, see <DocsLink slug="guides/media-sources" anchor="four-things-that-sound-alike">Four things that sound alike</DocsLink>.
-
-On a signed asset, the playback token replaces these params. Sign them into the token instead, as [Play signed assets](#play-signed-assets) describes.
+On a signed asset, sign the modifiers into the playback token instead. Mux ignores them next to a token.
 
 ## Play signed assets
 
-A playback ID with a [signed playback policy](https://www.mux.com/docs/guides/secure-video-playback) needs a JSON Web Token for each URL. Mux scopes each token to one audience, so sign one per URL on your server:
-
-| Token | Audience (`aud`) | Goes on |
-|---|---|---|
-| Playback | `v` | `source.playback.token` |
-| Poster | `t` | `source.poster.token` |
-| Storyboard | `s` | `source.storyboard.token` |
-| DRM license | `d` | `source.drm.token` (see [Play DRM-protected assets](#play-drm-protected-assets)) |
+For a playback ID with a [signed playback policy](https://www.mux.com/docs/guides/secure-video-playback), sign one token per audience on your server and pass each on its own field:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <MuxVideo
   source={{
     playbackId,
-    playback: { token: playbackToken },
-    poster: { token: posterToken },
-    storyboard: { token: storyboardToken },
+    playback: { token: playbackToken }, // aud: 'v'
+    poster: { token: posterToken }, // aud: 't'
+    storyboard: { token: storyboardToken }, // aud: 's'
   }}
   playsInline
   crossOrigin="anonymous"
@@ -175,35 +129,29 @@ const video = document.querySelector('mux-video')!;
 
 video.source = {
   playbackId,
-  playback: { token: playbackToken },
-  poster: { token: posterToken },
-  storyboard: { token: storyboardToken },
+  playback: { token: playbackToken }, // aud: 'v'
+  poster: { token: posterToken }, // aud: 't'
+  storyboard: { token: storyboardToken }, // aud: 's'
 };
 ```
-</FrameworkCase>
 
-<FrameworkCase frameworks={["html"]}>
-To sign the stream from markup alone, put the playback token in `src`. The poster and storyboard tokens still need script, so without them the player plays with no poster or thumbnails:
+To sign the stream from markup alone, put the playback token in `src`. The player then plays without a poster or thumbnails:
 
 ```html
 <mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8?token=PLAYBACK_TOKEN" playsinline crossorigin="anonymous"></mux-video>
 ```
 </FrameworkCase>
 
-A playback token replaces every other `playback` param, so bake modifiers such as `max_resolution` into the token when you sign it. Without a poster or storyboard token of the right audience, the component builds no URL for that image, and the player shows no poster or thumbnails.
+Skip the poster or storyboard token if you don't need that image.
 
-## Choose the poster and storyboard
+## Choose the poster frame
 
-`source.poster` takes [Mux's image modifiers](https://www.mux.com/docs/guides/get-images-from-a-video) for the poster, and `source.storyboard` takes the storyboard's:
+Pass [Mux's thumbnail modifiers](https://www.mux.com/docs/guides/get-images-from-a-video) on `source.poster`:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <MuxVideo
-  source={{
-    playbackId,
-    poster: { time: 12, width: 1280 },
-    storyboard: { format: 'webp' },
-  }}
+  source={{ playbackId, poster: { time: 12 } }}
   playsInline
   crossOrigin="anonymous"
 />
@@ -211,38 +159,26 @@ A playback token replaces every other `playback` param, so bake modifiers such a
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  playbackId,
-  poster: { time: 12, width: 1280 },
-  storyboard: { format: 'webp' },
-};
-```
-
-To pick the poster frame from markup, set `poster-time`. It reflects to `source.poster.time` and survives a `src` change:
+Set `poster-time`:
 
 ```html
-<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" poster-time="12" playsinline></mux-video>
+<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" poster-time="12" playsinline crossorigin="anonymous"></mux-video>
 ```
 </FrameworkCase>
 
-To use your own image instead, set `poster` on the player. Read the derived URLs from `contentData.poster` and `contentData.storyboard` after `sourcechange`.
-
-<FrameworkCase frameworks={["react"]}>
-The derived poster becomes available after `MuxVideo` mounts. When the image must be in server-rendered HTML, pass it to the player's `poster` yourself.
-</FrameworkCase>
+To show your own image instead, see <DocsLink slug="guides/poster">Poster</DocsLink>.
 
 ## Play DRM-protected assets
 
-For a playback ID with a [DRM playback policy](https://www.mux.com/docs/guides/protect-videos-with-drm), put the DRM license token on `source.drm.token`. The component derives Mux's FairPlay, Widevine, and PlayReady license servers from it. DRM playback is always signed, so a playback token goes alongside it:
+For a playback ID with a [DRM playback policy](https://www.mux.com/docs/guides/protect-videos-with-drm), add the DRM license token on `source.drm.token`, next to the playback token:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <MuxVideo
   source={{
     playbackId,
-    playback: { token: playbackToken },
-    drm: { token: drmToken },
+    playback: { token: playbackToken }, // aud: 'v'
+    drm: { token: drmToken }, // aud: 'd'
   }}
   playsInline
 />
@@ -253,44 +189,17 @@ For a playback ID with a [DRM playback policy](https://www.mux.com/docs/guides/p
 ```ts
 video.source = {
   playbackId,
-  playback: { token: playbackToken },
-  drm: { token: drmToken },
+  playback: { token: playbackToken }, // aud: 'v'
+  drm: { token: drmToken }, // aud: 'd'
 };
 ```
 </FrameworkCase>
 
-To license a key system from your own server, name it next to the token. Your entry wins for that key system:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxVideo
-  source={{
-    playbackId,
-    playback: { token: playbackToken },
-    // FairPlay and PlayReady from Mux, Widevine from your own server.
-    drm: { token: drmToken, 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } },
-  }}
-  playsInline
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  playbackId,
-  playback: { token: playbackToken },
-  // FairPlay and PlayReady from Mux, Widevine from your own server.
-  drm: { token: drmToken, 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } },
-};
-```
-</FrameworkCase>
-
-<DocsLink slug="guides/drm">Play DRM-protected content</DocsLink> covers how each browser licenses, and DRM outside Mux.
+For browser support and licensing from your own servers, see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>.
 
 ## Use a custom domain
 
-If you [stream from your own domain](https://www.mux.com/docs/guides/use-a-custom-domain-for-streaming), name it on `source.customDomain`. The component swaps it in for `mux.com` on every URL it builds: `stream.` for the playlist, `image.` for the poster and storyboard, and `license.` for DRM.
+If you [stream from your own domain](https://www.mux.com/docs/guides/use-a-custom-domain-for-streaming), name it on `source.customDomain`:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -299,7 +208,7 @@ If you [stream from your own domain](https://www.mux.com/docs/guides/use-a-custo
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Point `src` at the stream on your domain, and the component reads the domain back out of it:
+Point `src` at the stream on your domain:
 
 ```html
 <mux-video src="https://stream.media.example.com/PLAYBACK_ID.m3u8" playsinline crossorigin="anonymous"></mux-video>
@@ -308,162 +217,48 @@ Point `src` at the stream on your domain, and the component reads the domain bac
 
 ## Play live streams
 
-A live stream's playback ID plays the same way. Use the live player and skin, which swap the time slider for a button that returns viewers to the live edge:
+A live stream's playback ID plays the same way. Two Mux settings decide the playback engine:
 
-<FrameworkCase frameworks={["react"]}>
-```tsx
-import '@videojs/react/live-video/skin.css';
-import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
-import { MuxVideo } from '@videojs/react/media/mux-video';
+- **Low-latency live streams** play at low latency on hls.js only.
+- **Live streams without reconnect slates** play on hls.js only. To keep SPF, set `reconnect_window` above 0 and, for standard latency, `use_slate_for_standard_latency` to `true`. See [Handle live stream disconnects](https://www.mux.com/docs/guides/handle-live-stream-disconnects).
 
-<LiveVideoPlayer>
-  <LiveVideoSkin style={{ aspectRatio: '16 / 9' }}>
-    <MuxVideo source={{ playbackId: livePlaybackId }} playsInline crossOrigin="anonymous" />
-  </LiveVideoSkin>
-</LiveVideoPlayer>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<live-video-player>
-  <live-video-skin style="aspect-ratio: 16 / 9">
-    <mux-video src="https://stream.mux.com/LIVE_PLAYBACK_ID.m3u8" playsinline crossorigin="anonymous"></mux-video>
-  </live-video-skin>
-</live-video-player>
-
-<script type="module">
-  import '@videojs/html/live-video/player';
-  import '@videojs/html/live-video/skin';
-  import '@videojs/html/media/mux-video';
-</script>
-```
-</FrameworkCase>
-
-Use hls.js for low-latency streams and for streams without slates. See [When to use hls.js](#when-to-use-hlsjs). <DocsLink slug="guides/live-streams">Play live streams</DocsLink> covers DVR and live UI.
-
-## Monitor playback with Mux Data
-
-Add the Mux Data extension to the player to measure startup time, rebuffering, and failures. Mux attributes the views to the environment that owns the playback ID, so it needs no environment key:
-
-<FrameworkCase frameworks={["react"]}>
-```bash
-pnpm add @videojs/mux-data
-```
-
-```tsx
-import { MuxData } from '@videojs/react/extensions/mux-data';
-
-<VideoPlayer>
-  <VideoSkin>
-    <MuxVideo source={{ playbackId }} playsInline crossOrigin="anonymous" />
-    <MuxData />
-  </VideoSkin>
-</VideoPlayer>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```bash
-pnpm add @videojs/mux-data
-```
-
-```html
-<video-player>
-  <video-skin>
-    <mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" playsinline crossorigin="anonymous"></mux-video>
-    <mux-data></mux-data>
-  </video-skin>
-</video-player>
-
-<script type="module">
-  import '@videojs/html/extensions/mux-data';
-</script>
-```
-</FrameworkCase>
-
-<DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink> covers view metadata and player naming.
+For the live player and its controls, see <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
 
 ## Choose a playback engine
 
-The Mux media components play through one of two engines, and you choose one by import path. An engine is the code that downloads the stream and feeds it to the browser.
+Mux media components play through SPF, Video.js's own engine, or through hls.js. You choose by import path:
 
-SPF is Video.js's own engine, built for the streams Mux delivers. It's a fraction of hls.js's size, and it will become the default in an upcoming release. hls.js is mature, widely used, and plays almost any HLS stream. The default import uses hls.js today.
+| Import | Engine |
+|---|---|
+| `.../media/mux-video/spf` | SPF |
+| `.../media/mux-video` | hls.js today, SPF in an upcoming release |
+| `.../media/mux-video/hls-js` | hls.js |
 
-| Import | Engine | Choose it when |
-|---|---|---|
-| `.../media/mux-video/spf`, `.../media/mux-audio/spf` | SPF | None of the cases under [When to use hls.js](#when-to-use-hlsjs) applies to you. |
-| `.../media/mux-video`, `.../media/mux-audio` | hls.js today, SPF soon | You want the recommended engine, and you're fine with it changing in a future release. |
-| `.../media/mux-video/hls-js`, `.../media/mux-audio/hls-js` | hls.js | One of the cases under [When to use hls.js](#when-to-use-hlsjs) applies to you. |
+SPF is about a quarter of hls.js's size, and it starts and stops AirPlay reliably. Use hls.js if any of these applies:
 
-<FrameworkCase frameworks={["react"]}>
-```tsx
-import { MuxVideo } from '@videojs/react/media/mux-video/spf';
-```
+| If you… | Because on SPF… |
+|---|---|
+| Stream low-latency live | Low-latency streams play at standard latency. |
+| Stream live without reconnect slates | Playback stops where the broadcaster reconnected, in the stream and its recording. |
+| Track errors in Mux Data | Mux Data sees views, startup time, and rebuffering, but not playback errors, quality switches, or download speed. |
+| Support iPhones before iOS 17.1 | The stream doesn't play. |
 
-All three imports give you a component with the same basic API.
-</FrameworkCase>
+For what each engine supports beyond Mux, see <DocsLink slug="guides/hls">Play HLS streams</DocsLink>.
 
-<FrameworkCase frameworks={["html"]}>
-```ts
-import '@videojs/html/media/mux-video/spf';
-```
+## Monitor playback with Mux Data
 
-All three imports register the same tag with the same basic API. Load only one of them on a page: the first one to load claims the tag, and the others are ignored.
-</FrameworkCase>
-
-### When to use SPF
-
-- **You want a smaller page.** SPF is about a quarter of hls.js's size, which matters most with several players on a page or on slower connections.
-- **You only need the audio.** On the Mux audio component, SPF downloads only the audio, even when the Mux asset has video. hls.js downloads the video too, though no one sees it.
-- **You use AirPlay.** Starting and stopping AirPlay works smoothly on SPF. hls.js can get into a bad state when you do either.
-
-### When to use hls.js
-
-SPF is still under development. Use hls.js if any of these applies to you:
-
-- **You stream live without slates.** A slate is the image Mux shows while a broadcaster reconnects. Without one, playback stops at the point where the broadcaster dropped and came back, in the live stream and in the recording Mux makes of it.
-- **You rely on detailed Mux Data.** With SPF, Mux Data doesn't receive playback errors, or detail like quality switches and download speed.
-- **You need low latency.** SPF plays low-latency live streams with the delay of an ordinary live stream.
-- **You set quality limits on the player.** On the Mux video component, SPF doesn't let you set the lowest or highest quality the player picks on its own, or stop it from matching quality to the player's size.
-- **You support older iPhones.** SPF needs iOS 17.1 or later.
-
-### SPF limitations in detail
-
-**Live streams without slates.** When an encoder disconnects, Mux keeps the live stream open for its `reconnect_window`. With a slate, Mux fills that time with the slate image, so the stream stays continuous. Without one, no media arrives until the encoder reconnects, and Mux marks the break with `EXT-X-DISCONTINUITY`. The asset Mux records from the stream keeps the same discontinuity. SPF doesn't handle discontinuities yet, in CMAF or MPEG-TS, so playback breaks there. To avoid it, set `reconnect_window` above 0 and, for standard-latency streams, `use_slate_for_standard_latency` to `true`. [Handle live stream disconnects](https://www.mux.com/docs/guides/handle-live-stream-disconnects) covers the settings.
-
-**Mux Data.** Mux Data plugs into hls.js to collect engine-level data. It has no such integration for SPF, so it monitors the media element alone. Views, startup time, and rebuffering still come through. Errors SPF raises itself, such as a manifest that fails to load or content it can't play, don't, and neither do rendition switches or request timing and throughput.
-
-**Low-Latency HLS.** SPF skips the partial segments (`EXT-X-PART`) that make LL-HLS low latency and loads whole segments instead. The stream plays as standard-latency live, at the distance from the live edge that the playlist's `HOLD-BACK` sets. SPF logs a console warning when this happens.
-
-**Rendition limits.** `maxAutoResolution`, `minAutoResolution`, and `capRenditionToPlayerSize` are hls.js options, so the SPF flavor of the Mux video component doesn't take them. SPF always caps the rendition to the player's size. To limit renditions on either engine, use `source.playback.maxResolution` or `source.playback.minResolution`, which Mux applies to the playlist itself.
-
-**Browsers without Media Source Extensions.** SPF plays through `MediaSource`, or `ManagedMediaSource` on iPhone, and has no fallback to the browser's own HLS playback. iPhone Safari before iOS 17.1 has neither, so SPF can't play there. The hls.js flavor falls back to native HLS.
+See <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>.
 
 ## Troubleshooting
 
-### No poster or storyboard on a signed asset
+### A signed asset has no poster or thumbnails
 
-The component builds an image URL only when it has a token of the right audience. Check that `source.poster.token` was signed with `aud: 't'` and `source.storyboard.token` with `aud: 's'`.
-
-### Thumbnails don't appear on hover
-
-The storyboard `<track>` is cross-origin. Set `crossorigin="anonymous"` (`crossOrigin` in React) on the media component. Live streams have no storyboard, so the component removes the track once it detects a live stream.
+The image needs its own token. Check that `source.poster.token` was signed with `aud: 't'` and `source.storyboard.token` with `aud: 's'`.
 
 ### A DRM asset doesn't play
 
-Check that `source.drm.token` was signed with `aud: 'd'`. The component ignores a token that isn't scoped to DRM rather than sending a license request Mux would reject. A `playback.token` is required too.
+Check that `source.drm.token` was signed with `aud: 'd'`, and that `source.playback.token` is set too.
 
-## Related components
+### Thumbnails don't appear on hover
 
-- <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>
-- <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink>
-- <DocsLink slug="reference/components/mux-data">MuxData</DocsLink>
-
-## Related guides
-
-- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
-- <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>
-- <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>
-- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+Set `crossorigin="anonymous"` (`crossOrigin` in React) on the media component. Live streams have no thumbnails.

@@ -5,7 +5,7 @@ frameworkTitle:
 description: DASH video element powered by dash.js for adaptive bitrate streaming
 stability: unstable
 movedAnchors:
-  load-a-source: guides/media-sources
+  load-a-source: reference/components/dash-video#examples
 ---
 
 import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
@@ -26,7 +26,7 @@ import basicUsageHtml from "@/components/docs/demos/dash-video/html/css/BasicUsa
 import basicUsageHtmlCss from "@/components/docs/demos/dash-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/dash-video/html/css/BasicUsage.ts?raw";
 
-DASH video component powered by [dash.js](https://github.com/Dash-Industry-Forum/dash.js/) for MPEG-DASH adaptive bitrate streaming. It doesn't read `source.drm`; for DRM-protected DASH, use the <DocsLink slug="reference/components/shaka-video">Shaka video component</DocsLink>. <DocsLink slug="guides/media-sources">Media sources</DocsLink> explains how `source.engine.dashJs` settings apply.
+DASH video component powered by [dash.js](https://github.com/Dash-Industry-Forum/dash.js/) for MPEG-DASH adaptive bitrate streaming. It doesn't read `source.drm`. The <DocsLink slug="reference/components/shaka-video">Shaka video component</DocsLink> plays DRM-protected DASH.
 
 ## Import
 
@@ -34,7 +34,6 @@ DASH video component powered by [dash.js](https://github.com/Dash-Industry-Forum
 
 ## Guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
 - <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
 
 ## Examples
@@ -66,7 +65,7 @@ DASH video component powered by [dash.js](https://github.com/Dash-Industry-Forum
 
 <MediaReference media="DashVideo">
   <Fragment slot="engine-dashJs">
-    Pass dash.js's own settings here. They're handed to dash.js untouched, so every option in its [settings reference](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) works. Replacing the object resets any settings applied before it. <DocsLink slug="guides/media-sources">Media sources</DocsLink> covers how engine options fit into a structured source.
+    Pass dash.js's own settings here. They're handed to dash.js untouched, so every option in its [settings reference](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) works. Replacing the object resets any settings applied before it.
 
     Each of the three below is a group of dash.js settings rather than a single value, and dash.js documents what's inside them.
 

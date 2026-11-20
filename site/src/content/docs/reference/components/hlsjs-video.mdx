@@ -4,7 +4,7 @@ frameworkTitle:
   html: hlsjs-video
 description: HLS video element powered by hls.js for adaptive bitrate streaming
 movedAnchors:
-  load-a-source: guides/media-sources
+  load-a-source: guides/hls#play-the-stream
   protected-content: guides/drm
   cookie-gated-streams: guides/cookie-gated-streams
 ---
@@ -27,7 +27,7 @@ import basicUsageHtml from "@/components/docs/demos/hlsjs-video/html/css/BasicUs
 import basicUsageHtmlCss from "@/components/docs/demos/hlsjs-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/hlsjs-video/html/css/BasicUsage.ts?raw";
 
-HLS video component powered by [hls.js](https://github.com/video-dev/hls.js/) for adaptive bitrate streaming in every browser. It plays through hls.js wherever Media Source Extensions are available and through the browser's own HLS elsewhere. The lightweight <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> is smaller and covers most HLS playback. For Mux-hosted streams, the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> adds playback IDs on top of it. <DocsLink slug="guides/media-sources">Media sources</DocsLink> explains `source`, including `preferPlayback` and the rendition caps.
+HLS video component powered by [hls.js](https://github.com/video-dev/hls.js/). It plays through hls.js wherever Media Source Extensions are available and through the browser's own HLS elsewhere. The <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> has a smaller bundle, and the <DocsLink slug="reference/components/native-hls-video">native HLS video component</DocsLink> adds no engine. The <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> plays Mux playback IDs.
 
 ## Import
 
@@ -35,7 +35,7 @@ HLS video component powered by [hls.js](https://github.com/video-dev/hls.js/) fo
 
 ## Guides
 
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/hls">Play HLS streams</DocsLink>
 - <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
 - <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
 - <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
@@ -96,7 +96,7 @@ video.source = {
 
 <MediaReference media="HlsJsVideo">
   <Fragment slot="engine-hlsJs">
-    Pass hls.js's own configuration here. It's handed to hls.js untouched, so every option in its [config reference](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) works, spelled the way hls.js spells it. <DocsLink slug="guides/media-sources">Media sources</DocsLink> covers how engine options fit into a structured source.
+    Pass hls.js's own configuration here. It's handed to hls.js untouched, so every option in its [config reference](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) works, spelled the way hls.js spells it.
 
     The names and types below come from hls.js's own type definitions, so they tell you what exists and what shape it takes. hls.js documents what each one does; the descriptions are theirs to write, and most are blank here because its types carry none.
 
