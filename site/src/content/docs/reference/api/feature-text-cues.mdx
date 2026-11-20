@@ -142,7 +142,7 @@ Like a `<track>` element, an app track stays until it's removed, through source 
 
 App tracks start `hidden`. Browsers never draw `metadata` or `chapters` cues. An app `captions` or `subtitles` track is copied into the media, so the browser draws its cues when the track is selected, including in iOS fullscreen where the player's UI isn't shown, and the captions menu lists it. The track takes its copy's mode, so it's `disabled` until it's selected and `showing` while it is.
 
-When the media has no chapters track, the text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> can show its chapters. In the same way, when the media has no thumbnails track, `thumbnailsTrack` reads the first `metadata` track the app added with the label `thumbnails`, such as a storyboard file. Image URLs in its cues resolve against its `src`, as they do for a `<track>` element.
+The text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> shows its chapters, even when the media has chapters of its own. The media's chapters are the fallback when the app adds none. In the same way, `thumbnailsTrack` reads the first `metadata` track the app added with the label `thumbnails`, such as a storyboard file, before the media's. Image URLs in its cues resolve against its `src`, as they do for a `<track>` element.
 
 ## Exports
 
