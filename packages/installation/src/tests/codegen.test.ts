@@ -302,6 +302,36 @@ describe('generateHTMLUsageCode', () => {
     expect(result.imports).not.toContain('mux-data');
   });
 
+  it('adds an environment key placeholder when Mux Data monitors a source Mux does not host', () => {
+    const result = generateHTMLUsageCode({
+      ...baseHTML,
+      media: 'hls',
+      extensions: ['mux-data'],
+      sourceUrl: 'https://example.com/stream.m3u8',
+    });
+
+    expect(result.html).toContain('<mux-data env-key="YOUR_ENV_KEY"></mux-data>');
+    expect(result.html).toContain('https://dashboard.mux.com/settings/data');
+    expect(result.imports).toContain("import '@videojs/html/extensions/mux-data'");
+  });
+
+  it('leaves out the environment key when Mux Data monitors a stream.mux.com file', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, media: 'html5-video', extensions: ['mux-data'] });
+
+    expect(result.html).toContain(INSTALLATION_DEMO_SOURCES.videoMp4);
+    expect(result.html).toContain('<mux-data></mux-data>');
+    expect(result.html).toContain('playback ID in the stream.mux.com URL');
+    expect(result.html).not.toContain('selected by default');
+  });
+
+  it('adds Google Analytics with a note that the page needs a GA4 tag', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, extensions: ['google-analytics'] });
+
+    expect(result.html).toContain('<google-analytics></google-analytics>');
+    expect(result.html).toContain('gtag.js');
+    expect(result.imports).toContain("import '@videojs/html/extensions/google-analytics'");
+  });
+
   it('uses the vimeo-video tag and media import, without playsinline (iframe)', () => {
     const result = generateHTMLUsageCode({ ...baseHTML, media: 'vimeo' });
 
@@ -694,6 +724,26 @@ describe('generateReactCreateCode', () => {
 
     expect(code).not.toContain('MuxData');
     expect(code).not.toContain('mux-data');
+  });
+
+  it('adds an environment key placeholder when Mux Data monitors a source Mux does not host', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      media: 'dash',
+      extensions: ['mux-data'],
+      sourceUrl: 'https://example.com/manifest.mpd',
+    })['app/page.tsx'];
+
+    expect(code).toContain('<MuxData envKey="YOUR_ENV_KEY" />');
+    expect(code).toContain('https://dashboard.mux.com/settings/data');
+  });
+
+  it('renders and imports Google Analytics with a note that the page needs a GA4 tag', () => {
+    const code = generateReactCreateCode({ ...baseReact, extensions: ['google-analytics'] })['app/page.tsx'];
+
+    expect(code).toContain("import { GoogleAnalytics } from '@videojs/react/extensions/google-analytics'");
+    expect(code).toContain('<GoogleAnalytics />');
+    expect(code).toContain('gtag.js');
   });
 
   it('uses separate media import for Vimeo without playsInline (iframe)', () => {

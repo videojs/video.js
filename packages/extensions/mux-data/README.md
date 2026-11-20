@@ -17,7 +17,7 @@ match this package version before writing code. Then print installation instruct
 
 ```sh
 npx @videojs/cli agents init --framework react --media mux-video --extensions mux-data
-npx @videojs/cli agents init --framework html --media mux-video --extensions mux-data
+npx @videojs/cli agents init --framework html --media hls --extensions mux-data
 ```
 
 ## Usage

@@ -10,7 +10,10 @@ export interface InstallationRendererDefinition {
   readonly defaultSource: string;
   readonly playsInline: boolean;
   readonly preset: boolean;
+  /** Selects Mux Data by default. Its Mux playback source lets Mux Data work without an environment key. */
   readonly muxData: boolean;
+  /** Plays through a `<video>` or `<audio>` element, which Mux Data needs to monitor. Iframe embeds don't. */
+  readonly mediaElement: boolean;
 }
 
 /**
@@ -31,6 +34,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: true,
     muxData: false,
+    mediaElement: true,
   },
   'hls-background-video': {
     label: 'HLS Background Video',
@@ -43,6 +47,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: false,
     muxData: false,
+    mediaElement: true,
   },
   cloudflare: {
     label: 'Cloudflare Stream',
@@ -55,6 +60,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
   dash: {
     label: 'DASH',
@@ -67,6 +73,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: false,
     muxData: false,
+    mediaElement: true,
   },
   hls: {
     label: 'HLS',
@@ -79,6 +86,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: false,
     muxData: false,
+    mediaElement: true,
   },
   'html5-audio': {
     label: 'HTML5 Audio',
@@ -91,6 +99,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: true,
     muxData: false,
+    mediaElement: true,
   },
   'html5-video': {
     label: 'HTML5 Video',
@@ -103,6 +112,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: true,
     muxData: false,
+    mediaElement: true,
   },
   'mux-audio': {
     label: 'Mux',
@@ -115,6 +125,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: true,
+    mediaElement: true,
   },
   'mux-background-video': {
     label: 'Mux Background Video',
@@ -127,6 +138,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: false,
     muxData: false,
+    mediaElement: true,
   },
   'mux-video': {
     label: 'Mux',
@@ -139,6 +151,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: true,
     preset: false,
     muxData: true,
+    mediaElement: true,
   },
   spotify: {
     label: 'Spotify',
@@ -151,6 +164,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
   tiktok: {
     label: 'TikTok',
@@ -163,6 +177,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
   twitch: {
     label: 'Twitch',
@@ -175,6 +190,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
   vimeo: {
     label: 'Vimeo',
@@ -187,6 +203,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
   youtube: {
     label: 'YouTube',
@@ -199,6 +216,7 @@ export const INSTALLATION_RENDERERS = {
     playsInline: false,
     preset: false,
     muxData: false,
+    mediaElement: false,
   },
 } as const satisfies Record<string, InstallationRendererDefinition>;
 
@@ -225,6 +243,10 @@ export function getMediaSubpath(renderer: Renderer): string | null {
 
 export function isMuxRenderer(renderer: Renderer): boolean {
   return INSTALLATION_RENDERERS[renderer].muxData;
+}
+
+export function isMediaElementRenderer(renderer: Renderer): boolean {
+  return INSTALLATION_RENDERERS[renderer].mediaElement;
 }
 
 export function isPresetRenderer(renderer: Renderer): boolean {

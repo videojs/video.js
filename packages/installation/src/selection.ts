@@ -409,7 +409,7 @@ export function resolveInstallationSelection(
       errors.push({
         field: 'extensions',
         value: extension,
-        message: 'Expected a comma-separated list containing google-cast, mux-data, or none.',
+        message: `Expected a comma-separated list containing ${[...INSTALLATION_EXTENSIONS, 'none'].join(', ')}.`,
       });
     } else if (!availableExtensions.includes(extension)) {
       extensionErrors.push({
