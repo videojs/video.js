@@ -1760,6 +1760,7 @@ describe('Media component pipeline (end-to-end)', () => {
         'ContainerVideo',
         'EmbedVideo',
         'ExtendingVideo',
+        'FlavorVideo',
         'MixinVideo',
         'SimpleVideo',
         'SpfAudio',
@@ -1774,6 +1775,12 @@ describe('Media component pipeline (end-to-end)', () => {
       // SimpleVideo exposes `engine` (the live player instance) but no `source`,
       // so there is no engine config to document.
       expect(findElement('SimpleVideo')!.reference.engineOptions).toBeUndefined();
+      expect(findElement('SimpleVideo')!.reference.sourceFields).toBeUndefined();
+    });
+
+    it('records flavors only for an element registered from sibling define files', () => {
+      expect(findElement('FlavorVideo')!.reference.flavors).toEqual(['primary', 'lite']);
+      expect(findElement('BarrelVideo')!.reference.flavors).toBeUndefined();
     });
   });
 
@@ -2141,6 +2148,26 @@ describe('Media component pipeline (end-to-end)', () => {
         { name: 'undocumented', type: 'string | undefined' },
       ]);
     });
+
+    it('documents source fields, listing the engines under engine without their options', () => {
+      const ref = findElement('EmbedVideo')!.reference;
+
+      expect(ref.sourceFields).toEqual([
+        {
+          name: 'engine',
+          type: 'EmbedSourceEngineConfig',
+          description: 'Playback options, keyed by the engine that reads them.',
+        },
+        {
+          name: 'engine.embed',
+          type: 'EmbedEngineConfig',
+          description: "The provider's own embed parameters, passed through untouched.",
+        },
+        { name: 'src', type: 'string', description: "Embed URL or id. Mirrors the host's `src` property." },
+      ]);
+      expect(ref.platforms.html.properties.definitions.source).toMatchObject({ type: 'EmbedSource | null' });
+      expect(ref.platforms.html.properties.definitions.source.detailedType).toBeUndefined();
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────
@@ -2248,6 +2275,114 @@ describe('Media component pipeline (end-to-end)', () => {
       const props = findElement('ExtendingVideo')!.reference.platforms.html.properties.definitions;
 
       expect(props.customDomain.default).toBeUndefined();
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────
+  // ENGINE FLAVORS: FlavorVideo
+  // ─────────────────────────────────────────────────────────────────
+  //
+  // One element registered from two sibling define files over different hosts
+  // (mirrors `<mux-video>` over hls.js and SPF). The index re-exports the
+  // primary flavor. Both are documented on one reference, and a row only some
+  // flavors have lists them under `flavors`.
+  //
+  // Also exercises:
+  //   - structured `source` fields as sub-rows, nested interfaces under a dotted
+  //     name, `engine` expanded one level, `@internal` and `never` fields left
+  //     out, and `@default` tags
+  //   - attributes the element observes itself through `observedAttributes`
+
+  describe('FlavorVideo (engine flavors, source fields, observed attributes)', () => {
+    it('flattens source fields parents first, sorted by name at each level', () => {
+      const names = findElement('FlavorVideo')!.reference.sourceFields!.map((field) => field.name);
+
+      expect(names).toEqual([
+        'capToPlayerSize',
+        'drm',
+        'engine',
+        'engine.fast',
+        'maxAutoResolution',
+        'playback',
+        'playback.maxResolution',
+        'playback.token',
+        'playbackId',
+        'src',
+      ]);
+    });
+
+    it('keeps descriptions, types, and @default values on source fields', () => {
+      const fields = findElement('FlavorVideo')!.reference.sourceFields!;
+
+      expect(fields.find((field) => field.name === 'playback.maxResolution')).toEqual({
+        name: 'playback.maxResolution',
+        type: 'string',
+        description: 'Highest rendition the server puts in the manifest.',
+      });
+      expect(fields.find((field) => field.name === 'capToPlayerSize')).toMatchObject({
+        type: 'boolean',
+        default: 'true',
+      });
+      expect(fields.find((field) => field.name === 'playback')).toMatchObject({ type: 'FlavorPlaybackParams' });
+    });
+
+    it('falls back to the inherited description for a redeclared field', () => {
+      const drm = findElement('FlavorVideo')!.reference.sourceFields!.find((field) => field.name === 'drm');
+
+      expect(drm?.description).toBe('License servers keyed by key system.');
+    });
+
+    it('leaves @internal and never-typed fields out', () => {
+      const names = findElement('FlavorVideo')!.reference.sourceFields!.map((field) => field.name);
+
+      expect(names).not.toContain('debugTag');
+      expect(names).not.toContain('legacyUrl');
+    });
+
+    it('marks source fields only the primary flavor declares', () => {
+      const fields = findElement('FlavorVideo')!.reference.sourceFields!;
+      const marked = fields.filter((field) => field.flavors).map((field) => [field.name, field.flavors]);
+
+      expect(marked).toEqual([
+        ['capToPlayerSize', ['primary']],
+        ['engine', ['primary']],
+        ['engine.fast', ['primary']],
+        ['maxAutoResolution', ['primary']],
+      ]);
+    });
+
+    it('marks properties, props, and engines only some flavors have', () => {
+      const ref = findElement('FlavorVideo')!.reference;
+      const properties = ref.platforms.html.properties.definitions;
+
+      expect(properties.quality?.flavors).toEqual(['primary']);
+      expect(properties.engine?.flavors).toEqual(['primary']);
+      expect(properties.src?.flavors).toBeUndefined();
+      expect(ref.platforms.react?.props.quality?.flavors).toEqual(['primary']);
+      expect(ref.platforms.react?.props.source?.flavors).toBeUndefined();
+      expect(ref.engineFlavors).toEqual({ fast: ['primary'] });
+    });
+
+    it('treats a property one flavor forwards natively as on every flavor, listed once', () => {
+      const properties = findElement('FlavorVideo')!.reference.platforms.html.properties;
+
+      expect(properties.definitions.volume).toBeDefined();
+      expect(properties.definitions.volume?.flavors).toBeUndefined();
+      expect(properties.native).not.toContain('volume');
+    });
+
+    it('documents attributes the element observes itself, typed and described by @attribute tags', () => {
+      const attributes = findElement('FlavorVideo')!.reference.platforms.html.attributes;
+
+      expect(attributes.custom['poster-at']).toEqual({
+        type: 'number',
+        readonly: false,
+        description: 'Video time the poster is taken from. Sets `source.poster.time`.',
+      });
+      expect(attributes.custom['flavor-hint']).toEqual({ type: 'string', readonly: false });
+      // Already a standard attribute, so not repeated as a custom one.
+      expect(attributes.custom.src).toBeUndefined();
+      expect(attributes.standard).toContain('src');
     });
   });
 

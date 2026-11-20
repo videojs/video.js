@@ -47,7 +47,9 @@ for (const engine of model.engines) {
         sections={model.platforms.html.sections}
         engines={model.engines}
         engineOptions={ref.engineOptions ?? {}}
+        engineFlavors={ref.engineFlavors ?? {}}
         engineProse={engineProse}
+        sourceFields={ref.sourceFields}
       />
     ) : (
       model.platforms.react && <ReactMediaReference
@@ -57,7 +59,9 @@ for (const engine of model.engines) {
         refs={model.platforms.react.refs}
         engines={model.engines}
         engineOptions={ref.engineOptions ?? {}}
+        engineFlavors={ref.engineFlavors ?? {}}
         engineProse={engineProse}
+        sourceFields={ref.sourceFields}
       />
     )
   }

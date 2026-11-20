@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import type { MediaReference } from '@/types/media-reference';
 
-import { buildMediaReferenceTocHeadings, createMediaReferenceModel } from '../mediaReferenceModel';
+import { buildMediaReferenceTocHeadings, createMediaReferenceModel, flavorOnlyLabel } from '../mediaReferenceModel';
 
 function makeRef(overrides: Partial<MediaReference> = {}): MediaReference {
   return {
@@ -233,5 +233,21 @@ describe('buildMediaReferenceTocHeadings', () => {
 
     expect(react).toEqual(['props', 'refs', 'ref', 'media-ref', 'events']);
     expect(headings).toContainEqual({ depth: 4, text: 'mediaRef', slug: 'media-ref', frameworks: ['react'] });
+  });
+});
+
+describe('flavorOnlyLabel', () => {
+  it('names the flavors that have a row', () => {
+    expect(flavorOnlyLabel(['hls-js'])).toBe('hls.js only');
+    expect(flavorOnlyLabel(['spf'])).toBe('SPF only');
+  });
+
+  it('falls back to the flavor key for an unlabeled flavor', () => {
+    expect(flavorOnlyLabel(['hls-js', 'lite'])).toBe('hls.js and lite only');
+  });
+
+  it('returns undefined for a row every flavor has', () => {
+    expect(flavorOnlyLabel(undefined)).toBeUndefined();
+    expect(flavorOnlyLabel([])).toBeUndefined();
   });
 });

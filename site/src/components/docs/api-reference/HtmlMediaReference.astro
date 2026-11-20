@@ -3,7 +3,7 @@ import A from '@/components/typography/A.astro';
 import H3 from '@/components/typography/H3Markdown.astro';
 import MarkdownCode from '@/components/typography/MarkdownCode.astro';
 import P from '@/components/typography/P.astro';
-import type { EngineOptionDef, HtmlMediaReference } from '@/types/media-reference';
+import type { EngineOptionDef, SourceFieldDef, HtmlMediaReference } from '@/types/media-reference';
 import ApiCSSVarsTable from './ApiCSSVarsTable.astro';
 import ApiEngineOptionsSection from './ApiEngineOptionsSection.astro';
 import ApiEventsTable from './ApiEventsTable.astro';
@@ -23,10 +23,12 @@ interface Props {
   sections: Section[];
   engines: { key: string; id: string; title: string }[];
   engineOptions: Record<string, EngineOptionDef[]>;
+  engineFlavors: Record<string, string[]>;
   engineProse: Record<string, string>;
+  sourceFields?: SourceFieldDef[] | undefined;
 }
 
-const { media, mediaType, data, sections, engines, engineOptions, engineProse } = Astro.props;
+const { media, mediaType, data, sections, engines, engineOptions, engineFlavors, engineProse, sourceFields } = Astro.props;
 const attributesSection = sections.find((section) => section.key === 'attributes');
 const propertiesSection = sections.find((section) => section.key === 'properties');
 const engineSection = sections.find((section) => section.key === 'engineOptions');
@@ -86,6 +88,7 @@ const standardEvents = [...data.events.standard].sort();
         <MediaHostPropsTable
           hostProperties={data.properties.definitions}
           componentName={media}
+          sourceFields={sourceFields}
         />
       )}
       {nativeProperties.length > 0 && (
@@ -110,6 +113,7 @@ const standardEvents = [...data.events.standard].sort();
       section={engineSection}
       engines={engines}
       engineOptions={engineOptions}
+      engineFlavors={engineFlavors}
       prose={engineProse}
     />
   )
