@@ -18,19 +18,23 @@ const videoPresetStyles = [
 ].map((url) => [url.pathname.split('/src/')[1], url] as const);
 
 describe('container styles', () => {
-  it.each(containerStyles)('sizes the slotted video in the Shadow DOM (%s)', async (_, url) => {
-    const source = await readFile(url, 'utf8');
+  it('defines the slotted video fill once for every skin', async () => {
+    const source = await readFile(sharedContainerStyles, 'utf8');
 
-    expect(source).toContain('[&>slot::slotted(video)]:h-full!');
-    expect(source).toContain('[&>slot::slotted(video)]:w-full');
-    expect(source).toContain('[&>slot::slotted(video)]:object-media');
+    expect(source).toContain("'[&>slot::slotted(video)]'");
+    expect(source).toContain('${slottedVideo}:h-full!');
+    expect(source).toContain('${slottedVideo}:w-full');
+    expect(source).toContain('${slottedVideo}:object-media');
   });
 
-  it.each(containerStyles)('lets the container shrink inside the Shadow DOM host grid (%s)', async (_, url) => {
-    const source = await readFile(url, 'utf8');
+  it.each(containerStyles)(
+    'sizes the slotted video and lets the container shrink in the Shadow DOM (%s)',
+    async (_, url) => {
+      const source = await readFile(url, 'utf8');
 
-    expect(source).toContain("'min-h-0 min-w-0'");
-  });
+      expect(source).toContain("'shadow-dom': ['min-h-0 min-w-0', ...slottedVideoFill]");
+    }
+  );
 
   it('defines the slotted iframe embed fill once for every skin', async () => {
     const source = await readFile(sharedContainerStyles, 'utf8');
