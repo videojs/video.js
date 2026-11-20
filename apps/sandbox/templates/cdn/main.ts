@@ -277,16 +277,6 @@ async function loadCdnMedia(media: MediaId) {
 // Rendering — produces the exact HTML markup the installation builder generates.
 // ---------------------------------------------------------------------------
 
-/**
- * An embed fills the skin box the way `<video>` does on its own.
- *
- * TikTok's host floors itself at the portrait 325x578 its player refuses to draw below, so a landscape box needs that
- * floor cleared.
- */
-function getEmbedMediaClass(media: MediaId): string {
-  return media === 'tiktok-video' ? 'block w-full h-full min-w-0 min-h-0' : 'block w-full h-full';
-}
-
 function getPlayerTag(live: boolean): string {
   switch (descriptor.player) {
     case 'background':
@@ -358,7 +348,6 @@ async function render() {
   // per-embed pages on the html and react platforms.
   const mediaAttrs = embed ? (source.controls ? 'controls' : '') : renderMediaAttrs(state);
   const crossoriginAttr = embed ? '' : 'crossorigin';
-  const mediaClassAttr = embed ? `class="${getEmbedMediaClass(media)}"` : '';
 
   // Background video needs viewport dimensions instead of flex centering.
   if (background) {
@@ -398,7 +387,7 @@ async function render() {
 
   const skin = html`
     <${skinTag} class="sandbox-video-frame mx-auto max-w-4xl">
-      <${mediaTag} ${mediaClassAttr} ${sourceAttr} ${mediaAttrs} playsinline ${crossoriginAttr}>
+      <${mediaTag} ${sourceAttr} ${mediaAttrs} playsinline ${crossoriginAttr}>
         ${skinnedVideo ? renderChapters(getChapters(state.source)) : ''}
         ${renderStoryboard(storyboard)}
       </${mediaTag}>
