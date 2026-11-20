@@ -98,13 +98,5 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vjsc": "workspace:*"
-  },
-  "peerDependencies": {
-    "react-native-svg": "^15.16.0"
-  },
-  "peerDependenciesMeta": {
-    "react-native-svg": {
-      "optional": true
-    }
   }
 }
