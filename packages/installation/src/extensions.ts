@@ -1,7 +1,7 @@
 import { getInstallationPreset, type Skin, type UseCase } from './presets';
-import { isMuxRenderer, type Renderer } from './renderers';
+import { isMediaElementRenderer, isMuxRenderer, type Renderer } from './renderers';
 
-export const INSTALLATION_EXTENSIONS = ['google-cast', 'mux-data'] as const;
+export const INSTALLATION_EXTENSIONS = ['google-analytics', 'google-cast', 'mux-data'] as const;
 export type InstallationExtension = (typeof INSTALLATION_EXTENSIONS)[number];
 
 export interface InstallationExtensionDefinition {
@@ -14,6 +14,14 @@ export interface InstallationExtensionDefinition {
 }
 
 export const INSTALLATION_EXTENSION_DEFINITIONS = {
+  'google-analytics': {
+    label: 'Google Analytics',
+    description: 'Send video events to the GA4 tag on your page.',
+    packageName: '@videojs/google-analytics',
+    htmlSubpath: 'google-analytics',
+    htmlTag: 'google-analytics',
+    reactComponent: 'GoogleAnalytics',
+  },
   'google-cast': {
     label: 'Google Cast',
     description: 'Send video to Chromecast devices.',
@@ -24,7 +32,7 @@ export const INSTALLATION_EXTENSION_DEFINITIONS = {
   },
   'mux-data': {
     label: 'Mux Data',
-    description: 'Measure playback quality for Mux video and audio.',
+    description: 'Measure playback quality and engagement.',
     packageName: '@videojs/mux-data',
     htmlSubpath: 'mux-data',
     htmlTag: 'mux-data',
@@ -51,6 +59,9 @@ export function installationExtensionsFor(
   const extensions: InstallationExtension[] = [];
   const preset = getInstallationPreset(useCase);
 
+  // A decorative video autoplays and loops, so it would report a start and a completion on every loop.
+  if (useCase !== 'background-video') extensions.push('google-analytics');
+
   if (
     preset.mediaType === 'video' &&
     useCase !== 'background-video' &&
@@ -60,9 +71,23 @@ export function installationExtensionsFor(
     extensions.push('google-cast');
   }
 
-  if (isMuxRenderer(renderer)) extensions.push('mux-data');
+  if (isMediaElementRenderer(renderer)) extensions.push('mux-data');
 
   return extensions;
+}
+
+/**
+ * Whether generated Mux Data markup needs an environment key. Mux files a view under the environment that owns its
+ * playback ID, which it reads only from a Mux source or a `stream.mux.com` URL.
+ */
+export function muxDataNeedsEnvKey(renderer: Renderer, sourceUrl: string): boolean {
+  if (isMuxRenderer(renderer)) return false;
+
+  try {
+    return new URL(sourceUrl).hostname !== 'stream.mux.com';
+  } catch {
+    return true;
+  }
 }
 
 /** Preserve the existing Mux playback behavior while keeping every other extension opt-in. */

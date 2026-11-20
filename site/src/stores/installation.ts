@@ -267,10 +267,14 @@ skin.listen((next) => {
   if (selected.length !== extensions.get().length) extensions.set(selected);
 });
 
-media.listen((next) => {
+media.listen((next, previous) => {
   const available = installationExtensionsFor(useCase.get(), skin.get(), next);
-  const selected = extensions.get().filter((extension) => available.includes(extension));
   const defaults = defaultInstallationExtensions(next).filter((extension) => available.includes(extension));
+  // A default follows its media: Mux Data picked for a Mux source doesn't carry over to a source that needs a key.
+  const previousDefaults = defaultInstallationExtensions(previous).filter((extension) => !defaults.includes(extension));
+  const selected = extensions
+    .get()
+    .filter((extension) => available.includes(extension) && !previousDefaults.includes(extension));
   const fitted = [...new Set([...selected, ...defaults])];
 
   if (

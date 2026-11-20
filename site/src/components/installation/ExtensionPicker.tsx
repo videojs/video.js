@@ -7,6 +7,7 @@ import {
 import type { ReactNode } from 'react';
 
 import Cast from '@/assets/icons/cast.svg?react';
+import Graph from '@/assets/icons/graph.svg?react';
 import MuxLogo from '@/assets/logos/mux-small.svg?react';
 import CardCheckboxGroup from '@/components/CardCheckboxGroup';
 import { extensions } from '@/stores/installation';
@@ -15,6 +16,7 @@ import { useSelection } from './useSelection';
 import { withSelectionMarker } from './withSelectionMarker';
 
 const EXTENSION_MEDIA = {
+  'google-analytics': <Graph className="size-6" />,
   'google-cast': <Cast className="size-6" />,
   'mux-data': <MuxLogo className="w-7" />,
 } satisfies Record<InstallationExtension, ReactNode>;

@@ -207,7 +207,7 @@ export function installationDecisionOrderFor(
     {
       title: 'Choose extensions',
       guidance:
-        'Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin should cast a compatible source. Use none when no extension is needed.',
+        "Mux Data is included by default for Mux video and audio sources. Add it for other media played by a video or audio element when the user wants playback quality or engagement data in Mux; for a source not on stream.mux.com, ask for the Mux Data environment key and replace the generated YOUR_ENV_KEY placeholder. Add Google Analytics when the site already loads GA4 through gtag.js or Google Tag Manager and the user wants video events there; it isn't offered for background-video. Add Google Cast when a standard or live video player with a ready-made skin should cast a compatible source. Use none when no extension is needed.",
     },
     { title: 'Choose how to install', guidance: methodGuidance },
     ...stylingDecisions,

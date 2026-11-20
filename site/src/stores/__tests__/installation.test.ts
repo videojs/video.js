@@ -101,6 +101,22 @@ describe('useCase', () => {
     expect(extensions.get()).toEqual([]);
   });
 
+  it('drops a default extension with the media that chose it, but keeps one the reader added', () => {
+    window.history.replaceState(null, '', '/docs/guides/installation/react?media=mux-video');
+    syncInstallationSelectionFromUrl();
+
+    expect(extensions.get()).toEqual(['mux-data']);
+
+    media.set('hls');
+
+    expect(extensions.get()).toEqual([]);
+
+    extensions.set(['mux-data']);
+    media.set('dash');
+
+    expect(extensions.get()).toEqual(['mux-data']);
+  });
+
   it('normalizes invalid URL picks to the selection shown by the page', () => {
     window.history.replaceState(
       { index: 2, scrollX: 0, scrollY: 300 },
