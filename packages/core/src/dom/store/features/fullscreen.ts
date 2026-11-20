@@ -36,11 +36,10 @@ export const fullscreenFeature = definePlayerFeature({
       fullscreenAvailability: isFullscreenEnabled() ? 'available' : 'unsupported',
     });
 
-    const sync = () => {
+    const sync = () =>
       set({
         isFullscreen: isFullscreen(container, media),
       });
-    };
 
     sync();
 

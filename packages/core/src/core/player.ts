@@ -42,7 +42,7 @@ type ConfigStateKey<State> = [State] extends [never] ? PropertyKey : keyof State
 
 /**
  * Maps provider inputs to feature-owned state actions and detach-persistent keys. Pass the feature's source-state type
- * when declaring a config map so both keys are checked and each action accepts its input plus `null | undefined`.
+ * when declaring a config map so both keys are checked and each action accepts nullable text, including absent input.
  */
 export type PlayerFeatureConfig<State = never> = Record<
   string,
