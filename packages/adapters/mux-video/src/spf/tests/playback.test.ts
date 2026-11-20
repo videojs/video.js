@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { SpfVideoAdapter } from '../playback';
+import { SpfVideoAdapter } from '../adapter';
 
 const HLS_URL = 'https://stream.mux.com/abc123.m3u8';
 const MP4_URL = 'https://stream.mux.com/abc123/highest.mp4';
