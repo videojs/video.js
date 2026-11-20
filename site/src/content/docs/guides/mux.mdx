@@ -74,7 +74,7 @@ Put <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> ins
 
 Keep `crossorigin="anonymous"` (`crossOrigin` in React): the timeline thumbnails don't load without it.
 
-For an audio-only asset, use <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> with the audio player. It takes the same `source`.
+For an audio-only asset, install `@videojs/mux-audio` and use <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> with the audio player. It takes the same `source`.
 
 ## Set playback options
 
@@ -142,7 +142,7 @@ To sign the stream from markup alone, put the playback token in `src`. The playe
 ```
 </FrameworkCase>
 
-Skip the poster or storyboard token if you don't need that image.
+A token replaces the other params on its URL, so sign image modifiers such as the poster time into the image tokens too. Skip the poster or storyboard token if you don't need that image.
 
 ## Choose the poster frame
 
@@ -166,7 +166,7 @@ Set `poster-time`:
 ```
 </FrameworkCase>
 
-To show your own image instead, see <DocsLink slug="guides/poster">Poster</DocsLink>.
+On a signed asset, sign the time into the poster token instead; the component ignores these modifiers next to a token. To show your own image, see <DocsLink slug="guides/poster">Poster</DocsLink>.
 
 ## Play DRM-protected assets
 
@@ -234,7 +234,7 @@ Mux media components play through SPF, Video.js's own engine, or through hls.js.
 | `.../media/mux-video` | hls.js today, SPF in an upcoming release |
 | `.../media/mux-video/hls-js` | hls.js |
 
-SPF is about a quarter of hls.js's size, and it starts and stops AirPlay reliably. Use hls.js if any of these applies:
+SPF is about a quarter of hls.js's size. Use hls.js if any of these applies:
 
 | If you… | Because on SPF… |
 |---|---|

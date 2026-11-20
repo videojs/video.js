@@ -60,9 +60,9 @@ Each entry names one key system:
 | `com.widevine.alpha` | Widevine | Chrome, Firefox, Edge, Android |
 | `com.microsoft.playready` | PlayReady | Edge on Windows, smart TVs |
 
-Each entry takes a `licenseUrl`, where the browser's content decryption module (CDM) POSTs its license request. FairPlay also needs `serverCertificateUrl`, the DRM server (application) certificate, unless its CDM is pre-provisioned. Widevine and PlayReady ignore it.
+Each entry takes a `licenseUrl`. The player POSTs the license request from the browser's content decryption module (CDM) there. FairPlay also needs `serverCertificateUrl`, the DRM server (application) certificate, unless its CDM is pre-provisioned. Widevine and PlayReady ignore it.
 
-The browser decides which key system it uses, which is why you name all of them. `drm` sits on `source` rather than inside an engine's options because which engine plays the manifest can be decided later, and every engine reads it.
+The browser decides which key system it uses, which is why you name all of them. `drm` sits on `source` rather than inside an engine's options because which engine plays the manifest can be decided later. The table below shows which media components read it.
 
 ## Availability and constraints
 
@@ -94,7 +94,7 @@ How far `source.drm` gets depends on which engine plays the stream:
 
 ### Two playback paths
 
-The hls.js components play through hls.js wherever the browser supports Media Source Extensions, and through the browser's own HLS otherwise or when you set `preferPlayback: 'native'`. The two paths license differently:
+The hls.js components play through hls.js wherever the browser supports Media Source Extensions, and through the browser's own HLS otherwise, when you set `preferPlayback: 'native'`, or when the source's type isn't HLS. The two paths license differently:
 
 | Path | Key systems | What Video.js does with `drm` |
 |---|---|---|
@@ -147,9 +147,9 @@ Mux derives FairPlay, Widevine, and PlayReady license servers from one DRM token
 
 ## Troubleshooting
 
-### Playback fails with `MEDIA_ERR_ENCRYPTED` in Safari
+### Playback fails with `MEDIA_ERR_ENCRYPTED`
 
-The browser's own HLS is playing the stream and `drm` has no `com.apple.fps` entry. Add FairPlay with its `serverCertificateUrl`.
+The browser couldn't license any key system the source names. Check that `drm` names one the browser supports: Safari needs a `com.apple.fps` entry with its `serverCertificateUrl`, and the browser's own HLS licenses FairPlay only. Then check the license server's responses in the browser's network panel.
 
 ### Playback works in one browser but not another
 
@@ -157,7 +157,11 @@ Browsers support different key systems. Name every system you hold a license ser
 
 ### The license request is rejected
 
-Most license servers authenticate the request. A `licenseUrl` can carry a token your provider accepts as a query parameter. For headers or cookies, configure the engine directly, for example with hls.js's [`licenseXhrSetup`](https://github.com/video-dev/hls.js/blob/master/docs/API.md#licensexhrsetup) under `engine.hlsJs`.
+Most license servers authenticate the request. A `licenseUrl` can carry a token your provider accepts as a query parameter. For headers or cookies:
+
+- On HlsVideo, add `headers` or `credentials` to the key system's entry in `drm`.
+- On hls.js, set [`licenseXhrSetup`](https://github.com/video-dev/hls.js/blob/master/docs/API.md#licensexhrsetup) under `engine.hlsJs`.
+- On the browser's own HLS, license requests can't carry headers or cookies. Use a token in `licenseUrl`.
 
 ## Related components
 

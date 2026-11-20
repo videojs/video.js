@@ -78,7 +78,7 @@ Mux Data is opt-in. No media component monitors playback on its own, Mux ones in
 
 Mux Data needs to know which environment a view belongs to. For Mux-hosted playback, you do not need to set an environment key. The extension reports the Mux playback ID as the view's `video_id`, and Mux attributes the view to the environment that owns that playback ID.
 
-Set `envKey` when you monitor a source Mux doesn't host, like a self-hosted HLS or DASH stream. Find the key in the [Mux dashboard](https://dashboard.mux.com/settings/data):
+Set `envKey` when you monitor a source Mux doesn't host, like a self-hosted HLS or DASH stream, or a Mux stream served from a custom domain. The extension reads the playback ID only from `mux.com` URLs; on another domain it reports the full URL as `video_id`. Find the key in the [Mux dashboard](https://dashboard.mux.com/settings/data):
 
 <FrameworkCase frameworks={["react"]}>
 For the hls.js example, also install `@videojs/hlsjs-video`. Replace the media and extension in the primary example with `<MonitoredHlsVideo />`:
