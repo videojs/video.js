@@ -6,7 +6,7 @@ import H3 from '@/components/typography/H3Markdown.astro';
 import H4 from '@/components/typography/H4Markdown.astro';
 import MarkdownCode from '@/components/typography/MarkdownCode.astro';
 import P from '@/components/typography/P.astro';
-import type { EngineOptionDef, ReactMediaReference } from '@/types/media-reference';
+import type { EngineOptionDef, SourceFieldDef, ReactMediaReference } from '@/types/media-reference';
 import type { MediaReferenceRef } from '@/utils/mediaReferenceModel';
 import ApiEngineOptionsSection from './ApiEngineOptionsSection.astro';
 import MediaHostPropsTable from './MediaHostPropsTable.astro';
@@ -24,10 +24,12 @@ interface Props {
   refs: MediaReferenceRef[];
   engines: { key: string; id: string; title: string }[];
   engineOptions: Record<string, EngineOptionDef[]>;
+  engineFlavors: Record<string, string[]>;
   engineProse: Record<string, string>;
+  sourceFields?: SourceFieldDef[] | undefined;
 }
 
-const { media, data, sections, refs, engines, engineOptions, engineProse } = Astro.props;
+const { media, data, sections, refs, engines, engineOptions, engineFlavors, engineProse, sourceFields } = Astro.props;
 const propsSection = sections.find((section) => section.key === 'props');
 const engineSection = sections.find((section) => section.key === 'engineOptions');
 const refsSection = sections.find((section) => section.key === 'refs');
@@ -87,6 +89,7 @@ const mediaRefExample = mediaRef
           hostProperties={data.props}
           componentName={media}
           nameLabel="Prop"
+          sourceFields={sourceFields}
         />
       )}
     </>
@@ -100,6 +103,7 @@ const mediaRefExample = mediaRef
       section={engineSection}
       engines={engines}
       engineOptions={engineOptions}
+      engineFlavors={engineFlavors}
       prose={engineProse}
     />
   )

@@ -31,9 +31,9 @@ export interface NativeHlsSource {
   /** Manifest URL. Mirrors the host's `src` property. */
   src?: string | undefined;
   /**
-   * License servers for protected content, keyed by EME key system id. Safari negotiates keys itself and reaches
-   * FairPlay only, so the `com.apple.fps` entry is the one read here — the rest can ride along for an engine that can
-   * negotiate them.
+   * License servers for protected content, keyed by EME key system (`com.apple.fps`, `com.widevine.alpha`,
+   * `com.microsoft.playready`, `org.w3.clearkey`). Each entry takes a `licenseUrl`, plus a `serverCertificateUrl` for
+   * FairPlay. Native playback reads only `com.apple.fps`; other entries are accepted and ignored.
    */
   drm?: DrmSystemsConfig | undefined;
   /** Playback options, keyed by the engine that reads them. */
@@ -42,7 +42,7 @@ export interface NativeHlsSource {
 
 /** The engines a native HLS source can configure. */
 export interface NativeHlsEngineConfig {
-  /** Options for the browser's own HLS playback. */
+  /** Options for the browser's own HLS playback. Its `drmSystems`, when set, replaces `source.drm`. */
   nativeHls?: NativeHlsConfig | undefined;
 }
 
@@ -52,8 +52,8 @@ export interface NativeHlsEngineConfig {
  */
 export interface NativeHlsConfig {
   /**
-   * License servers for protected content, keyed by EME key system id. An escape hatch for licensing native playback
-   * differently from every other path: naming it replaces `source.drm` here, and nowhere else.
+   * License servers for native playback, in the same shape as `source.drm`. When set, it replaces `source.drm` for
+   * native playback only.
    */
   drmSystems?: DrmSystemsConfig | undefined;
 }

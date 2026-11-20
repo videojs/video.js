@@ -5,6 +5,7 @@ import MarkdownCode from '@/components/typography/MarkdownCode.astro';
 import P from '@/components/typography/P.astro';
 import type { EngineOptionDef } from '@/types/media-reference';
 import ApiEngineOptionsTable from './ApiEngineOptionsTable.astro';
+import FlavorBadge from './FlavorBadge.astro';
 
 /**
  * Renders the `source.engine` section of a media API reference: one subsection
@@ -19,11 +20,13 @@ interface Props {
   section: { id: string; title: string };
   engines: { key: string; id: string; title: string }[];
   engineOptions: Record<string, EngineOptionDef[]>;
+  /** The flavors that read an engine's options, for engines only some flavors have. */
+  engineFlavors?: Record<string, string[]>;
   /** Rendered HTML per engine key, from the page's `engine-<key>` slot. */
   prose: Record<string, string>;
 }
 
-const { media, section, engines, engineOptions, prose } = Astro.props;
+const { media, section, engines, engineOptions, engineFlavors = {}, prose } = Astro.props;
 ---
 
 <H3 id={section.id}>{section.title}</H3>
@@ -33,6 +36,7 @@ const { media, section, engines, engineOptions, prose } = Astro.props;
     <>
       <H4 id={engine.id}>
         <MarkdownCode>{engine.title}</MarkdownCode>
+        <FlavorBadge flavors={engineFlavors[engine.key]} />
       </H4>
       {prose[engine.key] ? (
         <Fragment set:html={prose[engine.key]} />

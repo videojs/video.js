@@ -19,10 +19,8 @@ import { createMuxDrmSystems } from './drm';
  * the HLS layer takes — `type`, `preferPlayback`, and its `engine` config.
  */
 export interface MuxSource extends HlsSource, MuxSourceBase {
-  /**
-   * The inherited license servers, or a Mux license `token` to derive them from. Redeclared because both halves name
-   * `drm`, and Mux's is the wider of the two.
-   */
+  // Redeclared because `HlsSource` and `MuxSourceBase` both name `drm`, and Mux's is the wider of the two. Its
+  // documentation is `MuxSourceBase`'s.
   drm?: MuxDrmParams | undefined;
 }
 
@@ -91,18 +89,8 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
   }
 
   /**
-   * Structured Mux source. Setting it derives `src` from the playback ID, custom domain, and `playback` params
-   * (appended as `snake_case` query params). A `playback.token` replaces all other params — signed URLs bake them into
-   * the token. Engine options live under `engine`.
-   *
-   * A `drm.token` fills in `drm` itself: Mux's FairPlay, Widevine, and PlayReady license servers for this playback ID,
-   * so protected media plays whichever path the browser takes. License servers named alongside the token win, key by
-   * key, for content Mux does not license.
-   *
-   * `playback.maxResolution` and `playback.minResolution` are server-side: they decide which renditions Mux puts in the
-   * manifest at all. The inherited `maxAutoResolution` and `minAutoResolution` only look like their pair — those are
-   * client-side and bound which of the renditions that _do_ arrive adaptive selection reaches for. The two halves are
-   * independent.
+   * Structured Mux source. Setting it derives `src` from `playbackId`, `customDomain`, and `playback`, and the license
+   * servers from `drm.token`.
    */
   get source(): MuxSource | null {
     return this.#source;
@@ -135,14 +123,18 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
   }
 
   /**
-   * What `source` says about its content. `poster` and `storyboard` are image URLs it describes rather than plays, from
-   * its `poster` and `storyboard` params; a key is absent when the URL can't be built — no playback ID, or signed
-   * playback without a matching image token. `title` and the rest come from the metadata Mux publishes for the asset,
-   * which loads with the source, so they arrive later than the URLs and are absent until then.
+   * What `source` says about its content. `poster` and `storyboard` are the image URLs built from `playbackId` and the
+   * `poster` and `storyboard` params. Each is absent when its URL can't be built: no playback ID, or signed playback
+   * without a matching image token.
    *
-   * The same object is handed back until something in it changes, and `contentdatachange` announces it when it does.
-   * Nothing here is applied for you, apart from the thumbnail track `<mux-video>` adds from `storyboard` (and drops for
-   * live streams).
+   * `title` is the asset's title from the metadata document Mux publishes for it, or its `video_title` entry when the
+   * document names no title. The document's other entries are included under their own keys. They arrive when the
+   * document loads, after the media starts loading, and are absent until then, without a playback ID, or when the asset
+   * has none.
+   *
+   * The same object is returned until something in it changes, and `contentdatachange` fires when it does, including
+   * when the title arrives. A player uses `title` and `poster` when it sets no title or poster of its own, and the Mux
+   * video component adds a thumbnails `<track>` from `storyboard`, except for live streams.
    */
   get contentData(): MuxContentData {
     return this.#contentData;

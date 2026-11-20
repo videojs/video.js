@@ -7,6 +7,8 @@ export const HostPropertyDefSchema = z.object({
   readonly: z.boolean(),
   overridesNative: z.boolean().optional(),
   default: z.string().optional(),
+  /** The flavors that have this row, when the element ships several and not all of them do. */
+  flavors: z.array(z.string()).optional(),
 });
 
 export const MediaEventDefSchema = z.object({
@@ -22,6 +24,19 @@ export const EngineOptionDefSchema = z.object({
   type: z.string(),
   detailedType: z.string().optional(),
   description: z.string().optional(),
+});
+
+/**
+ * One field of the structured `source`. `name` is its dotted path below `source` (`playback.maxResolution`), and fields
+ * arrive parents first, so a field's own fields follow it.
+ */
+export const SourceFieldDefSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  detailedType: z.string().optional(),
+  description: z.string().optional(),
+  default: z.string().optional(),
+  flavors: z.array(z.string()).optional(),
 });
 
 const HtmlMediaReferenceSchema = z.object({
@@ -54,8 +69,17 @@ export const MediaReferenceSchema = z.object({
   name: z.string(),
   tagName: z.string(),
   mediaType: z.enum(['video', 'audio']),
+  /**
+   * The flavors documented together, primary first, when the element is registered over several engines from sibling
+   * define files (`hls-js`, `spf`).
+   */
+  flavors: z.array(z.string()).optional(),
+  /** Fields of the structured `source`, shared by both platforms. */
+  sourceFields: z.array(SourceFieldDefSchema).optional(),
   /** Options accepted under `source.engine`, keyed by engine name. */
   engineOptions: z.record(z.string(), z.array(EngineOptionDefSchema)).optional(),
+  /** The flavors that read an engine's options, for engines not every flavor has. */
+  engineFlavors: z.record(z.string(), z.array(z.string())).optional(),
   platforms: z.object({
     html: HtmlMediaReferenceSchema,
     react: ReactMediaReferenceSchema.optional(),
@@ -64,6 +88,7 @@ export const MediaReferenceSchema = z.object({
 
 export type EngineOptionDef = z.infer<typeof EngineOptionDefSchema>;
 export type HostPropertyDef = z.infer<typeof HostPropertyDefSchema>;
+export type SourceFieldDef = z.infer<typeof SourceFieldDefSchema>;
 export type MediaEventDef = z.infer<typeof MediaEventDefSchema>;
 export type MediaTargetTag = z.infer<typeof MediaTargetTagSchema>;
 export type MediaReference = z.infer<typeof MediaReferenceSchema>;
