@@ -4,7 +4,7 @@ import { applyCaptionTracks } from '@app/shared/captions';
 import { renderChapters } from '@app/shared/html/chapters';
 import { defineNoSkin } from '@app/shared/html/no-skin';
 import { createLatestLoader, renderMediaAttrs } from '@app/shared/html/sandbox';
-import { packageSkinTag, skinPreset } from '@app/shared/html/skin-tags';
+import { packageSkinTag, type SkinPreset, skinPreset } from '@app/shared/html/skin-tags';
 import { renderStoryboard } from '@app/shared/html/storyboard';
 import { loadAudioStylesheets, loadVideoStylesheets } from '@app/shared/html/stylesheets';
 import { ensureCdnSandboxLocale } from '@app/shared/i18n/cdn-sandbox-locales';
@@ -159,34 +159,35 @@ async function applyLocale(next: SandboxLocaleTag): Promise<void> {
 // CDN module loading — mirrors the exact import graph of each CDN bundle.
 // ---------------------------------------------------------------------------
 
+/** Each CDN bundle registers its player and one skin, so every skin needs its own bundle. */
+const cdnPlayers = {
+  'video/default': () => import('@videojs/cdn/video'),
+  'video/neutral': () => import('@videojs/cdn/video-neutral'),
+  'video/compat': () => import('@videojs/cdn/video-compat'),
+  'video/scaffold': () => import('@videojs/cdn/video-scaffold'),
+  'live-video/default': () => import('@videojs/cdn/live-video'),
+  'live-video/neutral': () => import('@videojs/cdn/live-video-neutral'),
+  'live-video/compat': () => import('@videojs/cdn/live-video-compat'),
+  'live-video/scaffold': () => import('@videojs/cdn/live-video-scaffold'),
+  'audio/default': () => import('@videojs/cdn/audio'),
+  'audio/neutral': () => import('@videojs/cdn/audio-neutral'),
+  'audio/compat': () => import('@videojs/cdn/audio-compat'),
+  'audio/scaffold': () => import('@videojs/cdn/audio-scaffold'),
+  'live-audio/default': () => import('@videojs/cdn/live-audio'),
+  'live-audio/neutral': () => import('@videojs/cdn/live-audio-neutral'),
+  'live-audio/compat': () => import('@videojs/cdn/live-audio-compat'),
+  'live-audio/scaffold': () => import('@videojs/cdn/live-audio-scaffold'),
+} satisfies Record<`${SkinPreset}/${Skin}`, () => Promise<unknown>>;
+
 async function loadCdnPlayer(skin: Skin, live: boolean) {
-  switch (descriptor.player) {
-    case 'video':
-      if (live) {
-        if (skin === 'neutral') await import('@videojs/cdn/live-video-neutral');
-        else await import('@videojs/cdn/live-video');
-      } else {
-        if (skin === 'neutral') await import('@videojs/cdn/video-neutral');
-        else await import('@videojs/cdn/video');
-      }
-
-      break;
-    case 'audio':
-      if (live) {
-        if (skin === 'neutral') await import('@videojs/cdn/live-audio-neutral');
-        else await import('@videojs/cdn/live-audio');
-      } else {
-        if (skin === 'neutral') await import('@videojs/cdn/audio-neutral');
-        else await import('@videojs/cdn/audio');
-      }
-
-      break;
-    // Player and skin are shared; the element each one renders is what differs,
-    // and that arrives from `loadCdnMedia`.
-    case 'background':
-      await import('@videojs/cdn/background');
-      break;
+  // Player and skin are shared; the element each one renders is what differs,
+  // and that arrives from `loadCdnMedia`.
+  if (descriptor.player === 'background') {
+    await import('@videojs/cdn/background');
+    return;
   }
+
+  await cdnPlayers[`${skinPreset(descriptor.player, live)}/${skin}`]();
 }
 
 async function loadCdnMedia(media: MediaId) {
