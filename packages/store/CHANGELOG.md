@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/store@10.5.0...@videojs/store@10.6.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **store:** stop installing react into plain html projects ([#9819](https://github.com/videojs/video.js/issues/9819)) ([2971667](https://github.com/videojs/video.js/commit/297166735bc2e9182f4c67cc17226d50858bb77f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.6.0
+  * devDependencies
+    * @videojs/element bumped to 10.6.0
+  * peerDependencies
+    * @videojs/element bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/store@10.4.0...@videojs/store@10.5.0) (2026-11-16)
 
 
