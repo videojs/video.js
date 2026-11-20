@@ -1,7 +1,11 @@
 import Mux from '@mux/mux-node';
 import { z } from 'astro/zod';
+import type { ActionAPIContext } from 'astro:actions';
 import { ActionError, defineAction } from 'astro:actions';
 import { MUX_API_URL, MUX_TOKEN_ID, MUX_TOKEN_SECRET } from 'astro:env/server';
+
+import { SESSION_COOKIE_NAME } from '@/utils/auth';
+import { toMuxActionError } from '@/utils/mux/action-error';
 
 /**
  * Creates an authenticated Mux API client
@@ -20,6 +24,29 @@ function getMuxClient(token: string | undefined) {
     authorizationToken: token,
     baseURL: MUX_API_URL,
   });
+}
+
+/**
+ * Runs an authenticated Mux request for an action and converts any failure with `toMuxActionError`. When Mux rejects
+ * the session's token, the session is cleared so the client's `UNAUTHORIZED` handling signs the reader in again.
+ */
+async function requestMux<T>(
+  ctx: ActionAPIContext,
+  action: string,
+  fallbackMessage: string,
+  request: (muxClient: Mux) => Promise<T>
+): Promise<T> {
+  const muxClient = getMuxClient(ctx.locals.accessToken);
+
+  try {
+    return await request(muxClient);
+  } catch (error) {
+    const actionError = toMuxActionError(error, action, fallbackMessage);
+
+    if (actionError.code === 'UNAUTHORIZED') ctx.cookies.delete(SESSION_COOKIE_NAME, { path: '/' });
+
+    throw actionError;
+  }
 }
 
 function getHealthMuxClient() {
@@ -72,23 +99,15 @@ export const mux = {
       limit: z.number().optional().default(25),
       page: z.number().optional().default(1),
     }),
-    handler: async (input, ctx) => {
-      const muxClient = getMuxClient(ctx.locals.accessToken);
-
-      try {
+    handler: (input, ctx) =>
+      requestMux(ctx, 'mux.listAssets', 'Failed to fetch assets', async (muxClient) => {
         const assets = await muxClient.video.assets.list({
           limit: input.limit,
           page: input.page,
         });
 
         return assets.data;
-      } catch (error) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Failed to fetch assets',
-        });
-      }
-    },
+      }),
   }),
 
   /**
@@ -104,20 +123,10 @@ export const mux = {
     input: z.object({
       id: z.string(),
     }),
-    handler: async (input, ctx) => {
-      const muxClient = getMuxClient(ctx.locals.accessToken);
-
-      try {
-        const asset = await muxClient.video.assets.retrieve(input.id);
-
-        return asset;
-      } catch (error) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Failed to fetch asset',
-        });
-      }
-    },
+    handler: (input, ctx) =>
+      requestMux(ctx, 'mux.getAsset', 'Failed to fetch asset', (muxClient) =>
+        muxClient.video.assets.retrieve(input.id)
+      ),
   }),
 
   /** Create a direct upload URL for client-side uploads. Returns the signed upload URL and upload ID for tracking. */
@@ -125,10 +134,8 @@ export const mux = {
     input: z.object({
       corsOrigin: z.string().optional(),
     }),
-    handler: async (input, ctx) => {
-      const muxClient = getMuxClient(ctx.locals.accessToken);
-
-      try {
+    handler: (input, ctx) =>
+      requestMux(ctx, 'mux.createDirectUpload', 'Failed to create upload', async (muxClient) => {
         const upload = await muxClient.video.uploads.create({
           cors_origin: input.corsOrigin || '*',
           new_asset_settings: {
@@ -142,13 +149,7 @@ export const mux = {
           uploadUrl: upload.url,
           uploadId: upload.id,
         };
-      } catch (error) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Failed to create upload',
-        });
-      }
-    },
+      }),
   }),
 
   /**
@@ -159,23 +160,15 @@ export const mux = {
     input: z.object({
       uploadId: z.string(),
     }),
-    handler: async (input, ctx) => {
-      const muxClient = getMuxClient(ctx.locals.accessToken);
-
-      try {
+    handler: (input, ctx) =>
+      requestMux(ctx, 'mux.getUploadStatus', 'Failed to get upload status', async (muxClient) => {
         const upload = await muxClient.video.uploads.retrieve(input.uploadId);
 
         return {
           status: upload.status,
           assetId: upload.asset_id,
         };
-      } catch (error) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Failed to get upload status',
-        });
-      }
-    },
+      }),
   }),
 
   /** Poll asset status to get playback_id once ready. Status: 'preparing' | 'ready' | 'errored' */
@@ -183,22 +176,14 @@ export const mux = {
     input: z.object({
       assetId: z.string(),
     }),
-    handler: async (input, ctx) => {
-      const muxClient = getMuxClient(ctx.locals.accessToken);
-
-      try {
+    handler: (input, ctx) =>
+      requestMux(ctx, 'mux.getAssetStatus', 'Failed to get asset status', async (muxClient) => {
         const asset = await muxClient.video.assets.retrieve(input.assetId);
 
         return {
           status: asset.status,
           playbackId: asset.playback_ids?.[0]?.id,
         };
-      } catch (error) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Failed to get asset status',
-        });
-      }
-    },
+      }),
   }),
 };

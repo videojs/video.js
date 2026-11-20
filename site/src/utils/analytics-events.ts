@@ -60,8 +60,10 @@ export interface AnalyticsEventProperties {
   mux_upload_started: undefined;
   mux_upload_completed: undefined;
   mux_upload_ready: undefined;
-  /** Never carries upload IDs, playback IDs, or tokens: only the step and a short reason. */
-  mux_upload_failed: { stage: 'create_upload' | 'upload' | 'processing'; reason: string };
+  /** Never carries upload IDs, playback IDs, tokens, or Mux error text: only the step and a short reason. */
+  mux_upload_failed:
+    | { stage: 'create_upload'; reason: UploadFailureReason }
+    | { stage: 'upload' | 'processing'; reason: string };
   mux_upload_retried: undefined;
 }
 
@@ -74,6 +76,36 @@ const REASON_LIMIT = 100;
 /** A failure reason short enough to chart. Prefer an error code; a message is trimmed. */
 export function failureReason(error: { code?: string; message: string }): string {
   return error.code ?? error.message.slice(0, REASON_LIMIT);
+}
+
+/** Why creating a Mux upload failed, as a fixed category. Mux's own messages can name the reader's account. */
+export type UploadFailureReason =
+  | 'unauthorized'
+  | 'forbidden'
+  | 'rate_limited'
+  | 'bad_request'
+  | 'mux_error'
+  | 'network';
+
+/**
+ * The category for a failed upload request, from its action error code. An error without a code never reached the
+ * action, such as a failed `fetch`.
+ */
+export function uploadFailureReason(error: { code?: string }): UploadFailureReason {
+  switch (error.code) {
+    case undefined:
+      return 'network';
+    case 'UNAUTHORIZED':
+      return 'unauthorized';
+    case 'FORBIDDEN':
+      return 'forbidden';
+    case 'TOO_MANY_REQUESTS':
+      return 'rate_limited';
+    case 'BAD_REQUEST':
+      return 'bad_request';
+    default:
+      return 'mux_error';
+  }
 }
 
 const SEARCH_QUERY_LIMIT = 100;

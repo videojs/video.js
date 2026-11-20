@@ -12,10 +12,13 @@ import CloudUpload from '@/assets/icons/cloud-upload.svg?react';
 import MuxLogo from '@/assets/logos/mux-small.svg?react';
 import { MUX_URL } from '@/consts';
 import { muxPlaybackId, media, sourceUrl } from '@/stores/installation';
-import { ANALYTICS_EVENTS, failureReason, trackEvent } from '@/utils/analytics-events';
+import type { UploadFailureReason } from '@/utils/analytics-events';
+import { ANALYTICS_EVENTS, failureReason, trackEvent, uploadFailureReason } from '@/utils/analytics-events';
 import { withMuxAttribution } from '@/utils/mux/attribution';
 import { initiateAuthPopup } from '@/utils/mux/auth-flow';
 import { ASSET_PROCESSING_FAILED, pollForPlaybackId, UPLOAD_PROCESSING_FAILED } from '@/utils/mux/polling';
+import type { UploadFailureNotice } from '@/utils/mux/upload-failure';
+import { uploadFailureNotice } from '@/utils/mux/upload-failure';
 
 import type { UploaderState } from './UploaderOverlay';
 import UploaderOverlay from './UploaderOverlay';
@@ -34,11 +37,26 @@ function processingFailureReason(message: string): string {
   return message === UPLOAD_PROCESSING_FAILED || message === ASSET_PROCESSING_FAILED ? message : 'request_failed';
 }
 
+type CreateUploadResult = { uploadUrl: string; uploadId: string } | { reason: UploadFailureReason };
+
+/** Asks the server for an upload URL. A request that never reaches the action, such as one sent offline, throws. */
+async function createUpload(): Promise<CreateUploadResult> {
+  try {
+    const result = await actions.mux.createDirectUpload({ corsOrigin: window.location.origin });
+    if (result.error) return { reason: uploadFailureReason(result.error) };
+
+    return result.data;
+  } catch {
+    return { reason: 'network' };
+  }
+}
+
 export default function MuxUploaderPanel() {
   // Local state for upload flow (not shared across islands)
-  // 'idle' | 'needs_login' | 'uploading' | 'preparing' | 'ready' | 'polling_error';
+  // 'idle' | 'needs_login' | 'create_error' | 'uploading' | 'preparing' | 'ready' | 'polling_error';
   const [state, setState] = useState<UploaderState>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<UploadFailureNotice | null>(null);
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [playbackId, setPlaybackId] = useState<string | null>(null);
 
@@ -50,6 +68,16 @@ export default function MuxUploaderPanel() {
   // actually started counts as an upload failure.
   const transferStartedRef = useRef(false);
 
+  /** Records a failed upload request and shows the reader what happened instead of the uploader's raw error. */
+  const failCreateUpload = useCallback((reason: UploadFailureReason) => {
+    const notice = uploadFailureNotice(reason);
+
+    trackEvent(ANALYTICS_EVENTS.muxUploadFailed, { stage: 'create_upload', reason });
+    setFailure(notice);
+    setState('create_error');
+    return notice;
+  }, []);
+
   /**
    * Endpoint function called by MuxUploader when file is selected. Returns a Promise that resolves with the upload URL.
    * The upload waits for this Promise before starting.
@@ -57,17 +85,15 @@ export default function MuxUploaderPanel() {
   const getEndpoint = useCallback(async (): Promise<string> => {
     transferStartedRef.current = false;
 
-    // Try to create upload - will fail with 401 if not authenticated
-    const result = await actions.mux.createDirectUpload({
-      corsOrigin: window.location.origin,
-    });
+    // Not signed in, or Mux rejected the session's token (the server then clears the session): fails as unauthorized
+    const result = await createUpload();
 
     trackEvent(ANALYTICS_EVENTS.muxUploadRequested, {
-      signed_in: !result.error || result.error.code !== 'UNAUTHORIZED',
+      signed_in: !('reason' in result) || result.reason !== 'unauthorized',
     });
 
-    if (result.error) {
-      if (result.error.code === 'UNAUTHORIZED') {
+    if ('reason' in result) {
+      if (result.reason === 'unauthorized') {
         // Not logged in - show login UI and wait for auth
         setState('needs_login');
 
@@ -77,18 +103,17 @@ export default function MuxUploaderPanel() {
         });
       }
 
-      // Other error - throw and let MuxUploader display its native error UI
-      trackEvent(ANALYTICS_EVENTS.muxUploadFailed, { stage: 'create_upload', reason: failureReason(result.error) });
-      throw new Error(result.error.message);
+      // The overlay explains the failure; throwing stops MuxUploader from starting a transfer
+      throw new Error(failCreateUpload(result.reason).message);
     }
 
     // Authenticated - store upload ID and proceed
-    setUploadId(result.data.uploadId);
+    setUploadId(result.uploadId);
     setState('uploading');
     transferStartedRef.current = true;
     trackEvent(ANALYTICS_EVENTS.muxUploadStarted);
-    return result.data.uploadUrl;
-  }, []);
+    return result.uploadUrl;
+  }, [failCreateUpload]);
 
   /** Handles OAuth login via popup. On success: fetches upload URL and resolves the pending Promise. */
   const handleLogin = useCallback(async () => {
@@ -108,27 +133,20 @@ export default function MuxUploaderPanel() {
       onSuccess: async () => {
         trackEvent(ANALYTICS_EVENTS.muxAuthSucceeded);
 
-        // Now authenticated - fetch upload URL
-        const uploadResult = await actions.mux.createDirectUpload({
-          corsOrigin: window.location.origin,
-        });
+        // Now authenticated - fetch upload URL. Unauthorized here means Mux rejected a fresh sign-in.
+        const uploadResult = await createUpload();
 
-        if (uploadResult.error) {
-          trackEvent(ANALYTICS_EVENTS.muxUploadFailed, {
-            stage: 'create_upload',
-            reason: failureReason(uploadResult.error),
-          });
-          setError(uploadResult.error.message);
-          setState('polling_error');
+        if ('reason' in uploadResult) {
+          failCreateUpload(uploadResult.reason);
           return;
         }
 
         // Store upload ID and resolve the pending Promise
-        setUploadId(uploadResult.data.uploadId);
+        setUploadId(uploadResult.uploadId);
         setState('uploading');
         transferStartedRef.current = true;
         trackEvent(ANALYTICS_EVENTS.muxUploadStarted);
-        loginResolverRef.current?.(uploadResult.data.uploadUrl);
+        loginResolverRef.current?.(uploadResult.uploadUrl);
       },
       onError: (errorMessage) => {
         trackEvent(ANALYTICS_EVENTS.muxAuthFailed, {
@@ -139,7 +157,7 @@ export default function MuxUploaderPanel() {
         setState('polling_error');
       },
     });
-  }, []);
+  }, [failCreateUpload]);
 
   // The uploader's messages can name the upload URL, so only the step is recorded.
   const handleUploadError = useCallback(() => {
@@ -201,19 +219,24 @@ export default function MuxUploaderPanel() {
     sourceUrl.set(`https://stream.mux.com/${result.playbackId}.m3u8`);
   }, [uploadId]);
 
-  /** Resets uploader to try again after error */
-  const handleRetry = useCallback(() => {
-    trackEvent(ANALYTICS_EVENTS.muxUploadRetried);
-
+  /** Returns the uploader to its idle state. */
+  const handleDismiss = useCallback(() => {
     // Reset MuxUploader's internal state
     uploaderRef.current?.dispatchEvent(new CustomEvent('reset'));
 
     // Reset React state
     setState('idle');
     setError(null);
+    setFailure(null);
     setUploadId(null);
     setPlaybackId(null);
   }, []);
+
+  /** Resets uploader to try again after error */
+  const handleRetry = useCallback(() => {
+    trackEvent(ANALYTICS_EVENTS.muxUploadRetried);
+    handleDismiss();
+  }, [handleDismiss]);
 
   return (
     <div
@@ -285,9 +308,11 @@ export default function MuxUploaderPanel() {
       <UploaderOverlay
         state={state}
         error={error}
+        failure={failure}
         playbackId={playbackId}
         onLogin={handleLogin}
         onRetry={handleRetry}
+        onDismiss={handleDismiss}
       />
     </div>
   );
