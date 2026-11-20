@@ -83,6 +83,16 @@ import '@videojs/html/video/player';
 ```
 </FrameworkCase>
 
+<FrameworkCase frameworks={["react"]}>
+Inside a `VideoPlayer`, or another Video.js `Player` configured for video, `Video` becomes the player's media. Outside a player, it's a standalone native `<video>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Inside `<video-player>`, a native `<video>` becomes the player's media.
+</FrameworkCase>
+
+`<track>` elements carry captions, subtitles, chapters, descriptions, or metadata.
+
 ## Examples
 
 ### Basic Usage

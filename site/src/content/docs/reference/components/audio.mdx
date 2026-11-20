@@ -79,6 +79,14 @@ import '@videojs/html/audio/player';
 ```
 </FrameworkCase>
 
+<FrameworkCase frameworks={["react"]}>
+Inside a `AudioPlayer`, or another Video.js `Player` configured for audio, `Audio` becomes the player's media. Outside a player, it's a standalone native `<audio>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Inside `<audio-player>`, a native `<audio>` becomes the player's media.
+</FrameworkCase>
+
 ## Examples
 
 ### Basic Usage
