@@ -27,8 +27,7 @@ export interface DrmSystemConfig {
 /**
  * License servers keyed by EME key system id — the shape of `source.drm`.
  *
- * Name every system you hold a license server for: which one is negotiated is the browser's choice, and each playback
- * path reads the systems it can reach. hls.js's own `drmSystems` takes the same shape, so a single object describes DRM
- * for either engine.
+ * Which key system is negotiated is the browser's choice, and each playback path reads the key systems it can reach.
+ * hls.js's own `drmSystems` takes the same shape.
  */
 export type DrmSystemsConfig = Partial<Record<KeySystem, DrmSystemConfig>>;

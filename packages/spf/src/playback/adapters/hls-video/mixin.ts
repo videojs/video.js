@@ -63,13 +63,14 @@ export type { HlsVideoMediaError } from './error-surface';
 export interface HlsVideoSource {
   /** Manifest URL. Mirrors the host's `src` property. */
   src?: string | undefined;
-  /** MIME type of the source. Accepted for shape compatibility; this engine plays HLS whatever the URL, so it's unused. */
+  /** MIME type of the source. Accepted and not read: this engine plays every source as HLS. */
   type?: string | undefined;
   /**
-   * License servers for protected content, keyed by EME key-system id.
+   * License servers for protected content, keyed by EME key system (`com.apple.fps`, `com.widevine.alpha`,
+   * `com.microsoft.playready`, `org.w3.clearkey`). Each entry takes a `licenseUrl`, plus a `serverCertificateUrl` for
+   * FairPlay. Either URL can also be a function that returns it.
    *
-   * Read per license request rather than captured, so changing the source changes what is licensed without rebuilding
-   * the engine. Accepts a resolver per URL (see `DrmUrl`) for servers only known once a source is set.
+   * Read on each license request, so a new source changes what is licensed without recreating the playback engine.
    */
   drm?: DrmSystemsConfig | undefined;
 }

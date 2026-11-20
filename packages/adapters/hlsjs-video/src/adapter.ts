@@ -79,70 +79,65 @@ export interface HlsSource {
    * MIME type of the source. Takes precedence over inference from `src`.
    *
    * Matched case-insensitively, and the legacy HLS spellings (`application/x-mpegURL`, `audio/mpegurl`, …) count as
-   * `application/vnd.apple.mpegurl`. Anything unrecognized is treated as a URL the browser plays on its own.
+   * `application/vnd.apple.mpegurl`. A source of any other type is handed to the browser to play natively.
    */
   type?: SourceType | undefined;
   /**
-   * Preferred playback path: `'mse'` for hls.js, `'native'` for the browser's own HLS support. Ignored when the
-   * preferred path cannot play the source.
+   * Playback path for an HLS source. `'native'` plays through the browser's own HLS support. With `'mse'` or no value,
+   * hls.js plays wherever the browser supports Media Source Extensions, and the browser's own HLS support plays
+   * elsewhere. Changing it recreates the playback engine.
    */
   preferPlayback?: PlaybackType | undefined;
   /**
-   * License servers for protected content, keyed by EME key system id.
+   * License servers for protected content, keyed by EME key system (`com.apple.fps`, `com.widevine.alpha`,
+   * `com.microsoft.playready`, `org.w3.clearkey`). Each entry takes a `licenseUrl`, plus a `serverCertificateUrl` for
+   * FairPlay.
    *
-   * Engine neutral, because which engine plays is decided later: hls.js is handed every system named here (with EME
-   * switched on), and native playback negotiates the `com.apple.fps` entry itself. Name every system you hold a license
-   * server for — which one is used is the browser's choice.
+   * Hls.js receives every key system named here, and native playback reads `com.apple.fps`. Which key system is
+   * negotiated is the browser's choice.
    */
   drm?: DrmSystemsConfig | undefined;
   /**
-   * Highest resolution adaptive bitrate selection may choose on its own.
+   * Highest resolution adaptive selection picks on its own. Applied in the player: renditions above it still arrive in
+   * the manifest, stay in `videoRenditions`, and can be selected by hand. A server-side limit such as Mux's
+   * `playback.maxResolution` removes renditions from the manifest instead.
    *
-   * A ceiling on automatic selection, not a filter on what is available: renditions above it stay in `videoRenditions`
-   * and can still be selected by hand. Matching is by pixel area, so a `'720p'` cap admits any rendition at or below
-   * 1280×720 worth of pixels. When every rendition sits above the cap, the smallest one is used.
+   * Compared by pixel area, so `'720p'` admits any rendition up to 1280×720 worth of pixels. When every rendition is
+   * above it, the smallest one plays.
    *
-   * Applied live — changing it never rebuilds the playback engine. Requires the hls.js (MSE) engine; native HLS
+   * Changing it takes effect without recreating the playback engine. Read by hls.js (MSE) playback only; native HLS
    * playback ignores it.
-   *
-   * For Mux sources this is distinct from `playback.maxResolution`, which asks Mux to leave higher renditions out of
-   * the manifest altogether.
    */
   maxAutoResolution?: MediaResolution | undefined;
   /**
-   * Whether the element's rendered size caps automatic selection. Defaults to `true`.
+   * Whether the element's rendered size caps adaptive selection. When on, selection stops at the smallest rendition
+   * that covers the element in device pixels, so a device pixel ratio of `2` doubles the size measured in CSS pixels.
+   * The cap follows the element as it resizes, and never goes below `minAutoResolution`.
    *
-   * A 400px-wide player has no use for a 4K rendition, so selection is held to the smallest rendition that still covers
-   * the element, measured in device pixels — a `2` device pixel ratio asks for twice what a CSS measurement would. The
-   * cap follows the element as it resizes, and `minAutoResolution` bounds how far down it can go. Set it to `false` for
-   * a player whose layout size understates what it needs, such as one that goes fullscreen without a resize.
+   * Hls.js judges which rendition covers the element by its larger dimension rather than pixel area, so the cap can
+   * land on a different rendition than `maxAutoResolution` would for the same ladder.
    *
-   * Which rendition covers the element is hls.js's own judgement, weighed on the largest dimension rather than pixel
-   * area, so it can land elsewhere than `maxAutoResolution` would for the same ladder.
+   * Changing it takes effect without recreating the playback engine. Read by hls.js (MSE) playback only; native HLS
+   * playback ignores it. hls.js's own `capLevelToPlayerSize`, set through `engine.hlsJs`, is separate: turning it off
+   * stops the size checks every cap here runs on, and changing it recreates the engine.
    *
-   * Applied live — changing it never rebuilds the playback engine. Requires the hls.js (MSE) engine; native HLS
-   * playback ignores it. Setting hls.js's own `capLevelToPlayerSize` through `source.engine.hlsJs` is a different
-   * thing: it stops the loop _every_ cap here is evaluated on, and takes a rebuild.
+   * @default true
    */
   capRenditionToPlayerSize?: boolean | undefined;
   /**
-   * Lowest resolution `capRenditionToPlayerSize` may cap down to. Defaults to `'720p'`.
+   * Lowest resolution `capRenditionToPlayerSize` caps down to. It bounds only that size-derived cap and is not a
+   * quality floor: on a poor connection, adaptive selection still drops below it. It doesn't raise `maxAutoResolution`
+   * either, so `'360p'` alongside a `'720p'` floor caps at `'360p'`.
    *
-   * Not a quality floor. It bounds the size-derived cap and nothing else: when bandwidth is poor, adaptive selection
-   * still drops below it, because the cap is a ceiling and selection stays free underneath. Nor does it raise an
-   * explicit `maxAutoResolution` — asking for at most `'360p'` alongside a `'720p'` floor yields `'360p'`.
-   *
-   * The default exists because the low rungs of a ladder are there for poor network conditions, and capping a small
-   * player to them looks worse than its size suggests. Name a lower rung to weaken the floor, or `'270p'` to lift it
-   * for any real ladder.
-   *
-   * Applied live — changing it never rebuilds the playback engine. Requires the hls.js (MSE) engine; native HLS
+   * Changing it takes effect without recreating the playback engine. Read by hls.js (MSE) playback only; native HLS
    * playback ignores it.
+   *
+   * @default '720p'
    */
   minAutoResolution?: MediaResolution | undefined;
   /**
-   * Playback options, keyed by the engine that reads them. Only one of the two engines below ends up playing, and each
-   * reads only its own key.
+   * Playback options, keyed by the engine that reads them. One of the two engines plays a source, and each reads only
+   * its own key. Changing them recreates the playback engine.
    */
   engine?: HlsEngineConfig | undefined;
 }
@@ -150,14 +145,13 @@ export interface HlsSource {
 /** The engines an HLS source can configure. */
 export interface HlsEngineConfig {
   /**
-   * Hls.js's own configuration, passed through untouched. A `drmSystems` of its own replaces `source.drm` for hls.js —
-   * an escape hatch for licensing MSE playback differently, or for the parts of hls.js's DRM configuration `source.drm`
-   * does not cover.
+   * Hls.js's own configuration, passed to hls.js unchanged. Its `drmSystems`, when set, replaces `source.drm` for
+   * hls.js playback.
    */
   hlsJs?: Partial<HlsJsConfig> | undefined;
   /**
-   * Options for the browser's own HLS playback, used whenever the native path is the one taken. Its `drmSystems`
-   * replaces `source.drm` for that path in the same way.
+   * Options for the browser's own HLS playback, read when the native path plays. Its `drmSystems`, when set, replaces
+   * `source.drm` for native playback.
    */
   nativeHls?: NativeHlsConfig | undefined;
 }
