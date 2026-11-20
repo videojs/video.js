@@ -5,7 +5,6 @@
  * What's worth asserting here is that applying it to the audio-only Media keeps that surface intact — the two extend
  * different bases, so nothing guarantees it but a test — plus the two things this flavor decides for itself.
  */
-import { createEngine } from '@videojs/spf/engines/hls-audio-mpeg-ts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxAudioAdapter } from '../adapter';
@@ -14,11 +13,13 @@ import { MuxAudioAdapter } from '../adapter';
 const DOCUMENT = [{ 'start-time': 0, titles: [{ language: 'und', title: 'Big Buck Bunny' }] }];
 
 // Every Mux source fetches its metadata, so no test here reaches the network.
+// jsdom has no MediaSource; standing one in keeps these sources on SPF.
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => new Response(JSON.stringify(DOCUMENT), { status: 200 }))
   );
+  vi.stubGlobal('MediaSource', class {});
 });
 
 afterEach(() => {
@@ -26,8 +27,37 @@ afterEach(() => {
 });
 
 describe('MuxAudioAdapter', () => {
-  it('builds its engine with the MPEG-TS audio engine', () => {
-    expect(MuxAudioAdapter.createEngine).toBe(createEngine);
+  it('plays through the MPEG-TS audio engine', () => {
+    const media = new MuxAudioAdapter();
+
+    media.source = { playbackId: 'abc123' };
+
+    expect(media.engineName).toBe('spf-hls-audio-mpeg-ts');
+  });
+
+  it('plays natively when the browser has no Media Source Extensions', () => {
+    vi.stubGlobal('MediaSource', undefined);
+    const media = new MuxAudioAdapter();
+    const audio = document.createElement('audio');
+
+    // SAFETY: the host adapter is the video one, as on the hls.js-backed flavor;
+    // `<mux-audio>` attaches an `<audio>` to it the same way.
+    media.attach(audio as unknown as HTMLVideoElement);
+    media.source = { playbackId: 'abc123' };
+
+    expect(media.engineName).toBe('browser');
+    expect(media.engine).toBe(null);
+    expect(audio.getAttribute('src')).toBe('https://stream.mux.com/abc123.m3u8');
+  });
+
+  it('plays natively when preferPlayback asks for it, and keeps asking on the next src', () => {
+    const media = new MuxAudioAdapter();
+
+    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
+    media.src = 'https://stream.mux.com/def456';
+
+    expect(media.source).toEqual({ playbackId: 'def456', preferPlayback: 'native' });
+    expect(media.engineName).toBe('browser');
   });
 
   it('defaults source to null', () => {
@@ -37,8 +67,10 @@ describe('MuxAudioAdapter', () => {
   it('defaults preload to metadata, which is what the engine does', () => {
     const media = new MuxAudioAdapter();
 
+    media.source = { playbackId: 'abc123' };
+
     expect(media.preload).toBe('metadata');
-    expect(media.engine.state.preload.get()).toBe('metadata');
+    expect(media.engine?.state.preload.get()).toBe('metadata');
   });
 
   it('derives src from source.playbackId', () => {

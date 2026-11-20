@@ -12,4 +12,5 @@
  */
 export type { MuxContentData, MuxSourceBase } from '@videojs/mux-video';
 export type { MuxAdapterAPI, MuxAdapterProps } from '@videojs/mux-video/spf';
-export { MuxAudioAdapter } from './adapter';
+export type { MuxSource } from '@videojs/mux-video/spf';
+export { MuxAudioAdapter, type MuxAudioAdapterProps } from './adapter';

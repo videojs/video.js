@@ -8,6 +8,12 @@
   },
   "references": [
     {
+      "path": "../../media"
+    },
+    {
+      "path": "../../media/src/dom"
+    },
+    {
       "path": "../mux-video"
     },
     {

@@ -661,6 +661,9 @@ importers:
 
   packages/adapters/mux-audio:
     dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
       '@videojs/mux-video':
         specifier: workspace:*
         version: link:../mux-video
