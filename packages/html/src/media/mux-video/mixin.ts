@@ -34,8 +34,7 @@ export function MuxVideoMixin<Class extends AnyConstructor<HTMLElement>>(BaseCla
   class MuxVideoElement extends (BaseClass as unknown as Constructor<MuxVideoElementLike>) {
     /**
      * @attr {number} poster-time - The time, in seconds, of the video frame Mux uses for the poster image.
-     * Reflects to `source.poster.time` and is re-applied when `src` changes. Removing the attribute clears it.
-     * See [Play Mux videos](https://videojs.org/docs/guides/mux#choose-the-poster-and-storyboard).
+     * Sets `source.poster.time` and is re-applied when `src` changes. Removing the attribute clears it.
      */
     static get observedAttributes(): string[] {
       // Declared here rather than in `static properties` because it does not map to an

@@ -18,9 +18,10 @@ function PosterFrameMixin<Base extends new (...args: any[]) => HTMLElement>(Base
     /**
      * @attr {number} poster-frame - The time, in seconds, of the frame to show as the poster.
      * See [Add a poster](https://videojs.org/docs/guides/poster).
+     * @attr [poster-format=jpg] - Image format of the poster frame.
      */
     static get observedAttributes(): string[] {
-      return [...((BaseClass as any).observedAttributes ?? []), 'poster-frame'];
+      return [...((BaseClass as any).observedAttributes ?? []), 'poster-frame', 'poster-format'];
     }
   }
 

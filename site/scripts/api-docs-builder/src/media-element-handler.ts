@@ -424,15 +424,21 @@ function walkElementClass(
 
   for (const node of [declaration, ...declaration.body.body]) {
     for (const value of getJSDoc(file, node)?.tags.get('attr') ?? []) {
-      const match = value.match(/^(?:\{([^}]*)\}\s*)?(\S+)\s*(?:-\s*)?(.*)$/s);
-      if (!match?.[2] || match[2] in attributes) continue;
+      // `[name]` and `[name=default]` are JSDoc's optional-name forms.
+      const match = value.match(/^(?:\{([^}]*)\}\s*)?(?:\[([^\]=]+)(?:=([^\]]*))?\]|(\S+))\s*(?:-\s*)?(.*)$/s);
+      if (!match) continue;
 
-      const definition: HostPropertyDef = { type: match[1]?.trim() || 'string', readonly: false };
-      const description = match[3]?.trim();
+      const [, type, optionalName, defaultValue, requiredName, description] = match.map((part) => part?.trim());
+      const name = optionalName ?? requiredName;
+      if (!name || Object.hasOwn(attributes, name)) continue;
+
+      const definition: HostPropertyDef = { type: type || 'string', readonly: false };
+
+      if (defaultValue) definition.default = defaultValue;
 
       if (description) definition.description = description;
 
-      attributes[match[2]] = definition;
+      attributes[name] = definition;
     }
   }
 

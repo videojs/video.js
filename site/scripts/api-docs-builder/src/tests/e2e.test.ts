@@ -2400,6 +2400,18 @@ describe('Media component pipeline (end-to-end)', () => {
       });
     });
 
+    it('reads the optional-name @attr form as the bare name with its default', () => {
+      const attributes = findElement('MixinVideo')!.reference.platforms.html.attributes;
+
+      expect(attributes.custom['poster-format']).toEqual({
+        type: 'string',
+        readonly: false,
+        default: 'jpg',
+        description: 'Image format of the poster frame.',
+      });
+      expect(attributes.custom['[poster-format=jpg]']).toBeUndefined();
+    });
+
     it('does not add element attributes to elements that declare none', () => {
       expect(findElement('SimpleVideo')!.reference.platforms.html.attributes.custom['poster-frame']).toBeUndefined();
     });
