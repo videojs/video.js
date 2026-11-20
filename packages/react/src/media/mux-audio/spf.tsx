@@ -1,7 +1,7 @@
 'use client';
 
-import { type MuxAdapterProps, MuxAudioAdapter } from '@videojs/mux-audio/spf';
-import type { HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
+import { MuxAudioAdapter, type MuxAudioAdapterProps } from '@videojs/mux-audio/spf';
+import type { SpfPlaybackProps } from '@videojs/mux-video/spf';
 import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -15,19 +15,21 @@ export type {
   MuxAdapterAPI,
   MuxAdapterProps,
   MuxAudioAdapter,
+  MuxAudioAdapterProps,
   MuxContentData,
+  MuxSource,
   MuxSourceBase,
 } from '@videojs/mux-audio/spf';
 
-// `src` and `source` come from `MuxAdapterProps`: the Mux Adapter owns both, and its
+// `src` and `source` come from `MuxAudioAdapterProps`: the Mux Adapter owns both, and its
 // `source` is the structured Mux one rather than the generic engine's. Both are
 // omitted from the base rather than intersected with it — the two `source` types
 // describe different things, and an intersection satisfies neither.
 export interface MuxAudioProps
   extends
-    Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof HlsAudioAdapterProps | keyof MuxAdapterProps>,
-    Partial<Omit<HlsAudioAdapterProps, 'src' | 'source'>>,
-    Partial<MuxAdapterProps>,
+    Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof SpfPlaybackProps | keyof MuxAudioAdapterProps>,
+    Partial<Omit<SpfPlaybackProps, 'src' | 'source'>>,
+    Partial<MuxAudioAdapterProps>,
     MediaRefProps<MuxAudioAdapter>,
     MediaFallbackProps {
   children?: ReactNode;
