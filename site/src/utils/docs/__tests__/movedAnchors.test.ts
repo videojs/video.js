@@ -7,12 +7,12 @@ describe('resolveMovedAnchors', () => {
   it("resolves each target to the page's framework, keeping its anchor", () => {
     expect(
       resolveMovedAnchors(
-        { 'signed-playback': 'guides/mux#play-signed-assets', 'load-a-source': 'guides/media-sources' },
+        { 'signed-playback': 'guides/mux#play-signed-assets', 'load-a-source': 'guides/hls' },
         'react'
       )
     ).toEqual({
       'signed-playback': '/docs/framework/react/guides/mux#play-signed-assets',
-      'load-a-source': '/docs/framework/react/guides/media-sources',
+      'load-a-source': '/docs/framework/react/guides/hls',
     });
   });
 
