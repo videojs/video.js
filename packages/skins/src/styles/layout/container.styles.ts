@@ -1,5 +1,19 @@
 import { styles } from 'vjsc/styles';
 
+const slottedEmbed = '[&>slot::slotted([data-cross-origin-frame])]';
+
+/**
+ * Shadow DOM utilities for every skin's video preset. Iframe embeds such as `<youtube-video>` mark themselves
+ * `data-cross-origin-frame` and keep a native-like default size outside a skin, so the skin stretches them like the
+ * `<video>` the container sizes. Audio embeds carry the same marker but set their own height.
+ */
+export const slottedEmbedFill = [
+  `${slottedEmbed}:m-0 ${slottedEmbed}:block ${slottedEmbed}:w-full ${slottedEmbed}:max-w-full`,
+  `${slottedEmbed}:rounded-[inherit] ${slottedEmbed}:h-full!`,
+  // A minimum set for standalone use, such as TikTok's portrait floor, would overflow the player.
+  `${slottedEmbed}:min-w-0 ${slottedEmbed}:min-h-0`,
+] as const;
+
 export default styles({
   file: 'container.css',
   prefix: 'media',

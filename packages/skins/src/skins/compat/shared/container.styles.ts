@@ -1,5 +1,7 @@
 import { styles } from 'vjsc/styles';
 
+import { slottedEmbedFill } from '../../../styles/layout/container.styles';
+
 export default styles({
   file: 'container.css',
   prefix: 'media',
@@ -29,6 +31,9 @@ export default styles({
     video: {
       scopeRoot: true,
       utilities: 'bg-black',
+      variants: {
+        'shadow-dom': slottedEmbedFill,
+      },
     },
     audio: {
       scopeRoot: true,
