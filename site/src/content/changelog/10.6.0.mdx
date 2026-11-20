@@ -1,0 +1,48 @@
+---
+description: ""
+date: 2026-11-20
+version: "10.6.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.5.0...@videojs/core@10.6.0"
+---
+
+
+### 🚀 Features
+- *(spf)* Play live streams on the audio engines ([#9779](https://github.com/videojs/video.js/pull/9779)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- Add quality and audio track selection to live video ([#9798](https://github.com/videojs/video.js/pull/9798)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(hyperframes-video)* Add hyperframes composition media ([#9719](https://github.com/videojs/video.js/pull/9719)) by [@luwes](https://github.com/luwes)
+
+### 🐛 Bug Fixes
+- *(spf)* Fail the source when its manifest does not load ([#9776](https://github.com/videojs/video.js/pull/9776)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(hlsjs-video)* Surface fatal errors raised while media is attaching ([#9729](https://github.com/videojs/video.js/pull/9729)) by [@siam923](https://github.com/siam923)
+- *(spf)* Surface metadata before play for tracks without an init segment ([#9778](https://github.com/videojs/video.js/pull/9778)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(core)* Position popovers manually under a transformed ancestor ([#9762](https://github.com/videojs/video.js/pull/9762)) by [@vladosskins178](https://github.com/vladosskins178)
+- *(ci)* Gate agent workflows against untrusted issue content ([#9801](https://github.com/videojs/video.js/pull/9801)) by [@luwes](https://github.com/luwes)
+- *(spf)* Load the previous segment when a seek lands before a segment's first frame, and stop shifting MPEG-TS off the playlist ([#9774](https://github.com/videojs/video.js/pull/9774)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(google-cast)* Detect separate hls audio segment formats when casting ([#9788](https://github.com/videojs/video.js/pull/9788)) by [@luwes](https://github.com/luwes)
+- *(google-cast)* Keep receiver text tracks in sync with sidecar tracks ([#9789](https://github.com/videojs/video.js/pull/9789)) by [@luwes](https://github.com/luwes)
+- *(google-cast)* Disable DRM casts to the default receiver and document DRM casting ([#9794](https://github.com/videojs/video.js/pull/9794)) by [@luwes](https://github.com/luwes)
+- *(html,react)* Add explicit exports for nested public subpaths ([#9804](https://github.com/videojs/video.js/pull/9804)) by [@luwes](https://github.com/luwes)
+- *(google-cast)* Keep text track listeners on the list they were added to ([#9807](https://github.com/videojs/video.js/pull/9807)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(site)* Shorten redirect chains and fix 404s that Search Console reports ([#9647](https://github.com/videojs/video.js/pull/9647)) by [@decepulis](https://github.com/decepulis)
+- *(store)* Stop installing react into plain html projects ([#9819](https://github.com/videojs/video.js/pull/9819)) by [@luwes](https://github.com/luwes)
+- *(dash-video)* Clear the source before detaching so dash.js unbinds from the element ([#9814](https://github.com/videojs/video.js/pull/9814)) by [@luwes](https://github.com/luwes)
+- *(google-cast)* Unload the receiver when the source is cleared ([#9726](https://github.com/videojs/video.js/pull/9726)) by [@SrkianFardin25](https://github.com/SrkianFardin25)
+- *(html)* Make iframe embeds fill the player ([#9821](https://github.com/videojs/video.js/pull/9821)) by [@sampotts](https://github.com/sampotts)
+
+### 🚜 Refactor
+- *(google-cast)* Trim the extension and let providers listen to the cast context ([#9791](https://github.com/videojs/video.js/pull/9791)) by [@luwes](https://github.com/luwes)
+
+### 📚 Documentation
+- *(spf)* Correct what Mux packages as MPEG-TS and what live TS covers ([#9777](https://github.com/videojs/video.js/pull/9777)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(site)* Add changelog prose for 10.5.0 ([#9781](https://github.com/videojs/video.js/pull/9781)) by [@github-actions[bot]](https://github.com/github-actions[bot])
+- *(site)* Document Mux media playback engines ([#9787](https://github.com/videojs/video.js/pull/9787)) by [@decepulis](https://github.com/decepulis)
+
+### 🧪 Testing
+- *(test)* Cover source churn, unmounting, and remounting against real engines ([#9815](https://github.com/videojs/video.js/pull/9815)) by [@luwes](https://github.com/luwes)
+
+### New Contributors
+* @SrkianFardin25 made their first contribution in [#9726](https://github.com/videojs/video.js/pull/9726)
+* @vladosskins178 made their first contribution in [#9762](https://github.com/videojs/video.js/pull/9762)
+* @siam923 made their first contribution in [#9729](https://github.com/videojs/video.js/pull/9729)

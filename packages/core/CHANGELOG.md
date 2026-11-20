@@ -1,5 +1,28 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/core@10.5.0...@videojs/core@10.6.0) (2026-11-20)
+
+
+### Features
+
+* add quality and audio track selection to live video ([#9798](https://github.com/videojs/video.js/issues/9798)) ([3d55540](https://github.com/videojs/video.js/commit/3d555407f2c3bc6a01459a385a9ec0e83a3028e6))
+
+
+### Bug Fixes
+
+* **core:** position popovers manually under a transformed ancestor ([#9762](https://github.com/videojs/video.js/issues/9762)) ([e9da7b8](https://github.com/videojs/video.js/commit/e9da7b8af6a5e2c7e6fdb62761a283d9d3477a09))
+* **hlsjs-video:** surface fatal errors raised while media is attaching ([#9729](https://github.com/videojs/video.js/issues/9729)) ([4fc4e64](https://github.com/videojs/video.js/commit/4fc4e647f240c86a442dde36c338d76fefdd4cfe))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.6.0
+    * @videojs/store bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+    * video.js bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/core@10.4.0...@videojs/core@10.5.0) (2026-11-16)
 
 
