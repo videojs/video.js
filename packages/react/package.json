@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react",
-  "version": "10.5.0",
+  "version": "10.6.0",
   "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
     "audio",
@@ -149,6 +149,11 @@
       "development": "./dist/dev/i18n/index.js",
       "default": "./dist/default/i18n/index.js"
     },
+    "./i18n/locales/*/register": {
+      "types": "./dist/dev/i18n/locales/*/register.d.ts",
+      "development": "./dist/dev/i18n/locales/*/register.js",
+      "default": "./dist/default/i18n/locales/*/register.js"
+    },
     "./i18n/locales/*": {
       "types": "./dist/dev/i18n/locales/*.d.ts",
       "development": "./dist/dev/i18n/locales/*.js",
@@ -189,6 +194,7 @@
     "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/hyperframes-video": "workspace:*",
     "@videojs/icons": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
@@ -216,6 +222,7 @@
     "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/hyperframes-video": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
@@ -249,6 +256,9 @@
       "optional": true
     },
     "@videojs/hlsjs-video": {
+      "optional": true
+    },
+    "@videojs/hyperframes-video": {
       "optional": true
     },
     "@videojs/mixcloud-audio": {

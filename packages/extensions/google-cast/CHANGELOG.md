@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/google-cast@10.5.0...@videojs/google-cast@10.6.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **google-cast:** detect separate hls audio segment formats when casting ([#9788](https://github.com/videojs/video.js/issues/9788)) ([3494e62](https://github.com/videojs/video.js/commit/3494e6259e565f6762dffe6a297b805e64fd4ae0))
+* **google-cast:** disable DRM casts to the default receiver and document DRM casting ([#9794](https://github.com/videojs/video.js/issues/9794)) ([4b6b7fb](https://github.com/videojs/video.js/commit/4b6b7fbaf1bde7377b8609b98f102c9f813d211b))
+* **google-cast:** keep receiver text tracks in sync with sidecar tracks ([#9789](https://github.com/videojs/video.js/issues/9789)) ([f353194](https://github.com/videojs/video.js/commit/f35319440319ee55c5f163b636e67c84ddec1554))
+* **google-cast:** keep text track listeners on the list they were added to ([#9807](https://github.com/videojs/video.js/issues/9807)) ([38a16b0](https://github.com/videojs/video.js/commit/38a16b085bbfed5d8cf5c3b72969524ed71064a9))
+* **google-cast:** unload the receiver when the source is cleared ([#9726](https://github.com/videojs/video.js/issues/9726)) ([1949bf2](https://github.com/videojs/video.js/commit/1949bf26dcfc44d6bf7fa8ab5ebc0a362171af62))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.6.0
+    * @videojs/media bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/google-cast@10.4.0...@videojs/google-cast@10.5.0) (2026-11-16)
 
 

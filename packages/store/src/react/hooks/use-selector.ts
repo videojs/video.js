@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 import { type Comparator, type Selector, shallowEqual } from '../../core/shallow-equal';
 
@@ -24,14 +24,14 @@ export function useSelector<S, R>(
 ): R {
   const cache = useRef<R | undefined>(undefined);
 
-  const getSelectedSnapshot = () => {
+  const getSelectedSnapshot = useCallback(() => {
     const next = selector(getSnapshot());
     if (cache.current !== undefined && isEqual(cache.current, next)) return cache.current;
 
     cache.current = next;
 
     return next;
-  };
+  }, [getSnapshot, selector, isEqual]);
 
   return useSyncExternalStore(subscribe, getSelectedSnapshot, getSelectedSnapshot);
 }

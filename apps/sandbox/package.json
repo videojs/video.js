@@ -21,6 +21,7 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/html": "workspace:*",
+    "@videojs/hyperframes-video": "workspace:*",
     "@videojs/icons": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",

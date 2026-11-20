@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.5.0...@videojs/installation@10.6.0) (2026-11-20)
+
+
+### Features
+
+* **hyperframes-video:** add hyperframes composition media ([#9719](https://github.com/videojs/video.js/issues/9719)) ([67c4834](https://github.com/videojs/video.js/commit/67c48344f4f7f5de9cb79fd368b9d0de0fe348a6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.6.0
+  * devDependencies
+    * @videojs/media bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.4.0...@videojs/installation@10.5.0) (2026-11-16)
 
 

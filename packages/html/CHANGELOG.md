@@ -1,5 +1,76 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/html@10.5.0...@videojs/html@10.6.0) (2026-11-20)
+
+
+### Features
+
+* add quality and audio track selection to live video ([#9798](https://github.com/videojs/video.js/issues/9798)) ([3d55540](https://github.com/videojs/video.js/commit/3d555407f2c3bc6a01459a385a9ec0e83a3028e6))
+* **hyperframes-video:** add hyperframes composition media ([#9719](https://github.com/videojs/video.js/issues/9719)) ([67c4834](https://github.com/videojs/video.js/commit/67c48344f4f7f5de9cb79fd368b9d0de0fe348a6))
+
+
+### Bug Fixes
+
+* **html,react:** add explicit exports for nested public subpaths ([#9804](https://github.com/videojs/video.js/issues/9804)) ([887dfbc](https://github.com/videojs/video.js/commit/887dfbc8dc98bec904270cc7a4b25ebf365a3ad9))
+* **html:** make iframe embeds fill the player ([#9821](https://github.com/videojs/video.js/issues/9821)) ([3e6bd25](https://github.com/videojs/video.js/commit/3e6bd25c9be8dc7dab33c8bcf066505cb7fdc51a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.6.0
+    * @videojs/element bumped to 10.6.0
+    * @videojs/media bumped to 10.6.0
+    * @videojs/native-hls-video bumped to 10.6.0
+    * @videojs/spf bumped to 10.6.0
+    * @videojs/store bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.6.0
+    * @videojs/dailymotion-video bumped to 10.6.0
+    * @videojs/dash-video bumped to 10.6.0
+    * @videojs/google-analytics bumped to 10.6.0
+    * @videojs/google-cast bumped to 10.6.0
+    * @videojs/hlsjs-video bumped to 10.6.0
+    * @videojs/hyperframes-video bumped to 10.6.0
+    * @videojs/icons bumped to 10.6.0
+    * @videojs/mixcloud-audio bumped to 10.6.0
+    * @videojs/mux-audio bumped to 10.6.0
+    * @videojs/mux-data bumped to 10.6.0
+    * @videojs/mux-video bumped to 10.6.0
+    * @videojs/playerjs-video bumped to 10.6.0
+    * @videojs/shaka-video bumped to 10.6.0
+    * @videojs/skins bumped to 10.6.0
+    * @videojs/soundcloud-audio bumped to 10.6.0
+    * @videojs/spotify-audio bumped to 10.6.0
+    * @videojs/tiktok-video bumped to 10.6.0
+    * @videojs/twitch-video bumped to 10.6.0
+    * @videojs/vimeo-video bumped to 10.6.0
+    * @videojs/wistia-video bumped to 10.6.0
+    * @videojs/youtube-video bumped to 10.6.0
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.6.0
+    * @videojs/dailymotion-video bumped to 10.6.0
+    * @videojs/dash-video bumped to 10.6.0
+    * @videojs/google-analytics bumped to 10.6.0
+    * @videojs/google-cast bumped to 10.6.0
+    * @videojs/hlsjs-video bumped to 10.6.0
+    * @videojs/hyperframes-video bumped to 10.6.0
+    * @videojs/mixcloud-audio bumped to 10.6.0
+    * @videojs/mux-audio bumped to 10.6.0
+    * @videojs/mux-data bumped to 10.6.0
+    * @videojs/mux-video bumped to 10.6.0
+    * @videojs/playerjs-video bumped to 10.6.0
+    * @videojs/shaka-video bumped to 10.6.0
+    * @videojs/soundcloud-audio bumped to 10.6.0
+    * @videojs/spotify-audio bumped to 10.6.0
+    * @videojs/tiktok-video bumped to 10.6.0
+    * @videojs/twitch-video bumped to 10.6.0
+    * @videojs/vimeo-video bumped to 10.6.0
+    * @videojs/wistia-video bumped to 10.6.0
+    * @videojs/youtube-video bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/html@10.4.0...@videojs/html@10.5.0) (2026-11-16)
 
 

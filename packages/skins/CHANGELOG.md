@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.5.0...@videojs/skins@10.6.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **html:** make iframe embeds fill the player ([#9821](https://github.com/videojs/video.js/issues/9821)) ([3e6bd25](https://github.com/videojs/video.js/commit/3e6bd25c9be8dc7dab33c8bcf066505cb7fdc51a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.6.0
+    * @videojs/element bumped to 10.6.0
+    * @videojs/icons bumped to 10.6.0
+    * @videojs/installation bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.4.0...@videojs/skins@10.5.0) (2026-11-16)
 
 

@@ -1,0 +1,125 @@
+<!doctype html>
+<!--
+  A HyperFrames composition as their tooling writes one: a whole document with its own GSAP and its own timeline
+  script. `<hyperframes-video src>` fetches it and plays it in an opaque frame, with the runtime injected ahead of
+  these scripts, so nothing here can reach the sandbox page.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Video.js × HyperFrames</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0b1020;
+        font-family: system-ui, sans-serif;
+      }
+      #stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .clip {
+        position: absolute;
+        visibility: hidden;
+      }
+      .backdrop {
+        inset: 0;
+        background: radial-gradient(circle at 30% 40%, #312e81, #0b1020 70%);
+      }
+      .kicker {
+        top: 300px;
+        left: 160px;
+        font-size: 48px;
+        font-weight: 600;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #a5b4fc;
+      }
+      .headline {
+        top: 380px;
+        left: 160px;
+        font-size: 150px;
+        font-weight: 800;
+        color: #fff;
+      }
+      .bar {
+        top: 600px;
+        left: 160px;
+        width: 900px;
+        height: 16px;
+        border-radius: 8px;
+        background: #f472b6;
+        transform-origin: left center;
+      }
+      .outro {
+        top: 440px;
+        left: 0;
+        width: 1920px;
+        text-align: center;
+        font-size: 120px;
+        font-weight: 800;
+        color: #fbbf24;
+      }
+      .dot {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #38bdf8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage" data-composition-id="intro" data-width="1920" data-height="1080">
+      <div class="clip backdrop" data-start="0" data-duration="10" data-track-index="0"></div>
+      <p class="clip kicker" data-start="0.3" data-duration="5.2" data-track-index="1">A HyperFrames file</p>
+      <h1 class="clip headline" data-start="0.6" data-duration="4.9" data-track-index="2">Played by Video.js</h1>
+      <div class="clip bar" data-start="1.4" data-duration="4.1" data-track-index="3"></div>
+      <div
+        class="clip dot dot-1"
+        data-start="2"
+        data-duration="3.5"
+        data-track-index="4"
+        style="top: 760px; left: 160px"
+      ></div>
+      <div
+        class="clip dot dot-2"
+        data-start="2.2"
+        data-duration="3.3"
+        data-track-index="5"
+        style="top: 760px; left: 280px"
+      ></div>
+      <div
+        class="clip dot dot-3"
+        data-start="2.4"
+        data-duration="3.1"
+        data-track-index="6"
+        style="top: 760px; left: 400px"
+      ></div>
+      <h2 class="clip outro" data-start="6" data-duration="4" data-track-index="1">Seek me anywhere.</h2>
+    </div>
+
+    <script>
+      window.__timelines['intro'] = gsap
+        .timeline({ paused: true })
+        .from('.kicker', { x: -80, opacity: 0, duration: 0.8, ease: 'power2.out' }, 0.3)
+        .from('.headline', { y: 60, opacity: 0, duration: 1, ease: 'power3.out' }, 0.6)
+        .from('.bar', { scaleX: 0, duration: 1.2, ease: 'power2.inOut' }, 1.4)
+        .from('.dot', { y: 120, opacity: 0, stagger: 0.2, duration: 0.6, ease: 'back.out(2)' }, 2)
+        .to('.dot', { x: 1300, duration: 3, ease: 'power1.inOut', stagger: 0.1 }, 2.8)
+        .from('.outro', { scale: 0.6, opacity: 0, duration: 0.9, ease: 'back.out(1.6)' }, 6)
+        .to('.outro', { letterSpacing: '0.08em', duration: 3.1, ease: 'none' }, 6.9);
+    </script>
+  </body>
+</html>

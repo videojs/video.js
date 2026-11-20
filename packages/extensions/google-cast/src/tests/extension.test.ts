@@ -35,8 +35,12 @@ const mocks = vi.hoisted(() => {
       this.target = null;
     });
     destroy = vi.fn();
+    updateAvailability = vi.fn();
 
-    constructor(public config: unknown) {
+    constructor(
+      public config: unknown,
+      public canCast: () => boolean = () => true
+    ) {
       FakeProvider.instances.push(this);
     }
   }
@@ -280,6 +284,79 @@ describe('GoogleCastExtension', () => {
     });
   });
 
+  describe('DRM sources', () => {
+    const DRM_SOURCE = { playbackId: 'abc', drm: { token: 'drm-token' } };
+    const WIDEVINE = { 'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' } };
+
+    /** A media component or adapter playing `source`, which it announces with `sourcechange`. */
+    function attachSource(googleCast: GoogleCastExtension, source: unknown) {
+      const media = Object.assign(createHost(document.createElement('video')), { source });
+
+      googleCast.attach({ media: media as unknown as Media, container: null });
+
+      return { media, provider: mocks.FakeProvider.instances.at(-1)! };
+    }
+
+    it('cannot cast a source signed for DRM to the default receiver', () => {
+      const { provider } = attachSource(new GoogleCastExtension(), DRM_SOURCE);
+
+      expect(provider.canCast()).toBe(false);
+    });
+
+    it('can cast it once a receiver is set, and reports the change', () => {
+      const googleCast = new GoogleCastExtension();
+      const { provider } = attachSource(googleCast, DRM_SOURCE);
+
+      provider.updateAvailability.mockClear();
+      googleCast.receiver = 'ABCD1234';
+
+      expect(provider.canCast()).toBe(true);
+      expect(provider.updateAvailability).toHaveBeenCalledTimes(1);
+    });
+
+    it('can cast Mux sources without a DRM token, and other media', () => {
+      const { provider } = attachSource(new GoogleCastExtension(), { playbackId: 'abc' });
+
+      expect(provider.canCast()).toBe(true);
+      expect(setup().provider.canCast()).toBe(true);
+    });
+
+    it.each([
+      ['license servers in `drm`', { src: 'https://example.com/a.m3u8', drm: WIDEVINE }],
+      ['license servers on a Mux source', { playbackId: 'abc', drm: WIDEVINE }],
+      ['hls.js `drmSystems`', { src: 'https://example.com/a.m3u8', engine: { hlsJs: { drmSystems: WIDEVINE } } }],
+      ['hls.js `emeEnabled`', { src: 'https://example.com/a.m3u8', engine: { hlsJs: { emeEnabled: true } } }],
+      [
+        'native HLS `drmSystems`',
+        { src: 'https://example.com/a.m3u8', engine: { nativeHls: { drmSystems: WIDEVINE } } },
+      ],
+    ])('cannot cast a source with %s to the default receiver', (_, source) => {
+      const { provider } = attachSource(new GoogleCastExtension(), source);
+
+      expect(provider.canCast()).toBe(false);
+    });
+
+    it('can cast a source whose DRM config has no entries', () => {
+      const { provider } = attachSource(new GoogleCastExtension(), {
+        src: 'https://example.com/a.m3u8',
+        drm: { token: undefined },
+      });
+
+      expect(provider.canCast()).toBe(true);
+    });
+
+    it('checks again when the source changes', () => {
+      const { media, provider } = attachSource(new GoogleCastExtension(), { playbackId: 'abc' });
+
+      provider.updateAvailability.mockClear();
+      media.source = DRM_SOURCE;
+      media.dispatchEvent(new Event('sourcechange'));
+
+      expect(provider.updateAvailability).toHaveBeenCalledTimes(1);
+      expect(provider.canCast()).toBe(false);
+    });
+  });
+
   describe('local source changes', () => {
     it('follows a new local source on the receiver while connected', () => {
       const { video, provider } = setup();
@@ -344,12 +421,44 @@ describe('GoogleCastExtension', () => {
       expect(provider.load).not.toHaveBeenCalled();
     });
 
+    it('takes the source off the receiver when the media drops it while connected', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      provider.loadedSrc = 'https://example.com/video.mp4';
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the receiver loaded when the media empties while a source remains', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      video.src = 'https://example.com/next.mp4';
+      provider.loadedSrc = 'https://example.com/video.mp4';
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).not.toHaveBeenCalled();
+    });
+
+    it('ignores an emptied media when nothing is on the receiver', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).not.toHaveBeenCalled();
+    });
+
     it('stops following the media after detach', () => {
       const { video, googleCast, provider } = setup();
 
       connect(provider);
+      provider.loadedSrc = 'https://example.com/video.mp4';
       googleCast.detach();
       video.dispatchEvent(new Event('loadstart'));
+      video.dispatchEvent(new Event('emptied'));
 
       expect(provider.load).not.toHaveBeenCalled();
     });
