@@ -23,7 +23,7 @@ SPF now reports a failed manifest as a playback error ([#9776](https://github.co
 
 Google Cast now detects separate HLS audio segment formats, keeps sidecar text tracks and caption selections in sync with the receiver, and unloads receiver media when you clear the local source ([#9788](https://github.com/videojs/video.js/pull/9788), [#9789](https://github.com/videojs/video.js/pull/9789), [#9726](https://github.com/videojs/video.js/pull/9726)). It also cleans up text-track listeners when a player unmounts ([#9807](https://github.com/videojs/video.js/pull/9807)). A Google Cast refactor also recognizes CRLF-terminated playlists when it detects their segment format ([#9791](https://github.com/videojs/video.js/pull/9791)).
 
-The Default Media Receiver cannot play DRM-protected content, so the Cast button now stays disabled for a protected source until you configure a custom receiver. The [casting guide](/docs/guides/casting/#cast-drm-protected-content) explains how to pass DRM configuration to one ([#9794](https://github.com/videojs/video.js/pull/9794)).
+The Default Media Receiver cannot play DRM-protected content, so the Cast button now stays disabled for a protected source until you configure a custom receiver. The casting guide for [HTML](/docs/framework/html/guides/casting#cast-drm-protected-content) and [React](/docs/framework/react/guides/casting#cast-drm-protected-content) explains how to pass DRM configuration to one ([#9794](https://github.com/videojs/video.js/pull/9794)).
 
 ## Installation and player fixes
 
