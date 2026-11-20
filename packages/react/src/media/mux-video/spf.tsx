@@ -1,7 +1,6 @@
 'use client';
 
-import { type MuxAdapterProps, MuxVideoAdapter } from '@videojs/mux-video/spf';
-import type { HlsVideoAdapterProps } from '@videojs/spf/adapters/hls-video';
+import { MuxVideoAdapter, type MuxVideoAdapterProps, type SpfVideoAdapterProps } from '@videojs/mux-video/spf';
 import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -16,19 +15,25 @@ export type {
   MuxAdapterAPI,
   MuxAdapterProps,
   MuxContentData,
+  MuxSource,
   MuxSourceBase,
   MuxVideoAdapter,
+  MuxVideoAdapterProps,
+  SpfPlaybackType,
+  SpfVideoAdapter,
+  SpfVideoAdapterProps,
+  SpfVideoSource,
 } from '@videojs/mux-video/spf';
 
-// `src` and `source` come from `MuxAdapterProps`: the Mux Adapter owns both, and its
+// `src` and `source` come from `MuxVideoAdapterProps`: the Mux Adapter owns both, and its
 // `source` is the structured Mux one rather than the generic engine's. Both are
 // omitted from the base rather than intersected with it — the two `source` types
 // describe different things, and an intersection satisfies neither.
 export interface MuxVideoProps
   extends
-    Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsVideoAdapterProps | keyof MuxAdapterProps>,
-    Partial<Omit<HlsVideoAdapterProps, 'src' | 'source'>>,
-    Partial<MuxAdapterProps>,
+    Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof SpfVideoAdapterProps | keyof MuxVideoAdapterProps>,
+    Partial<Omit<SpfVideoAdapterProps, 'src' | 'source'>>,
+    Partial<MuxVideoAdapterProps>,
     MediaRefProps<MuxVideoAdapter>,
     MediaFallbackProps {
   children?: ReactNode;
