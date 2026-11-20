@@ -1,5 +1,41 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.5.0...@videojs/cdn@10.6.0) (2026-11-20)
+
+
+### Features
+
+* **hyperframes-video:** add hyperframes composition media ([#9719](https://github.com/videojs/video.js/issues/9719)) ([67c4834](https://github.com/videojs/video.js/commit/67c48344f4f7f5de9cb79fd368b9d0de0fe348a6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.6.0
+    * @videojs/core bumped to 10.6.0
+    * @videojs/dailymotion-video bumped to 10.6.0
+    * @videojs/dash-video bumped to 10.6.0
+    * @videojs/google-cast bumped to 10.6.0
+    * @videojs/hlsjs-video bumped to 10.6.0
+    * @videojs/html bumped to 10.6.0
+    * @videojs/hyperframes-video bumped to 10.6.0
+    * @videojs/mixcloud-audio bumped to 10.6.0
+    * @videojs/mux-audio bumped to 10.6.0
+    * @videojs/mux-data bumped to 10.6.0
+    * @videojs/mux-video bumped to 10.6.0
+    * @videojs/native-hls-video bumped to 10.6.0
+    * @videojs/playerjs-video bumped to 10.6.0
+    * @videojs/shaka-video bumped to 10.6.0
+    * @videojs/soundcloud-audio bumped to 10.6.0
+    * @videojs/spf bumped to 10.6.0
+    * @videojs/spotify-audio bumped to 10.6.0
+    * @videojs/tiktok-video bumped to 10.6.0
+    * @videojs/twitch-video bumped to 10.6.0
+    * @videojs/vimeo-video bumped to 10.6.0
+    * @videojs/wistia-video bumped to 10.6.0
+    * @videojs/youtube-video bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.4.0...@videojs/cdn@10.5.0) (2026-11-16)
 
 

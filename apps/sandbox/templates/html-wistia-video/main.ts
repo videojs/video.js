@@ -9,7 +9,7 @@ createHtmlSandbox({
   render: ({ skinTag, attrs }) => html`
     <video-player>
       <${skinTag} class="sandbox-video-frame mx-auto max-w-4xl">
-        <wistia-video class="block h-full w-full" src="${WISTIA_VIDEO_SRC}" ${attrs} playsinline></wistia-video>
+        <wistia-video src="${WISTIA_VIDEO_SRC}" ${attrs} playsinline></wistia-video>
       </${skinTag}>
     </video-player>
   `,

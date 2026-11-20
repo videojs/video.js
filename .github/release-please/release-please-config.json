@@ -21,6 +21,7 @@
         "@videojs/google-analytics",
         "@videojs/google-cast",
         "@videojs/hlsjs-video",
+        "@videojs/hyperframes-video",
         "@videojs/html",
         "@videojs/icons",
         "@videojs/installation",
@@ -130,6 +131,9 @@
     },
     "packages/adapters/spotify-audio": {
       "component": "@videojs/spotify-audio"
+    },
+    "packages/adapters/hyperframes-video": {
+      "component": "@videojs/hyperframes-video"
     },
     "packages/adapters/playerjs-video": {
       "component": "@videojs/playerjs-video"

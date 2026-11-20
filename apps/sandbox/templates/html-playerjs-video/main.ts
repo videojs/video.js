@@ -8,7 +8,7 @@ createHtmlSandbox({
   render: ({ skinTag, src, attrs }) => html`
     <video-player>
       <${skinTag} class="sandbox-video-frame mx-auto max-w-4xl">
-        <playerjs-video class="block h-full w-full"${src} ${attrs} playsinline></playerjs-video>
+        <playerjs-video${src} ${attrs} playsinline></playerjs-video>
       </${skinTag}>
     </video-player>
   `,

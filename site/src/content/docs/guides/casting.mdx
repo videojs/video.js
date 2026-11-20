@@ -150,6 +150,8 @@ By default, Video.js sends the current source to Google's Default Media Receiver
 
 </FrameworkCase>
 
+The Default Media Receiver can't license DRM-protected content, so the Cast button stays disabled for a protected source until `receiver` is set. See [Cast DRM-protected content](#cast-drm-protected-content).
+
 <FrameworkCase frameworks={["react"]}>
 Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">GoogleCast reference</DocsLink> for the exact option types.
 </FrameworkCase>
@@ -157,6 +159,66 @@ Use `src` and `contentType` when the receiver should load a different source tha
 <FrameworkCase frameworks={["html"]}>
 Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">`<google-cast>` reference</DocsLink> for the exact option types and attribute-to-property mapping.
 </FrameworkCase>
+
+### Cast DRM-protected content
+
+The Default Media Receiver can't license DRM-protected content, because it has no way to receive a license server from the sender. Register and host your own receiver ([Google's guide](https://developers.google.com/cast/codelabs/cast-receiver)), then set `receiver` to its application ID and pass the license server in `customData`. Use the same shape as a source's <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">`drm`</DocsLink>, keyed by EME key system id. Cast devices license with Widevine, so that's the key system to pass:
+
+<FrameworkCase frameworks={["react"]}>
+
+```tsx
+<GoogleCast
+  receiver="YOUR_APP_ID"
+  customData={{
+    drm: {
+      'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+    },
+  }}
+/>
+```
+
+</FrameworkCase>
+<FrameworkCase frameworks={["html"]}>
+
+```html
+<google-cast receiver="YOUR_APP_ID"></google-cast>
+```
+
+```ts
+import type { GoogleCastExtension } from '@videojs/html/extensions/google-cast';
+
+const googleCast = document.querySelector<GoogleCastExtension>('google-cast')!;
+googleCast.customData = {
+  drm: {
+    'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+  },
+};
+```
+
+</FrameworkCase>
+
+The receiver licenses the stream from that server:
+
+```js
+const context = cast.framework.CastReceiverContext.getInstance();
+
+context.getPlayerManager().setMediaPlaybackInfoHandler((loadRequest, playbackConfig) => {
+  const licenseUrl = loadRequest.media.customData?.drm?.['com.widevine.alpha']?.licenseUrl;
+
+  if (licenseUrl) {
+    playbackConfig.protectionSystem = cast.framework.ContentProtection.WIDEVINE;
+    playbackConfig.licenseUrl = licenseUrl;
+  }
+
+  return playbackConfig;
+});
+
+context.start();
+```
+
+Video.js doesn't send the media's `source.drm` to the receiver, so `customData` is the only way the license server gets there. Update `customData` whenever the source or its license server changes. Serve the receiver over HTTPS: DRM playback needs a secure context.
+
+For Mux sources, see <DocsLink slug="reference/components/mux-video" anchor="cast-drm-protected-content">Mux video</DocsLink>.
 
 ### Read connection state
 
@@ -172,7 +234,7 @@ Use `remotePlaybackAvailability` to decide whether to offer a route and `remoteP
 
 ### The cast button doesn't render, or renders disabled
 
-The Cast button hides when the route is unsupported. In Chromium with no Cast device reachable, it stays visible but disabled. The AirPlay button hides unless Safari reports an AirPlay device.
+The Cast button hides when the route is unsupported. In Chromium with no Cast device reachable, it stays visible but disabled. It's also disabled for a [DRM-protected source](#cast-drm-protected-content) until `receiver` is set. The AirPlay button hides unless Safari reports an AirPlay device.
 
 ### Casting starts but the device shows an error
 

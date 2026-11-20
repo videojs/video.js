@@ -1,6 +1,6 @@
 {
   "name": "@videojs/store",
-  "version": "10.5.0",
+  "version": "10.6.0",
   "description": "Reactive state management for external systems.",
   "keywords": [
     "media",
@@ -51,8 +51,7 @@
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
   },
   "dependencies": {
-    "@videojs/utils": "workspace:*",
-    "react-compiler-runtime": "^1.0.0"
+    "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
