@@ -55,6 +55,25 @@ export function parseFrameRate(value: string): FrameRate | undefined {
   return { frameRateNumerator: Math.round(fps) };
 }
 
+// Video codec identifiers, matched case-insensitively against each CODECS
+// entry's prefix: AVC (`avc1`, `avc3`), HEVC (`hvc1`, `hev1`), Dolby Vision
+// (`dvh1`, `dvhe`, `dva1`, `dvav`, `dav1`), AV1, and VP9. An unrecognized codec
+// parses empty, which leaves the track with no codecs to probe or to build its
+// SourceBuffer mimetype from.
+const VIDEO_CODEC_PREFIXES = [
+  'avc1.',
+  'avc3.',
+  'hvc1.',
+  'hev1.',
+  'dvh1.',
+  'dvhe.',
+  'dva1.',
+  'dvav.',
+  'dav1.',
+  'av01.',
+  'vp09.',
+];
+
 // Audio codec identifiers, matched case-insensitively against each CODECS
 // entry's prefix. Beyond AAC (`mp4a.*`): Dolby (`ac-3`, `ec-3`, `ac-4`), Opus,
 // FLAC (`fLaC`), DTS (`dts*`), ALAC, and Vorbis. Recognizing these is what lets
@@ -71,7 +90,7 @@ export function parseCodecs(codecs: string): { video?: string; audio?: string } 
   for (const codec of parts) {
     const lower = codec.toLowerCase();
 
-    if (codec.startsWith('avc1.') || codec.startsWith('hvc1.') || codec.startsWith('hev1.')) {
+    if (VIDEO_CODEC_PREFIXES.some((prefix) => lower.startsWith(prefix))) {
       result.video = codec;
     } else if (AUDIO_CODEC_PREFIXES.some((prefix) => lower.startsWith(prefix))) {
       result.audio = codec;
