@@ -66,20 +66,20 @@ export default function App() {
 ```
 </FrameworkCase>
 
-That's the whole setup. Without a title, the extension falls back to the title the media reports (Mux, Vimeo, and SoundCloud media report one), then to the source URL. It never reads a `title` attribute on `<video>`, so set the title on the extension.
+That's the whole setup. Without a title, the extension falls back to the title the media reports (Mux and Vimeo media report one, for example), then to the source URL. It never reads a `title` attribute on `<video>`, so set the title on the extension.
 
 ## How it works
 
 The extension listens to the media the player is using and turns playback into GA4's [Enhanced Measurement](https://support.google.com/analytics/answer/9216061) video events (`video_start`, `video_progress`, `video_complete`) plus interaction events such as `pause`, `seek`, and `fullscreenEnter`. Each event goes to `window.dataLayer`, which GTM reads, and to `window.gtag` when it exists.
 
-Every event carries the current time, duration, percent watched, stream type, title, and URL, followed by anything else you put in `metadata`. The <DocsLink slug="reference/components/google-analytics" anchor="events">GoogleAnalytics reference</DocsLink> lists each event, when it fires, and every parameter.
+Every event carries the current time, duration, playback position as a percentage, stream type, title, and URL, followed by anything else you put in `metadata`. The <DocsLink slug="reference/components/google-analytics" anchor="events">GoogleAnalytics reference</DocsLink> lists each event, when it fires, and every parameter.
 
 ## Availability and constraints
 
 - Google Analytics tracking is opt-in. No media component sends events until you add the extension.
 - GA4 must already be on the page through `gtag.js` or GTM. Without it, events collect in `window.dataLayer` and go nowhere.
 - Progress milestones (10%, 25%, 50%, and 75%) need a known duration, so live streams don't send `video_progress`.
-- GA4 accepts at most 25 parameters per event. The extension uses 8, which leaves 17 for your `metadata`.
+- GA4 caps the parameters per event, which limits how many custom dimensions you can add. See the <DocsLink slug="reference/components/google-analytics" anchor="collection-limits">collection limits</DocsLink>.
 - Custom dimensions appear in GA4 reports only after you [register them](https://support.google.com/analytics/answer/14240153) in GA4.
 
 ## Common variations
@@ -113,36 +113,6 @@ To pass an object instead, assign the `metadata` property. It overrides attribut
 </FrameworkCase>
 
 Naming dimensions after their [Mux Data](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) equivalents, such as `video_series` and `video_id`, keeps the two reports comparable if you also <DocsLink slug="guides/mux-data">monitor playback with Mux Data</DocsLink>.
-
-### Mark a stream as live
-
-The extension asks the media whether it's live. When the media can't tell, set the stream type yourself:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics metadata={{ video_title: 'Live Keynote', video_stream_type: 'live' }} />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics metadata-video-title="Live Keynote" metadata-video-stream-type="live"></google-analytics>
-```
-</FrameworkCase>
-
-### Turn off progress milestones
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics disableProgress />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics disable-progress></google-analytics>
-```
-</FrameworkCase>
 
 ### Use a renamed data layer
 
@@ -221,7 +191,23 @@ If events log but don't reach GA4 through GTM, add a GA4 event tag with a custom
 
 ### No `video_progress` events
 
-The stream is live, its duration is unknown, or progress is turned off. Check `video_stream_type` and `video_duration` in the `debug` output.
+The stream is live, its duration is unknown, or `disableProgress` is set. Check `video_stream_type` and `video_duration` in the `debug` output.
+
+### Live streams report as on-demand
+
+The extension asks the media whether it's live, and some media can't tell. Set the stream type yourself:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics metadata={{ video_title: 'Live Keynote', video_stream_type: 'live' }} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics metadata-video-title="Live Keynote" metadata-video-stream-type="live"></google-analytics>
+```
+</FrameworkCase>
 
 ### Reports show URLs instead of titles
 

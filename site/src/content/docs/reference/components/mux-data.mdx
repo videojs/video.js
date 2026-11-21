@@ -67,9 +67,19 @@ Any number of `metadata-*` attributes can label a view without script. `metadata
 
 Views also report the extension itself as the Mux plugin, so they can be told apart from other Video.js integrations such as `videojs-mux`.
 
+## Engine data
+
+The extension monitors the media element for every media. For two engines it also hands the engine to the Mux Data SDK, which adds stream-level data: rendition switches, segment request timing and throughput, and engine errors.
+
+| Engine | Reported data |
+|---|---|
+| hls.js | Element and stream-level |
+| dash.js | Element and stream-level |
+| SPF engines, Shaka Player, and the browser (native HLS or a file) | Element-level only |
+
 ## Video and session IDs
 
-`video_id` is the Mux playback ID for sources on a `mux.com` domain, and the source URL otherwise. `view_session_id` is generated once per extension instance, so the views of one player share a session. A `video_id` or `view_session_id` key in `metadata` overrides either.
+`video_id` is the Mux playback ID for `https://stream.mux.com` sources, and the source URL otherwise. `view_session_id` is generated once per extension instance, so the views of one player share a session. A `video_id` or `view_session_id` key in `metadata` overrides either.
 
 Without `envKey`, Mux attributes a view to the environment that owns its playback ID, so views of sources Mux doesn't host need an `envKey` to be recorded.
 
@@ -93,6 +103,8 @@ When no player software name is set, views report `videojs-<framework>-<engine>`
 The framework is always one word, so everything after the second hyphen is the engine. The name updates on the current view when a source change switches engines. Media that doesn't declare an engine name leaves it out, as in `videojs-html`. A player software name you set always takes precedence.
 
 The player software version defaults to the Video.js version, and the Mux plugin is reported as `@videojs/mux-data` at the same version.
+
+## Options that restart monitoring
 
 Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view and starts a new one. The rest update the view in place.
 

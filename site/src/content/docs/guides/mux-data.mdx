@@ -81,7 +81,7 @@ The extension attaches to the media the player is using, not to a specific eleme
 The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, and the rest alike. When the source changes, it follows.
 </FrameworkCase>
 
-How much it reports depends on the engine playing the stream. Every media reports the metrics available from the media element. The extension also hands [hls.js](https://github.com/video-dev/hls.js/) and [dash.js](https://github.com/Dash-Industry-Forum/dash.js) engines to the Mux Data SDK, which adds stream-level detail: rendition switches, segment request timing and throughput, and engine errors.
+How much it reports depends on the engine playing the stream; the <DocsLink slug="reference/components/mux-data" anchor="engine-data">MuxData reference</DocsLink> lists what each engine adds.
 
 Mux needs to know which environment each view belongs to. For a source on `stream.mux.com`, the extension reports the playback ID, and Mux files the view under the environment that owns it. Any other source needs an environment key.
 
@@ -89,30 +89,58 @@ Mux needs to know which environment each view belongs to. For a source on `strea
 
 - Mux Data is opt-in. No media component monitors playback on its own, Mux ones included, so nothing is measured and no beacons are sent until you add the extension.
 - Sources Mux doesn't host, like a self-hosted HLS or DASH stream, need `envKey`. See [Monitor a source Mux doesn't host](#monitor-a-source-mux-doesnt-host).
-- Only media backed by a `<video>` or `<audio>` element is monitored. Embeds that play in an iframe, such as YouTube and Vimeo, are not.
-- Media without a JavaScript engine, like native HLS in Safari or an MP4 file, reports element-level metrics only.
+- Iframe embeds such as YouTube and Vimeo can't be monitored, and some engines report less detail than others. See which <DocsLink slug="reference/components/mux-data" anchor="engine-data">engines report what</DocsLink>.
 
 ## Common variations
 
 ### Monitor a source Mux doesn't host
 
-Find the environment key in the [Mux dashboard](https://dashboard.mux.com/settings/data) and set `envKey`. This example plays the stream with the hls.js adapter from `@videojs/hlsjs-video`:
+Find the environment key in the [Mux dashboard](https://dashboard.mux.com/settings/data) and set `envKey`. This example plays the stream with the hls.js adapter:
 
 <FrameworkCase frameworks={["react"]}>
-```tsx
-<Container>
-  <HlsJsVideo src="https://example.com/stream.m3u8" />
-  <MuxData envKey="YOUR_ENV_KEY" /> {/* [!code focus] */}
-</Container>
+```bash
+pnpm add @videojs/react @videojs/hlsjs-video @videojs/mux-data
+```
+
+```tsx title="App.tsx"
+import { Container, createPlayer } from '@videojs/react';
+import { MuxData } from '@videojs/react/extensions/mux-data';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+import { videoFeatures } from '@videojs/react/video';
+
+const { Player } = createPlayer({ features: videoFeatures });
+
+export default function App() {
+  return (
+    <Player>
+      <Container>
+        <HlsJsVideo src="https://example.com/stream.m3u8" playsInline />
+        <MuxData envKey="YOUR_ENV_KEY" /> {/* [!code focus] */}
+      </Container>
+    </Player>
+  );
+}
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-```html
-<media-container>
-  <hlsjs-video src="https://example.com/stream.m3u8"></hlsjs-video>
-  <mux-data env-key="YOUR_ENV_KEY"></mux-data> <!-- [!code focus] -->
-</media-container>
+```bash
+pnpm add @videojs/html @videojs/hlsjs-video @videojs/mux-data
+```
+
+```html title="index.html"
+<video-player>
+  <media-container>
+    <hlsjs-video src="https://example.com/stream.m3u8" playsinline></hlsjs-video>
+    <mux-data env-key="YOUR_ENV_KEY"></mux-data> <!-- [!code focus] -->
+  </media-container>
+</video-player>
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
+  import '@videojs/html/media/hlsjs-video';
+  import '@videojs/html/extensions/mux-data';
+</script>
 ```
 </FrameworkCase>
 
@@ -176,7 +204,7 @@ Iframe embeds don't expose a media element for the Mux Data SDK to monitor, so t
 
 ### A view ends and a new one starts while the video plays
 
-Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view. Set them once, before playback starts. Other options update the current view in place.
+A few options restart monitoring when they change, which ends the current view. Set them once, before playback starts. See which <DocsLink slug="reference/components/mux-data" anchor="options-that-restart-monitoring">options restart monitoring</DocsLink>.
 
 ### You can't tell whether beacons are sent
 

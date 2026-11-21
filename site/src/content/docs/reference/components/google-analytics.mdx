@@ -64,7 +64,7 @@ Each event is pushed to `window[dataLayerName]` as `{ event, ...params }`, which
 | Event | Dispatched when | `video_percent` |
 |---|---|---|
 | `video_start` | Playback first begins, or `currentTime` first moves past 0. Also after `video_complete` when looped playback restarts from the start | `0` |
-| `video_progress` | Playback crosses 10%, 25%, 50%, and 75%, once each. Not dispatched when the stream type is `'live'`, the duration is unknown, or `disableProgress` is set | The milestone |
+| `video_progress` | Playback crosses 10%, 25%, 50%, and 75%. Each milestone fires once, then again after playback replays from the end, loops back to the start, or loads a new source. Not dispatched when the stream type is `'live'`, the duration is unknown, or `disableProgress` is set | The milestone |
 | `video_complete` | The media ends, or looped playback restarts from the start | `100` |
 
 ### Interaction events
@@ -72,31 +72,31 @@ Each event is pushed to `window[dataLayerName]` as `{ event, ...params }`, which
 | Event | Dispatched when | `video_percent` |
 |---|---|---|
 | `play` | Playback first begins | `0` |
-| `resume` | Playback begins again after the first `play` | Current percent |
-| `pause` | Playback pauses, except while seeking or at the end | Current percent |
+| `resume` | Playback begins again after the first `play` | Current position |
+| `pause` | Playback pauses, except while seeking or at the end | Current position |
 | `end` | The media ends, before `video_complete` | `100` |
-| `seek` | A seek completes, except a loop restart | Current percent |
-| `mute` | The media becomes muted, or its volume reaches 0 | Current percent |
-| `unmute` | The media becomes unmuted with a volume above 0 | Current percent |
-| `fullscreenEnter` | The player or its media enters fullscreen | Current percent |
-| `fullscreenExit` | The player or its media leaves fullscreen | Current percent |
+| `seek` | A seek completes, except a loop restart | Current position |
+| `mute` | The media becomes muted, or its volume reaches 0 | Current position |
+| `unmute` | The media becomes unmuted with a volume above 0 | Current position |
+| `fullscreenEnter` | The player or its media enters fullscreen | Current position |
+| `fullscreenExit` | The player or its media leaves fullscreen | Current position |
 
-A new source (`loadstart`) resets the session, so the next playback dispatches `play` and `video_start` again and progress milestones fire again.
+A new source (`loadstart`) resets the session, so the next playback dispatches `play` and `video_start` again. "Current position" is the playback position as a percentage of the duration, so seeking to 90% reports `90`.
 
 ## Event parameters
 
-Every event carries these parameters, followed by every other `metadata` entry as a custom dimension:
+Every event carries these parameters, followed by every other `metadata` entry as a custom dimension. A `metadata` key with the same name as a parameter replaces its value.
 
-| Parameter | Value | Override |
-|---|---|---|
-| `video_current_time` | Current time, in whole seconds | — |
-| `video_duration` | Duration, in whole seconds; `0` when unknown | — |
-| `video_percent` | See [Events](#events) | — |
-| `video_provider` | `'video.js'` | `metadata.video_provider` |
-| `video_stream_type` | `'live'` when the media reports a live stream, otherwise `'on-demand'` | `metadata.video_stream_type` |
-| `video_title` | The title in the media's content data, then `video_url`, then `'Untitled Video'` | `metadata.video_title` |
-| `video_url` | The media's `currentSrc`, then `src` | `metadata.video_url` |
-| `visible` | `false` while the page is hidden | — |
+| Parameter | Value |
+|---|---|
+| `video_current_time` | Current time, in whole seconds |
+| `video_duration` | Duration, in whole seconds. `0` until the duration is known, and `Infinity` for a live stream with no end |
+| `video_percent` | See [Events](#events) |
+| `video_provider` | `'video.js'` |
+| `video_stream_type` | `'live'` when the media reports a live stream, otherwise `'on-demand'` |
+| `video_title` | The title in the media's content data, then `video_url`, then `'Untitled Video'` |
+| `video_url` | The media's `currentSrc`, then `src` |
+| `visible` | `false` while the page is hidden |
 
 ## Collection limits
 
