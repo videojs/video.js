@@ -1,7 +1,7 @@
 import { flush } from '@videojs/store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import type { UIEvent, UIFocusEvent, UIPointerEvent } from '../../event';
+import type { UIFocusEvent, UIPointerEvent } from '../../event';
 import { createPopupGroup } from '../group';
 import { createTestPopover, focusTrigger } from './helpers';
 
@@ -21,8 +21,8 @@ function pointerEvent(pointerType: string): UIPointerEvent {
   };
 }
 
-function clickEvent(): UIEvent {
-  return { preventDefault: vi.fn(), stopPropagation: vi.fn() };
+function clickEvent(): MouseEvent {
+  return new MouseEvent('click');
 }
 
 function focusEvent(): UIFocusEvent {
