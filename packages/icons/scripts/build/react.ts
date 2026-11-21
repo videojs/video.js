@@ -2,20 +2,55 @@ import { join } from 'node:path';
 
 import { transform } from '@svgr/core';
 import { transformSync } from 'oxc-transform';
+import { optimize } from 'svgo';
 
 import { DIST_DIR } from '../internal/paths.js';
+import { createSvgoConfig } from '../internal/svg.js';
 import type { IconDefinition, IconFamily } from './model.js';
 import { writeOutput } from './output.js';
 
-const transformOptions: Parameters<typeof transform>[1] = {
-  plugins: ['@svgr/plugin-jsx'],
-  jsxRuntime: 'automatic',
-  ref: true,
+/** One React-flavored output: where it is written, whether SVGR targets `react-native-svg`, and its typings. */
+interface ReactTarget {
+  readonly directory: string;
+  readonly native: boolean;
+  readonly typeImports: string;
+  readonly componentType: string;
+}
+
+const REACT_TARGET: ReactTarget = {
+  directory: 'react',
+  native: false,
+  typeImports: `import type * as React from 'react';`,
+  componentType: 'React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & React.RefAttributes<SVGSVGElement>>',
 };
 
-async function buildComponent(icon: IconDefinition): Promise<string> {
+const REACT_NATIVE_TARGET: ReactTarget = {
+  directory: 'react-native',
+  native: true,
+  typeImports: [`import type * as React from 'react';`, `import type { Svg, SvgProps } from 'react-native-svg';`].join(
+    '\n'
+  ),
+  componentType: 'React.ForwardRefExoticComponent<SvgProps & React.RefAttributes<Svg>>',
+};
+
+/**
+ * `react-native-svg` has no stylesheet, class or CSS-variable support, so the hooks web icons expose for CSS animation
+ * (the spinner's `<style>`, segment classes and `--media-spinner-delay`) would only reach native as inert props.
+ */
+const NATIVE_SVG_CONFIG = createSvgoConfig([
+  'removeStyleElement',
+  'removeXMLNS',
+  { name: 'removeAttrs', params: { attrs: ['class', 'style'] } },
+]);
+
+async function buildComponent(icon: IconDefinition, target: ReactTarget): Promise<string> {
   const componentName = `${icon.pascalName}Icon`;
-  const jsx = await transform(icon.svg, transformOptions, { componentName });
+  const svg = target.native ? optimize(icon.svg, NATIVE_SVG_CONFIG).data : icon.svg;
+  const jsx = await transform(
+    svg,
+    { plugins: ['@svgr/plugin-jsx'], jsxRuntime: 'automatic', ref: true, native: target.native },
+    { componentName }
+  );
   const result = transformSync(`${componentName}.jsx`, jsx, {
     lang: 'jsx',
     sourceType: 'module',
@@ -31,18 +66,18 @@ async function buildComponent(icon: IconDefinition): Promise<string> {
   return result.code;
 }
 
-export async function emitReactFamily({ name: family, icons }: IconFamily): Promise<void> {
-  const directory = join(DIST_DIR, 'react', family);
+async function emitFamily({ name: family, icons }: IconFamily, target: ReactTarget): Promise<void> {
+  const directory = join(DIST_DIR, target.directory, family);
 
   for (const icon of icons) {
     const componentName = `${icon.pascalName}Icon`;
 
-    writeOutput(join(directory, `${icon.name}.js`), await buildComponent(icon));
+    writeOutput(join(directory, `${icon.name}.js`), await buildComponent(icon, target));
     writeOutput(
       join(directory, `${icon.name}.d.ts`),
       [
-        `import * as React from 'react';`,
-        `declare const ${componentName}: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & React.RefAttributes<SVGSVGElement>>;`,
+        target.typeImports,
+        `declare const ${componentName}: ${target.componentType};`,
         `export default ${componentName};`,
         ``,
       ].join('\n')
@@ -56,12 +91,21 @@ export async function emitReactFamily({ name: family, icons }: IconFamily): Prom
   writeOutput(
     join(directory, 'index.d.ts'),
     [
-      `import type * as React from 'react';`,
-      ...icons.map(
-        ({ pascalName }) =>
-          `export declare const ${pascalName}Icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & React.RefAttributes<SVGSVGElement>>;`
-      ),
+      target.typeImports,
+      ...icons.map(({ pascalName }) => `export declare const ${pascalName}Icon: ${target.componentType};`),
       ``,
     ].join('\n')
   );
+}
+
+export function emitReactFamily(family: IconFamily): Promise<void> {
+  return emitFamily(family, REACT_TARGET);
+}
+
+/**
+ * Same SVGR pipeline as {@link emitReactFamily}, targeting `react-native-svg`, so both platforms render one source.
+ * Icons that animate through CSS (the spinner) render static here; native bindings animate them themselves.
+ */
+export function emitReactNativeFamily(family: IconFamily): Promise<void> {
+  return emitFamily(family, REACT_NATIVE_TARGET);
 }
