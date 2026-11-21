@@ -1,8 +1,33 @@
 import { flush } from '@videojs/store';
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import type { UIEvent, UIFocusEvent, UIPointerEvent } from '../../event';
 import { createPopupGroup } from '../group';
-import { createTestPopover } from './helpers';
+import { createTestPopover, focusTrigger } from './helpers';
+
+function stubPrimaryInput({ hover }: { hover: boolean }): void {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: hover && query === '(hover: hover)' }));
+}
+
+function pointerEvent(pointerType: string): UIPointerEvent {
+  return {
+    clientX: 0,
+    clientY: 0,
+    pointerId: 1,
+    pointerType,
+    buttons: 0,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
+  };
+}
+
+function clickEvent(): UIEvent {
+  return { preventDefault: vi.fn(), stopPropagation: vi.fn() };
+}
+
+function focusEvent(): UIFocusEvent {
+  return { relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() };
+}
 
 function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
@@ -271,69 +296,136 @@ describe('createPopover', () => {
       expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: 'click' }));
     });
 
-    it('does not open on click on touch devices when openOnHover is enabled', () => {
-      const matchMedia = vi.fn(() => ({
-        matches: false,
-      }));
+    it('does not toggle on a touch click when openOnHover is enabled and the primary input cannot hover', () => {
+      stubPrimaryInput({ hover: false });
 
-      vi.stubGlobal('matchMedia', matchMedia);
+      const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
 
-      const { popover, onOpenChange } = createTestPopover({
-        openOnHover: () => true,
-      });
-
-      popover.triggerProps.onClick({ preventDefault: vi.fn() } as unknown as UIEvent);
+      popover.triggerProps.onPointerDown(pointerEvent('touch'));
+      popover.triggerProps.onClick(clickEvent());
 
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(popover.input.current.active).toBe(false);
     });
 
-    it('does not open via focus on touch devices when openOnHover is enabled', () => {
-      const matchMedia = vi.fn(() => ({
-        matches: false,
-      }));
+    it.each(['mouse', 'pen'])(
+      'toggles on a %s click when openOnHover is enabled and the primary input cannot hover',
+      (pointerType) => {
+        stubPrimaryInput({ hover: false });
 
-      vi.stubGlobal('matchMedia', matchMedia);
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
 
-      const { popover, onOpenChange } = createTestPopover({
-        openOnHover: () => true,
-      });
+        popover.triggerProps.onPointerDown(pointerEvent(pointerType));
+        popover.triggerProps.onClick(clickEvent());
 
-      popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
+        expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: 'click' }));
+      }
+    );
 
-      expect(onOpenChange).not.toHaveBeenCalled();
+    it('does not reuse a mouse pointerdown for a later click', () => {
+      stubPrimaryInput({ hover: false });
+
+      const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
+
+      popover.triggerProps.onPointerDown(pointerEvent('mouse'));
+      popover.triggerProps.onClick(clickEvent());
+      popover.triggerProps.onClick(clickEvent());
+
+      expect(onOpenChange).toHaveBeenCalledOnce();
     });
 
-    it('does not open via focus when pointer is not fine', () => {
-      const matchMedia = vi.fn((query: string) => ({
-        matches: query === '(hover: hover)',
-      }));
+    it('toggles on a touch click when openOnHover is enabled and the primary input can hover', () => {
+      stubPrimaryInput({ hover: true });
 
-      vi.stubGlobal('matchMedia', matchMedia);
+      const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
 
-      const { popover, onOpenChange } = createTestPopover({
-        openOnHover: () => true,
-      });
+      popover.triggerProps.onPointerDown(pointerEvent('touch'));
+      popover.triggerProps.onClick(clickEvent());
 
-      popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
-
-      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: 'click' }));
     });
 
-    it('opens via focus when hover and fine pointer are supported', () => {
-      const matchMedia = vi.fn((query: string) => ({
-        matches: query === '(hover: hover)' || query === '(pointer: fine)',
-      }));
-
-      vi.stubGlobal('matchMedia', matchMedia);
-
-      const { popover, onOpenChange } = createTestPopover({
-        openOnHover: () => true,
+    describe('hover', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
       });
 
-      popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
+      afterEach(() => {
+        vi.useRealTimers();
+      });
 
-      expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
+      it.each(['mouse', 'pen'])('opens on %s hover even when the primary input cannot hover', (pointerType) => {
+        stubPrimaryInput({ hover: false });
+
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true, delay: () => 300 });
+
+        popover.triggerProps.onPointerEnter(pointerEvent(pointerType));
+        vi.advanceTimersByTime(300);
+
+        expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'hover' });
+      });
+
+      it('does not open on touch pointer enter even when the primary input can hover', () => {
+        stubPrimaryInput({ hover: true });
+
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true, delay: () => 300 });
+
+        popover.triggerProps.onPointerEnter(pointerEvent('touch'));
+        vi.advanceTimersByTime(300);
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+      });
+
+      it('closes on mouse pointer leave', () => {
+        stubPrimaryInput({ hover: false });
+
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
+
+        popover.open('hover');
+        onOpenChange.mockClear();
+
+        popover.triggerProps.onPointerLeave(pointerEvent('mouse'));
+        vi.advanceTimersByTime(0);
+
+        expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'hover' });
+      });
+    });
+
+    describe('focus', () => {
+      let trigger: HTMLButtonElement;
+
+      beforeEach(() => {
+        trigger = document.createElement('button');
+        document.body.append(trigger);
+      });
+
+      afterEach(() => {
+        trigger.remove();
+      });
+
+      it('opens via keyboard focus even when the primary input cannot hover', () => {
+        stubPrimaryInput({ hover: false });
+
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
+
+        popover.setTriggerElement(trigger);
+        focusTrigger(trigger, { visible: true });
+        popover.triggerProps.onFocusIn(focusEvent());
+
+        expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
+      });
+
+      it('does not open via focus that is not focus-visible', () => {
+        stubPrimaryInput({ hover: true });
+
+        const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true });
+
+        popover.setTriggerElement(trigger);
+        focusTrigger(trigger, { visible: false });
+        popover.triggerProps.onFocusIn(focusEvent());
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+      });
     });
   });
 
