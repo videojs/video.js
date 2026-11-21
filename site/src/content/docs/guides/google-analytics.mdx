@@ -1,21 +1,34 @@
 ---
-title: Track video telemetry with Google Analytics 4
-description: Track video engagement, progress milestones, and playback interactions by adding the Google Analytics extension to a player
+title: Track video events with Google Analytics 4
+description: Send video starts, progress milestones, completions, and playback interactions to Google Analytics 4 by adding the Google Analytics extension to a player
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
-import Aside from '@/components/Aside.astro';
 
-Google Analytics 4 (GA4) Enhanced Measurement tracks video engagement and viewer interaction. Add the Google Analytics <DocsLink slug="guides/architecture">extension</DocsLink> to a player and it monitors whichever media that player is playing, automatically dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer` and `window.gtag`.
+Send video starts, progress milestones, completions, and playback interactions to Google Analytics 4 (GA4). Add the Google Analytics <DocsLink slug="guides/architecture">extension</DocsLink> to a player and it reports on whichever media that player is playing.
+
+## Installation
+
+This guide assumes your page already loads GA4 through Google Tag (`gtag.js`) or Google Tag Manager (GTM). The extension sends events to them; it doesn't load either one.
 
 <FrameworkCase frameworks={["react"]}>
-Install the extension alongside the framework façade:
-
 ```bash
 pnpm add @videojs/react @videojs/google-analytics
 ```
+</FrameworkCase>
 
+<FrameworkCase frameworks={["html"]}>
+```bash
+pnpm add @videojs/html @videojs/google-analytics
+```
+</FrameworkCase>
+
+## Recommended approach
+
+Put the extension inside the player next to the media, and give it the title you want to see in your reports. It renders nothing, so its position doesn't matter:
+
+<FrameworkCase frameworks={["react"]}>
 ```tsx title="App.tsx"
 import { Container, createPlayer } from '@videojs/react';
 import { GoogleAnalytics } from '@videojs/react/extensions/google-analytics';
@@ -29,7 +42,7 @@ export default function App() {
     <Player>
       <Container>
         <Video src="https://example.com/video.mp4" />
-        <GoogleAnalytics metadata={{ video_title: 'My Video' }} /> {/* [!code focus] */}
+        <GoogleAnalytics metadata={{ video_title: 'Keynote Presentation' }} /> {/* [!code focus] */}
       </Container>
     </Player>
   );
@@ -38,17 +51,11 @@ export default function App() {
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Install the extension alongside the framework façade:
-
-```bash
-pnpm add @videojs/html @videojs/google-analytics
-```
-
 ```html title="index.html"
 <video-player>
   <media-container>
     <video src="https://example.com/video.mp4"></video>
-    <google-analytics metadata-video-title="My Video"></google-analytics> <!-- [!code focus] -->
+    <google-analytics metadata-video-title="Keynote Presentation"></google-analytics> <!-- [!code focus] -->
   </media-container>
 </video-player>
 <script type="module">
@@ -57,10 +64,93 @@ pnpm add @videojs/html @videojs/google-analytics
   import '@videojs/html/extensions/google-analytics';
 </script>
 ```
+</FrameworkCase>
 
+That's the whole setup. Without a title, the extension falls back to the title the media reports (Mux and Vimeo media report one, for example), then to the source URL. It never reads a `title` attribute on `<video>`, so set the title on the extension.
+
+## How it works
+
+The extension listens to the media the player is using and turns playback into GA4's [Enhanced Measurement](https://support.google.com/analytics/answer/9216061) video events (`video_start`, `video_progress`, `video_complete`) plus interaction events such as `pause`, `seek`, and `fullscreenEnter`. Each event goes to `window.dataLayer`, which GTM reads, and to `window.gtag` when it exists.
+
+Every event carries the current time, duration, playback position as a percentage, stream type, title, and URL, followed by anything else you put in `metadata`. The <DocsLink slug="reference/components/google-analytics" anchor="events">GoogleAnalytics reference</DocsLink> lists each event, when it fires, and every parameter.
+
+## Availability and constraints
+
+- Google Analytics tracking is opt-in. No media component sends events until you add the extension.
+- GA4 must already be on the page through `gtag.js` or GTM. Without it, events collect in `window.dataLayer` and go nowhere.
+- Progress milestones (10%, 25%, 50%, and 75%) need a known duration, so live streams don't send `video_progress`.
+- GA4 caps the parameters per event, which limits how many custom dimensions you can add. See the <DocsLink slug="reference/components/google-analytics" anchor="collection-limits">collection limits</DocsLink>.
+- Custom dimensions appear in GA4 reports only after you [register them](https://support.google.com/analytics/answer/14240153) in GA4.
+
+## Common variations
+
+### Add custom dimensions
+
+Put any extra keys in `metadata`. Each one is sent as an event parameter with every event:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics
+  metadata={{
+    video_title: 'Keynote Presentation',
+    video_series: 'Annual Conference',
+    video_id: 'conf_2026_01',
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics
+  metadata-video-title="Keynote Presentation"
+  metadata-video-series="Annual Conference"
+  metadata-video-id="conf_2026_01"
+></google-analytics>
+```
+
+To pass an object instead, assign the `metadata` property. It overrides attributes with the same key.
+</FrameworkCase>
+
+Naming dimensions after their [Mux Data](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) equivalents, such as `video_series` and `video_id`, keeps the two reports comparable if you also <DocsLink slug="guides/mux-data">monitor playback with Mux Data</DocsLink>.
+
+### Use a renamed data layer
+
+If your GTM snippet renames the data layer, pass the same name:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics dataLayerName="myDataLayer" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics data-layer-name="myDataLayer"></google-analytics>
+```
+</FrameworkCase>
+
+### Send events to another tool as well
+
+Pass an `onEvent` callback. It receives each event's name and parameters before they're sent to GA4:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics onEvent={(event, params) => myAnalytics.track(event, params)} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const ga = document.querySelector('google-analytics');
+ga.onEvent = (event, params) => myAnalytics.track(event, params);
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
 ### Load from a CDN
 
-When loading Video.js from a CDN, include the `extensions/google-analytics.js` script tag:
+When you load Video.js from a CDN, add the extension's script after the player's:
 
 ```html title="index.html"
 <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn/video.js"></script>
@@ -69,167 +159,17 @@ When loading Video.js from a CDN, include the `extensions/google-analytics.js` s
 <video-player>
   <media-container>
     <video src="https://example.com/video.mp4"></video>
-    <google-analytics metadata-video-title="My Video"></google-analytics>
+    <google-analytics metadata-video-title="Keynote Presentation"></google-analytics>
   </media-container>
 </video-player>
 ```
 </FrameworkCase>
 
-That's the entire setup for standard video tracking. The extension renders nothing; place it anywhere inside the player.
+## Troubleshooting
 
-<Aside type="note">
-Google Analytics tracking is opt-in. No media component sends telemetry on its own until you add the extension to the player.
-</Aside>
+### No video events reach GA4
 
-## How events are reported
-
-When Google Tag (`gtag.js`) or Google Tag Manager (GTM) is configured on your site, `window.dataLayer` is available globally. The extension pushes structured event objects into `window.dataLayer`:
-
-```js
-window.dataLayer.push({
-  event: 'video_progress',
-  video_current_time: 30,
-  video_duration: 120,
-  video_percent: 25,
-  video_provider: 'video.js',
-  video_stream_type: 'on-demand',
-  video_title: 'My Video',
-  video_url: 'https://example.com/video.mp4',
-  visible: true,
-});
-```
-
-If `window.gtag` is defined, the extension also calls `window.gtag('event', event, params)` with the same parameters. If you use a custom data layer array on `window`, specify its property name with `dataLayerName` (or `data-layer-name` in HTML).
-
-### GA4 Enhanced Measurement events
-
-The extension dispatches standard GA4 Enhanced Measurement video events:
-
-- `video_start`: Dispatched when playback begins for the first time or starts at `currentTime > 0`.
-- `video_progress`: Dispatched when playback crosses 10%, 25%, 50%, and 75% milestones.
-- `video_complete`: Dispatched when the video reaches the end (`ended` event) or loops back to the start.
-
-### Video.js interaction events
-
-In addition to GA4 Enhanced Measurement events, the extension emits player interaction events to measure how viewers engage with controls:
-
-- `play`: Dispatched on first play.
-- `pause`: Dispatched when playback is paused (not triggered during seeking or when ended).
-- `resume`: Dispatched when playback resumes after a pause.
-- `end`: Dispatched when the video finishes.
-- `seek`: Dispatched when scrubbing or seeking completes (bypassed on loop restarts).
-- `mute`: Dispatched when audio is muted or volume drops to 0.
-- `unmute`: Dispatched when audio is unmuted with non-zero volume.
-- `fullscreenEnter`: Dispatched when entering fullscreen.
-- `fullscreenExit`: Dispatched when exiting fullscreen.
-
-## Set stream type
-
-By default, the stream type is inferred from the media (`media.streamType === 'live' ? 'live' : 'on-demand'`). For on-demand videos, duration is known and the extension calculates playback percentage to fire progress milestones at 10%, 25%, 50%, and 75%.
-
-To override or explicitly specify a live stream, pass `video_stream_type: 'live'` in `metadata`:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics metadata={{ video_title: 'Live Stream', video_stream_type: 'live' }} />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics></google-analytics>
-<script type="module">
-  const ga = document.querySelector('google-analytics');
-  ga.metadata = { video_title: 'Live Stream', video_stream_type: 'live' };
-</script>
-```
-</FrameworkCase>
-
-When the effective stream type is `'live'`, milestone progress tracking is bypassed since live streams have unbounded or dynamic duration.
-
-## Disable progress tracking
-
-By default, the extension tracks progress milestones at 10%, 25%, 50%, and 75% for on-demand playback. To turn off milestone progress tracking, set `disableProgress` (or `disable-progress` in HTML):
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics disableProgress />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics disable-progress></google-analytics>
-```
-</FrameworkCase>
-
-## Set video title
-
-Set `metadata.video_title` on the extension so GA4 gets an explicit title for every media type, including iframe embeds that do not expose a useful DOM `title`.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics metadata={{ video_title: 'Keynote Presentation' }} />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics></google-analytics>
-<script type="module">
-  const ga = document.querySelector('google-analytics');
-  ga.metadata = { video_title: 'Keynote Presentation' };
-</script>
-```
-</FrameworkCase>
-
-When `metadata.video_title` is omitted, the extension derives a title in this order: the title the media reports in its content data (Mux, Vimeo, and SoundCloud media report one, for example), then the resolved `video_url`, then `'Untitled Video'`. Do not rely on a `<video title="...">` attribute as your analytics title; set `metadata.video_title` instead.
-
-## Metadata and custom dimensions
-
-Pass `metadata` to set official GA4 video parameters (`video_title`, `video_provider`, `video_url`) and custom dimensions (such as Mux Data compatible names `video_id`, `video_series`, `video_producer`, `video_content_type`, or custom dimensions like `custom_1`):
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<GoogleAnalytics
-  metadata={{
-    video_title: 'Keynote Presentation',
-    video_series: 'Annual Conference',
-    video_producer: 'Video.js Team',
-    video_id: 'conf_2026_01',
-    custom_1: 'attendee_pro',
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<google-analytics></google-analytics>
-<script type="module">
-  const ga = document.querySelector('google-analytics');
-  ga.metadata = {
-    video_title: 'Keynote Presentation',
-    video_series: 'Annual Conference',
-    video_producer: 'Video.js Team',
-    video_id: 'conf_2026_01',
-    custom_1: 'attendee_pro',
-  };
-</script>
-```
-</FrameworkCase>
-
-### GA4 collection limits
-
-Google Analytics 4 enforces collection limits on event parameters:
-
-- **25 parameters per event**: The extension sends 8 standard parameters (`video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_stream_type`, `video_title`, `video_url`, and `visible`), leaving room for up to 17 custom dimensions in `metadata`.
-- **Parameter names**: Up to 40 characters in length.
-- **String values**: Up to 100 characters in length.
-
-## Debugging
-
-Enable console logging by setting the `debug` option:
+Check that `gtag.js` or GTM loads on the page. Then turn on `debug` to log each event the extension sends:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -243,35 +183,35 @@ Enable console logging by setting the `debug` option:
 ```
 </FrameworkCase>
 
-When enabled, the extension logs every dispatched event and its parameters:
-
 ```
 [GoogleAnalyticsExtension] Event: "video_start" {video_current_time: 0, video_duration: 120, ...}
 ```
 
-You can also provide an `onEvent` callback to intercept dispatched events programmatically:
+If events log but don't reach GA4 through GTM, add a GA4 event tag with a custom event trigger for them. GTM doesn't forward data layer events on its own.
+
+### No `video_progress` events
+
+The stream is live, its duration is unknown, or `disableProgress` is set. Check `video_stream_type` and `video_duration` in the `debug` output.
+
+### Live streams report as on-demand
+
+The extension asks the media whether it's live, and some media can't tell. Set the stream type yourself:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<GoogleAnalytics
-  onEvent={(event, params) => {
-    console.log('Telemetry event:', event, params);
-  }}
-/>
+<GoogleAnalytics metadata={{ video_title: 'Live Keynote', video_stream_type: 'live' }} />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics></google-analytics>
-<script type="module">
-  const ga = document.querySelector('google-analytics');
-  ga.onEvent = (event, params) => {
-    console.log('Telemetry event:', event, params);
-  };
-</script>
+<google-analytics metadata-video-title="Live Keynote" metadata-video-stream-type="live"></google-analytics>
 ```
 </FrameworkCase>
+
+### Reports show URLs instead of titles
+
+Set `video_title` in `metadata`. The URL is the fallback when neither you nor the media provides a title.
 
 ## Related components
 

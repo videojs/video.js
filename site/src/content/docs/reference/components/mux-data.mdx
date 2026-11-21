@@ -12,7 +12,7 @@ import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 import ExtensionImports from '@/components/docs/api-reference/ExtensionImports.astro';
 
-Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches. See <DocsLink slug="guides/mux-data">Mux Data</DocsLink> for how monitoring works.
+Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches. Media backed by a `<video>` or `<audio>` element is monitored; embeds that play in an iframe, such as YouTube and Vimeo, are not. See <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink> for the complete setup.
 
 ## Import
 
@@ -67,6 +67,22 @@ Any number of `metadata-*` attributes can label a view without script. `metadata
 
 Views also report the extension itself as the Mux plugin, so they can be told apart from other Video.js integrations such as `videojs-mux`.
 
+## Engine data
+
+The extension monitors the media element for every media. For two engines it also hands the engine to the Mux Data SDK, which adds stream-level data: rendition switches, segment request timing and throughput, and engine errors.
+
+| Engine | Reported data |
+|---|---|
+| hls.js | Element and stream-level |
+| dash.js | Element and stream-level |
+| SPF engines, Shaka Player, and the browser (native HLS or a file) | Element-level only |
+
+## Video and session IDs
+
+`video_id` is the Mux playback ID for `https://stream.mux.com` sources, and the source URL otherwise. `view_session_id` is generated once per extension instance, so the views of one player share a session. A `video_id` or `view_session_id` key in `metadata` overrides either.
+
+Without `envKey`, Mux attributes a view to the environment that owns its playback ID, so views of sources Mux doesn't host need an `envKey` to be recorded.
+
 ## Player software name
 
 When no player software name is set, views report `videojs-<framework>-<engine>`, where the framework is `html` or `react` and the engine is the one playing the current source:
@@ -88,10 +104,12 @@ The framework is always one word, so everything after the second hyphen is the e
 
 The player software version defaults to the Video.js version, and the Mux plugin is reported as `@videojs/mux-data` at the same version.
 
+## Options that restart monitoring
+
 Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view and starts a new one. The rest update the view in place.
 
 ## See also
 
-<DocsLinkCard slug="guides/mux-data" description="How monitoring works">Mux Data</DocsLinkCard>
+<DocsLinkCard slug="guides/mux-data" description="Measure playback quality">Monitor playback with Mux Data</DocsLinkCard>
 <DocsLinkCard slug="reference/components/mux-video">Mux video reference</DocsLinkCard>
 <DocsLinkCard slug="reference/components/mux-audio">Mux audio reference</DocsLinkCard>

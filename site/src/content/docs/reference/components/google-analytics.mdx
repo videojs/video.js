@@ -10,7 +10,7 @@ import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 import ExtensionImports from '@/components/docs/api-reference/ExtensionImports.astro';
 
-Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches, dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer`. See <DocsLink slug="guides/google-analytics">Google Analytics</DocsLink> for how telemetry works.
+Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches, dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer`. See <DocsLink slug="guides/google-analytics">Track video events with Google Analytics 4</DocsLink> for the complete setup.
 
 ## Import
 
@@ -55,14 +55,57 @@ Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension
 Any number of `metadata-*` attributes can set dimensions without script. `metadata` remains a property when you need to pass an object or override attribute values, and `onEvent` is property-only. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
 </FrameworkCase>
 
+## Events
+
+Each event is pushed to `window[dataLayerName]` as `{ event, ...params }`, which creates the array when it doesn't exist. When `window.gtag` is a function, the same event is also sent as `gtag('event', event, params)`. `onEvent` receives every event first.
+
+### GA4 Enhanced Measurement events
+
+| Event | Dispatched when | `video_percent` |
+|---|---|---|
+| `video_start` | Playback first begins, or `currentTime` first moves past 0. Also after `video_complete` when looped playback restarts from the start | `0` |
+| `video_progress` | Playback crosses 10%, 25%, 50%, and 75%. Each milestone fires once, then again after playback replays from the end, loops back to the start, or loads a new source. Not dispatched when the stream type is `'live'`, the duration is unknown, or `disableProgress` is set | The milestone |
+| `video_complete` | The media ends, or looped playback restarts from the start | `100` |
+
+### Interaction events
+
+| Event | Dispatched when | `video_percent` |
+|---|---|---|
+| `play` | Playback first begins | `0` |
+| `resume` | Playback begins again after the first `play` | Current position |
+| `pause` | Playback pauses, except while seeking or at the end | Current position |
+| `end` | The media ends, before `video_complete` | `100` |
+| `seek` | A seek completes, except a loop restart | Current position |
+| `mute` | The media becomes muted, or its volume reaches 0 | Current position |
+| `unmute` | The media becomes unmuted with a volume above 0 | Current position |
+| `fullscreenEnter` | The player or its media enters fullscreen | Current position |
+| `fullscreenExit` | The player or its media leaves fullscreen | Current position |
+
+A new source (`loadstart`) resets the session, so the next playback dispatches `play` and `video_start` again. "Current position" is the playback position as a percentage of the duration, so seeking to 90% reports `90`.
+
+## Event parameters
+
+Every event carries these parameters, followed by every other `metadata` entry as a custom dimension. A `metadata` key with the same name as a parameter replaces its value.
+
+| Parameter | Value |
+|---|---|
+| `video_current_time` | Current time, in whole seconds |
+| `video_duration` | Duration, in whole seconds. `0` until the duration is known, and `Infinity` for a live stream with no end |
+| `video_percent` | See [Events](#events) |
+| `video_provider` | `'video.js'` |
+| `video_stream_type` | `'live'` when the media reports a live stream, otherwise `'on-demand'` |
+| `video_title` | The title in the media's content data, then `video_url`, then `'Untitled Video'` |
+| `video_url` | The media's `currentSrc`, then `src` |
+| `visible` | `false` while the page is hidden |
+
 ## Collection limits
 
 Google Analytics 4 enforces collection limits on event parameters:
 
-- **25 parameters per event**: The extension sends 8 standard parameters (`video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_stream_type`, `video_title`, `video_url`, and `visible`), leaving room for up to 17 custom dimensions in `metadata`.
-- **Parameter names**: Up to 40 characters in length.
-- **String values**: Up to 100 characters in length.
+- **25 parameters per event**: the 8 parameters above leave room for up to 17 custom dimensions in `metadata`.
+- **Parameter names**: up to 40 characters.
+- **String values**: up to 100 characters.
 
 ## See also
 
-<DocsLinkCard slug="guides/google-analytics" description="Configure GA4 video telemetry">Google Analytics</DocsLinkCard>
+<DocsLinkCard slug="guides/google-analytics" description="Send video events to GA4">Track video events with Google Analytics 4</DocsLinkCard>
