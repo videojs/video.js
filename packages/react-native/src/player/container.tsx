@@ -15,7 +15,7 @@ export interface ContainerProps extends ViewProps {
  * Thinner than its web counterpart, which additionally registers itself as the store's `container` via
  * `useContainerAttach`, owns a `ContainerCore` for activity state, and provides a popup group. None of that is
  * reachable yet — `PlayerTarget.container` is `HTMLElement`-typed, so nothing can be registered. See
- * `NativePlayerTarget` for what de-DOMing it would unlock.
+ * `NativePlayerTarget` for what de-DOMing it would unlock. Controls activity is reported by `Controls` instead.
  */
 export function Container({ children, style, ...props }: ContainerProps): ReactNode {
   return (

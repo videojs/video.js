@@ -8,6 +8,8 @@ import {
 } from '@videojs/core';
 import { createSelector } from '@videojs/store';
 
+import { nativeControlsFeature } from './features/controls';
+
 /** Select playback state from a react-native player store. */
 export const selectPlayback = createSelector(playbackFeature);
 
@@ -25,3 +27,6 @@ export const selectMetadata = createSelector(metadataFeature);
 
 /** Select playback-rate state from a react-native player store. */
 export const selectPlaybackRate = createSelector(playbackRateFeature);
+
+/** Select controls visibility state from a react-native player store. */
+export const selectControls = createSelector(nativeControlsFeature);
