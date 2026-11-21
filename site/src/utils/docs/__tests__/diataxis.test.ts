@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { getDocTypeFromId, isSection } from '../../../types/docs';
 import { getAllGuideSlugs } from '../sidebar';
 import type { DocPage } from './diataxis';
-import { findDiataxisIssues, findTaskHeadings } from './diataxis';
+import { findDiataxisIssues, findReferenceDuplicates, findTaskHeadings } from './diataxis';
 
 const CONTENT_ROOT = resolve(process.cwd(), 'src/content/docs');
 
@@ -80,7 +80,116 @@ describe('findDiataxisIssues', () => {
   });
 });
 
+describe('findReferenceDuplicates', () => {
+  const reference = page({
+    id: 'reference/components/example',
+    type: 'reference',
+    body: [
+      '- **25 parameters per event**: the 8 standard parameters leave room for up to 17 custom dimensions.',
+      '',
+      '| Engine | Played by |',
+      '|---|---|',
+      '| `hlsjs` | hls.js |',
+      '| `shaka` | Shaka Player |',
+      '| `dashjs` | dash.js |',
+      '| `browser` | The browser |',
+    ].join('\n'),
+  });
+
+  it('reports a list item a guide repeats from reference', () => {
+    const guide = page({
+      body: '<FrameworkCase frameworks={["react"]}>\n- **25 parameters per event**: the 8 standard parameters leave room for up to 17 custom dimensions.\n</FrameworkCase>',
+    });
+
+    expect(findReferenceDuplicates([guide, reference])).toEqual([
+      expect.objectContaining({ id: 'guides/example', referenceId: 'reference/components/example' }),
+    ]);
+  });
+
+  it('reports a lookup table whose rows name the same entries, even when the cells differ', () => {
+    const guide = page({
+      body: [
+        '| Engine | Played by |',
+        '|---|---|',
+        '| `hlsjs` | [hls.js](https://github.com/video-dev/hls.js/) |',
+        '| `shaka` | [Shaka Player](https://github.com/shaka-project/shaka-player) |',
+        '| `dashjs` | [dash.js](https://github.com/Dash-Industry-Forum/dash.js) |',
+        '| `browser` | The browser itself |',
+      ].join('\n'),
+    });
+
+    expect(findReferenceDuplicates([guide, reference])).toHaveLength(1);
+  });
+
+  it('allows code examples, short sentences, and small tables to repeat', () => {
+    const shared = ['```html', '<mux-data></mux-data>', '```'].join('\n');
+    const table = ['| Engine | Played by |', '|---|---|', '| `hlsjs` | hls.js |', '| `shaka` | Shaka Player |'].join(
+      '\n'
+    );
+    const guide = page({ body: [shared, 'It renders nothing.', table].join('\n\n') });
+    const ref = page({
+      id: 'reference/components/x',
+      type: 'reference',
+      body: [shared, 'It renders nothing.', table].join('\n\n'),
+    });
+
+    expect(findReferenceDuplicates([guide, ref])).toEqual([]);
+  });
+
+  it('measures prose as read, so a shared list of links is not a copy', () => {
+    const link = '- [Mux Data metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata)';
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: link });
+
+    expect(findReferenceDuplicates([page({ body: link }), ref])).toEqual([]);
+  });
+
+  it('skips indented code fences, such as one inside a numbered list', () => {
+    const install = [
+      '1. Install the packages:',
+      '',
+      '   ```bash',
+      '   pnpm add @videojs/react @videojs/mux-video @videojs/mux-data @videojs/google-analytics @videojs/google-cast',
+      '   ```',
+    ].join('\n');
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: install });
+
+    expect(findReferenceDuplicates([page({ body: install }), ref])).toEqual([]);
+  });
+
+  it('reads prose that follows a table without a blank line, and paragraphs that open with a component', () => {
+    const sentence =
+      'Changing the SDK, the beacon domain, debug, or cookies restarts monitoring, which ends the current view.';
+    const linked = `<DocsLink slug="reference/x">MuxData</DocsLink> ${sentence}`;
+    const guide = page({ body: ['| A | B |', '|---|---|', '| a | b |', sentence, '', linked].join('\n') });
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: [sentence, '', linked].join('\n\n') });
+
+    expect(findReferenceDuplicates([guide, ref]).map((duplicate) => duplicate.excerpt)).toEqual([sentence, linked]);
+  });
+
+  it('leaves the writing-style pages, which quote reference prose as examples, unchecked', () => {
+    const text = 'A long enough sentence that a writing-style page quotes from a reference page to show its tone.';
+    const ref = page({ id: 'reference/components/x', type: 'reference', body: text });
+
+    expect(findReferenceDuplicates([page({ id: 'writing-style/write-references', body: text }), ref])).toEqual([]);
+  });
+
+  it('ignores passages shared only between guides', () => {
+    const text = 'A long enough sentence that two guides happen to share, which is a separate problem from this check.';
+
+    expect(findReferenceDuplicates([page({ body: text }), page({ id: 'guides/other', body: text })])).toEqual([]);
+  });
+});
+
 describe('docs content', () => {
+  it('keeps reference detail out of guides', () => {
+    const duplicates = findReferenceDuplicates(pages);
+    const report = duplicates
+      .map((duplicate) => `${duplicate.id} repeats ${duplicate.referenceId}: ${duplicate.excerpt}`)
+      .join('\n');
+
+    expect(duplicates, `\nLink to the reference page instead of repeating it:\n${report}\n`).toEqual([]);
+  });
+
   it('keeps every page inside the boundary of its folder', async () => {
     const issues = pages.flatMap((entry) => findDiataxisIssues(entry));
     const report = issues.map((issue) => `${issue.id} [${issue.rule}]: ${issue.message}`).join('\n');

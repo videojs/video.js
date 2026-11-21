@@ -39,7 +39,7 @@ Diátaxis has a fourth mode — learning-oriented **tutorials**. We don't have a
 
 Concept pages and how-to guides share one folder and one URL prefix, `guides/`. The difference is the shape of the page, not its address. Reference has its own folder for exact API and error-code descriptions. The site derives that split from the path and shows it in the eyebrow above the title (for example "Guide › Playback").
 
-A unit test, `pnpm -F site test diataxis`, guards the line between the two folders: no title starts with "How to", and no reference page carries how-to sections or a `<CustomUiNote />`. Whether a guide reads as a concept or a how-to is a judgement you make while writing and reviewing, with the compass below. The test helps by printing, as warnings only, any heading on a Concepts-section page that opens with a task verb such as "Add" or "Configure".
+A unit test, `pnpm -F site test diataxis`, guards the line between the two folders: no title starts with "How to", no reference page carries how-to sections or a `<CustomUiNote />`, and no guide repeats a reference page's paragraphs, list items, or lookup tables verbatim. Code examples may repeat. The test catches exact copies only, so look for restatements in other words when you review. Whether a guide reads as a concept or a how-to is a judgement you make while writing and reviewing, with the compass below. The test helps by printing, as warnings only, any heading on a Concepts-section page that opens with a task verb such as "Add" or "Configure".
 
 To pick a mode, use the Diátaxis [compass](https://diataxis.fr/compass/). Ask two questions: does the content inform **action** (practical steps) or **cognition** (understanding)? And does it serve the reader's **study** (acquiring skills) or their **work** (applying them)?
 
@@ -64,7 +64,7 @@ A capability does not automatically need its own guide. Keep a small task as a s
 | No prerequisites | Has prerequisites |
 | Jump in anywhere | Read top to bottom |
 
-Keep each page's job clear. A how-to guide leads with working code and includes only the explanation a reader needs to modify it — that's its "How it works" section. Deeper background belongs in a concept page; link to it instead of explaining inline. Step-by-step instructions creeping into a concept page belong in a how-to guide.
+Keep each page's job clear. A how-to guide leads with working code and includes only the explanation a reader needs to modify it — that's its "How it works" section. Each section of a how-to answers a reader goal ("to do X…"); a section that tours an option is reference written in the imperative. A table belongs in a how-to only when the reader acts on it, such as a migration mapping. A catalog of events, options, or defaults belongs in reference, so link to it instead. Deeper background belongs in a concept page; link to it instead of explaining inline. Step-by-step instructions creeping into a concept page belong in a how-to guide.
 
 ### How-to guide template
 
@@ -80,7 +80,7 @@ Most how-to guides use the same sections, in this order:
 6. **Troubleshooting** — symptom, likely cause, fix.
 7. **Related components**, **Related API**, **Related guides** — three link groups.
 
-A guide may skip a section that doesn't apply. Established guides may keep a topic-specific structure when it tells the story more clearly — especially broad customization workflows such as Build your own UI component. Do not reorganize a useful page only to satisfy the template.
+A guide may skip a section that doesn't apply. Established guides may keep a topic-specific structure when it tells the story more clearly — especially broad customization workflows such as Build your own UI component. Do not reorganize a useful page only to satisfy the template. A topic-specific structure still follows the reader's goal: it is not a reason to organize a how-to by option.
 
 One goal per page. Titles are goal-oriented and in the reader's words: each completes the sentence "How to…" without the literal prefix ("Play live streams", "Show captions and subtitles" — not "Live Playback" or "Text Tracks"). Think about what someone who only knows YouTube — or their coding agent — would search for. One page should fully answer one question.
 
