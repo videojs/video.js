@@ -49,6 +49,7 @@
   "scripts": {
     "build": "bob build",
     "clean": "rimraf --glob lib types android/build ios/build '*.tsbuildinfo'",
+    "test": "vp test run",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -62,11 +63,15 @@
     "@react-native-community/cli": "20.2.0",
     "@react-native/babel-preset": "0.86.2",
     "@react-native/metro-config": "0.86.2",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.0",
+    "jsdom": "^26.1.0",
     "react": "19.2.8",
+    "react-dom": "19.2.8",
     "react-native": "0.86.2",
     "react-native-builder-bob": "^0.43.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

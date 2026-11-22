@@ -29,5 +29,5 @@
     "target": "ESNext",
     "verbatimModuleSyntax": true
   },
-  "exclude": ["lib", "types"]
+  "exclude": ["lib", "types", "test", "vite.config.ts", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }
