@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { TooltipGroupCore } from '../../../../core/ui/tooltip/group';
 import { createPopupGroup } from '../../popover/group';
-import { createTestPopover, focusTrigger } from '../../popover/tests/helpers';
+import { createTestPopover } from '../../popover/tests/helpers';
 import { createTestTooltip } from './helpers';
 
 describe('createTooltip', () => {
@@ -63,10 +63,10 @@ describe('createTooltip', () => {
     describe('touch pointer suppression', () => {
       beforeEach(() => {
         vi.useFakeTimers();
-        // Report a touch primary input, like an iPad with a trackpad attached.
-        // Tooltips must judge hover and focus per event rather than by device.
+        // jsdom lacks matchMedia — stub so popover's canHover() and canOpenOnFocus()
+        // return true, allowing us to test that the tooltip layer blocks touch independently.
         vi.stubGlobal('matchMedia', (query: string) => ({
-          matches: false,
+          matches: query === '(hover: hover)' || query === '(pointer: fine)',
           media: query,
           addEventListener: vi.fn(),
           removeEventListener: vi.fn(),
@@ -155,7 +155,33 @@ describe('createTooltip', () => {
         expect(onOpenChange).not.toHaveBeenCalled();
       });
 
-      it.each(['mouse', 'pen'])('opens on %s pointer enter', (pointerType) => {
+      it('opens on mouse pointer enter', () => {
+        const { tooltip, onOpenChange } = createTestTooltip();
+
+        tooltip.triggerProps.onPointerEnter({
+          clientX: 0,
+          clientY: 0,
+          pointerId: 1,
+          pointerType: 'mouse',
+          buttons: 0,
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+
+        vi.advanceTimersByTime(600);
+
+        expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'hover' });
+      });
+
+      it.each(['mouse', 'pen'])('opens on %s pointer enter when the primary input reports touch', (pointerType) => {
+        // iPadOS reports a touch primary input even with a trackpad or Apple Pencil attached.
+        vi.stubGlobal('matchMedia', (query: string) => ({
+          matches: false,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }));
+
         const { tooltip, onOpenChange } = createTestTooltip();
 
         tooltip.triggerProps.onPointerEnter({
@@ -274,28 +300,15 @@ describe('createTooltip', () => {
 
       it('opens via focus when no pointer down (keyboard Tab)', () => {
         const { tooltip, onOpenChange } = createTestTooltip();
-        const trigger = document.createElement('button');
-
-        document.body.append(trigger);
-        tooltip.setTriggerElement(trigger);
 
         // Simulate keyboard Tab: focusin without preceding pointerdown
-        focusTrigger(trigger, { visible: true });
         tooltip.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
 
         expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
-
-        trigger.remove();
       });
 
       it('opens via keyboard focus after tap-triggered focus was suppressed', () => {
         const { tooltip, onOpenChange } = createTestTooltip();
-        const trigger = document.createElement('button');
-
-        document.body.append(trigger);
-        tooltip.setTriggerElement(trigger);
-        focusTrigger(trigger, { visible: true });
-
         const pointerEvent = {
           clientX: 0,
           clientY: 0,
@@ -314,8 +327,6 @@ describe('createTooltip', () => {
         // Later keyboard Tab: flag is clean, focus opens tooltip
         tooltip.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
         expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
-
-        trigger.remove();
       });
     });
   });

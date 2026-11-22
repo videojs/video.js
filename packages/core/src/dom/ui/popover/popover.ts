@@ -41,7 +41,6 @@ export interface PopoverOptions {
 /** @internal */
 export interface PopoverTriggerProps {
   onClick: (event: UIEvent) => void;
-  onPointerDown: (event: UIPointerEvent) => void;
   onPointerEnter: (event: UIPointerEvent) => void;
   onPointerLeave: (event: UIPointerEvent) => void;
   onFocusIn: (event: UIFocusEvent) => void;
@@ -82,8 +81,6 @@ export function createPopover(options: PopoverOptions): PopoverApi {
 
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
   const capturedPointers = new Set<number>();
-  // Set by the trigger's pointerdown and consumed by the click that follows.
-  let clickPointerType: string | null = null;
 
   let ignoreNextBlurClose = false;
   let blurGuardTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -119,39 +116,28 @@ export function createPopover(options: PopoverOptions): PopoverApi {
     }
   }
 
+  function canHover(): boolean {
+    return globalThis.matchMedia?.('(hover: hover)')?.matches ?? false;
+  }
+
   /**
-   * Hover is judged per event rather than with `(hover: hover)`, which only describes the primary input. Hybrid devices
-   * such as an iPad with a trackpad or Apple Pencil report a touch primary but still deliver real hovers.
+   * `(hover: hover)` describes only the primary input, which iPadOS always reports as touch, even while a trackpad or
+   * Apple Pencil is hovering. Judge hover from the event instead.
    */
   function isHoverEvent(event: UIPointerEvent): boolean {
     return event.pointerType !== 'touch';
   }
 
-  /** Only keyboard focus opens a hover popover; taps and clicks focus the trigger too. */
-  function isKeyboardFocus(): boolean {
-    const active = getDeepActiveElement(triggerEl?.ownerDocument);
+  function canOpenOnFocus(): boolean {
+    if (!canHover()) return false;
 
-    return active?.matches(':focus-visible') ?? false;
+    return globalThis.matchMedia?.('(pointer: fine)')?.matches ?? false;
   }
 
-  function primaryInputCanHover(): boolean {
-    return globalThis.matchMedia?.('(hover: hover)')?.matches ?? false;
-  }
-
-  /**
-   * Hover popovers ignore taps on touch-first devices. A click from a hovering pointer always toggles; taps and
-   * keyboard clicks keep toggling only where the primary input hovers, such as a touch laptop.
-   */
   function canToggleOnClick(): boolean {
     if (!options.openOnHover?.()) return true;
 
-    const pointerType = clickPointerType;
-
-    clickPointerType = null;
-
-    if (pointerType && pointerType !== 'touch') return true;
-
-    return primaryInputCanHover();
+    return canHover();
   }
 
   function clearBlurGuard(): void {
@@ -346,10 +332,6 @@ export function createPopover(options: PopoverOptions): PopoverApi {
       }
     },
 
-    onPointerDown(event) {
-      clickPointerType = event.pointerType;
-    },
-
     onPointerEnter(event) {
       if (!options.openOnHover?.()) return;
 
@@ -380,7 +362,7 @@ export function createPopover(options: PopoverOptions): PopoverApi {
 
     onFocusIn(_event) {
       if (options.openOnHover?.()) {
-        if (!isKeyboardFocus()) return;
+        if (!canOpenOnFocus()) return;
 
         applyOpen('focus');
       }
