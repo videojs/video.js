@@ -167,6 +167,31 @@ describe('removeAllSubtitlesTracksFromMedia', () => {
     removeAllSubtitlesTracksFromMedia(media);
     expect(media.children.length).toBe(0);
   });
+
+  it('disables the TextTrack before removing the slot so Chrome stops painting its cues', () => {
+    const media = document.createElement('video');
+
+    addSubtitlesTracksToMedia(media, [makeModelTrack()]);
+
+    const el = media.querySelector<HTMLTrackElement>('#track-en')!;
+    const track = el.track;
+
+    track.mode = 'showing';
+    track.addCue(new VTTCue(0, 2, 'Hello'));
+
+    const hostTrack = document.createElement('track');
+
+    hostTrack.id = 'host-track';
+    hostTrack.kind = 'subtitles';
+    hostTrack.src = 'data:text/vtt,';
+    media.appendChild(hostTrack);
+    hostTrack.track.mode = 'showing';
+
+    removeAllSubtitlesTracksFromMedia(media);
+
+    expect(track.mode).toBe('disabled');
+    expect(hostTrack.track.mode).toBe('showing');
+  });
 });
 
 describe('refreshTextTrackCues', () => {
