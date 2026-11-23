@@ -382,6 +382,33 @@ describe('MuxDataExtension', () => {
     expect(emit).not.toHaveBeenCalled();
   });
 
+  it('reports the adapter source in place of the blob the element plays', async () => {
+    const { sdk, monitor } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk });
+    const adapter = new FakeEngineAdapter();
+
+    adapter.src = 'https://stream.mux.com/abc123.m3u8';
+    adapter.engine = {};
+
+    attach(data, adapter);
+    await settle();
+
+    const [, { stateDataTranslator }] = monitor.mock.lastCall!;
+
+    expect(stateDataTranslator({ video_source_url: 'blob:https://example.com/0f3a' })).toEqual({
+      video_source_url: 'https://stream.mux.com/abc123.m3u8',
+    });
+
+    adapter.src = 'https://stream.mux.com/def456.m3u8';
+
+    expect(stateDataTranslator({ video_source_url: 'blob:https://example.com/9b1c' })).toEqual({
+      video_source_url: 'https://stream.mux.com/def456.m3u8',
+    });
+    expect(stateDataTranslator({ video_source_url: 'https://cdn.example.com/hls.m3u8' })).toEqual({
+      video_source_url: 'https://cdn.example.com/hls.m3u8',
+    });
+  });
+
   it('does not monitor media without a native element behind it', async () => {
     const { sdk, monitor } = createSdk();
     const data = new MuxDataExtension({ MuxDataSdk: sdk });

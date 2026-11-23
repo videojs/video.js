@@ -71,6 +71,11 @@ function srcOf(media: Media): string {
   return media.currentSrc.startsWith('blob:') ? '' : media.currentSrc;
 }
 
+/** A `blob:` or `data:` URL: a handle the element plays, not a source. */
+function isMseUrl(url: string): boolean {
+  return /^(blob|data):/i.test(url);
+}
+
 /**
  * Player extension that monitors the player's media with the Mux Data SDK.
  *
@@ -462,6 +467,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       ...(beaconCollectionDomain ? { beaconCollectionDomain } : {}),
       ...(disableCookies ? { disableCookies } : {}),
       ...engineOptions,
+      stateDataTranslator: this.#translateStateData,
       data: {
         ...MUX_PLUGIN_DATA,
         ...(env_key ? { env_key } : {}),
@@ -475,6 +481,16 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       },
     });
   }
+
+  /** Report the media's source URL where the SDK only found the `blob:` or `data:` URL the element plays. */
+  #translateStateData: NonNullable<MuxDataOptions['stateDataTranslator']> = (state) => {
+    const url = state?.video_source_url;
+    if (!state || !isString(url) || !isMseUrl(url)) return state;
+
+    const src = this.#media ? srcOf(this.#media) : '';
+
+    return src ? { ...state, video_source_url: src } : state;
+  };
 
   /**
    * The video-scoped beacon data: the session id, the derived `video_id`, and the caller's metadata, which may override
