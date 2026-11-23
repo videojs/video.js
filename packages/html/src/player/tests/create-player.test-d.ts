@@ -5,9 +5,9 @@ import {
   definePlayerFeature,
   features,
   metadataFeature,
+  type OrientationLockType,
   type PlayerStore,
   type PlayerTarget,
-  type ScreenOrientationLockType,
   type VideoPlayerStore,
   videoFeatures,
 } from '@videojs/core/dom';
@@ -94,7 +94,7 @@ describe('createPlayer', () => {
     const plainPlayer = new withoutOrientationLock.PlayerElement();
 
     assertType<CreatePlayerResult<PlayerStore<[typeof features.orientationLock]>>>(withOrientationLock);
-    assertType<ScreenOrientationLockType | null | undefined>(orientationPlayer.orientationLockType);
+    assertType<OrientationLockType | null | undefined>(orientationPlayer.orientationLockType);
 
     // @ts-expect-error orientation lock properties are absent when the feature is absent.
     plainPlayer.orientationLockType;
