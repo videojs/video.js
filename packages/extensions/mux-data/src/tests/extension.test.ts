@@ -1,8 +1,8 @@
 import { HTMLVideoAdapter } from '@videojs/media/dom';
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxDataExtension } from '..';
-import type { MuxDataSdk } from '../types';
+import type { MuxDataOptions, MuxDataSdk } from '../types';
 
 function createSdk() {
   const emit = vi.fn();
@@ -654,6 +654,99 @@ describe('MuxDataExtension', () => {
     expect(options).not.toHaveProperty('hlsjs');
     expect(options).not.toHaveProperty('Hls');
     expect(options).not.toHaveProperty('dashjs');
+  });
+
+  describe('source URL', () => {
+    const MSE_STATE = { video_source_url: 'blob:https://example.com/0f3a', player_is_paused: false };
+
+    // An engine without an integration is warned about in development.
+    beforeEach(() => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    /** Run the element state the SDK read through the translator the extension handed to `monitor()`. */
+    function translate(
+      monitor: ReturnType<typeof createSdk>['monitor'],
+      stateData: NonNullable<MuxDataOptions['data']>
+    ) {
+      const [, options] = monitor.mock.lastCall!;
+
+      return options.stateDataTranslator(stateData);
+    }
+
+    /** Shaped like the SPF engine: a JS engine with no Mux Data integration, fed to the element as a `blob:`. */
+    async function attachSpf(props: ConstructorParameters<typeof MuxDataExtension>[0] = {}) {
+      const { sdk, monitor, emit } = createSdk();
+      const data = new MuxDataExtension({ MuxDataSdk: sdk, ...props });
+      const adapter = new FakeEngineAdapter();
+
+      adapter.engine = {};
+      adapter.src = 'https://stream.mux.com/abc123.m3u8';
+
+      const video = attach(data, adapter);
+
+      setCurrentSrc(video, MSE_STATE.video_source_url);
+      await settle();
+
+      return { monitor, emit, adapter };
+    }
+
+    it('reports the media source in place of the MediaSource URL for an engine without an integration', async () => {
+      const { monitor } = await attachSpf();
+
+      expect(translate(monitor, MSE_STATE)).toEqual({
+        video_source_url: 'https://stream.mux.com/abc123.m3u8',
+        player_is_paused: false,
+      });
+      expect(translate(monitor, { video_source_url: '' })).toEqual({
+        video_source_url: 'https://stream.mux.com/abc123.m3u8',
+      });
+    });
+
+    it('reports the new source after a source change', async () => {
+      const { monitor, emit, adapter } = await attachSpf();
+
+      adapter.src = 'https://stream.mux.com/def456.m3u8';
+      adapter.dispatchEvent(new Event('loadstart'));
+      await settle();
+
+      expect(emit).toHaveBeenCalledWith('videochange', expect.objectContaining({ video_id: 'def456' }));
+      expect(translate(monitor, MSE_STATE).video_source_url).toBe('https://stream.mux.com/def456.m3u8');
+    });
+
+    it('reports a caller-supplied source URL over the media source', async () => {
+      const { monitor } = await attachSpf({ metadata: { video_source_url: 'https://cdn.example.com/abc123.m3u8' } });
+
+      expect(translate(monitor, MSE_STATE).video_source_url).toBe('https://cdn.example.com/abc123.m3u8');
+    });
+
+    it('leaves the source URL an engine integration reports', async () => {
+      const { sdk, monitor } = createSdk();
+      const data = new MuxDataExtension({ MuxDataSdk: sdk });
+      const adapter = new FakeEngineAdapter();
+      const hlsState = { video_source_url: 'https://stream.mux.com/abc123/rendition.m3u8' };
+
+      adapter.engine = new FakeHlsJsEngine();
+      adapter.src = 'https://stream.mux.com/abc123.m3u8';
+
+      attach(data, adapter);
+      await settle();
+
+      expect(monitor.mock.lastCall![1].hlsjs).toBe(adapter.engine);
+      expect(translate(monitor, hlsState)).toEqual(hlsState);
+    });
+
+    it('does not invent a source URL for media without one', async () => {
+      const { monitor, adapter } = await attachSpf();
+
+      adapter.src = '';
+
+      expect(translate(monitor, MSE_STATE)).toEqual(MSE_STATE);
+    });
   });
 
   it('keeps one view session id across video changes', async () => {

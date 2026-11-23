@@ -71,6 +71,11 @@ function srcOf(media: Media): string {
   return media.currentSrc.startsWith('blob:') ? '' : media.currentSrc;
 }
 
+/** Whether the SDK's reading of the element names no real resource: no source yet, or a MediaSource handle. */
+function isOpaqueSourceUrl(url: string | undefined): boolean {
+  return !url || /^(?:blob|data):/i.test(url);
+}
+
 /**
  * Player extension that monitors the player's media with the Mux Data SDK.
  *
@@ -462,6 +467,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       ...(beaconCollectionDomain ? { beaconCollectionDomain } : {}),
       ...(disableCookies ? { disableCookies } : {}),
       ...engineOptions,
+      stateDataTranslator: this.#translateStateData,
       data: {
         ...MUX_PLUGIN_DATA,
         ...(env_key ? { env_key } : {}),
@@ -475,6 +481,21 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       },
     });
   }
+
+  /**
+   * The SDK re-reads the element on nearly every event and reports its `currentSrc` as `video_source_url`. Under MSE
+   * that is a `blob:` (sent as `MSE style URL`), and without an envKey Mux has nothing left to attribute the view by.
+   * The hls.js and dash.js integrations report their manifest URL in its place; for any other engine, report the
+   * media's own source. A caller-supplied `video_source_url` wins, as metadata does for `video_id`.
+   */
+  #translateStateData: NonNullable<MuxDataOptions['stateDataTranslator']> = (stateData) => {
+    const media = this.#media;
+    const metadataUrl = this.#monitoredMetadata?.video_source_url;
+    const video_source_url =
+      metadataUrl || (media && isOpaqueSourceUrl(stateData?.video_source_url) ? srcOf(media) : '');
+
+    return video_source_url ? { ...stateData, video_source_url } : stateData;
+  };
 
   /**
    * The video-scoped beacon data: the session id, the derived `video_id`, and the caller's metadata, which may override
