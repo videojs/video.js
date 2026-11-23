@@ -50,6 +50,14 @@ describe('container styles', () => {
     expect(source).toContain("'shadow-dom': slottedEmbedFill");
   });
 
+  // The container ring can sit on the page, so it reads the public color instead of the control ring.
+  it.each(containerStyles)('colors the container focus ring with the public focus ring color (%s)', async (_, url) => {
+    const source = await readFile(url, 'utf8');
+
+    expect(source).toContain('focus-visible:outline-media-focus-ring');
+    expect(source).not.toContain('outline-media-ring');
+  });
+
   // The HTML container sits inside the skin's shadow root, so a ratio on it beats any `aspect-ratio` the page sets on the host.
   it.each(containerStyles)('does not force an aspect ratio (%s)', async (_, url) => {
     const source = await readFile(url, 'utf8');

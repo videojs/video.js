@@ -11,7 +11,7 @@ export default styles({
       scopeRoot: true,
       utilities: [
         'relative block h-full w-full overflow-hidden rounded-media-player [--spacing:var(--media-spacing)] [font-family:var(--media-font-family,inherit)] text-media text-media-foreground @container/media-root',
-        'outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-media-ring',
+        'outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-media-focus-ring',
       ],
       variants: {
         // The container is a grid item of the skin host, so it must not inherit `min-*: auto` from its content.
