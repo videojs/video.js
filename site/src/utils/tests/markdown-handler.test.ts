@@ -42,12 +42,22 @@ describe('staticMarkdownHeaderRules', () => {
     ]);
 
     for (const headers of rules.values()) {
-      expect(headers).toEqual({
+      expect(headers).toMatchObject({
         'content-type': negotiated!.headers.get('content-type'),
         'cache-control': negotiated!.headers.get('cache-control'),
         'netlify-cdn-cache-control': negotiated!.headers.get('netlify-cdn-cache-control'),
       });
     }
+
+    expect(rules.get('/docs/framework/react/guides/build-with-ai.md')!.link).toBe(negotiated!.headers.get('link'));
+  });
+
+  it('points each static twin at its HTML page as the canonical URL', () => {
+    const rules = parseHeaderRules(staticMarkdownHeaderRules(['/blog/hello.md', '/docs/guides/installation.md']));
+
+    expect(rules.get('/blog/hello.md')!.link).toBe('<https://videojs.org/blog/hello>; rel="canonical"');
+    // The installation index page only redirects, so its twin has no canonical page.
+    expect(rules.get('/docs/guides/installation.md')).not.toHaveProperty('link');
   });
 
   it('leaves installation twins to the edge function', () => {

@@ -1,11 +1,27 @@
-import type { GoogleCastProvider } from './provider';
-import { getCastContext, IterableWeakSet, loadCastFramework, onCastApiAvailable } from './utils';
+import { loadCastFramework, onCastApiAvailable } from './utils';
 
-export const googleCastInstances = new IterableWeakSet<GoogleCastProvider>();
+type CastFrameworkCallback = (framework: typeof cast.framework) => void;
 
 export let castFramework: typeof cast.framework | undefined;
 
 let pendingCastFramework: Promise<typeof cast.framework> | null = null;
+const castFrameworkCallbacks = new Set<CastFrameworkCallback>();
+
+/**
+ * Call `callback` once the Cast framework is available, right away when it already is. Doesn't load the framework.
+ *
+ * @returns A function that cancels the call.
+ */
+export function whenCastFramework(callback: CastFrameworkCallback): () => void {
+  if (castFramework) {
+    callback(castFramework);
+    return () => {};
+  }
+
+  castFrameworkCallbacks.add(callback);
+
+  return () => castFrameworkCallbacks.delete(callback);
+}
 
 export async function ensureCastFramework(): Promise<typeof cast.framework> {
   if (castFramework) return castFramework;
@@ -46,17 +62,11 @@ function registerCastFramework(): void {
     return;
   }
 
-  if (!castFramework) {
-    castFramework = cast.framework;
+  if (castFramework) return;
 
-    getCastContext()!.addEventListener(castFramework.CastContextEventType.CAST_STATE_CHANGED, () => {
-      googleCastInstances.forEach((provider) => provider.onCastStateChanged());
-    });
+  castFramework = cast.framework;
 
-    getCastContext()!.addEventListener(castFramework.CastContextEventType.SESSION_STATE_CHANGED, () => {
-      googleCastInstances.forEach((provider) => provider.onSessionStateChanged());
-    });
+  for (const callback of castFrameworkCallbacks) callback(castFramework);
 
-    googleCastInstances.forEach((provider) => provider.onCastFrameworkAvailable());
-  }
+  castFrameworkCallbacks.clear();
 }

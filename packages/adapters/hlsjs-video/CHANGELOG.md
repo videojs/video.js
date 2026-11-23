@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.5.0...@videojs/hlsjs-video@10.6.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **hlsjs-video:** surface fatal errors raised while media is attaching ([#9729](https://github.com/videojs/video.js/issues/9729)) ([4fc4e64](https://github.com/videojs/video.js/commit/4fc4e647f240c86a442dde36c338d76fefdd4cfe))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.6.0
+    * @videojs/native-hls-video bumped to 10.6.0
+    * @videojs/spf bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.4.0...@videojs/hlsjs-video@10.5.0) (2026-11-16)
 
 

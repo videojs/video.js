@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/dash-video@10.5.0...@videojs/dash-video@10.6.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **dash-video:** clear the source before detaching so dash.js unbinds from the element ([#9814](https://github.com/videojs/video.js/issues/9814)) ([93b5443](https://github.com/videojs/video.js/commit/93b5443c66204384daf4bfd9c4bff6112f51cc9e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.6.0
+    * @videojs/utils bumped to 10.6.0
+
 ## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/dash-video@10.4.0...@videojs/dash-video@10.5.0) (2026-11-16)
 
 

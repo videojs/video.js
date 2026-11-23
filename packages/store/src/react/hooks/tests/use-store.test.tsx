@@ -80,5 +80,23 @@ describe('useStore', () => {
       expect(renderCount).toBe(1);
       expect(result.current).toBe(1);
     });
+
+    it('keeps one subscription across re-renders with an inline selector', async () => {
+      const { store } = createTestStore();
+      const subscribe = vi.spyOn(store, 'subscribe');
+
+      const { result } = renderHook(() => useStore(store, (s) => s.volume));
+
+      await act(async () => {
+        await store.setVolume(0.5);
+      });
+
+      await act(async () => {
+        await store.setVolume(0.25);
+      });
+
+      expect(result.current).toBe(0.25);
+      expect(subscribe).toHaveBeenCalledTimes(1);
+    });
   });
 });

@@ -39,27 +39,22 @@ function avc1(sps: Uint8Array, pps: Uint8Array, width: number, height: number): 
 }
 
 /**
- * A fragment's decode timeline, started at its earliest presentation time rather than its first decode time.
- *
- * With B-frames, a segment's first frame is decoded a frame or two before it is presented. Relocation aligns the
- * earliest decode time with the playlist, so an unshifted fragment would present that much after its segment's start: a
- * seek onto the boundary lands in a hole, and a flush at the boundary cuts the previous segment's last frames. Shifting
- * every decode time up to the earliest presentation time, and every composition offset down by the same amount, leaves
- * presentation untouched and keeps decode times non-negative (`trun` v1 carries the negative offsets). Durations are
- * DTS deltas; the last sample reuses the one before it.
+ * A fragment's timing, carried as the stream recorded it: `tfdt` is the first sample's decode time and each composition
+ * offset is that sample's PTS − DTS. Relocation reads `tfdt` as a decode time (`media/mp4/timestamp-origin`), so the
+ * fragment lands on the playlist's timeline exactly as a CMAF segment of the same stream would. With B-frames the first
+ * frame presents a frame or two after the segment's start. That delay is real media timing, covered by the previous
+ * segment's end rather than hidden by moving the timeline. Durations are DTS deltas; the last sample reuses the one
+ * before it.
  */
 export function toFragmentTiming(samples: VideoSample[]): Pick<FramedStream, 'baseMediaDecodeTime' | 'samples'> {
-  const earliestPts = Math.min(...samples.map((sample) => sample.pts));
-  const shift = earliestPts - samples[0]!.dts;
-
   return {
-    baseMediaDecodeTime: earliestPts,
+    baseMediaDecodeTime: samples[0]!.dts,
     samples: samples.map((sample, i) => {
       const next = samples[i + 1];
       const previous = samples[i - 1];
       const duration = next ? next.dts - sample.dts : previous ? sample.dts - previous.dts : MPEG_TS_TIMESCALE / 30;
 
-      return { duration, size: sample.size, key: sample.key, cts: sample.pts - sample.dts - shift };
+      return { duration, size: sample.size, key: sample.key, cts: sample.pts - sample.dts };
     }),
   };
 }

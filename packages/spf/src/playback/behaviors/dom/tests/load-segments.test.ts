@@ -10,6 +10,7 @@ import { createSegmentLoaderActor, type SegmentLoaderActor } from '../../../acto
 import { createSourceBufferActor, type SourceBufferActor } from '../../../actors/dom/source-buffer';
 import { makeSourceBuffer } from '../../../actors/dom/tests/segment-loader-fixtures';
 import type { TextTrackSegmentLoaderActor } from '../../../actors/text-track-segment-loader';
+import { type CreateLoadStart, coveringSegmentLoadStart } from '../../../primitives/load-start';
 import {
   loadAudioSegments,
   loadVideoSegments,
@@ -107,7 +108,8 @@ function setupLoadSegments(
   initialState: SegmentLoadingState,
   bufferActor: SourceBufferActor,
   type: 'video' | 'audio',
-  fetchFn: FetchBytes = fetchStream
+  fetchFn: FetchBytes = fetchStream,
+  config: { createLoadStart?: CreateLoadStart } = {}
 ) {
   const state = makeState(initialState);
   const loaderActor = createSegmentLoaderActor(bufferActor, fetchFn);
@@ -118,7 +120,9 @@ function setupLoadSegments(
       : { audioBufferActor: bufferActor, audioSegmentLoaderActor: loaderActor }
   );
   const reactor =
-    type === 'video' ? loadVideoSegments.setup({ state, context }) : loadAudioSegments.setup({ state, context });
+    type === 'video'
+      ? loadVideoSegments.setup({ state, context, config })
+      : loadAudioSegments.setup({ state, context, config });
   const cleanup = () => {
     reactor.destroy();
     loaderActor.destroy();
@@ -658,6 +662,43 @@ describe('loadVideoSegments', () => {
       'http://example.com/b5.m4s',
       'http://example.com/b6.m4s',
     ]);
+
+    cleanup();
+  });
+
+  it.each([
+    { name: 'starts the load at the previous segment', createLoadStart: coveringSegmentLoadStart, start: 0 },
+    { name: 'starts the load at the playhead without createLoadStart', createLoadStart: undefined, start: 10.01 },
+  ])('$name when the segment at the playhead starts after it', async ({ createLoadStart, start }) => {
+    const track = makeResolvedVideoTrack([makeSegment('s1', 0), makeSegment('s2', 10), makeSegment('s3', 20)]);
+    const actor = createSourceBufferActor(makeSourceBuffer([], [[10.03, 20]]), {
+      initTrackId: 'track-1',
+      segments: [{ id: 's2', startTime: 10, duration: 10, trackId: 'track-1' }],
+      bufferedRanges: [{ start: 10.03, end: 20 }],
+    });
+    const { send, cleanup } = setupLoadSegments(
+      {
+        preload: 'auto',
+        loadActivated: true,
+        currentTime: 10.01,
+        selectedVideoTrackId: 'track-1',
+        presentation: {
+          id: 'p1',
+          url: 'http://example.com/playlist.m3u8',
+          startTime: 0,
+          duration: 30,
+          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
+        },
+      },
+      actor,
+      'video',
+      fetchStream,
+      { createLoadStart }
+    );
+
+    await vi.waitFor(() =>
+      expect(send).toHaveBeenLastCalledWith({ type: 'load', track, range: { start, end: 40.01 } })
+    );
 
     cleanup();
   });

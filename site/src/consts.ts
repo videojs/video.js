@@ -12,6 +12,15 @@ export const PRODUCTION_URL = new URL('https://videojs.org');
 export const PRERELEASE_URL = new URL('https://main.videojs.org');
 // Docs for Video.js 8 and earlier.
 export const LEGACY_URL = new URL('https://legacy.videojs.org');
+/**
+ * Routes that only redirect to a page picked from the reader's framework preference, so never serve a page of their
+ * own.
+ */
+export const PREFERENCE_REDIRECT_PATHS: ReadonlySet<string> = new Set([
+  '/docs',
+  '/docs/framework',
+  '/docs/guides/installation',
+]);
 export const SITE_TITLE = 'Video.js';
 export const SEO_SUFFIX = 'Open Source Video Player';
 /** Month (`YYYY-MM`) of the first Video.js 10 blog post; earlier posts document Video.js 1 through 8. */

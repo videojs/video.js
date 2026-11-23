@@ -30,8 +30,8 @@ describe('toFragmentTiming', () => {
     sample(900_000 + 3 * FRAME, 900_000 + 4 * FRAME),
   ];
 
-  it('starts decoding at the earliest presentation time', () => {
-    expect(toFragmentTiming(bFrames).baseMediaDecodeTime).toBe(900_000 + 2 * FRAME);
+  it('starts at the first decode time, not the earliest presentation time', () => {
+    expect(toFragmentTiming(bFrames).baseMediaDecodeTime).toBe(900_000);
   });
 
   it('presents every sample when it presented before', () => {

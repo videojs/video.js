@@ -16,7 +16,6 @@ declare namespace chrome.cast.media {
   enum HlsVideoSegmentFormat {
     FMP4 = 'fmp4',
     MPEG2_TS = 'mpeg2_ts',
-    TS = 'ts',
   }
 
   interface MediaInfo {

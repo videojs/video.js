@@ -42,7 +42,11 @@ Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/b
 
 ### Config
 
-The setup declares `config?`: callers may omit it. It has no keys.
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `createLoadStart?` | `CreateLoadStart` | Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes. The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the segment at the playhead begins after it. Omit to load from the playhead. |
 
 ### State
 
@@ -71,7 +75,11 @@ Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/b
 
 ### Config
 
-The setup declares `config?`: callers may omit it. It has no keys.
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `createLoadStart?` | `CreateLoadStart` | Builds a signal that starts a full-range load earlier than the playhead, re-sending the load when it changes. The video and audio features supply `coveringSegmentLoadStart`, which starts from the previous segment when the segment at the playhead begins after it. Omit to load from the playhead. |
 
 ### State
 
