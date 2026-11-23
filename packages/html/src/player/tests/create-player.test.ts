@@ -412,10 +412,10 @@ describe('createPlayer', () => {
 
     const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
 
-    player.setAttribute('orientation-lock-type', 'portrait');
+    player.setAttribute('orientation-lock-type', 'auto');
     document.body.append(player);
 
-    expect(player.store.orientationLockType).toBe('portrait');
+    expect(player.store.orientationLockType).toBe('auto');
 
     player.orientationLockType = 'natural';
     await player.updateComplete;
