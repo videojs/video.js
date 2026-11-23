@@ -1,17 +1,21 @@
-import { TimeCore, type TimeProps, type TimeType } from '@videojs/core';
+import { TimeCore, type TimeProps, type TimeState, type TimeType } from '@videojs/core';
 import { translateText } from '@videojs/core/i18n';
 import { durationSuffixText, elapsedSuffixText, remainingSuffixText } from '@videojs/core/i18n/text/time';
-import { isUndefined } from '@videojs/utils/predicate';
+import { isFunction, isUndefined } from '@videojs/utils/predicate';
 import { formatTimeAsPhrase } from '@videojs/utils/time';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { type GestureResponderEvent, StyleSheet, Text, type TextProps } from 'react-native';
+import { type GestureResponderEvent, Text, type TextProps } from 'react-native';
 
-import { usePlayer } from '../player/context';
-import { selectBuffer, selectTime } from '../store/selectors';
-import { toNativeA11yProps } from './utils/accessibility';
+import { usePlayer } from '../../player/context';
+import { selectBuffer, selectTime } from '../../store/selectors';
+import { toNativeA11yProps } from '../utils/accessibility';
+import { timeStyles } from './styles';
 
-export interface TimeLabelProps extends Omit<TextProps, 'children'>, TimeProps {}
+export interface ValueProps extends Omit<TextProps, 'children'>, TimeProps {
+  /** Replaces the default content, the signed time text, with content derived from the time state. */
+  children?: ((state: TimeState) => ReactNode) | undefined;
+}
 
 const SUFFIX_TEXT = {
   current: elapsedSuffixText,
@@ -28,20 +32,24 @@ const EMPTY_SEEKABLE = { seekable: [] };
  * or `toggle` changes.
  *
  * ```tsx
- * <TimeLabel />
- * <TimeLabel type="duration" />
- * <TimeLabel type="remaining" negativeSign="−" />
+ * <Time.Value />
+ * <Time.Value type="duration" />
+ * <Time.Value type="remaining" negativeSign="−" />
+ * <Time.Value>{(state) => <MyTime seconds={state.seconds} />}</Time.Value>
  * ```
+ *
+ * Compose values with `Time.Group` and `Time.Separator` for a `current / duration` display.
  */
-export function TimeLabel({
+export function Value({
   type,
   negativeSign,
   label,
   toggle = false,
   onPress,
   style,
+  children,
   ...props
-}: TimeLabelProps): ReactNode {
+}: ValueProps): ReactNode {
   const time = usePlayer(selectTime);
   const buffer = usePlayer(selectBuffer);
   const [core] = useState(() => new TimeCore());
@@ -86,27 +94,27 @@ export function TimeLabel({
   };
 
   return (
+    // Consumer props spread first so the core-derived accessibility props always win.
     <Text
+      {...props}
       {...a11y}
       accessibilityHint={description ? translateText(description) : undefined}
       onPress={toggle ? handlePress : onPress}
-      style={[styles.time, style]}
-      {...props}
+      style={[timeStyles.text, style]}
     >
-      {sign}
-      {state.text}
+      {isFunction(children) ? (
+        children(state)
+      ) : (
+        <>
+          {sign}
+          {state.text}
+        </>
+      )}
     </Text>
   );
 }
 
-export namespace TimeLabel {
-  export type Props = TimeLabelProps;
+export namespace Value {
+  export type Props = ValueProps;
+  export type State = TimeState;
 }
-
-const styles = StyleSheet.create({
-  time: {
-    color: 'white',
-    fontSize: 13,
-    fontVariant: ['tabular-nums'],
-  },
-});

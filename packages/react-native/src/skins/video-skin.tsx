@@ -7,7 +7,7 @@ import { InlineError } from '../ui/inline-error';
 import { PlayButton } from '../ui/play-button';
 import { Poster } from '../ui/poster';
 import { SeekButton } from '../ui/seek-button';
-import { TimeLabel } from '../ui/time-label';
+import { Time } from '../ui/time';
 import { TimeSlider } from '../ui/time-slider';
 import { Title } from '../ui/title';
 
@@ -47,7 +47,7 @@ export function VideoSkin({ children, ...props }: VideoSkinProps): ReactNode {
         </View>
       </View>
       <View pointerEvents="box-none" style={styles.bottom}>
-        <TimeLabel type="current" />
+        <Time.Value type="current" />
         <TimeSlider style={styles.slider} />
       </View>
       {/* Above the controls so its message is not dimmed or crossed by them; it ignores touches. */}

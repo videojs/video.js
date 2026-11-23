@@ -42,6 +42,6 @@ export { InlineError, type InlineErrorProps } from './ui/inline-error';
 export { PlayButton, type PlayButtonProps } from './ui/play-button';
 export { Poster, type PosterProps } from './ui/poster';
 export { SeekButton, type SeekButtonProps } from './ui/seek-button';
-export { TimeLabel, type TimeLabelProps } from './ui/time-label';
+export { Time } from './ui/time';
 export { TimeSlider, type TimeSliderProps } from './ui/time-slider';
 export { Title, type TitleProps } from './ui/title';
