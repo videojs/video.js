@@ -16,6 +16,8 @@
   --color-media-primary: var(--media-primary);
   --color-media-primary-foreground: var(--media-primary-foreground);
   --color-media-ring: var(--media-ring);
+  /* The container ring sits on the page unless a theme insets it, so it defaults to the page text color. */
+  --color-media-focus-ring: var(--media-focus-ring-color, var(--media-container-ring, currentColor));
   --color-media-backdrop: var(--media-backdrop);
 
   /* Player layout breakpoints, measured against the `media-root` container. */

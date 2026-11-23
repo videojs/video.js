@@ -25,6 +25,7 @@ export const mediaTheme = {
     'media-primary',
     'media-primary-foreground',
     'media-ring',
+    'media-focus-ring',
     'media-backdrop',
   ],
   container: [

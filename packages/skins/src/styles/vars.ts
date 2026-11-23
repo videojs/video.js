@@ -33,6 +33,10 @@ export const vars = {
     description:
       'Visibility of the video skin controls before playback starts. Defaults to `hidden`, leaving only the centre play button; set `visible` to show the controls.',
   },
+  '--media-focus-ring-color': {
+    kind: 'public',
+    description: 'Focus ring color for the player container, independent of the control focus rings.',
+  },
   '--media-font-family': {
     kind: 'public',
     description: 'Font family used by the player interface.',
@@ -125,6 +129,10 @@ export const vars = {
   '--media-border': {
     kind: 'internal',
     description: 'Scoped border color.',
+  },
+  '--media-container-ring': {
+    kind: 'internal',
+    description: 'Container focus-ring fallback for themes that inset the ring over the media.',
   },
   '--media-ring': {
     kind: 'internal',
