@@ -26,6 +26,13 @@
         opacity: 0;
         pointer-events: none;
       }
+      #custom-control,
+      shadow-control {
+        display: block;
+        padding: 16px 24px;
+        background: white;
+        color: black;
+      }
       media-play-button {
         padding: 24px 32px;
         background: white;
@@ -42,6 +49,8 @@
         <media-controls>
           <media-controls-content>
             <media-play-button>Play / pause</media-play-button>
+            <div id="custom-control" data-interactive>Skip intro</div>
+            <shadow-control id="shadow-control" role="button">Shadow</shadow-control>
           </media-controls-content>
         </media-controls>
       </media-container>
@@ -53,6 +62,22 @@
       import '@videojs/html/ui/controls';
       import '@videojs/html/ui/controls-content';
       import '@videojs/html/ui/play-button';
+
+      class ShadowControl extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML = '<span>Shadow control</span>';
+        }
+      }
+      customElements.define('shadow-control', ShadowControl);
+
+      for (const id of ['custom-control', 'shadow-control']) {
+        const el = document.getElementById(id);
+        el.dataset.clicks = '0';
+        el.addEventListener('click', () => {
+          el.dataset.clicks = String(Number(el.dataset.clicks) + 1);
+        });
+      }
 
       document.querySelector('video').src = new URLSearchParams(location.search).get('src');
     </script>

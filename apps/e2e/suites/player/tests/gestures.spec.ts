@@ -199,6 +199,27 @@ test.describe('Touch controls without a skin', () => {
   });
 });
 
+test.describe('Touch controls with custom controls', () => {
+  test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });
+
+  for (const id of ['custom-control', 'shadow-control']) {
+    test(`tap on ${id} still activates it`, async ({ page }) => {
+      const player = new PlayerPage(page);
+
+      await page.goto(`/touch-controls.html?src=${encodeURIComponent(MEDIA.mp4.url)}`);
+      await player.waitForMediaReady();
+
+      const control = page.locator(`#${id}`);
+
+      // Reveal the controls first, then tap the custom control: it must receive its click.
+      await page.touchscreen.tap(5, 5);
+      await expect(player.controls).toHaveAttribute(DATA_ATTRS.visible, '');
+      await control.tap();
+      await expect(control).toHaveAttribute('data-clicks', '1');
+    });
+  }
+});
+
 test.describe('Touch Gestures', () => {
   test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });
 

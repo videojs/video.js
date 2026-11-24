@@ -109,23 +109,13 @@ export class GestureCoordinator {
     const { signal } = this.#disconnect;
 
     let pointerDownTime = 0;
-    let preventTouchClick = false;
-    let multitouch = false;
-
-    listen(
-      this.#target,
-      'touchstart',
-      (event) => {
-        multitouch = event.touches.length > 1;
-      },
-      { signal, passive: true }
-    );
+    let claimedTouchTap = false;
 
     listen(
       this.#target,
       'pointerdown',
       (event) => {
-        preventTouchClick = false;
+        claimedTouchTap = false;
 
         if (isInteractionLocked(this.#target)) {
           pointerDownTime = 0;
@@ -165,10 +155,7 @@ export class GestureCoordinator {
           resolve: (type) => matchBindings(bindings, type, pointerType, clientX, target),
         };
 
-        preventTouchClick =
-          !multitouch &&
-          pointerType === 'touch' &&
-          (matches.resolve('tap').length > 0 || matches.resolve('doubletap').length > 0);
+        claimedTouchTap = pointerType === 'touch' && event.isPrimary && matches.resolve('tap').length > 0;
 
         for (const recognizer of this.#recognizers) {
           recognizer.handleUp(matches, event);
@@ -183,24 +170,11 @@ export class GestureCoordinator {
       this.#target,
       'touchend',
       (event) => {
-        if (preventTouchClick && event.touches.length === 0) event.preventDefault();
+        if (claimedTouchTap && event.touches.length === 0) event.preventDefault();
 
-        preventTouchClick = false;
-
-        if (event.touches.length === 0) multitouch = false;
+        claimedTouchTap = false;
       },
       { signal, passive: false }
-    );
-
-    listen(
-      this.#target,
-      'touchcancel',
-      (event) => {
-        preventTouchClick = false;
-
-        if (event.touches.length === 0) multitouch = false;
-      },
-      { signal, passive: true }
     );
   }
 

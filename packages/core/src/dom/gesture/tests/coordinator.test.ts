@@ -210,70 +210,27 @@ describe('GestureCoordinator touch click suppression', () => {
     expect(touchEnd(button).defaultPrevented).toBe(false);
   });
 
-  it('preserves doubletap recognition while cancelling the browser clicks', () => {
+  it('does not claim the touch when only a doubletap gesture is bound', () => {
     const container = setup();
-    const tap = vi.fn();
     const doubletap = vi.fn();
 
-    createTapGesture(container, tap, { pointer: 'touch' });
     createDoubleTapGesture(container, doubletap, { pointer: 'touch' });
     pointerDown(container);
     pointerUp(container, { pointerType: 'touch', clientX: 150 });
 
-    expect(touchEnd(container).defaultPrevented).toBe(true);
-
-    vi.advanceTimersByTime(100);
-    pointerDown(container);
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
-
-    expect(touchEnd(container).defaultPrevented).toBe(true);
-
-    vi.advanceTimersByTime(300);
-
-    expect(doubletap).toHaveBeenCalledOnce();
-    expect(tap).not.toHaveBeenCalled();
-  });
-
-  it('leaves a multitouch sequence native until every contact has ended', () => {
-    const container = setup();
-
-    createTapGesture(container, vi.fn(), { pointer: 'touch' });
-    pointerDown(container);
-    touchEvent(container, 'touchstart', 1);
-    pointerDown(container);
-    touchEvent(container, 'touchstart', 2);
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
-
-    expect(touchEvent(container, 'touchend', 1).defaultPrevented).toBe(false);
-
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
-
     expect(touchEnd(container).defaultPrevented).toBe(false);
-
-    pointerDown(container);
-    touchEvent(container, 'touchstart', 1);
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
-
-    expect(touchEnd(container).defaultPrevented).toBe(true);
   });
 
-  it('handles the next single touch when the last multitouch contact ended outside the container', () => {
+  it('leaves the lift of a non-primary touch native', () => {
     const container = setup();
 
     createTapGesture(container, vi.fn(), { pointer: 'touch' });
-    // Another contact is already down outside the container when this one starts inside it.
     pointerDown(container);
-    touchEvent(container, 'touchstart', 2);
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+    pointerDown(container);
+    pointerUp(container, { pointerType: 'touch', clientX: 150, isPrimary: false });
 
     expect(touchEvent(container, 'touchend', 1).defaultPrevented).toBe(false);
-
-    // The outside contact's touchend never reaches this container; the next touch starts a fresh sequence.
-    pointerDown(container);
-    touchEvent(container, 'touchstart', 1);
-    pointerUp(container, { pointerType: 'touch', clientX: 150 });
-
-    expect(touchEnd(container).defaultPrevented).toBe(true);
+    expect(touchEnd(container).defaultPrevented).toBe(false);
   });
 
   it('does not cancel native panning after the browser cancels the pointer', () => {
@@ -282,10 +239,8 @@ describe('GestureCoordinator touch click suppression', () => {
 
     createTapGesture(container, activate, { pointer: 'touch' });
     pointerDown(container);
-    touchEvent(container, 'touchstart', 1);
     container.dispatchEvent(new Event('pointercancel', { bubbles: true }));
 
-    expect(touchEvent(container, 'touchcancel').defaultPrevented).toBe(false);
     expect(touchEnd(container).defaultPrevented).toBe(false);
     expect(activate).not.toHaveBeenCalled();
   });
@@ -379,13 +334,19 @@ function touchEvent(target: HTMLElement, type: string, activeTouches = 0): Event
   return event;
 }
 
-function pointerUp(target: HTMLElement, init: { pointerType: string; clientX: number; button?: number }): PointerEvent {
+function pointerUp(
+  target: HTMLElement,
+  init: { pointerType: string; clientX: number; button?: number; isPrimary?: boolean }
+): PointerEvent {
   const event = new PointerEvent('pointerup', {
     bubbles: true,
     pointerType: init.pointerType,
     clientX: init.clientX,
     button: init.button ?? 0,
   });
+
+  // jsdom's PointerEvent does not implement `isPrimary`.
+  Object.defineProperty(event, 'isPrimary', { value: init.isPrimary ?? true });
 
   target.dispatchEvent(event);
   return event;

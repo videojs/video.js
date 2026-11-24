@@ -49,6 +49,11 @@ export function isEditableTarget(event: KeyboardEvent): boolean {
  * @internal
  */
 export function isInteractiveTarget(event: Event): boolean {
+  // Walk the composed path so a control's role on a shadow host is seen even when the event target is inside its
+  // shadow root, where `closest()` stops.
+  const path = event.composedPath();
+  if (path.length > 0) return path.some((node) => node instanceof Element && node.matches(INTERACTIVE_SELECTOR));
+
   const target = resolveEventTarget(event);
   if (!(target instanceof Element)) return false;
 
