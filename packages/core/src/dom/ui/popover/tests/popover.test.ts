@@ -1,6 +1,7 @@
 import { flush } from '@videojs/store';
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import type { UIPointerEvent } from '../../event';
 import { createPopupGroup } from '../group';
 import { createTestPopover } from './helpers';
 
@@ -334,6 +335,59 @@ describe('createPopover', () => {
       popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
 
       expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
+    });
+  });
+
+  describe('hover', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    function stubPrimaryInput({ hover }: { hover: boolean }): void {
+      vi.stubGlobal('matchMedia', (query: string) => ({ matches: hover && query === '(hover: hover)' }));
+    }
+
+    function pointerEvent(pointerType: string): UIPointerEvent {
+      return {
+        clientX: 0,
+        clientY: 0,
+        pointerId: 1,
+        pointerType,
+        buttons: 0,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      };
+    }
+
+    it.each(['mouse', 'pen'])('opens and closes on %s hover when the primary input cannot hover', (pointerType) => {
+      stubPrimaryInput({ hover: false });
+
+      const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true, delay: () => 300 });
+
+      popover.triggerProps.onPointerEnter(pointerEvent(pointerType));
+      vi.advanceTimersByTime(300);
+
+      expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'hover' });
+
+      popover.triggerProps.onPointerLeave(pointerEvent(pointerType));
+      vi.advanceTimersByTime(0);
+
+      expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'hover' });
+    });
+
+    it('does not open on touch pointer enter when the primary input can hover', () => {
+      stubPrimaryInput({ hover: true });
+
+      const { popover, onOpenChange } = createTestPopover({ openOnHover: () => true, delay: () => 300 });
+
+      popover.triggerProps.onPointerEnter(pointerEvent('touch'));
+      vi.advanceTimersByTime(300);
+
+      expect(onOpenChange).not.toHaveBeenCalled();
     });
   });
 
