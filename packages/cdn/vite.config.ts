@@ -271,6 +271,8 @@ export default defineConfig({
     // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
     clearMocks: false,
     environment: 'node',
+    // Dynamic composite imports can exceed Vitest's default under workspace load.
+    testTimeout: 15_000,
   },
   pack: cdnPackConfigs,
 });

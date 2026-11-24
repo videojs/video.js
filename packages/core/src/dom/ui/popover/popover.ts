@@ -120,6 +120,14 @@ export function createPopover(options: PopoverOptions): PopoverApi {
     return globalThis.matchMedia?.('(hover: hover)')?.matches ?? false;
   }
 
+  /**
+   * `(hover: hover)` describes only the primary input, which iPadOS always reports as touch, even while a trackpad or
+   * Apple Pencil is hovering. Judge hover from the event instead.
+   */
+  function isHoverEvent(event: UIPointerEvent): boolean {
+    return event.pointerType !== 'touch';
+  }
+
   function canOpenOnFocus(): boolean {
     if (!canHover()) return false;
 
@@ -324,10 +332,10 @@ export function createPopover(options: PopoverOptions): PopoverApi {
       }
     },
 
-    onPointerEnter(_event) {
+    onPointerEnter(event) {
       if (!options.openOnHover?.()) return;
 
-      if (!canHover()) return;
+      if (!isHoverEvent(event)) return;
 
       clearHoverTimeout();
 
@@ -338,10 +346,10 @@ export function createPopover(options: PopoverOptions): PopoverApi {
       hoverTimeout = setTimeout(() => applyOpen('hover'), delay);
     },
 
-    onPointerLeave(_event) {
+    onPointerLeave(event) {
       if (!options.openOnHover?.()) return;
 
-      if (!canHover()) return;
+      if (!isHoverEvent(event)) return;
 
       clearHoverTimeout();
 

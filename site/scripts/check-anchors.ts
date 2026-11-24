@@ -69,6 +69,21 @@ function resolveTargetPage(distDirectory: string, pagePath: string): string | un
   return undefined;
 }
 
+/**
+ * Resolve a framework-agnostic docs path such as `/docs/guides/casting` to the framework pages its on-demand route can
+ * redirect to. The redirect keeps the fragment, so the anchor has to exist on every one of them.
+ */
+function resolveAgnosticDocsPages(distDirectory: string, pagePath: string): string[] {
+  const match = /^\/docs\/(?!framework\/)(.+)$/.exec(pagePath);
+  const frameworkDirectory = join(distDirectory, 'docs', 'framework');
+  if (!match || !existsSync(frameworkDirectory)) return [];
+
+  return readdirSync(frameworkDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => resolveTargetPage(distDirectory, `/docs/framework/${entry.name}/${match[1]}`))
+    .filter((page): page is string => page !== undefined);
+}
+
 export function checkAnchors(distDirectory: string): BrokenAnchor[] {
   const root = resolve(distDirectory);
   const pages = walkHtml(root).map((path) =>
@@ -97,25 +112,30 @@ export function checkAnchors(distDirectory: string): BrokenAnchor[] {
       const fragment = decodeURIComponent(href.slice(hashIndex + 1));
       if (fragment === '' || fragment.startsWith(':~:')) continue;
 
-      let targetPage: string | undefined;
+      let targetPages: string[];
 
       if (rawPath === '') {
-        targetPage = page;
+        targetPages = [page];
       } else if (rawPath.startsWith('/')) {
-        targetPage = resolveTargetPage(distDirectory, decodeURIComponent(rawPath));
+        const absolutePath = decodeURIComponent(rawPath);
+        const targetPage = resolveTargetPage(distDirectory, absolutePath);
+
+        targetPages = targetPage ? [targetPage] : resolveAgnosticDocsPages(distDirectory, absolutePath);
       } else {
-        targetPage = resolveTargetPage(
+        const targetPage = resolveTargetPage(
           distDirectory,
           posix.join(urlDirectory === '.' ? '' : urlDirectory, decodeURIComponent(rawPath))
         );
+
+        targetPages = targetPage ? [targetPage] : [];
       }
 
-      if (!targetPage) {
+      if (targetPages.length === 0) {
         broken.push({ page, href, reason: 'missing-page' });
         continue;
       }
 
-      if (!idsByPage.get(targetPage)?.has(fragment)) {
+      if (targetPages.some((targetPage) => !idsByPage.get(targetPage)?.has(fragment))) {
         broken.push({ page, href, reason: 'missing-anchor' });
       }
     }

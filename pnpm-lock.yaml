@@ -968,6 +968,9 @@ importers:
       happy-dom:
         specifier: ^20.11.1
         version: 20.11.1
+      oxc-parser:
+        specifier: 0.146.0
+        version: 0.146.0
       rolldown:
         specifier: ~1.2.5
         version: 1.2.5

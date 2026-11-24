@@ -173,6 +173,32 @@ describe('createTooltip', () => {
         expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'hover' });
       });
 
+      it.each(['mouse', 'pen'])('opens on %s pointer enter when the primary input reports touch', (pointerType) => {
+        // iPadOS reports a touch primary input even with a trackpad or Apple Pencil attached.
+        vi.stubGlobal('matchMedia', (query: string) => ({
+          matches: false,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }));
+
+        const { tooltip, onOpenChange } = createTestTooltip();
+
+        tooltip.triggerProps.onPointerEnter({
+          clientX: 0,
+          clientY: 0,
+          pointerId: 1,
+          pointerType,
+          buttons: 0,
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+
+        vi.advanceTimersByTime(600);
+
+        expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'hover' });
+      });
+
       it('closes on pointer down', () => {
         const { tooltip, onOpenChange } = createTestTooltip();
 

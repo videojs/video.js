@@ -78,13 +78,13 @@ The built-in button hides when `fullscreenAvailability` is not `'available'`. Us
 
 ## Common variations
 
-### Lock orientation while fullscreen
+### Adapt orientation to the video
 
-<FrameworkCase frameworks={["react"]}>
-
-Add `orientationLockFeature` to lock screen orientation while the player is fullscreen. It isn't part of `videoFeatures`, so the preset `VideoPlayer` doesn't include it. It locks to `landscape` by default and unlocks on exit.
+Add `orientationLockFeature` to enable screen locking while the player is fullscreen. It isn't part of `videoFeatures`, so the preset `VideoPlayer` doesn't include it. By default, it locks to `landscape`; set `orientationLockType` to `auto` to follow the video's intrinsic dimensions. It unlocks when fullscreen exits.
 
 The preset has a fixed feature list, so build the player yourself with <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink>:
+
+<FrameworkCase frameworks={["react"]}>
 
 ```tsx
 import { Container, createPlayer, FullscreenButton, orientationLockFeature } from '@videojs/react';
@@ -96,7 +96,7 @@ const { Player } = createPlayer({
 
 export default function App() {
   return (
-    <Player>
+    <Player orientationLockType="auto">
       <Container>
         <Video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" muted playsInline />
         <FullscreenButton>Fullscreen</FullscreenButton>
@@ -107,14 +107,13 @@ export default function App() {
 ```
 
 </FrameworkCase>
-<FrameworkCase frameworks={["html"]}>
 
-Add `orientationLockFeature` to lock screen orientation while the player is fullscreen. It isn't part of `videoFeatures`, so the preset `<video-player>` doesn't include it. It locks to `landscape` by default and unlocks on exit.
+<FrameworkCase frameworks={["html"]}>
 
 Register a custom player tag with <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink>:
 
 ```html
-<orientation-player>
+<orientation-player orientation-lock-type="auto">
   <media-container>
     <video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" muted playsinline></video>
     <media-fullscreen-button>Fullscreen</media-fullscreen-button>
@@ -136,13 +135,9 @@ Register a custom player tag with <DocsLink slug="reference/api/html-create-play
 
 </FrameworkCase>
 
-<FrameworkCase frameworks={["react"]}>
-To lock to something other than `landscape`, set `orientationLockType` on the player. See the <DocsLink slug="reference/api/feature-orientation-lock">orientation lock feature</DocsLink> reference for details.
-</FrameworkCase>
+When fullscreen starts, `auto` compares `videoWidth` with `videoHeight`: wider video selects `landscape`, taller video selects `portrait`. Equal dimensions do not request a lock. If dimensions are not available yet, the feature waits for media metadata; it also follows later video-size changes while fullscreen remains active.
 
-<FrameworkCase frameworks={["html"]}>
-To lock to something other than `landscape`, set the `orientation-lock-type` attribute on the player. See the <DocsLink slug="reference/api/feature-orientation-lock">orientation lock feature</DocsLink> reference for details.
-</FrameworkCase>
+The device is locked only if the browser supports the Screen Orientation API and accepts the request. Otherwise, its current orientation is left unchanged; a warning is emitted in development builds only. See <DocsLink slug="reference/api/feature-orientation-lock">orientation lock</DocsLink> for fixed orientation values and selectors.
 
 ### Double-click to toggle
 

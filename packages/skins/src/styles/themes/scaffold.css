@@ -14,6 +14,8 @@
     --media-tooltip-boundary-offset: var(--media-popover-boundary-offset);
     --media-popover-foreground: white;
     --media-ring: var(--media-accent);
+    /* The container ring is inset over the media, so it matches the control rings. */
+    --media-container-ring: var(--media-ring);
     --media-button-highlight: rgb(255 255 255 / 0.2);
     --media-video-border-radius: var(--media-border-radius, 0px);
     --media-control-radius: 0px;

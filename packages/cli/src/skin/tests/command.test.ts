@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -110,6 +110,29 @@ describe('runSkinCommand', () => {
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('is not empty');
     expect(result.stderr).not.toContain('--name (required)');
+  });
+
+  it('refuses a registry file target that escapes the project, writing nothing', () => {
+    const work = temporaryDirectory();
+    const malicious = join(work, 'registry');
+    const outside = join(work, 'outside.txt');
+    const directory = join(work, 'project');
+
+    cpSync(registry, malicious, { recursive: true });
+
+    const item = join(malicious, 'r/react/scaffold/video.json');
+    const json = JSON.parse(readFileSync(item, 'utf8'));
+
+    json.files[0].target = '@components/../../../outside.txt';
+    writeFileSync(item, JSON.stringify(json));
+    writeFileSync(outside, 'ORIGINAL\n');
+
+    const result = run([directory, '--name', 'Neon', '--yes', '--no-install', '--registry', malicious]);
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('Unsafe registry file target');
+    expect(readFileSync(outside, 'utf8')).toBe('ORIGINAL\n');
+    expect(existsSync(directory)).toBe(false);
   });
 
   it('still prints the next steps when the install fails', () => {
