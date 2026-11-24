@@ -46,6 +46,12 @@ export function projectPath(target: string): string {
   if (!match) throw new Error(`Unsupported registry file target "${target}".`);
 
   const [, alias, path] = match;
+
+  // Registries are remote input: a `..`, empty, or absolute segment could write outside the project.
+  if (path!.split(/[/\\]/).some((segment) => segment === '' || segment === '.' || segment === '..')) {
+    throw new Error(`Unsafe registry file target "${target}".`);
+  }
+
   if (alias === 'components' && path!.startsWith('videojs/')) return `src/${path!.slice('videojs/'.length)}`;
 
   return `src/${alias}/${path}`;

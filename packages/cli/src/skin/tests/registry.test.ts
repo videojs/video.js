@@ -61,6 +61,19 @@ describe('projectPath', () => {
     expect(projectPath('@lib/resolve-class-name.ts')).toBe('src/lib/resolve-class-name.ts');
     expect(() => projectPath('~/elsewhere.ts')).toThrow(/Unsupported/);
   });
+
+  it('rejects targets that could leave the project', () => {
+    for (const target of [
+      '@components/../../../outside.txt',
+      '@components/videojs/../../outside.txt',
+      '@lib/..',
+      '@hooks/a/./b.ts',
+      '@lib//etc/passwd',
+      '@components/..\\..\\outside.txt',
+    ]) {
+      expect(() => projectPath(target), target).toThrow(/Unsafe/);
+    }
+  });
 });
 
 describe('rewriteImports', () => {

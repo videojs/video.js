@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 import { REGISTRY_ORIGIN, registryStylings, type RegistryPreset, type RegistryStyling } from '@videojs/installation';
 
@@ -34,6 +34,14 @@ function isEmptyDirectory(path: string): boolean {
   if (!existsSync(path)) return true;
 
   return readdirSync(path).every((entry) => entry === '.git' || entry === '.DS_Store');
+}
+
+function isInside(root: string, path: string): boolean {
+  const relativePath = relative(root, path);
+
+  return (
+    relativePath !== '' && relativePath !== '..' && !relativePath.startsWith(`..${sep}`) && !isAbsolute(relativePath)
+  );
 }
 
 /** A directory the skin can go in, relative to where the command runs. */
@@ -191,6 +199,10 @@ async function createSkin(argv: readonly string[]): Promise<number> {
   process.stdout.write('Copying the skin and its workbench…\n');
 
   const project = await createProject(options, slugify(options.name));
+
+  // Some paths come from a registry, so check every one before writing any of them.
+  const outside = [...project.files.keys()].find((path) => !isInside(root, resolve(root, path)));
+  if (outside) throw new Error(`Refusing to write ${outside} outside ${root}.`);
 
   for (const [path, source] of project.files) {
     const target = resolve(root, path);
