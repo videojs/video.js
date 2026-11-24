@@ -10,6 +10,11 @@ import { SeekButton } from '../ui/seek-button';
 import { Time } from '../ui/time';
 import { TimeSlider } from '../ui/time-slider';
 import { Title } from '../ui/title';
+import { ICON_SIZE } from '../ui/utils/button';
+
+/** Inset between a center button's icon and the edge of its scrim. */
+const SCRIM_INSET = 10;
+const SCRIM_SIZE = ICON_SIZE + SCRIM_INSET * 2;
 
 export interface VideoSkinProps extends ContainerProps {
   children?: ReactNode | undefined;
@@ -41,9 +46,9 @@ export function VideoSkin({ children, ...props }: VideoSkinProps): ReactNode {
       <Title style={styles.title} />
       <View style={styles.buttonContainer}>
         <View style={styles.buttons}>
-          <SeekButton seconds={-10} />
-          <PlayButton />
-          <SeekButton seconds={10} />
+          <SeekButton seconds={-10} style={styles.scrim} />
+          <PlayButton style={styles.scrim} />
+          <SeekButton seconds={10} style={styles.scrim} />
         </View>
       </View>
       <View pointerEvents="box-none" style={styles.bottom}>
@@ -93,6 +98,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 24,
+  },
+  // The center buttons float over the video, so each gets its own scrim to stay legible over bright frames.
+  scrim: {
+    padding: SCRIM_INSET,
+    borderRadius: SCRIM_SIZE / 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
