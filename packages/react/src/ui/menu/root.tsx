@@ -135,7 +135,7 @@ export function MenuRoot({
       return next;
     });
   }, []);
-  const optionState = useMemo(() => resolveMenuOptionState(optionStates.values()), [optionStates]);
+  const optionState = useResolvedOptionState(optionStates);
   const setParentOptionState = parentMenu?.setOptionState;
 
   useEffect(() => {
@@ -190,6 +190,17 @@ function isSameOptionState(a: MenuOptionState | undefined, b: MenuOptionState): 
   return (
     a?.value === b.value && a.disabled === b.disabled && a.hidden === b.hidden && a.availability === b.availability
   );
+}
+
+/** Resolves child option states, keeping one identity for equal results so republishing to a parent menu cannot loop. */
+function useResolvedOptionState(states: ReadonlyMap<symbol, MenuOptionState>): MenuOptionState | null {
+  const resolved = useMemo(() => resolveMenuOptionState(states.values()), [states]);
+  const [stable, setStable] = useState(resolved);
+  const isSame = stable && resolved ? isSameOptionState(stable, resolved) : stable === resolved;
+
+  if (!isSame) setStable(resolved);
+
+  return stable;
 }
 
 export namespace MenuRoot {
