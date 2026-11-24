@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> The `8.x` branch no longer accepts pull requests. Video.js 8 issues and pull requests now go to [videojs/videojs-v8](https://github.com/videojs/videojs-v8).
+
 ## Description
 Please describe the change as necessary.
 If it's a feature or enhancement please be as detailed as possible.
