@@ -1,0 +1,27 @@
+name: Video.js 8 PR Redirect
+
+# `pull_request_target` reads this file from the default branch, so it runs for PRs whose base
+# is `8.x` even though that branch does not have this workflow. Never check out PR code here.
+on:
+  pull_request_target:
+    types: [opened, reopened]
+    branches: ['8.x']
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Point to videojs/videojs-v8
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" --body "Thanks for your contribution! 🙏
+
+          Video.js 8 now lives in [videojs/videojs-v8](https://github.com/videojs/videojs-v8), and the \`8.x\` branch here no longer takes pull requests. Please open this pull request against that repository instead."

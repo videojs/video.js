@@ -8,6 +8,9 @@ Video.js is a free and open source library, and we appreciate any help you're wi
 
 [vjs-gov]: https://github.com/videojs/admin/blob/main/GOVERNANCE.md
 
+> [!NOTE]
+> Contributing to Video.js 8? It now lives in [videojs/videojs-v8](https://github.com/videojs/videojs-v8). Please open v8 issues and pull requests there.
+
 ## 🎒 Contributing code
 
 Video.js 10 is set up a monorepo using [`pnpm` workspaces](https://pnpm.io/workspaces). As such, most scripts run will be done from the project/workspace root. Unless otherwise specified, assume commands and similar should be run from the root directory.
