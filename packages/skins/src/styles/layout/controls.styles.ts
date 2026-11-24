@@ -37,6 +37,13 @@ const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:poin
 // The centre play button shrinks rather than hides in small players.
 const centerPlay = ['rounded-media-pill!'] as const;
 
+// The centre play and seek buttons share one primary fill so they read as a single group.
+const centerPrimary = [
+  'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
+  'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+  'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+] as const;
+
 export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
@@ -141,9 +148,7 @@ export default styles({
         default: [
           ...centerPlay,
           'size-auto! p-4! media-max-360:p-3!',
-          'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
-          'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
-          'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+          ...centerPrimary,
           'pointer-fine:data-started:not-focus-visible:opacity-0!',
           'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
         ],
@@ -171,8 +176,8 @@ export default styles({
       variants: {
         default: [
           'media-max-2xs:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
-          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
-          'media-high-contrast:bg-media-background!',
+          'rounded-media-pill!',
+          ...centerPrimary,
         ],
       },
     },
