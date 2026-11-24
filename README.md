@@ -6,6 +6,8 @@
 
 **Update:** Big changes coming in Video.js 10, early 2026! [Read the discussion.](https://github.com/videojs/video.js/discussions/9035)
 
+**Video.js 8:** Issues and pull requests for Video.js 8 now go to [videojs/videojs-v8](https://github.com/videojs/videojs-v8).
+
 Video.js is a powerful and customizable open-source video player that runs smoothly across all major web platforms, including desktop, mobile, and Smart TVs.
 
 Right out of the box, Video.js supports all common media formats used on the web including streaming formats like HLS and DASH. It works on desktops, mobile devices, tablets, and web-based Smart TVs. It can be further extended and customized by a robust ecosystem of [plugins][plugins].
