@@ -3,10 +3,16 @@ export const prerender = false;
 
 import { DEFAULT_FRAMEWORK } from '@/types/docs';
 import { getPreferencesServer } from '@/utils/docs/preferences';
-import { getInstallationRoutePath } from '@/utils/installation/routes';
+import { resolveDocsHref } from '@/utils/docs/routing';
+import { getInstallationRoutePath, isInstallationRouteSegment } from '@/utils/installation/routes';
 
 const { framework } = getPreferencesServer(Astro.cookies);
 const target = framework ?? DEFAULT_FRAMEWORK;
 
-return Astro.redirect(getInstallationRoutePath(target), 307);
+// A framework with no installation route keeps its installation guide first in its own sidebar.
+const url = isInstallationRouteSegment(target)
+  ? getInstallationRoutePath(target)
+  : resolveDocsHref({ slug: null, framework: target });
+
+return Astro.redirect(url, 307);
 ---

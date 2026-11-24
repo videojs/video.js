@@ -411,6 +411,33 @@ describe('sidebar utilities', () => {
     });
   });
 
+  describe('opt-in frameworks', () => {
+    const sidebar: Sidebar = [
+      {
+        sidebarLabel: 'Getting started',
+        contents: [
+          { slug: 'shared' },
+          { slug: 'native-only', frameworks: ['react-native'] },
+          { slug: 'everywhere', frameworks: ['html', 'react', 'react-native'] },
+          { href: '/changelog', sidebarLabel: 'Changelog' },
+        ],
+      },
+      { sidebarLabel: 'Web only', contents: [{ slug: 'web' }] },
+    ];
+
+    it('should only give an alpha framework the entries that list it', () => {
+      const filtered = filterSidebar('react-native', sidebar, false);
+
+      expect(filtered).toHaveLength(1);
+      expect(getAllGuideSlugs(filtered)).toEqual(['native-only', 'everywhere']);
+      expect((filtered[0] as Section).contents).toHaveLength(2);
+    });
+
+    it('should keep unrestricted entries on stable frameworks', () => {
+      expect(getAllGuideSlugs(filterSidebar('react', sidebar, false))).toEqual(['shared', 'everywhere', 'web']);
+    });
+  });
+
   describe('findFirstGuide with real sidebar config', () => {
     it('should return a guide for every valid framework', async () => {
       // Import the real sidebar config

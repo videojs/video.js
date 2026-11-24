@@ -10,8 +10,13 @@ export interface SelectOption<T = string> {
   value: T | null;
   label: string;
   icon?: ReactNode;
+  /** Short status shown after the label, such as "Alpha". */
+  badge?: string;
   disabled?: boolean;
 }
+
+const BADGE_CLASS =
+  'inline-flex h-4.5 shrink-0 items-center rounded-md corner-squircle bg-accent/12 px-1.5 text-p4 leading-none font-medium text-accent dark:bg-accent/15';
 
 export interface SelectProps<T = string> {
   value: T | null;
@@ -55,6 +60,7 @@ export function Select<T extends string = string>({
           </span>
         )}
         <BaseSelect.Value className="min-w-0 flex-1 truncate" />
+        {selected?.badge && <span className={BADGE_CLASS}>{selected.badge}</span>}
         <BaseSelect.Icon className={twMerge('text-muted flex shrink-0', iconClassName)}>
           <ChevronDown className="size-4" />
         </BaseSelect.Icon>
@@ -94,6 +100,7 @@ export function Select<T extends string = string>({
                     </span>
                   )}
                   <BaseSelect.ItemText className="min-w-0 flex-1 truncate">{option.label}</BaseSelect.ItemText>
+                  {option.badge && <span className={BADGE_CLASS}>{option.badge}</span>}
                   <BaseSelect.ItemIndicator className="absolute right-2 inline-flex items-center">
                     <Check className="size-4" />
                   </BaseSelect.ItemIndicator>

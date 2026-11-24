@@ -20,7 +20,7 @@ import TurndownService from 'turndown';
 import { FIRST_V10_BLOG_MONTH, SITE_DESCRIPTION } from '../src/consts';
 import { sidebar } from '../src/docs.config';
 import type { Section, Sidebar, SupportedFramework } from '../src/types/docs';
-import { FRAMEWORK_LABELS, isLink, isSection, isValidFramework } from '../src/types/docs';
+import { FRAMEWORK_LABELS, isLink, isSection, isValidFramework, isWebFramework } from '../src/types/docs';
 import { INSTALLATION_PACKAGE_VERSION, renderInstallationMarkdownSelection } from '../src/utils/installation/markdown';
 import {
   getInstallationRoutePath,
@@ -847,17 +847,20 @@ export function generateDocsIndex(
 
   content += `> Install the [Video.js skill](https://github.com/videojs/skills) to help AI coding agents find version-matched pages from this index.\n\n`;
 
-  content += `> The \`video.js\` package on npm contains no player; install \`video.js@8\` to stay on Video.js 8. Video.js 10 ships as \`@videojs/${framework}\`; to move existing Video.js 8 code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-video-js-8.md\n\n`;
+  // The package, migration, and installation-picker notes describe the web packages only.
+  if (isWebFramework(framework)) {
+    content += `> The \`video.js\` package on npm contains no player; install \`video.js@8\` to stay on Video.js 8. Video.js 10 ships as \`@videojs/${framework}\`; to move existing Video.js 8 code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-video-js-8.md\n\n`;
 
-  const vidstackPackage = framework === 'react' ? '@vidstack/react' : 'vidstack';
+    const vidstackPackage = framework === 'react' ? '@vidstack/react' : 'vidstack';
 
-  content += `> Vidstack Player is in security-only maintenance. To move existing \`${vidstackPackage}\` code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-vidstack.md\n\n`;
+    content += `> Vidstack Player is in security-only maintenance. To move existing \`${vidstackPackage}\` code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-vidstack.md\n\n`;
 
-  if (framework === 'react') {
-    content += `> Video-React is in security-only maintenance. To move existing \`video-react\` code, read ${siteUrl}/docs/framework/react/guides/migrate-from-video-react.md\n\n`;
+    if (framework === 'react') {
+      content += `> Video-React is in security-only maintenance. To move existing \`video-react\` code, read ${siteUrl}/docs/framework/react/guides/migrate-from-video-react.md\n\n`;
+    }
+
+    content += `> Print version-matched installation options without changing files: \`npx @videojs/cli agents init\`, then pass \`--framework ${framework}\` with the other choices. Installation guide index: ${siteUrl}/docs/guides/installation.md\n\n`;
   }
-
-  content += `> Print version-matched installation options without changing files: \`npx @videojs/cli agents init\`, then pass \`--framework ${framework}\` with the other choices. Installation guide index: ${siteUrl}/docs/guides/installation.md\n\n`;
 
   // Get sidebar filtered for this framework (production only)
   if (!isValidFramework(framework)) return content;

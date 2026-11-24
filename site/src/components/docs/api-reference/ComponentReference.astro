@@ -7,7 +7,7 @@ import H4 from '@/components/typography/H4Markdown.astro';
 import MarkdownCode from '@/components/typography/MarkdownCode.astro';
 import P from '@/components/typography/P.astro';
 import type { ComponentReference } from '@/types/component-reference';
-import { isValidFramework } from '@/types/docs';
+import { isValidFramework, isWebFramework } from '@/types/docs';
 import { resolveReferenceSlug } from '@/utils/api-reference-overrides';
 import { createComponentReferenceModel } from '@/utils/componentReferenceModel';
 import FrameworkCase from '../FrameworkCase.astro';
@@ -26,6 +26,9 @@ interface Props {
 const { component, partOrder } = Astro.props;
 const { framework } = Astro.params;
 if (!framework || !isValidFramework(framework)) throw new Error(`Invalid or missing framework param.`);
+
+// The API docs builder only reads the React and HTML packages.
+if (!isWebFramework(framework)) throw new Error(`No generated component reference exists for "${framework}".`);
 
 const entry = await getEntry('componentReference', resolveReferenceSlug(component));
 const apiRef: ComponentReference | null = entry?.data ?? null;

@@ -11,10 +11,13 @@ import { currentFramework as frameworkStore, currentStyle as styleStore } from '
 import type { AnySupportedStyle, SupportedFramework } from '@/types/docs';
 import {
   FRAMEWORK_LABELS,
+  FRAMEWORK_STABILITY,
+  FRAMEWORK_STABILITY_LABELS,
   FRAMEWORK_STYLES,
   getDefaultStyle,
   isValidFramework,
   isValidStyleForFramework,
+  isWebFramework,
   STYLE_LABELS,
   SUPPORTED_FRAMEWORKS,
 } from '@/types/docs';
@@ -28,10 +31,12 @@ import useIsHydrated from '@/utils/useIsHydrated';
 const FRAMEWORK_ICONS = {
   react: <ReactLogo className="size-4" />,
   html: <Html5Logo className="size-4" />,
+  'react-native': <ReactLogo className="size-4" />,
 } satisfies Record<SupportedFramework, ReactNode>;
 
 const STYLE_ICONS = {
   css: <Css3Logo className="size-4" />,
+  stylesheet: <ReactLogo className="size-4" />,
 } satisfies Record<AnySupportedStyle, ReactNode>;
 
 function focusVisibleFrameworkSelector() {
@@ -79,7 +84,7 @@ export function Selectors({
       previous: displayedFramework,
     });
 
-    if (registryFrameworkSelection) {
+    if (registryFrameworkSelection && isWebFramework(newFramework)) {
       // The installation stores are already loaded on the Shadcn guide; importing them here keeps them off other pages.
       void import('@/stores/registry').then(({ selectRegistryFramework }) => {
         selectRegistryFramework(newFramework);
@@ -126,20 +131,35 @@ export function Selectors({
     styleStore.set(newStyle);
   };
 
-  const frameworkOptions = SUPPORTED_FRAMEWORKS.map((fw) => ({
-    value: fw,
-    label: FRAMEWORK_LABELS[fw],
-    icon: FRAMEWORK_ICONS[fw],
-  }));
+  const frameworkOptions = SUPPORTED_FRAMEWORKS.map((fw) => {
+    const stability = FRAMEWORK_STABILITY[fw];
 
-  // Tailwind skins are on the roadmap; the disabled entry tells readers the styling axis exists without linking anywhere.
+    return {
+      value: fw,
+      label: FRAMEWORK_LABELS[fw],
+      icon: FRAMEWORK_ICONS[fw],
+      badge: stability && FRAMEWORK_STABILITY_LABELS[stability],
+    };
+  });
+
+  // Tailwind skins are on the roadmap for the web frameworks; the disabled entry tells readers the styling axis exists
+  // without linking anywhere.
   const styleOptions: SelectOption<AnySupportedStyle | 'tailwind'>[] = [
     ...FRAMEWORK_STYLES[currentFramework].map((st) => ({
       value: st,
       label: STYLE_LABELS[st],
       icon: STYLE_ICONS[st],
     })),
-    { value: 'tailwind', label: 'Tailwind (coming soon)', icon: <TailwindLogo className="size-4" />, disabled: true },
+    ...(currentFramework === 'react-native'
+      ? []
+      : [
+          {
+            value: 'tailwind' as const,
+            label: 'Tailwind (coming soon)',
+            icon: <TailwindLogo className="size-4" />,
+            disabled: true,
+          },
+        ]),
   ];
 
   return (

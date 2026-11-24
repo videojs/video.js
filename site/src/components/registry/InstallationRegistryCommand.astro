@@ -1,6 +1,6 @@
 ---
 /** The registry command for whatever skin the installation page's pickers selected. */
-import { isValidFramework } from '@/types/docs';
+import { isWebFramework } from '@/types/docs';
 import {
   defaultRegistryStyling,
   type RegistryFramework,
@@ -23,7 +23,7 @@ interface Props {
 
 const { framework: frameworkProp } = Astro.props;
 const routeFramework = Astro.params.framework;
-const framework = frameworkProp ?? (isValidFramework(routeFramework) ? routeFramework : null);
+const framework = frameworkProp ?? (isWebFramework(routeFramework) ? routeFramework : null);
 if (!framework) throw new Error(`InstallationRegistryCommand needs a framework route, received ${routeFramework}.`);
 
 // The server-rendered command, which is what Markdown readers see, uses the page's default selection.

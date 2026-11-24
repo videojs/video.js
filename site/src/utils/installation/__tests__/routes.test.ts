@@ -62,6 +62,12 @@ describe('installation routes', () => {
     expect(getInstallationRouteForSlug('guides/installation-cdn', 'react')).toBe('cdn');
     expect(getInstallationRouteForSlug('guides/architecture', 'react')).toBeNull();
   });
+
+  it('leaves frameworks without an installation route in the framework flow', () => {
+    expect(getInstallationRouteForSlug('guides/installation', 'react-native')).toBeNull();
+    expect(getInstallationRouteForSlug('guides/installation-react-native', 'react-native')).toBeNull();
+    expect(getInstallationRouteForSlug('guides/installation-cdn', 'react-native')).toBe('cdn');
+  });
 });
 
 describe('installationMarkdownGuides', () => {

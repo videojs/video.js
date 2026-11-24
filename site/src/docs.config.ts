@@ -8,14 +8,23 @@ import type { Sidebar } from '@/types/docs';
 export const sidebar: Sidebar = [
   {
     sidebarLabel: 'Guides',
-    llmsDescription: 'Installation, migration, concepts, playback guides, customization, and tooling for Video.js.',
+    llmsDescription: {
+      react: 'Installation, migration, concepts, playback guides, customization, and tooling for Video.js.',
+      html: 'Installation, migration, concepts, playback guides, customization, and tooling for Video.js.',
+      'react-native': 'Alpha guides for Video.js in React Native. Most guides are not written yet.',
+    },
     contents: [
       {
         sidebarLabel: 'Getting Started',
-        llmsDescription:
-          'Install Video.js, customize a skin, understand its main pieces, check browser and AI tool support, and contribute.',
+        llmsDescription: {
+          react:
+            'Install Video.js, customize a skin, understand its main pieces, check browser and AI tool support, and contribute.',
+          html: 'Install Video.js, customize a skin, understand its main pieces, check browser and AI tool support, and contribute.',
+          'react-native': 'Install the alpha React Native package and see what it supports so far.',
+        },
         contents: [
           { slug: 'guides/installation', sidebarLabel: 'Installation' },
+          { slug: 'guides/installation-react-native', sidebarLabel: 'Installation', frameworks: ['react-native'] },
           { slug: 'guides/installation-vue', sidebarLabel: 'Install with Vue', frameworks: ['html'], hidden: true },
           {
             slug: 'guides/installation-svelte',

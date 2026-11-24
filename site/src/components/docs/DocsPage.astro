@@ -15,7 +15,7 @@ import H2Markdown from '@/components/typography/H2Markdown.astro';
 import { PRODUCTION_URL } from '@/consts';
 import DocsLayout from '@/layouts/Docs.astro';
 import type { SupportedFramework } from '@/types/docs';
-import { DOC_TYPE_LABELS } from '@/types/docs';
+import { DOC_TYPE_LABELS, FRAMEWORK_LABELS, FRAMEWORK_STABILITY } from '@/types/docs';
 import { filterSidebar, getAdjacentGuides, getSectionsForGuide } from '@/utils/docs/sidebar';
 import { getDocTitle, isCodeIdentifier } from '@/utils/docs/title';
 import { createTechArticleSchema } from '@/utils/jsonLd/schemas';
@@ -154,6 +154,14 @@ const jsonLdSchema = createTechArticleSchema({
               This API works today, but its shape is still settling and may change in a minor release. The implementation
               underneath is production quality; what is not final is how you configure it from Video.js. Pin your version
               and check the changelog when you upgrade.
+            </Aside>
+          )
+        }
+        {
+          FRAMEWORK_STABILITY[framework] === "alpha" && (
+            <Aside type="caution" title={`${FRAMEWORK_LABELS[framework]} is in alpha`}>
+              Video.js for {FRAMEWORK_LABELS[framework]} is early work. Its APIs will change without notice, most
+              features are missing, and these docs cover only what exists so far.
             </Aside>
           )
         }

@@ -4,7 +4,7 @@ import { currentFramework } from '@/stores/preferences';
 import type { SupportedFramework } from '@/types/docs';
 import { isShadcnInstallationUrl } from '@/utils/installation/routes';
 
-import { getFrameworkPreferenceClient, setFrameworkPreferenceClient } from './preferences';
+import { getWebFrameworkPreferenceClient, setFrameworkPreferenceClient } from './preferences';
 import { getFrameworkFromDocsUrl } from './routing';
 
 const DOCS_SIDEBAR_ID = 'docs-sidebar';
@@ -93,7 +93,7 @@ export async function syncFrameworkPreferenceFromUrl(url: URL): Promise<void> {
   if (isShadcnInstallationUrl(url)) {
     // The Shadcn guide reads its framework from the query with rules that only installation pages need to load.
     const { resolveShadcnFramework } = await import('@/utils/installation/framework-navigation');
-    const framework = resolveShadcnFramework(url, getFrameworkPreferenceClient() ?? 'react');
+    const framework = resolveShadcnFramework(url, getWebFrameworkPreferenceClient() ?? 'react');
 
     if (framework) publishFramework(framework);
 

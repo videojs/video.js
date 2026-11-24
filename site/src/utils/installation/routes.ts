@@ -161,13 +161,13 @@ export function isShadcnInstallationUrl(url: Pick<URL, 'pathname'>): boolean {
 
 /**
  * The installation route that renders a guide slug. React and HTML share one document, so `framework` picks between
- * them.
+ * them. A framework with no route here, such as React Native, keeps its installation guide in the framework flow.
  */
 export function getInstallationRouteForSlug(
   slug: string | null | undefined,
   framework: SupportedFramework
 ): InstallationRouteSegment | null {
-  if (slug === INSTALLATION_ROUTES[framework].slug) return framework;
+  if (isInstallationRouteSegment(framework) && slug === INSTALLATION_ROUTES[framework].slug) return framework;
 
   return (
     INSTALLATION_ROUTE_SEGMENTS.find(

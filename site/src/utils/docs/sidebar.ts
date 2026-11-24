@@ -1,11 +1,12 @@
 import type { Guide, Sidebar, SidebarItem, SupportedFramework } from '@/types/docs';
-import { FRAMEWORK_STYLES, isLink, isSection } from '@/types/docs';
+import { FRAMEWORK_STYLES, isLink, isListedForFramework, isSection } from '@/types/docs';
 
 import { sidebar } from '../../docs.config';
 
 /**
- * Check if an item (Guide or Section) should be shown based on framework. If no frameworks are specified, the item is
- * visible to all frameworks.
+ * Check if an item (Guide or Section) should be shown based on framework. A section with no frameworks specified is
+ * visible to all frameworks and is dropped later if nothing in it is. A guide or link with none is visible to every
+ * stable framework; an opt-in framework such as React Native only gets the ones that list it.
  *
  * @param item - The guide or section to check
  * @param framework - The currently selected framework
@@ -22,7 +23,9 @@ export function isItemVisible(
     return false;
   }
 
-  return !item.frameworks || item.frameworks.includes(framework);
+  if (isSection(item)) return !item.frameworks || item.frameworks.includes(framework);
+
+  return isListedForFramework(item.frameworks, framework);
 }
 
 /**
@@ -192,7 +195,7 @@ export function getValidFrameworksForGuide(guide: Guide, sidebarToSearch: Sideba
         const result = findWithRestrictions(item.contents, sectionFrameworks);
         if (result) return result;
       } else if (!isLink(item) && item.slug === guide.slug) {
-        return item.frameworks ? inherited.filter((f) => item.frameworks!.includes(f)) : inherited;
+        return inherited.filter((f) => isListedForFramework(item.frameworks, f));
       }
     }
 
