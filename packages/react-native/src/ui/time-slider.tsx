@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 
 import { usePlayer } from '../player/context';
-import { selectBuffer, selectPlayback, selectTime } from '../store/selectors';
+import { selectBuffer, selectControls, selectPlayback, selectTime } from '../store/selectors';
 import { useLatestRef } from '../utils/use-latest-ref';
 import { toNativeA11yProps } from './utils/accessibility';
 import { createSliderGesture } from './utils/slider-gesture';
@@ -46,12 +46,23 @@ export function TimeSlider({ disabled, pauseOnDrag, changeThrottle, style, ...pr
   const time = usePlayer(selectTime);
   const buffer = usePlayer(selectBuffer);
   const playback = usePlayer(selectPlayback);
+  const controls = usePlayer(selectControls);
   const [core] = useState(() => new TimeSliderCore());
 
   const timeRef = useLatestRef(time);
   const playbackRef = useLatestRef(playback);
   const lastSeekRef = useRef<number | undefined>(undefined);
   const originRef = useRef(0);
+  const releaseControlsLockRef = useRef<(() => void) | null>(null);
+
+  // Keeps the controls up for the whole touch, as the web slider does; a drag outlasts the idle delay.
+  const lockControls = () => {
+    releaseControlsLockRef.current ??= controls?.requestControlsLock() ?? null;
+  };
+  const releaseControls = () => {
+    releaseControlsLockRef.current?.();
+    releaseControlsLockRef.current = null;
+  };
 
   const [gesture] = useState(() => {
     function seekTo(percent: number) {
@@ -75,8 +86,14 @@ export function TimeSlider({ disabled, pauseOnDrag, changeThrottle, style, ...pr
     });
   });
 
-  // Ending a drag on unmount also resumes playback that `pauseOnDrag` paused.
-  useEffect(() => () => gesture.cancel(), [gesture]);
+  // Ending a drag on unmount also resumes playback that `pauseOnDrag` paused, and frees the controls.
+  useEffect(
+    () => () => {
+      gesture.cancel();
+      releaseControlsLockRef.current?.();
+    },
+    [gesture]
+  );
 
   const input = useSnapshot(gesture.input);
 
@@ -119,11 +136,18 @@ export function TimeSlider({ disabled, pauseOnDrag, changeThrottle, style, ...pr
         const { pageX, locationX } = event.nativeEvent;
 
         originRef.current = pageX - locationX;
+        lockControls();
         gesture.press(locationX);
       }}
       onResponderMove={(event: GestureResponderEvent) => gesture.move(event.nativeEvent.pageX - originRef.current)}
-      onResponderRelease={() => gesture.release()}
-      onResponderTerminate={() => gesture.release()}
+      onResponderRelease={() => {
+        gesture.release();
+        releaseControls();
+      }}
+      onResponderTerminate={() => {
+        gesture.release();
+        releaseControls();
+      }}
       style={[styles.root, state.disabled && styles.disabled, style]}
       {...props}
     >
