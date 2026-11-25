@@ -31,4 +31,18 @@ pnpm -F @videojs/abr-lab lab:down
 - The origin is h2 over TLS 1.3 with a self-signed certificate, `max-age=3600` caching, and `Timing-Allow-Origin: *`. It has no CDN tiers: every response is an origin hit, so lab recordings isolate the network from cache effects.
 - Only one of `probe` and `record --lab` may run at a time: they share the origin's shaper.
 
-The design notes behind this live in the "Learned ABR for SPF" doc (Architecture and Predictor inputs tabs).
+## Playback simulator
+
+`src/abr/` replays synthetic capacity traces through a TCP transfer model (validated against `probe` sweeps) and a player loop, then scores QoE. Predictors and decision rules plug in, so a change can be judged by playback rather than by estimate error alone.
+
+```bash
+pnpm -F @videojs/abr-lab abr [--seeds 20] [--validate recordings/probe-*.jsonl]   # predictors x rules (throughput, MPC)
+pnpm -F @videojs/abr-lab abr:start [--seeds 20] [--playlist-bytes N]              # starting estimates, weighed by scenario
+pnpm -F @videojs/abr-lab abr:cold [--seeds 20]                                     # first displayed rung: fused estimate, abandonment
+```
+
+- `abr:start` and `abr:cold` run dash.js with only its starting estimate changed. Sessions are built in `src/abr/worlds.ts`, and scenario weights there are assumptions.
+- `abr:cold` scores how often the first rung lands below or above the settled rung (median over 20–60 s of content) and `startQoe` per customer profile (`START_PROFILES` in `src/abr/scenarios.ts`, also assumptions).
+- The fused estimate (`kind: 'fused'` in `src/predictors/with-prior.ts`) is a grid belief (`src/predictors/belief.ts`) over a prior, a stored value from the last session (trusted by first-request TTFB), NetInfo and the playlist's first burst. Its spreads were fitted on the same simulator, so its results are optimistic.
+
+The design notes behind this live in the "Learned ABR for SPF" doc (Architecture and Predictor inputs tabs). Results, open questions and next steps are in its Results tab and its "Status and how to resume" section.
