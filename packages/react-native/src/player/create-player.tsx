@@ -9,11 +9,12 @@ import type { InferStoreState, Store, UnionSliceState } from '@videojs/store';
 import { combine, createStore } from '@videojs/store';
 import { useStore } from '@videojs/store/react';
 import { pick } from '@videojs/utils/object';
-import { type FC, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { isNull } from '@videojs/utils/predicate';
+import { type FC, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { ReactNativeMedia } from '../media/react-native-media';
 import type { NativePlayerTarget } from '../store/native-player-target';
-import { useDestroy } from '../utils/use-destroy';
+import { useInstance } from '../utils/use-instance';
 import { NativePlayerContextProvider, useMedia, useNativePlayerContext } from './context';
 
 /** A feature that can compose into a react-native player store, along with the config inputs it declares. */
@@ -114,28 +115,37 @@ export function createPlayer(config: CreatePlayerConfig<AnyNativeFeature[]>): Cr
 
     // Both created during render, not in an effect, so `media.handle` is already non-null on the
     // first render and the surface never has a null pass to render around. The store starts from
-    // this render's config so features never run on defaults the props override.
-    const [media] = useState(() => new ReactNativeMedia());
-    const [store] = useState(() => createConfiguredStore(configValues));
-    const syncedValues = useRef(configValues);
-
-    useDestroy(store);
-    useDestroy(media);
+    // this render's config so features never run on defaults the props override. An `<Activity>`
+    // hide can destroy them while component state survives; `useInstance` replaces them on show.
+    const media = useInstance(() => new ReactNativeMedia());
+    const store = useInstance(() => createConfiguredStore(configValues));
+    const syncedValues = useRef({ store, values: configValues });
 
     // Forwards committed config changes, and only the inputs that changed, as web's Player does.
     useLayoutEffect(() => {
       const previous = syncedValues.current;
 
+      // Replacement stores are seeded from this render's props during creation.
+      if (previous.store !== store) {
+        syncedValues.current = { store, values: configValues };
+        return;
+      }
+
       for (const key of configKeys) {
-        if (Object.is(previous[key], configValues[key])) continue;
+        if (Object.is(previous.values[key], configValues[key])) continue;
 
         setPlayerConfigValue(store, featureConfig[key]!, configValues[key]);
       }
 
-      syncedValues.current = configValues;
+      syncedValues.current = { store, values: configValues };
     });
 
-    useEffect(() => store.attach({ media, container: null }), [store, media]);
+    useEffect(() => {
+      // Shown again after an <Activity> hide destroyed the store or media; useInstance is replacing them.
+      if (store.destroyed || isNull(media.handle)) return;
+
+      store.attach({ media, container: null });
+    }, [store, media]);
 
     const value = useMemo(() => ({ store, media }), [store, media]);
 
