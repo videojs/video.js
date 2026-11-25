@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cdn",
-  "version": "10.6.0",
+  "version": "10.7.0",
   "description": "Video.js 10 as browser-ready bundles for script tags, with no build step",
   "keywords": [
     "audio",
@@ -107,6 +107,7 @@
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
     "happy-dom": "^20.11.1",
+    "oxc-parser": "0.146.0",
     "rolldown": "~1.2.5",
     "tsx": "^4.23.1",
     "vite-plus": "catalog:"

@@ -1,0 +1,25 @@
+---
+description: "Adds adaptive orientation locking and improves CDN localization, self-hosting, and player controls."
+date: 2026-11-24
+version: "10.7.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.6.0...@videojs/core@10.7.0"
+---
+Video.js 10.7.0 makes fullscreen behavior more adaptive and keeps CDN-based players reliable across languages and input methods.
+
+## Adapt fullscreen orientation
+
+The opt-in `orientationLockFeature` now supports `orientationLockType="auto"`. In fullscreen, wide video locks to landscape, tall video locks to portrait, and square video does not request a lock. The feature waits for metadata when needed and follows dimension changes. See the [fullscreen guide](/docs/guides/fullscreen/#adapt-orientation-to-the-video) for setup ([#9806](https://github.com/videojs/video.js/pull/9806)).
+
+## Keep CDN players reliable
+
+CDN skin bundles now register the localization elements they need, so default and neutral live video, audio, and live audio players can use loaded locale bundles ([#9839](https://github.com/videojs/video.js/pull/9839)). Self-hosted CDN archives now also include chunks reached only through dynamic imports, restoring Chinese and Portuguese locale aliases and the WebVTT parser ([#9844](https://github.com/videojs/video.js/pull/9844)).
+
+## Refine player controls
+
+The player focus ring is now visible on light pages, and you can set `--media-focus-ring-color` to customize it; see [Customize skins](/docs/guides/customize-skins/) ([#9838](https://github.com/videojs/video.js/pull/9838)). Trackpad, mouse, and pencil hovers now open player popovers on touch-first devices, while finger touches continue not to start a hover ([#9832](https://github.com/videojs/video.js/pull/9832)). On touch devices, the default skin's center seek buttons now match the play button ([#9842](https://github.com/videojs/video.js/pull/9842)).
+
+## New contributors
+
+Thanks to first-time contributor [@Codinplus31](https://github.com/Codinplus31).
