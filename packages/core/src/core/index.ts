@@ -31,6 +31,8 @@ export * from './ui/gesture/core';
 export * from './ui/hotkey/core';
 export * from './ui/indicator/labels';
 export * from './ui/indicator/lifecycle';
+export * from './ui/inline-error/core';
+export * from './ui/inline-error/data';
 export * from './ui/input-action';
 export * from './ui/live-button/core';
 export * from './ui/live-button/data';

@@ -28,6 +28,7 @@
     "!android/gradlew",
     "!android/gradlew.bat",
     "!android/local.properties",
+    "!**/tests",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -49,10 +50,12 @@
   "scripts": {
     "build": "bob build",
     "clean": "rimraf --glob lib types android/build ios/build '*.tsbuildinfo'",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vp test run"
   },
   "dependencies": {
     "@videojs/core": "workspace:*",
+    "@videojs/icons": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/store": "workspace:*",
     "@videojs/utils": "workspace:*"
@@ -66,11 +69,13 @@
     "react": "19.2.8",
     "react-native": "0.86.2",
     "react-native-builder-bob": "^0.43.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "react-native": ">=0.76.0"
+    "react-native": ">=0.80.0",
+    "react-native-svg": "^15.16.0"
   },
   "codegenConfig": {
     "name": "VideoJSSpec",
@@ -96,6 +101,7 @@
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
+    "exclude": "**/{__tests__,__fixtures__,__mocks__,tests}/**",
     "targets": [
       [
         "module",

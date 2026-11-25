@@ -39,6 +39,14 @@
       "types": "./dist/react/*/index.d.ts",
       "default": "./dist/react/*/index.js"
     },
+    "./react-native": {
+      "types": "./dist/react-native/default/index.d.ts",
+      "default": "./dist/react-native/default/index.js"
+    },
+    "./react-native/*": {
+      "types": "./dist/react-native/*/index.d.ts",
+      "default": "./dist/react-native/*/index.js"
+    },
     "./html": {
       "types": "./dist/html/default/index.d.ts",
       "default": "./dist/html/default/index.js"

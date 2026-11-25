@@ -37,4 +37,11 @@ export {
   selectPlaybackRate,
   selectTime,
 } from './store/selectors';
+export { BufferingIndicator, type BufferingIndicatorProps } from './ui/buffering-indicator';
+export { InlineError, type InlineErrorProps } from './ui/inline-error';
 export { PlayButton, type PlayButtonProps } from './ui/play-button';
+export { Poster, type PosterProps } from './ui/poster';
+export { SeekButton, type SeekButtonProps } from './ui/seek-button';
+export { Time } from './ui/time';
+export { TimeSlider, type TimeSliderProps } from './ui/time-slider';
+export { Title, type TitleProps } from './ui/title';
