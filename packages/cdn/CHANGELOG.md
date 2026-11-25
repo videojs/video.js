@@ -1,5 +1,42 @@
 # Changelog
 
+## [10.7.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.6.0...@videojs/cdn@10.7.0) (2026-11-24)
+
+
+### Bug Fixes
+
+* **cdn:** include chunks reached only by dynamic import in the archive ([#9844](https://github.com/videojs/video.js/issues/9844)) ([3690780](https://github.com/videojs/video.js/commit/3690780b3ed132fb67a78253ddcda76adb792b0a))
+* **cdn:** register the i18n provider in every skin bundle ([#9839](https://github.com/videojs/video.js/issues/9839)) ([3eba7a7](https://github.com/videojs/video.js/commit/3eba7a718d27901609cedf9f5c28278775382092))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.7.0
+    * @videojs/core bumped to 10.7.0
+    * @videojs/dailymotion-video bumped to 10.7.0
+    * @videojs/dash-video bumped to 10.7.0
+    * @videojs/google-cast bumped to 10.7.0
+    * @videojs/hlsjs-video bumped to 10.7.0
+    * @videojs/html bumped to 10.7.0
+    * @videojs/hyperframes-video bumped to 10.7.0
+    * @videojs/mixcloud-audio bumped to 10.7.0
+    * @videojs/mux-audio bumped to 10.7.0
+    * @videojs/mux-data bumped to 10.7.0
+    * @videojs/mux-video bumped to 10.7.0
+    * @videojs/native-hls-video bumped to 10.7.0
+    * @videojs/playerjs-video bumped to 10.7.0
+    * @videojs/shaka-video bumped to 10.7.0
+    * @videojs/soundcloud-audio bumped to 10.7.0
+    * @videojs/spf bumped to 10.7.0
+    * @videojs/spotify-audio bumped to 10.7.0
+    * @videojs/tiktok-video bumped to 10.7.0
+    * @videojs/twitch-video bumped to 10.7.0
+    * @videojs/vimeo-video bumped to 10.7.0
+    * @videojs/wistia-video bumped to 10.7.0
+    * @videojs/youtube-video bumped to 10.7.0
+
 ## [10.6.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.5.0...@videojs/cdn@10.6.0) (2026-11-20)
 
 
