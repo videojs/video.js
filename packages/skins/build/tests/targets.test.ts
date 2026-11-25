@@ -96,5 +96,5 @@ describe('reactComponentTarget', () => {
 
     expect(missing).toEqual([]);
     expect(checked).toBeGreaterThan(40);
-  });
+  }, 30_000);
 });

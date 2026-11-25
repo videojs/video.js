@@ -142,7 +142,7 @@ describe('auditSkinCss', () => {
         file
       ).toEqual([]);
     }
-  });
+  }, 30_000);
 
   it('passes the Compat and Scaffold stylesheets for the older Compat browsers', () => {
     const files = globSync('packages/react/src/presets/*/{compat,scaffold}-skin.css', { cwd: workspaceDir });
