@@ -44,7 +44,7 @@ export class GestureCoordinator {
   claimsTap(event: PointerEvent, action: string): boolean {
     if (isInteractionLocked(this.#target)) return true;
 
-    if (isInteractiveTarget(event)) return false;
+    if (isInteractiveTarget(event, this.#target)) return false;
 
     return this.#bindings.some(
       (b) => b.type === 'tap' && b.action === action && (!b.pointer || b.pointer === event.pointerType)
@@ -144,7 +144,7 @@ export class GestureCoordinator {
 
         if (Date.now() - pointerDownTime > TAP_THRESHOLD) return;
 
-        if (isInteractiveTarget(event)) return;
+        if (isInteractiveTarget(event, this.#target)) return;
 
         const pointerType = event.pointerType;
         const clientX = event.clientX;

@@ -253,6 +253,28 @@ describe('isInteractiveTarget', () => {
     host.remove();
   });
 
+  it('ignores interactive ancestors of the boundary element', () => {
+    const outer = document.createElement('div');
+    const root = outer.attachShadow({ mode: 'open' });
+    const boundary = document.createElement('div');
+    const inner = document.createElement('span');
+    let bounded: boolean | undefined;
+    let unbounded: boolean | undefined;
+
+    outer.setAttribute('role', 'button');
+    boundary.append(inner);
+    root.append(boundary);
+    document.body.append(outer);
+    outer.addEventListener('pointerup', (event) => {
+      bounded = isInteractiveTarget(event, boundary);
+      unbounded = isInteractiveTarget(event);
+    });
+    inner.dispatchEvent(new Event('pointerup', { bubbles: true, composed: true }));
+    expect(bounded).toBe(false);
+    expect(unbounded).toBe(true);
+    outer.remove();
+  });
+
   it('returns true for menu item radio targets', () => {
     const item = document.createElement('div');
 

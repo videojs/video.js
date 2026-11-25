@@ -221,6 +221,30 @@ describe('GestureCoordinator touch click suppression', () => {
     expect(touchEnd(container).defaultPrevented).toBe(false);
   });
 
+  it('cancels the touchend of a claimed tap while the doubletap still fires', () => {
+    const container = setup();
+    const tap = vi.fn();
+    const doubletap = vi.fn();
+
+    createTapGesture(container, tap, { pointer: 'touch' });
+    createDoubleTapGesture(container, doubletap, { pointer: 'touch' });
+    pointerDown(container);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(container).defaultPrevented).toBe(true);
+
+    vi.advanceTimersByTime(100);
+    pointerDown(container);
+    pointerUp(container, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(container).defaultPrevented).toBe(true);
+
+    vi.advanceTimersByTime(300);
+
+    expect(doubletap).toHaveBeenCalledOnce();
+    expect(tap).not.toHaveBeenCalled();
+  });
+
   it('leaves the lift of a non-primary touch native', () => {
     const container = setup();
 
