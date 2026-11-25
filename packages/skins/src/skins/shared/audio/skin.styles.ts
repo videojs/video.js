@@ -2,8 +2,7 @@ import { styles } from 'vjsc/styles';
 
 const errorDialogOpen = 'has-[[role=alertdialog][data-open]]';
 const errorDialogShown = 'has-[[role=alertdialog][data-open]:not([data-ending-style])]';
-// Only the controls surface carries both attributes.
-const controls = '[&_[data-interactive][data-visible]]';
+const controls = '[&_.audio-controls]';
 
 export default styles({
   file: 'audio/skin.css',

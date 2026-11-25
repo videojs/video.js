@@ -11,6 +11,7 @@ export default styles({
   prefix: 'audio-controls',
   rules: {
     root: {
+      className: 'audio-controls',
       utilities: [],
     },
     content: {

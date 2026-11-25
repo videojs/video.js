@@ -206,7 +206,7 @@ for (const variant of CASES) {
         await waitForStableText(dialog);
         await normalizeErrorDialogCopy(dialog);
 
-        const controls = panel.root.locator('[data-interactive][data-visible]').first();
+        const controls = panel.root.locator('.audio-controls').first();
 
         await expect.poll(() => controls.evaluate((element) => getComputedStyle(element).visibility)).toBe('hidden');
 
