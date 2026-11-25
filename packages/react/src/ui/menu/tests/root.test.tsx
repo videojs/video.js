@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { MenuOptionState } from '@videojs/core';
 import type { KeyboardEventHandler, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -6,7 +7,7 @@ import { createPlayerWrapper } from '../../../testing/mocks';
 import { ControlsContextProvider } from '../../controls/context';
 import { MenuCheckboxItem } from '../checkbox-item';
 import { MenuContent } from '../content';
-import { useMenuOptionState } from '../context';
+import { useMenuContext, useMenuOptionState } from '../context';
 import { MenuGroup } from '../group';
 import { MenuGroupLabel } from '../group-label';
 import { MenuItem } from '../item';
@@ -1332,5 +1333,33 @@ describe('MenuContent', () => {
 
     expect(event.defaultPrevented).toBe(true);
     expect(screen.queryByTestId('content')).toBeNull();
+  });
+});
+
+describe('MenuRoot', () => {
+  it('keeps option state identity when a child republishes an equal state', () => {
+    const seen: Array<MenuOptionState | null> = [];
+
+    function OptionStateProbe() {
+      seen.push(useMenuContext().optionState);
+      return null;
+    }
+
+    function Fixture({ publisherKey }: { publisherKey: number }) {
+      return (
+        <MenuRoot>
+          <OptionPublisher key={publisherKey} />
+          <OptionStateProbe />
+        </MenuRoot>
+      );
+    }
+
+    const { rerender } = render(<Fixture publisherKey={0} />);
+    const published = seen.at(-1);
+
+    rerender(<Fixture publisherKey={1} />);
+
+    expect(published).toMatchObject({ value: 'Auto', availability: 'available' });
+    expect(seen.at(-1)).toBe(published);
   });
 });
