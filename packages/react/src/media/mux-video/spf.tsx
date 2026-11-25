@@ -1,6 +1,6 @@
 'use client';
 
-import { MuxVideoAdapter, type MuxVideoAdapterProps, type SpfVideoAdapterProps } from '@videojs/mux-video/spf';
+import { MuxVideoAdapter, type MuxVideoAdapterProps, type SpfPlaybackProps } from '@videojs/mux-video/spf';
 import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -19,10 +19,12 @@ export type {
   MuxSourceBase,
   MuxVideoAdapter,
   MuxVideoAdapterProps,
+  SpfAdapterLike,
+  SpfPlaybackAPI,
   SpfPlaybackType,
   SpfVideoAdapter,
-  SpfVideoAdapterProps,
-  SpfVideoSource,
+  SpfPlaybackProps,
+  SpfPlaybackSource,
 } from '@videojs/mux-video/spf';
 
 // `src` and `source` come from `MuxVideoAdapterProps`: the Mux Adapter owns both, and its
@@ -31,8 +33,8 @@ export type {
 // describe different things, and an intersection satisfies neither.
 export interface MuxVideoProps
   extends
-    Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof SpfVideoAdapterProps | keyof MuxVideoAdapterProps>,
-    Partial<Omit<SpfVideoAdapterProps, 'src' | 'source'>>,
+    Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof SpfPlaybackProps | keyof MuxVideoAdapterProps>,
+    Partial<Omit<SpfPlaybackProps, 'src' | 'source'>>,
     Partial<MuxVideoAdapterProps>,
     MediaRefProps<MuxVideoAdapter>,
     MediaFallbackProps {
