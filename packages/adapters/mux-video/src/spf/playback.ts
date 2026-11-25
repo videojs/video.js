@@ -316,8 +316,14 @@ export class SpfVideoAdapter extends HTMLVideoAdapter implements SpfVideoAdapter
   }
 
   #destroyDelegate() {
+    const wasSpf = this.#delegate instanceof SpfDelegate;
+
     this.#delegate?.destroy();
     this.#delegate = null;
+
+    // Under Managed Media Source, SPF leaves the element's `disableRemotePlayback`
+    // set, which would keep AirPlay off for the source native playback takes next.
+    if (wasSpf && this.#mediaElement) super.disableRemotePlayback = this.#authorDisableRemotePlayback ?? false;
 
     // Delegate teardown already emits `streamtypechange` (bridged); only sync the cache.
     if (!this.#isUserStreamType) this.#streamType = MediaStreamTypes.UNKNOWN;

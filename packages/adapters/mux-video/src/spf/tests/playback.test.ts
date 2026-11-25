@@ -100,6 +100,21 @@ describe('SpfVideoAdapter', () => {
     expect(media.engineName).toBe('spf-hls-video-mpeg-ts');
   });
 
+  it('hands remote playback back to the author when the next source plays natively', () => {
+    stubMediaSource();
+    const media = new SpfVideoAdapter();
+    const video = document.createElement('video');
+
+    media.attach(video);
+    media.src = HLS_URL;
+    // What SPF does to the element under Managed Media Source.
+    video.disableRemotePlayback = true;
+
+    media.src = MP4_URL;
+
+    expect(video.disableRemotePlayback).toBe(false);
+  });
+
   it('carries type and preferPlayback over to the next src', () => {
     stubMediaSource();
     const media = new SpfVideoAdapter();
