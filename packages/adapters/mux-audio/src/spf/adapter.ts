@@ -28,7 +28,16 @@ import { HlsAudioMpegTsAdapter } from '@videojs/spf/adapters/hls-audio-mpeg-ts';
 export class MuxAudioAdapter extends MuxMixin(HlsAudioMpegTsAdapter) {
   static override readonly defaultProps: Omit<HlsAudioAdapterProps, 'src' | 'source'> & MuxAdapterProps = {
     ...HlsAudioAdapter.defaultProps,
+    // What the hls.js-backed flavor reports, and what the engine does when nothing is set.
+    preload: 'metadata',
     src: '',
     source: null,
   };
+
+  constructor(...args: ConstructorParameters<typeof HlsAudioMpegTsAdapter>) {
+    super(...args);
+
+    // SPF's adapter starts from its own default, so this flavor's is applied here.
+    this.preload = MuxAudioAdapter.defaultProps.preload;
+  }
 }
