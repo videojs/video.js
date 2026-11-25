@@ -157,7 +157,7 @@ export class SliderCore {
     const { min, max, step } = this.#props;
     const raw = min + (percent / 100) * (max - min);
 
-    return roundToStep(clamp(raw, min, max), step, min);
+    return clamp(roundToStep(clamp(raw, min, max), step, min), min, max);
   }
 
   /** Convert percent to a clamped value without applying step rounding. */

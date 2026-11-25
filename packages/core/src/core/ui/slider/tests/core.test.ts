@@ -190,6 +190,15 @@ describe('SliderCore', () => {
   });
 
   describe('valueFromPercent', () => {
+    it('keeps a release value within bounds changed during a coarse-step drag', () => {
+      const core = new SliderCore({ min: 0, max: 80, step: 40 });
+      expect(core.valueFromPercent(100)).toBe(80);
+
+      core.setProps({ ...core.props, max: 60 });
+
+      expect(core.valueFromPercent(100)).toBe(60);
+    });
+
     it('converts 0% to min', () => {
       const core = new SliderCore();
 
