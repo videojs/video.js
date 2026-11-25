@@ -1,7 +1,25 @@
 export const FRAMEWORK_STYLES = {
   react: ['css'],
   html: ['css'],
+  'react-native': ['stylesheet'],
 } as const;
+
+export const FRAMEWORK_STABILITIES = ['alpha'] as const;
+
+export type FrameworkStability = (typeof FRAMEWORK_STABILITIES)[number];
+
+/**
+ * Frameworks whose docs are still being written. An alpha framework is badged in the framework selector and is opt-in:
+ * it only gets the pages and sidebar entries that list it in `frameworks`, so a page written for the stable frameworks
+ * never appears under it by accident. Remove the entry when the framework's docs are complete.
+ */
+export const FRAMEWORK_STABILITY: Partial<Record<keyof typeof FRAMEWORK_STYLES, FrameworkStability>> = {
+  'react-native': 'alpha',
+};
+
+export const FRAMEWORK_STABILITY_LABELS = {
+  alpha: 'Alpha',
+} satisfies Record<FrameworkStability, string>;
 
 export const DOC_STABILITIES = ['unstable'] as const;
 
@@ -49,10 +67,12 @@ export type AnySupportedStyle = SupportedStyle<SupportedFramework>;
 export const FRAMEWORK_LABELS: Record<SupportedFramework, string> = {
   react: 'React',
   html: 'HTML',
+  'react-native': 'React Native',
 };
 
 export const STYLE_LABELS: Record<AnySupportedStyle, string> = {
   css: 'CSS',
+  stylesheet: 'StyleSheet',
 };
 
 export const SUPPORTED_FRAMEWORKS = Object.keys(FRAMEWORK_STYLES) as (keyof typeof FRAMEWORK_STYLES)[];
@@ -70,6 +90,34 @@ export const ALL_FRAMEWORK_STYLE_COMBINATIONS = SUPPORTED_FRAMEWORKS.flatMap((fr
 
 export function getDefaultStyle<F extends SupportedFramework>(framework: F): SupportedStyle<F> {
   return FRAMEWORK_STYLES[framework][0];
+}
+
+/** Whether a framework only shows the sidebar entries that name it. See `FRAMEWORK_STABILITY`. */
+export function isOptInFramework(framework: SupportedFramework): boolean {
+  return FRAMEWORK_STABILITY[framework] !== undefined;
+}
+
+/**
+ * Whether a sidebar page or link with this `frameworks` restriction belongs to a framework. An unrestricted entry
+ * belongs to every stable framework, and to an opt-in framework only when it is listed.
+ */
+export function isListedForFramework(
+  frameworks: readonly SupportedFramework[] | undefined,
+  framework: SupportedFramework
+): boolean {
+  return frameworks ? frameworks.includes(framework) : !isOptInFramework(framework);
+}
+
+/**
+ * The frameworks that render in a browser. The generated API reference, the installation picker, and the Shadcn
+ * registry only have data for these.
+ */
+export const WEB_FRAMEWORKS = ['react', 'html'] as const satisfies readonly SupportedFramework[];
+
+export type WebFramework = (typeof WEB_FRAMEWORKS)[number];
+
+export function isWebFramework(value: string | undefined | null): value is WebFramework {
+  return WEB_FRAMEWORKS.some((framework) => framework === value);
 }
 
 export function isValidFramework(value: string | undefined | null): value is SupportedFramework {
@@ -95,7 +143,7 @@ export function isValidStyleForFramework(
 ): style is AnySupportedStyle {
   if (!style) return false;
 
-  return FRAMEWORK_STYLES[framework].includes(style as any);
+  return (FRAMEWORK_STYLES[framework] as readonly string[]).includes(style);
 }
 
 export interface Guide {

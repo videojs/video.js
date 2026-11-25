@@ -8,7 +8,7 @@
 
 import type { AnySupportedStyle, SupportedFramework } from '@/types/docs';
 import type { EventProperties } from '@/utils/analytics';
-import { getFrameworkPreferenceClient } from '@/utils/docs/preferences';
+import { getWebFrameworkPreferenceClient } from '@/utils/docs/preferences';
 import { installationContextForUrl } from '@/utils/installation/analytics-context';
 
 export const ANALYTICS_EVENTS = {
@@ -106,5 +106,5 @@ export function trackEvent<E extends AnalyticsEventName>(name: E, ...[properties
  * pageview sent before any picker island has loaded the store.
  */
 export function currentInstallationContext(): EventProperties {
-  return installationContextForUrl(location.pathname, location.search, getFrameworkPreferenceClient() ?? undefined);
+  return installationContextForUrl(location.pathname, location.search, getWebFrameworkPreferenceClient());
 }

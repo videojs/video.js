@@ -125,6 +125,17 @@ The sidebar label defaults to the guide's `title` frontmatter; override it with 
 }
 ```
 
+React Native is an alpha framework, so it is opt-in: an entry with no `frameworks` appears under React and HTML but not under React Native. To publish a guide for React Native, list every framework it applies to:
+
+```ts
+{
+  slug: 'guides/architecture',
+  frameworks: ['react', 'html', 'react-native']
+}
+```
+
+Before you add `react-native` to a shared guide, wrap everything that only holds on the web in `<FrameworkCase frameworks={["react", "html"]}>`, because unwrapped content renders for every framework the guide is listed for. A guide that shares little with the web version is easier to maintain as its own file, as `guides/installation-react-native` is.
+
 When a page changes slug, keep its old address alive with a rule in `site/netlify.toml`. Add one for the page and one for its `.md` twin, using `:framework` so a single rule covers every framework, and place them above the section-wide rules so a page that changed section as well lands in one hop:
 
 ```toml
@@ -161,7 +172,7 @@ Keep documentation clear, human, and useful. Here are the key rules:
 ## 5. Understand MDX and our components
 
 ### `<FrameworkCase>` and `<StyleCase>`
-First, understand that the guide you write will be rendered for every framework / style combination (e.g., HTML + CSS, React + CSS) unless you restrict it to specific frameworks in the sidebar config as shown above.
+First, understand that the guide you write will be rendered for every stable framework / style combination (e.g., HTML + CSS, React + CSS) unless you restrict it to specific frameworks in the sidebar config as shown above.
 
 Use the `<FrameworkCase>` and `<StyleCase>` components to conditionally show content to just one framework or style. `<FrameworkCase>` resolves at build time, so content for other frameworks is left out of the page entirely. `<StyleCase>` follows the reader's style preference, so its content is rendered for every style and shown or hidden with CSS:
 

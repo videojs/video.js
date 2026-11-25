@@ -1,6 +1,6 @@
 ---
 /** The Shadcn init command for the selected project template. */
-import { isValidFramework } from '@/types/docs';
+import { isWebFramework } from '@/types/docs';
 import {
   defaultInstallationTemplate,
   INSTALLATION_TEMPLATE_LABELS,
@@ -18,7 +18,7 @@ interface Props {
 
 const { installation = false, framework: frameworkProp } = Astro.props;
 const routeFramework = Astro.params.framework;
-const framework = frameworkProp ?? (isValidFramework(routeFramework) ? routeFramework : null);
+const framework = frameworkProp ?? (isWebFramework(routeFramework) ? routeFramework : null);
 if (!framework) throw new Error(`RegistryInitCommand needs a framework route, received ${routeFramework}.`);
 
 // The template select is hidden from Markdown readers, so name the other values the server-rendered command can take.

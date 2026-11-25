@@ -2,7 +2,7 @@
 // installation renderer that `llms-markdown.ts` needs from a built `@videojs/installation`.
 import { sidebar } from '../src/docs.config';
 import type { Sidebar, SupportedFramework } from '../src/types/docs';
-import { isLink, isSection, SUPPORTED_FRAMEWORKS } from '../src/types/docs';
+import { isLink, isListedForFramework, isSection, SUPPORTED_FRAMEWORKS } from '../src/types/docs';
 
 /** Top-level sidebar sections whose pages share a directory; each section's llms files are written there. */
 export function llmsSections(framework: SupportedFramework) {
@@ -66,7 +66,9 @@ export function filterSidebarForLlms(items: Sidebar, framework: SupportedFramewo
     .filter((item) => {
       if (item.devOnly) return false;
 
-      return !item.frameworks || item.frameworks.includes(framework);
+      if (isSection(item)) return !item.frameworks || item.frameworks.includes(framework);
+
+      return isListedForFramework(item.frameworks, framework);
     })
     .map((item) => {
       if (isSection(item)) {

@@ -1,7 +1,7 @@
 import type { AstroCookies } from 'astro';
 
-import type { AnySupportedStyle, SupportedFramework, SupportedStyle } from '@/types/docs';
-import { DEFAULT_FRAMEWORK, isValidFramework, isValidStyleForFramework } from '@/types/docs';
+import type { AnySupportedStyle, SupportedFramework, SupportedStyle, WebFramework } from '@/types/docs';
+import { DEFAULT_FRAMEWORK, isValidFramework, isValidStyleForFramework, isWebFramework } from '@/types/docs';
 
 // Cookie name for framework (server-side redirects)
 export const FRAMEWORK_COOKIE = 'vjs_docs_framework';
@@ -50,6 +50,13 @@ export function getFrameworkPreferenceClient(): SupportedFramework | null {
   const framework = cookies[FRAMEWORK_COOKIE];
 
   return framework && isValidFramework(framework) ? framework : DEFAULT_FRAMEWORK;
+}
+
+/** The saved framework when it is one the installation picker and the Shadcn registry cover. */
+export function getWebFrameworkPreferenceClient(): WebFramework | undefined {
+  const framework = getFrameworkPreferenceClient();
+
+  return isWebFramework(framework) ? framework : undefined;
 }
 
 export function setFrameworkPreferenceClient(framework: SupportedFramework): void {

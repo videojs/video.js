@@ -1,0 +1,45 @@
+---
+title: Installation
+description: Try the alpha Video.js player for React Native on iOS and Android
+---
+
+`@videojs/react-native` renders video through a native player view on iOS and Android and connects it to the same player store the web packages use.
+
+## What works today
+
+- `VideoPlayer` creates the player and its store.
+- `Video` renders one native video surface and takes a `src`.
+- `VideoSkin` lays out the surface with a play button over it. Play and pause are the only controls so far.
+- `usePlayer` and `useMedia` read player state and reach the media from your own components.
+
+Captions, quality selection, fullscreen, picture-in-picture, casting, and the other features in the web docs are not available yet.
+
+## Requirements
+
+- React Native 0.76 or later with the New Architecture enabled, which is the default from 0.76
+- React 18 or 19
+
+## Install
+
+The package is not published to npm yet. To try it, clone the [Video.js repository](https://github.com/videojs/video.js) and run the example app in `apps/react-native`. Its [README](https://github.com/videojs/video.js/blob/main/apps/react-native/README.md) lists the native toolchain each platform needs.
+
+## Create a player
+
+Wrap the skin and the video in `VideoPlayer`. Give the skin a size; the video fills it.
+
+```tsx
+import { StyleSheet } from 'react-native';
+import { Video, VideoPlayer, VideoSkin } from '@videojs/react-native';
+
+export function Player() {
+  return (
+    <VideoPlayer>
+      <VideoSkin style={{ width: 320, height: 180 }}>
+        <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" style={StyleSheet.absoluteFill} />
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+`Video` is a single native surface, so it cannot have children. Controls sit beside it inside the skin.

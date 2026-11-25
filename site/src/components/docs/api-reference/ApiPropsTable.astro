@@ -19,7 +19,7 @@ interface Props {
 
 const { props, componentName, framework, showAttributeName } = Astro.props;
 
-const entries = Object.entries(props).filter(([, prop]) => !prop.frameworks || prop.frameworks.includes(framework));
+const entries = Object.entries(props).filter(([, prop]) => !prop.frameworks || prop.frameworks.some((candidate) => candidate === framework));
 const toggleColumn = entries.some(([, prop]) => Boolean(prop.description || prop.detailedType));
 ---
 

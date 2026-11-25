@@ -1,12 +1,11 @@
 ---
-import { FRAMEWORK_STYLES, getDefaultStyle, SUPPORTED_FRAMEWORKS } from '@/types/docs';
+import { FRAMEWORK_STYLES, SUPPORTED_FRAMEWORKS } from '@/types/docs';
 
 const STYLE_KEY_PREFIX = 'vjs_docs_style_';
 
 // Derive values from the single source of truth (FRAMEWORK_STYLES)
 // Pass as plain objects since define:vars serializes to JSON
 const frameworkStylesConfig = Object.fromEntries(SUPPORTED_FRAMEWORKS.map((fw) => [fw, [...FRAMEWORK_STYLES[fw]]]));
-const defaultStyleConfig = getDefaultStyle(SUPPORTED_FRAMEWORKS[0]);
 
 // Collect all unique styles across all frameworks for CSS generation
 const allStyles = [...new Set(Object.values(FRAMEWORK_STYLES).flat())];
@@ -37,7 +36,6 @@ const allStyles = [...new Set(Object.values(FRAMEWORK_STYLES).flat())];
   define:vars={{
     keyPrefix: STYLE_KEY_PREFIX,
     frameworkStyles: frameworkStylesConfig,
-    defaultStyle: defaultStyleConfig,
   }}
 >
   function applyStoredStyle(url, root) {
@@ -69,7 +67,7 @@ const allStyles = [...new Set(Object.values(FRAMEWORK_STYLES).flat())];
         style = localStorage.getItem(storageKey);
 
         if (!style || !validStyles.includes(style)) {
-          style = defaultStyle;
+          style = validStyles[0];
           localStorage.setItem(storageKey, style);
         }
       }

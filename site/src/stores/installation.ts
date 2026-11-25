@@ -20,7 +20,7 @@ import {
 import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 import { atom, type WritableAtom } from 'nanostores';
 
-import { getFrameworkPreferenceClient } from '@/utils/docs/preferences';
+import { getWebFrameworkPreferenceClient } from '@/utils/docs/preferences';
 import { getInstallationRouteSegment, type InstallationRouteSegment } from '@/utils/installation/routes';
 import {
   DEFAULT_SELECTION,
@@ -34,7 +34,7 @@ function selectionFromUrl(target: Pick<URL, 'pathname' | 'search'>): Installatio
   const route = getInstallationRouteSegment(target.pathname);
   if (!route) return DEFAULT_SELECTION;
 
-  return parseInstallationSearchForRoute(route, target.search, getFrameworkPreferenceClient() ?? undefined);
+  return parseInstallationSearchForRoute(route, target.search, getWebFrameworkPreferenceClient());
 }
 
 const initialSelection = globalThis.location ? selectionFromUrl(location) : DEFAULT_SELECTION;
