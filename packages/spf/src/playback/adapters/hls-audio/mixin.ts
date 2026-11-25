@@ -167,11 +167,6 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       this.#config = config ?? {};
       this.#engine = this.#createEngine();
 
-      // The constructed class's default rather than this one's, so a Media built
-      // on this adapter can name its own (the Mux Medias report `'metadata'`).
-      this.preload =
-        (this.constructor as typeof HlsAudioImpl).defaultProps?.preload ?? HlsAudioImpl.defaultProps.preload;
-
       // Mirror the engine's live detection onto the media surface, as the video
       // adapter does; `liveEdgeStart` is derived at read time.
       this.#stopLiveSync = effect(() => {

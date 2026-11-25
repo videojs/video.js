@@ -33,4 +33,11 @@ export class MuxAudioAdapter extends MuxMixin(HlsAudioMpegTsAdapter) {
     src: '',
     source: null,
   };
+
+  constructor(...args: ConstructorParameters<typeof HlsAudioMpegTsAdapter>) {
+    super(...args);
+
+    // SPF's adapter starts from its own default, so this flavor's is applied here.
+    this.preload = MuxAudioAdapter.defaultProps.preload;
+  }
 }

@@ -253,11 +253,6 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
       this.#config = { ...config, drm: { ...drm, ...config?.drm } };
       this.#engine = this.#createEngine();
 
-      // The constructed class's default rather than this one's, so a Media built
-      // on this adapter can name its own (the Mux Medias report `'metadata'`).
-      this.preload =
-        (this.constructor as typeof HlsVideoImpl).defaultProps?.preload ?? HlsVideoImpl.defaultProps.preload;
-
       // Mirror the engine's live/stream-type detection onto the media surface,
       // firing the change events the store features listen for. One effect over
       // the presentation + selection signals; `liveEdgeStart` is deliberately
