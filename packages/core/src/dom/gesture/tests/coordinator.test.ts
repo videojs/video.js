@@ -210,6 +210,30 @@ describe('GestureCoordinator touch click suppression', () => {
     expect(touchEnd(button).defaultPrevented).toBe(false);
   });
 
+  it('leaves touchend uncancelled for a claimed tap on a non-interactive, non-media element', () => {
+    const container = setup();
+    const overlay = document.createElement('div');
+
+    container.appendChild(overlay);
+    createTapGesture(container, vi.fn(), { pointer: 'touch' });
+    pointerDown(overlay);
+    pointerUp(overlay, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(overlay).defaultPrevented).toBe(false);
+  });
+
+  it('cancels touchend for a claimed tap that falls through to the media element', () => {
+    const container = setup();
+    const video = document.createElement('video');
+
+    container.appendChild(video);
+    createTapGesture(container, vi.fn(), { pointer: 'touch' });
+    pointerDown(video);
+    pointerUp(video, { pointerType: 'touch', clientX: 150 });
+
+    expect(touchEnd(video).defaultPrevented).toBe(true);
+  });
+
   it('does not claim the touch when only a doubletap gesture is bound', () => {
     const container = setup();
     const doubletap = vi.fn();

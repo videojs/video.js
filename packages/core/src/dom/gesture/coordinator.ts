@@ -155,7 +155,11 @@ export class GestureCoordinator {
           resolve: (type) => matchBindings(bindings, type, pointerType, clientX, target),
         };
 
-        claimedTouchTap = pointerType === 'touch' && event.isPrimary && matches.resolve('tap').length > 0;
+        claimedTouchTap =
+          pointerType === 'touch' &&
+          event.isPrimary &&
+          isMediaSurfaceTarget(event, this.#target) &&
+          matches.resolve('tap').length > 0;
 
         for (const recognizer of this.#recognizers) {
           recognizer.handleUp(matches, event);
@@ -189,6 +193,23 @@ export class GestureCoordinator {
     this.#disconnect?.abort();
     this.#disconnect = null;
   }
+}
+
+/**
+ * Whether a touch fell through to the media or the bare container, the only targets a hidden control (which has
+ * `pointer-events: none`) can sit over. Anything else under the finger is visible UI that should keep its click.
+ */
+function isMediaSurfaceTarget(event: Event, boundary: HTMLElement): boolean {
+  const path = event.composedPath();
+  if (path[0] === boundary) return true;
+
+  for (const node of path) {
+    if (node === boundary) return false;
+
+    if (node instanceof HTMLMediaElement) return true;
+  }
+
+  return false;
 }
 
 const coordinators = new WeakMap<HTMLElement, GestureCoordinator>();

@@ -27,6 +27,7 @@
         pointer-events: none;
       }
       #custom-control,
+      #plain-control,
       shadow-control {
         display: block;
         padding: 16px 24px;
@@ -50,6 +51,7 @@
           <media-controls-content>
             <media-play-button>Play / pause</media-play-button>
             <div id="custom-control" data-interactive>Skip intro</div>
+            <div id="plain-control">Plain overlay</div>
             <shadow-control id="shadow-control" role="button">Shadow</shadow-control>
           </media-controls-content>
         </media-controls>
@@ -71,7 +73,7 @@
       }
       customElements.define('shadow-control', ShadowControl);
 
-      for (const id of ['custom-control', 'shadow-control']) {
+      for (const id of ['custom-control', 'plain-control', 'shadow-control']) {
         const el = document.getElementById(id);
         el.dataset.clicks = '0';
         el.addEventListener('click', () => {

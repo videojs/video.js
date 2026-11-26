@@ -74,7 +74,7 @@ Choose a built-in `action` from the API reference below, or use an application-d
 
 Gestures supplement visible, keyboard-operable controls; they should never be the only way to perform an action. Gestures ignore pointer activity that begins on interactive controls, links, form fields, menu items, or elements marked with `data-interactive`.
 
-On touch devices, a tap that a `tap` gesture claims also cancels the browser's follow-up click. Custom controls inside the player need a real control element (such as `button`), a `role="button"` (or another interactive role), or `data-interactive`; otherwise taps on them go to the gesture layer and the control does not receive its click. For a web component, put the role or `data-interactive` on the host element.
+On touch devices, a tap that a `tap` gesture claims and that falls through to the media or the bare player container also cancels the browser's follow-up click, so controls revealed by that tap do not receive it. Taps on any other visible element inside the player keep their click.
 
 ## Examples
 

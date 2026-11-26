@@ -202,7 +202,7 @@ test.describe('Touch controls without a skin', () => {
 test.describe('Touch controls with custom controls', () => {
   test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });
 
-  for (const id of ['custom-control', 'shadow-control']) {
+  for (const id of ['custom-control', 'plain-control', 'shadow-control']) {
     test(`tap on ${id} still activates it`, async ({ page }) => {
       const player = new PlayerPage(page);
 
