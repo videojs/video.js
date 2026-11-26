@@ -35,6 +35,9 @@ type MediaButtonCore<ComponentState extends ButtonState, MediaState> = MediaButt
  * Abstract base for HTML custom elements that render a media-control button. `ComponentState` is the state the button
  * reflects to data attributes, and `MediaState` is the player state it reads and acts on. Pass both: a subclass that
  * omits them still compiles, but types `activate(state)` and `mediaState` as the `ButtonState` and `object` defaults.
+ *
+ * Each subclass supplies a core from `@videojs/core`, so this base suits the built-in buttons rather than custom
+ * controls. Build a custom control on `UIElement` with a `PlayerController` instead.
  */
 export abstract class MediaButtonElement<
   ComponentState extends ButtonState = ButtonState,
