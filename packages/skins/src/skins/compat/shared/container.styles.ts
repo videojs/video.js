@@ -1,6 +1,6 @@
 import { styles } from 'vjsc/styles';
 
-import { slottedEmbedFill, slottedVideoFill } from '../../../styles/layout/container.styles';
+import { childEmbedFill, slottedEmbedFill, slottedVideoFill } from '../../../styles/layout/container.styles';
 
 export default styles({
   file: 'container.css',
@@ -22,7 +22,7 @@ export default styles({
     // Size comes from the media or the page, never a fixed ratio the page cannot override through the shadow root.
     video: {
       scopeRoot: true,
-      utilities: 'bg-black',
+      utilities: ['bg-black', ...childEmbedFill],
       variants: {
         'shadow-dom': slottedEmbedFill,
       },

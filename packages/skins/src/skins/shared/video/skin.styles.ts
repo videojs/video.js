@@ -1,6 +1,6 @@
 import { styles } from 'vjsc/styles';
 
-import { slottedEmbedFill } from '../../../styles/layout/container.styles';
+import { childEmbedFill, slottedEmbedFill } from '../../../styles/layout/container.styles';
 
 export default styles({
   file: 'video/skin.css',
@@ -9,7 +9,7 @@ export default styles({
     root: {
       // The skin root shares the container's scope root, so its rules must also match `:scope`.
       scopeRoot: true,
-      utilities: 'pointer-fine:not-data-controls-visible:cursor-none',
+      utilities: ['pointer-fine:not-data-controls-visible:cursor-none', ...childEmbedFill],
       variants: {
         'shadow-dom': slottedEmbedFill,
       },

@@ -50,6 +50,21 @@ describe('container styles', () => {
     expect(source).toContain("'shadow-dom': slottedEmbedFill");
   });
 
+  it('defines the child iframe embed fill once for every skin', async () => {
+    const source = await readFile(sharedContainerStyles, 'utf8');
+
+    expect(source).toContain("'[&>[data-cross-origin-frame]]'");
+    expect(source).toContain('${childEmbed}:h-full!');
+    expect(source).toContain('${childEmbed}:min-w-0 ${childEmbed}:min-h-0');
+  });
+
+  // Registry skins have no shadow root, so the page's embed is a child of the container rather than slotted into it.
+  it.each(videoPresetStyles)('stretches child iframe embeds without a shadow root (%s)', async (_, url) => {
+    const source = await readFile(url, 'utf8');
+
+    expect(source).toMatch(/utilities: \[[^\]]*\.\.\.childEmbedFill\]/);
+  });
+
   // The container ring can sit on the page, so it reads the public color instead of the control ring.
   it.each(containerStyles)('colors the container focus ring with the public focus ring color (%s)', async (_, url) => {
     const source = await readFile(url, 'utf8');

@@ -28,6 +28,15 @@ export const slottedEmbedFill = [
   `${slottedEmbed}:min-w-0 ${slottedEmbed}:min-h-0`,
 ] as const;
 
+const childEmbed = '[&>[data-cross-origin-frame]]';
+
+/** The same fill for a skin without a shadow root, such as a registry skin, whose embed is a child of the container. */
+export const childEmbedFill = [
+  `${childEmbed}:m-0 ${childEmbed}:block ${childEmbed}:w-full ${childEmbed}:max-w-full`,
+  `${childEmbed}:rounded-[inherit] ${childEmbed}:h-full!`,
+  `${childEmbed}:min-w-0 ${childEmbed}:min-h-0`,
+] as const;
+
 export default styles({
   file: 'container.css',
   prefix: 'media',
