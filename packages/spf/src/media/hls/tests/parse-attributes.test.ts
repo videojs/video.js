@@ -12,6 +12,22 @@ describe('parseCodecs', () => {
     expect(parseCodecs('hev1.2.4.L120.B0')).toEqual({ video: 'hev1.2.4.L120.B0' });
   });
 
+  it('recognizes the other video codecs HLS carries', () => {
+    expect(parseCodecs('avc3.640028')).toEqual({ video: 'avc3.640028' });
+    expect(parseCodecs('av01.0.08M.08')).toEqual({ video: 'av01.0.08M.08' });
+    expect(parseCodecs('vp09.00.40.08')).toEqual({ video: 'vp09.00.40.08' });
+    expect(parseCodecs('dvh1.05.06')).toEqual({ video: 'dvh1.05.06' });
+    expect(parseCodecs('dvhe.05.06')).toEqual({ video: 'dvhe.05.06' });
+    expect(parseCodecs('dvav.09.05')).toEqual({ video: 'dvav.09.05' });
+    expect(parseCodecs('dva1.09.05')).toEqual({ video: 'dva1.09.05' });
+    expect(parseCodecs('dav1.10.06')).toEqual({ video: 'dav1.10.06' });
+    expect(parseCodecs('av01.0.08M.08,opus')).toEqual({ video: 'av01.0.08M.08', audio: 'opus' });
+  });
+
+  it('matches video codecs case-insensitively, keeping the codec as written', () => {
+    expect(parseCodecs('AVC1.640028,MP4A.40.2')).toEqual({ video: 'AVC1.640028', audio: 'MP4A.40.2' });
+  });
+
   it('recognizes Dolby audio codecs (ac-3 / ec-3 / ac-4), including muxed with video', () => {
     expect(parseCodecs('ac-3')).toEqual({ audio: 'ac-3' });
     expect(parseCodecs('ec-3')).toEqual({ audio: 'ec-3' });
