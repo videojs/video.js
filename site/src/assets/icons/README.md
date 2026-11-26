@@ -5,7 +5,7 @@ Interface glyphs for the docs site, imported as React components through `?react
 - Interface glyphs come from [Octicons](https://primer.style/octicons) via [Icônes](https://icones.js.org)
   (`octicon:*`), MIT licence. Each file is the variant authored for the size it renders at: plain names (including `markdown`) are the 16px
   drawings, `*-24` files and the picker/theme glyphs (`cloud-upload`, `computer`, `film`, `image`, `live-streaming`,
-  `moon`, `radio`, `sun`) are 24px drawings. `sun-16`, `moon-16`, and `computer-16` are the 16px
+  `graph`, `moon`, `radio`, `sun`) are 24px drawings. `sun-16`, `moon-16`, and `computer-16` are the 16px
   drawings of the theme glyphs for compact controls. Render them only at that size (`size-4` or `size-6`), never through `em`
   units, so strokes stay on whole pixels.
 - `music-note` and `puzzle` have no Octicon; they come from

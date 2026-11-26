@@ -3,7 +3,9 @@ import {
   fitSelectionToPreset,
   getInstallationPreset,
   installationExtensionsFor,
+  muxDataNeedsEnvKey,
   PRIVATE_INSTALLATION_QUERY_PARAMETERS,
+  resolveInstallationSourceUrl,
   resolveInstallationTemplate,
   resolveRegistryStyling,
   sourceFrameworkFor,
@@ -267,10 +269,44 @@ skin.listen((next) => {
   if (selected.length !== extensions.get().length) extensions.set(selected);
 });
 
+/**
+ * Extensions the store selected because the media selects them by default, not because the reader did. Only these can
+ * leave on their own when the media changes; the reader's picks stay for as long as the media supports them.
+ */
+const defaultedExtensions = new Set<InstallationExtension>(
+  initialSelection.extensions.filter((extension) =>
+    defaultInstallationExtensions(initialSelection.media).includes(extension)
+  )
+);
+
+extensions.listen((next) => {
+  for (const extension of defaultedExtensions) {
+    if (!next.includes(extension)) defaultedExtensions.delete(extension);
+  }
+});
+
+/** A default Mux Data carries over to another media only while its source needs no environment key. */
+function keepsDefault(extension: InstallationExtension, renderer: Renderer): boolean {
+  if (extension !== 'mux-data') return false;
+
+  return !muxDataNeedsEnvKey(renderer, resolveInstallationSourceUrl(sourceUrl.get(), renderer, useCase.get()));
+}
+
 media.listen((next) => {
   const available = installationExtensionsFor(useCase.get(), skin.get(), next);
-  const selected = extensions.get().filter((extension) => available.includes(extension));
   const defaults = defaultInstallationExtensions(next).filter((extension) => available.includes(extension));
+  const selected = extensions
+    .get()
+    .filter(
+      (extension) =>
+        available.includes(extension) &&
+        (!defaultedExtensions.has(extension) || defaults.includes(extension) || keepsDefault(extension, next))
+    );
+
+  for (const extension of defaults) {
+    if (!selected.includes(extension)) defaultedExtensions.add(extension);
+  }
+
   const fitted = [...new Set([...selected, ...defaults])];
 
   if (
