@@ -1,8 +1,14 @@
 ---
-import { installationCommand, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
+import { installationCommand, SKILL_FILE_URL, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
 
 import AgentPrompt from '@/components/AgentPrompt.astro';
-import { INSTALLATION_ROUTES, isInstallationRouteSegment } from '@/utils/installation/routes';
+import { PRODUCTION_URL } from '@/consts';
+import {
+  getInstallationRoutePath,
+  INSTALLATION_ROUTE_PREFIX,
+  INSTALLATION_ROUTES,
+  isInstallationRouteSegment,
+} from '@/utils/installation/routes';
 
 const route = Astro.params.framework;
 const routeConfig = isInstallationRouteSegment(route) ? INSTALLATION_ROUTES[route] : undefined;
@@ -14,10 +20,14 @@ const input = route === 'cdn'
     ? { framework: routeConfig.pickerFramework }
     : undefined;
 const init = installationCommand(input, null);
+// Installation guides return the same plan as `agents init` from query parameters on their Markdown URL.
+const guideFallback = isInstallationRouteSegment(route)
+  ? `If you can't run the command, read ${new URL(`${getInstallationRoutePath(route)}.md`, PRODUCTION_URL)}. It lists the same options, and adding them to that URL as query parameters returns the same plan.`
+  : `If you can't run the command, choose a guide from ${new URL(`${INSTALLATION_ROUTE_PREFIX}.md`, PRODUCTION_URL)}. Each guide lists the same options, and adding them to its \`.md\` URL as query parameters returns the same plan.`;
 const installationPrompt = route === 'shadcn'
   ? `When installation details are needed, run \`${installationCommand({ method: 'shadcn', framework: 'react' }, null)}\` for React, or \`${installationCommand({ method: 'shadcn', framework: 'html' }, null)}\` for plain HTML. The command prints version-matched choices and instructions without changing files.`
   : `When installation details are needed, run \`${init}\` to print the version-matched choices and instructions without changing files.`;
-const prompt = `Install the Video.js skill: run \`${skillsCommand()}\` and follow the steps for the agent you are running in. If you can't run commands, follow the install instructions at ${SKILLS_REPOSITORY_URL} instead. Then use the Video.js skill when you work on video or audio in this project. ${installationPrompt}`;
+const prompt = `Install the Video.js skill: run \`${skillsCommand()}\` and follow the steps for the agent you are running in. If the command can't run or is blocked, follow the install instructions at ${SKILLS_REPOSITORY_URL} instead. Not every agent can install skills; if yours can't, read ${SKILL_FILE_URL} and the reference files it links, and follow them as instructions for this session. Then use the Video.js skill when you work on video or audio in this project. ${installationPrompt} ${guideFallback}`;
 ---
 
 <AgentPrompt prompt={prompt} />

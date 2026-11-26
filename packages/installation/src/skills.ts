@@ -3,6 +3,11 @@ import { INSTALLATION_CLI_PACKAGE, installationCommand } from './plan';
 /** The repository that publishes the Video.js skill and its plugin marketplace. */
 export const SKILLS_REPOSITORY = 'videojs/skills';
 export const SKILLS_REPOSITORY_URL = `https://github.com/${SKILLS_REPOSITORY}`;
+/**
+ * The plain-text `SKILL.md` of the main Video.js skill, for agents that read the skill instead of installing it. Its
+ * links to reference files resolve relative to this URL.
+ */
+export const SKILL_FILE_URL = `https://raw.githubusercontent.com/${SKILLS_REPOSITORY}/main/skills/videojs/SKILL.md`;
 
 /** Coding agents with their own install steps, in the order instructions list them. */
 export const SKILL_AGENTS = ['codex', 'claude-code', 'vscode', 'cursor', 'other'] as const;
