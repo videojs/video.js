@@ -5,29 +5,30 @@ description: Measure startup time, rebuffering, failures, and watch time by addi
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
-import Aside from '@/components/Aside.astro';
 
-[Mux Data](https://www.mux.com/data) measures playback quality: startup time, rebuffering, playback failures, and watch time. Add the Mux Data <DocsLink slug="guides/architecture">extension</DocsLink> to a player and it monitors whichever media that player is playing:
+[Mux Data](https://www.mux.com/data) measures playback quality: startup time, rebuffering, playback failures, and watch time. Add the Mux Data <DocsLink slug="guides/architecture">extension</DocsLink> to a player and it monitors whichever media that player is playing.
 
-<FrameworkCase frameworks={["react"]}>
-Install the extension alongside the framework façade. The MuxVideo example also installs the Mux playback adapter:
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-Install the extension alongside the framework façade. The `<mux-video>` example also installs the Mux playback adapter:
-</FrameworkCase>
+## Installation
 
 <FrameworkCase frameworks={["react"]}>
+Install the extension alongside the framework façade. The example below also installs the Mux playback adapter for MuxVideo:
+
 ```bash
 pnpm add @videojs/react @videojs/mux-video @videojs/mux-data
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
+Install the extension alongside the framework façade. The example below also installs the Mux playback adapter for `<mux-video>`:
+
 ```bash
 pnpm add @videojs/html @videojs/mux-video @videojs/mux-data
 ```
 </FrameworkCase>
+
+## Recommended approach
+
+Put the extension inside the player next to the media. It renders nothing, so its position doesn't matter:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx title="App.tsx"
@@ -43,7 +44,7 @@ export default function App() {
     <Player>
       <Container>
         <MuxVideo source={{ playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM' }} playsInline />
-        <MuxData /> {/* [!code focus] */}
+        <MuxData metadata={{ video_title: 'Big Buck Bunny' }} /> {/* [!code focus] */}
       </Container>
     </Player>
   );
@@ -56,7 +57,7 @@ export default function App() {
 <video-player>
   <media-container>
     <mux-video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8" playsinline></mux-video>
-    <mux-data></mux-data> <!-- [!code focus] -->
+    <mux-data metadata-video-title="Big Buck Bunny"></mux-data> <!-- [!code focus] -->
   </media-container>
 </video-player>
 <script type="module">
@@ -68,127 +69,94 @@ export default function App() {
 ```
 </FrameworkCase>
 
-That's the whole setup for Mux-hosted playback — no environment key required. The extension renders nothing; place it anywhere inside the player.
+That's the whole setup for Mux-hosted playback. You don't need an environment key, and the title is optional but makes views easier to find in the dashboard.
 
-<Aside type="note">
-Mux Data is opt-in. No media component monitors playback on its own, Mux ones included, so nothing is measured and no beacons are sent until you add the extension.
-</Aside>
-
-## Set the environment key
-
-Mux Data needs to know which environment a view belongs to. For Mux-hosted playback, you do not need to set an environment key. The extension reports the Mux playback ID as the view's `video_id`, and Mux attributes the view to the environment that owns that playback ID.
-
-Set `envKey` when you monitor a source Mux doesn't host, like a self-hosted HLS or DASH stream. Find the key in the [Mux dashboard](https://dashboard.mux.com/settings/data):
+## How it works
 
 <FrameworkCase frameworks={["react"]}>
-For the hls.js example, also install `@videojs/hlsjs-video`. Replace the media and extension in the primary example with `<MonitoredHlsVideo />`:
+The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink>, and the rest alike. When the source changes, it follows.
+</FrameworkCase>
 
+<FrameworkCase frameworks={["html"]}>
+The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, and the rest alike. When the source changes, it follows.
+</FrameworkCase>
+
+How much it reports depends on the engine playing the stream; the <DocsLink slug="reference/components/mux-data" anchor="engine-data">MuxData reference</DocsLink> lists what each engine adds.
+
+Mux needs to know which environment each view belongs to. For a source on `stream.mux.com`, the extension reports the playback ID, and Mux files the view under the environment that owns it. Any other source needs an environment key.
+
+## Availability and constraints
+
+- Mux Data is opt-in. No media component monitors playback on its own, Mux ones included, so nothing is measured and no beacons are sent until you add the extension.
+- Sources Mux doesn't host, like a self-hosted HLS or DASH stream, need `envKey`. See [Monitor a source Mux doesn't host](#monitor-a-source-mux-doesnt-host).
+- Iframe embeds such as YouTube and Vimeo can't be monitored, and some engines report less detail than others. See which <DocsLink slug="reference/components/mux-data" anchor="engine-data">engines report what</DocsLink>.
+
+## Common variations
+
+### Monitor a source Mux doesn't host
+
+Find the environment key in the [Mux dashboard](https://dashboard.mux.com/settings/data) and set `envKey`. This example plays the stream with the hls.js adapter:
+
+<FrameworkCase frameworks={["react"]}>
 ```bash
-pnpm add @videojs/hlsjs-video
+pnpm add @videojs/react @videojs/hlsjs-video @videojs/mux-data
 ```
 
-```tsx
-import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+```tsx title="App.tsx"
+import { Container, createPlayer } from '@videojs/react';
 import { MuxData } from '@videojs/react/extensions/mux-data';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+import { videoFeatures } from '@videojs/react/video';
 
-function MonitoredHlsVideo() {
+const { Player } = createPlayer({ features: videoFeatures });
+
+export default function App() {
   return (
-    <>
-      <HlsJsVideo src="https://example.com/stream.m3u8" />
-      <MuxData envKey="YOUR_ENV_KEY" /> {/* [!code focus] */}
-    </>
+    <Player>
+      <Container>
+        <HlsJsVideo src="https://example.com/stream.m3u8" playsInline />
+        <MuxData envKey="YOUR_ENV_KEY" /> {/* [!code focus] */}
+      </Container>
+    </Player>
   );
 }
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-For the hls.js example, also install `@videojs/hlsjs-video`. Replace `<mux-video>` in the primary example with `<hlsjs-video>` and keep `<hlsjs-video>` and `<mux-data>` inside the container:
-
 ```bash
-pnpm add @videojs/hlsjs-video
+pnpm add @videojs/html @videojs/hlsjs-video @videojs/mux-data
 ```
 
-```html
-<hlsjs-video src="https://example.com/stream.m3u8"></hlsjs-video>
-<mux-data env-key="YOUR_ENV_KEY"></mux-data> <!-- [!code focus] -->
+```html title="index.html"
+<video-player>
+  <media-container>
+    <hlsjs-video src="https://example.com/stream.m3u8" playsinline></hlsjs-video>
+    <mux-data env-key="YOUR_ENV_KEY"></mux-data> <!-- [!code focus] -->
+  </media-container>
+</video-player>
 <script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
   import '@videojs/html/media/hlsjs-video';
   import '@videojs/html/extensions/mux-data';
 </script>
 ```
 </FrameworkCase>
 
-An explicit `envKey` overrides the environment Mux infers from the playback ID. Set one to send Mux-hosted views to a specific environment.
+An explicit `envKey` also overrides the environment Mux infers for Mux-hosted playback, so set one to send those views to a different environment.
 
-## How it works
+### Describe the view
 
-<FrameworkCase frameworks={["react"]}>
-The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink>, and the rest alike.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, and the rest alike.
-</FrameworkCase>
-
-How much the extension reports depends on the engine playing the stream. All media report the playback metrics available from the media element. The extension also recognizes [hls.js](https://github.com/video-dev/hls.js/) and [dash.js](https://github.com/Dash-Industry-Forum/dash.js) engines and hands them to the Mux Data SDK, which adds stream-level detail: rendition switches, segment request timing and throughput, and engine errors. Media without a JavaScript engine, like native HLS or a plain `<video>`, report only the element-level metrics.
-
-The `video_id` it reports is the Mux playback ID for streams served from `stream.mux.com`, and the source URL otherwise. Each view also gets a generated `view_session_id`. Override either through `metadata`.
-
-## Name the player
+Pass Mux Data [metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) to label views with your own titles, viewer IDs, and custom dimensions:
 
 <FrameworkCase frameworks={["react"]}>
-Each view reports a player software name of `videojs-react-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-react-hlsjs`.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-Each view reports a player software name of `videojs-html-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-html-hlsjs`.
-</FrameworkCase>
-
-| Engine | Played by |
-|---|---|
-| `hlsjs` | [hls.js](https://github.com/video-dev/hls.js/) |
-| `spf-hls-video` | The Video.js SPF engine for video, used by HLS video |
-| `spf-hls-video-mpeg-ts` | The SPF video engine with MPEG-TS support, used by the SPF flavor of Mux video |
-| `spf-hls-audio` | The audio-only SPF engine, used by HLS audio |
-| `spf-hls-audio-mpeg-ts` | The audio-only SPF engine with MPEG-TS support, used by the SPF flavor of Mux audio |
-| `spf-hls-background-video` | The SPF engine for background video, used by HLS background video |
-| `spf-hls-background-video-mpeg-ts` | The SPF background video engine with MPEG-TS support, used by Mux background video |
-| `shaka` | [Shaka Player](https://github.com/shaka-project/shaka-player) |
-| `dashjs` | [dash.js](https://github.com/Dash-Industry-Forum/dash.js) |
-| `browser` | The browser itself, like native HLS in Safari or an MP4 file |
-
-The name follows the engine that's playing, so a source change that switches engines updates the name for the current view.
-
-To report your own name instead, set the player software name. It takes precedence over the default:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxData playerSoftwareName="my-player" playerSoftwareVersion="2.4.0" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<mux-data player-software-name="my-player" player-software-version="2.4.0"></mux-data>
-```
-</FrameworkCase>
-
-## Describe the view
-
-Pass Mux Data [metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) to label views with your own titles, viewer IDs, and custom dimensions.
-
-<FrameworkCase frameworks={["react"]}>
-`metadata` takes an object on the component:
-
 ```tsx
 <MuxData metadata={{ video_title: 'Big Buck Bunny', viewer_user_id: 'u_789' }} />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Set `metadata-*` attributes in markup, or assign the `metadata` property when you need an object or want to override attribute values. The property wins when both set the same key.
-
 ```html
 <mux-data
   metadata-video-title="Big Buck Bunny"
@@ -196,28 +164,60 @@ Set `metadata-*` attributes in markup, or assign the `metadata` property when yo
 ></mux-data>
 ```
 
+To pass an object instead, assign the `metadata` property. It overrides attributes with the same key:
+
 ```ts
 const muxData = document.querySelector('mux-data');
 muxData.metadata = { video_title: 'Big Buck Bunny', viewer_user_id: 'u_789' };
 ```
 </FrameworkCase>
 
-## Configuration
+### Report your own player name
 
 <FrameworkCase frameworks={["react"]}>
-The <DocsLink slug="reference/components/mux-data">MuxData reference</DocsLink> lists every option: the metadata and software fields above, plus the beacon domain, cookie, debug, and SDK settings. Most options update the current view in place; changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, ending the current view and starting a new one.
+By default, views report a player name built from the engine, such as `videojs-react-hlsjs`, so you can compare engines in Mux Data. To group views under your own name instead, set `playerSoftwareName`:
+
+```tsx
+<MuxData playerSoftwareName="my-player" playerSoftwareVersion="2.4.0" />
+```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The <DocsLink slug="reference/components/mux-data">`<mux-data>` reference</DocsLink> lists every option: the metadata and software fields above, plus the beacon domain, cookie, debug, and SDK settings. Most options update the current view in place; changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, ending the current view and starting a new one.
+By default, views report a player name built from the engine, such as `videojs-html-hlsjs`, so you can compare engines in Mux Data. To group views under your own name instead, set `player-software-name`:
+
+```html
+<mux-data player-software-name="my-player" player-software-version="2.4.0"></mux-data>
+```
 </FrameworkCase>
+
+The <DocsLink slug="reference/components/mux-data" anchor="player-software-name">player software name reference</DocsLink> lists every engine name.
+
+## Troubleshooting
+
+### No views appear for a self-hosted stream
+
+Mux can only file views under an environment by playback ID when the source is on `stream.mux.com`. Set `envKey`.
+
+### No views appear for a YouTube or Vimeo embed
+
+Iframe embeds don't expose a media element for the Mux Data SDK to monitor, so the extension skips them.
+
+### A view ends and a new one starts while the video plays
+
+A few options restart monitoring when they change, which ends the current view. Set them once, before playback starts. See which <DocsLink slug="reference/components/mux-data" anchor="options-that-restart-monitoring">options restart monitoring</DocsLink>.
+
+### You can't tell whether beacons are sent
+
+Set `debug` to turn on the Mux Data SDK's console logging.
 
 ## Related components
 
 - <DocsLink slug="reference/components/mux-data">MuxData</DocsLink>
 - <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>
 - <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink>
+- <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>
 
 ## Related guides
 
-- <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>
+- <DocsLink slug="guides/google-analytics">Track video events with Google Analytics 4</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
