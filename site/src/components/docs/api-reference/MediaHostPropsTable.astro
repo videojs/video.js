@@ -5,22 +5,34 @@
  * Host properties are getter/setter pairs exposed by the media component's host
  * class. They differ from standard HTML attributes — they're accessed via JS
  * properties on the element instance.
+ *
+ * When `sourceFields` is given, the `source` row is followed by one indented row per field of the structured source,
+ * named by its full path so each row reads on its own.
  */
 import MarkdownCode from '@/components/typography/MarkdownCode.astro';
-import type { HostPropertyDef } from '@/types/media-reference';
+import type { HostPropertyDef, SourceFieldDef } from '@/types/media-reference';
 import ApiTable from './ApiTable.astro';
 import DetailRow from './DetailRow.astro';
+import FlavorBadge from './FlavorBadge.astro';
 
 interface Props {
   hostProperties: Record<string, HostPropertyDef>;
   componentName: string;
   nameLabel?: string;
+  sourceFields?: SourceFieldDef[] | undefined;
 }
 
-const { hostProperties, componentName, nameLabel = 'Property' } = Astro.props;
+const { hostProperties, componentName, nameLabel = 'Property', sourceFields = [] } = Astro.props;
 
 const entries = Object.entries(hostProperties).sort(([a], [b]) => a.localeCompare(b));
-const toggleColumn = entries.some(([, def]) => Boolean(def.readonly || def.description || def.detailedType));
+const fields = hostProperties.source ? sourceFields : [];
+const toggleColumn =
+  entries.some(([, def]) => Boolean(def.readonly || def.description || def.detailedType)) ||
+  fields.some((field) => Boolean(field.description || field.detailedType));
+
+function fieldId(name: string): string {
+  return `${componentName}-source-${name.replace(/\./g, '-')}`;
+}
 ---
 
 <ApiTable columns={[nameLabel, "Type", "Default"]} toggle={toggleColumn}>
@@ -32,28 +44,73 @@ const toggleColumn = entries.some(([, def]) => Boolean(def.readonly || def.descr
         [readonlyNote, def.description].filter(Boolean).join(" ") || undefined;
 
       return (
-        <DetailRow
-          id={id}
-          name={name}
-          detailedType={def.detailedType}
-          description={description}
-          colspan={3}
-          toggleColumn={toggleColumn}
-        >
-          <td>
-            <MarkdownCode>{name}</MarkdownCode>
-          </td>
-          <td class="w-full" data-apiref-cell="type">
-            <MarkdownCode code={def.type} />
-          </td>
-          <td>
-            {def.default ? (
-              <MarkdownCode code={def.default} />
-            ) : (
-              <span class="text-muted">—</span>
-            )}
-          </td>
-        </DetailRow>
+        <>
+          <DetailRow
+            id={id}
+            name={name}
+            detailedType={def.detailedType}
+            description={description}
+            colspan={3}
+            toggleColumn={toggleColumn}
+          >
+            <td>
+              <span class="inline-flex items-center whitespace-nowrap">
+                <MarkdownCode>{name}</MarkdownCode>
+                <FlavorBadge flavors={def.flavors} />
+              </span>
+            </td>
+            <td class="w-full" data-apiref-cell="type">
+              <MarkdownCode code={def.type} />
+            </td>
+            <td>
+              {def.default ? (
+                <MarkdownCode code={def.default} />
+              ) : (
+                <span class="text-muted">—</span>
+              )}
+            </td>
+          </DetailRow>
+          {name === "source" &&
+            fields.map((field) => {
+              const segments = field.name.split(".");
+              const parent = ["source", ...segments.slice(0, -1)].join(".");
+              const fieldName = `source.${field.name}`;
+
+              return (
+                <DetailRow
+                  id={fieldId(field.name)}
+                  name={fieldName}
+                  detailedType={field.detailedType}
+                  description={field.description}
+                  colspan={3}
+                  toggleColumn={toggleColumn}
+                >
+                  <td
+                    data-apiref-source-field
+                    style={`padding-inline-start: ${0.75 + segments.length}rem`}
+                  >
+                    <span class="inline-flex items-center whitespace-nowrap">
+                      <MarkdownCode>
+                        <span class="text-muted">{parent}.</span>
+                        {segments.at(-1)}
+                      </MarkdownCode>
+                      <FlavorBadge flavors={field.flavors} />
+                    </span>
+                  </td>
+                  <td class="w-full" data-apiref-cell="type">
+                    <MarkdownCode code={field.type} />
+                  </td>
+                  <td>
+                    {field.default ? (
+                      <MarkdownCode code={field.default} />
+                    ) : (
+                      <span class="text-muted">—</span>
+                    )}
+                  </td>
+                </DetailRow>
+              );
+            })}
+        </>
       );
     })
   }

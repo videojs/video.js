@@ -36,6 +36,12 @@ import {
 } from '../hls-video/error-surface';
 import type { HlsVideoSource } from '../hls-video/mixin';
 
+/** What this Adapter can be pointed at: the video flavor's source shape, so one object serves either. */
+export interface HlsAudioSource extends HlsVideoSource {
+  /** License servers, in the shape the video flavor takes. Accepted and not read: this engine plays no encrypted media. */
+  drm?: HlsVideoSource['drm'];
+}
+
 /** What `new HlsAudioAdapter(options)` accepts; see `HlsVideoAdapterOptions` for why it is typed here. */
 export interface HlsAudioAdapterOptions {
   /** Engine config forwarded to `createEngine`. */
@@ -44,7 +50,7 @@ export interface HlsAudioAdapterOptions {
 
 export interface HlsAudioAdapterProps {
   src: string;
-  source: HlsVideoSource | null;
+  source: HlsAudioSource | null;
   preload: '' | 'none' | 'metadata' | 'auto';
   /**
    * The element's CORS-settings attribute: a mode, the bare attribute (`''`, read as `anonymous`), or `null` for none.
@@ -157,7 +163,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     /** Aborting a generation cancels all retries, including ones not yet registered. */
     #playGeneration = new AbortController();
-    #source: HlsVideoSource | null = HlsAudioImpl.defaultProps.source;
+    #source: HlsAudioSource | null = HlsAudioImpl.defaultProps.source;
 
     constructor(...args: any[]) {
       super(...args);
@@ -450,11 +456,11 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
      *
      * @fires sourcechange - Fired when `source` changes. Read `source` for the new value.
      */
-    get source(): HlsVideoSource | null {
+    get source(): HlsAudioSource | null {
       return this.#source;
     }
 
-    set source(value: HlsVideoSource | null) {
+    set source(value: HlsAudioSource | null) {
       const source = value ?? null;
       if (source === this.#source) return;
 

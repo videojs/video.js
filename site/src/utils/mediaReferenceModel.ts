@@ -169,6 +169,18 @@ function createRefs(react: ReactMediaReference): MediaReferenceRef[] {
   ];
 }
 
+/** Display names for the engine flavors an element ships, keyed by define-file name. */
+const FLAVOR_LABELS: Readonly<Record<string, string>> = { 'hls-js': 'hls.js', spf: 'SPF' };
+
+/** The badge text for a row only some flavors support, such as `hls.js only`; `undefined` when every flavor has it. */
+export function flavorOnlyLabel(flavors: readonly string[] | undefined): string | undefined {
+  if (!flavors || flavors.length === 0) return undefined;
+
+  const labels = flavors.map((flavor) => FLAVOR_LABELS[flavor] ?? flavor);
+
+  return `${labels.join(' and ')} only`;
+}
+
 export function createMediaReferenceModel(mediaName: string, ref: MediaReference | null): MediaReferenceModel | null {
   if (!ref) return null;
 

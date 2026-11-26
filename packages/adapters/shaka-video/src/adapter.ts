@@ -64,10 +64,10 @@ export interface ShakaSource {
    */
   type?: string | undefined;
   /**
-   * License servers for protected content, keyed by EME key system id.
-   *
-   * Translated into the `drm.servers` and `drm.advanced` Shaka configures EME from. Name every system you hold a
-   * license server for — which one is used is the browser's choice.
+   * License servers for protected content, keyed by EME key system (`com.apple.fps`, `com.widevine.alpha`,
+   * `com.microsoft.playready`, `org.w3.clearkey`). Each entry takes a `licenseUrl`, plus a `serverCertificateUrl` for
+   * FairPlay. Handed to Shaka as its `drm.servers` and `drm.advanced` configuration. Which key system is negotiated is
+   * the browser's choice.
    */
   drm?: DrmSystemsConfig | undefined;
   /** Playback options, keyed by the engine that reads them. */
@@ -81,9 +81,8 @@ export interface ShakaSource {
  */
 export interface ShakaEngineConfig {
   /**
-   * Shaka Player's own configuration, passed through untouched. Replacing it resets any previously applied
-   * configuration. A `drm.servers` of its own replaces `source.drm` — an escape hatch for licensing against the parts
-   * of Shaka's DRM configuration `source.drm` does not cover.
+   * Shaka Player's own configuration, passed to Shaka unchanged. Replacing it resets any previously applied
+   * configuration. Its `drm.servers`, when set, replaces `source.drm`.
    */
   shaka?: ShakaConfig | undefined;
 }

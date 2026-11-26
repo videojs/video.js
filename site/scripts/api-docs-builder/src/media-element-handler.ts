@@ -40,6 +40,7 @@ import type {
   MediaReference,
   MediaTargetTag,
   ReactMediaReference,
+  SourceFieldDef,
 } from './types.js';
 
 const HOST_BASE_CLASSES = new Set(['HTMLMediaAdapter', 'HTMLVideoAdapter', 'HTMLAudioAdapter', 'EventTarget']);
@@ -106,6 +107,8 @@ const INFERRED_CLASS_PROPERTY_TYPES: InferredClassPropertyTypes = {
 
 interface MediaElementSource {
   defineFilePath: string;
+  /** The registered element class, as declared in the define entry. */
+  elementClassName: string;
   className: string;
   tagName: string;
   mediaFilePath: string;
@@ -113,6 +116,32 @@ interface MediaElementSource {
   hostClassName: string;
   mediaType: 'video' | 'audio';
   targetTag: MediaTargetTag;
+  /**
+   * The define file's name when its directory registers the same element from sibling files, one per engine (`hls-js`,
+   * `spf`). The flavor the directory's `index.ts` re-exports is the primary one.
+   */
+  flavor?: string;
+  primary: boolean;
+}
+
+/** What every media element reference shares, extracted once. */
+interface SharedMediaSurface {
+  staticProperties: StaticMediaProperty[];
+  videoEvents: string[];
+  audioEvents: string[];
+  customEventNames: Set<string>;
+  videoMethods: string[];
+  audioMethods: string[];
+  nativeNames: Set<string>;
+  videoBaseSurface: Record<string, HostPropertyDef>;
+  audioBaseSurface: Record<string, HostPropertyDef>;
+  videoCSSVars: Record<string, { description: string }>;
+  audioCSSVars: Record<string, { description: string }>;
+}
+
+interface ObservedAttribute {
+  type?: string;
+  description?: string;
 }
 
 interface StaticMediaProperty {
@@ -142,116 +171,169 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
   );
   if (!fs.existsSync(customMediaPath)) return [];
 
-  const staticProperties = extractStaticProperties(customMediaPath, project);
   const mediaTypesPath = path.join(monorepoRoot, 'packages/media/src/core/types.ts');
-  const videoEvents = extractEventsFromTypes(mediaTypesPath, 'VideoEvents', project);
-  const audioEvents = extractEventsFromTypes(mediaTypesPath, 'AudioEvents', project);
-  const customEventNames = new Set([
-    ...extractEventsFromTypes(mediaTypesPath, 'MediaStreamTypeEvents', project),
-    ...extractEventsFromTypes(mediaTypesPath, 'MediaLiveEvents', project),
-  ]);
   const mediaHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-media-adapter/html-media-adapter.ts');
   const videoHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-video-adapter/html-video-adapter.ts');
   const audioHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-audio-adapter/html-audio-adapter.ts');
   const baseMethods = extractPublicMethodNames(mediaHostPath, 'HTMLMediaAdapter', project);
-  const videoMethods = mergeNames(baseMethods, extractPublicMethodNames(videoHostPath, 'HTMLVideoAdapter', project));
-  const audioMethods = mergeNames(baseMethods, extractPublicMethodNames(audioHostPath, 'HTMLAudioAdapter', project));
   const nativeNames = collectNativeMemberNames();
   const baseHost = extractHostProperties(mediaHostPath, 'HTMLMediaAdapter', project, nativeNames);
   const videoHost = extractHostProperties(videoHostPath, 'HTMLVideoAdapter', project, nativeNames);
   const audioHost = extractHostProperties(audioHostPath, 'HTMLAudioAdapter', project, nativeNames);
-  const videoBaseSurface = { ...baseHost.properties, ...videoHost.properties };
-  const audioBaseSurface = { ...baseHost.properties, ...audioHost.properties };
-  const videoCSSVars = cssVarsRecord(extractCSSVars(customMediaPath, project, 'Video'));
-  const audioCSSVars = cssVarsRecord(extractCSSVars(customMediaPath, project, 'Audio'));
-  const results: MediaElementResult[] = [];
+  const shared: SharedMediaSurface = {
+    staticProperties: extractStaticProperties(customMediaPath, project),
+    videoEvents: extractEventsFromTypes(mediaTypesPath, 'VideoEvents', project),
+    audioEvents: extractEventsFromTypes(mediaTypesPath, 'AudioEvents', project),
+    customEventNames: new Set([
+      ...extractEventsFromTypes(mediaTypesPath, 'MediaStreamTypeEvents', project),
+      ...extractEventsFromTypes(mediaTypesPath, 'MediaLiveEvents', project),
+    ]),
+    videoMethods: mergeNames(baseMethods, extractPublicMethodNames(videoHostPath, 'HTMLVideoAdapter', project)),
+    audioMethods: mergeNames(baseMethods, extractPublicMethodNames(audioHostPath, 'HTMLAudioAdapter', project)),
+    nativeNames,
+    videoBaseSurface: { ...baseHost.properties, ...videoHost.properties },
+    audioBaseSurface: { ...baseHost.properties, ...audioHost.properties },
+    videoCSSVars: cssVarsRecord(extractCSSVars(customMediaPath, project, 'Video')),
+    audioCSSVars: cssVarsRecord(extractCSSVars(customMediaPath, project, 'Audio')),
+  };
+
+  // Flavors of one element share a page, so they are built separately and merged into one reference.
+  const groups = new Map<string, MediaElementSource[]>();
 
   for (const source of sources) {
-    const host = extractHostProperties(source.hostFilePath, source.hostClassName, project, nativeNames);
-    const baseSurface =
-      source.targetTag === 'video' ? videoBaseSurface : source.targetTag === 'audio' ? audioBaseSurface : {};
-    const publicProperties = { ...baseSurface, ...host.properties };
-    const propertyDefinitions: Record<string, HostPropertyDef> = {};
+    const key = `${source.className}#${source.tagName}`;
 
-    for (const [name, definition] of Object.entries(baseSurface)) {
-      if (!definition.overridesNative) propertyDefinitions[name] = definition;
-    }
-
-    Object.assign(propertyDefinitions, host.properties);
-
-    const standardAttributes: string[] = [];
-    const customAttributes: Record<string, HostPropertyDef> = {};
-
-    for (const { property, attribute } of staticProperties) {
-      const definition = publicProperties[property];
-
-      if (source.targetTag === 'iframe') {
-        if (definition) customAttributes[attribute] = { ...definition, readonly: false };
-      } else if (definition && !definition.overridesNative) {
-        customAttributes[attribute] = { ...definition, readonly: false };
-      } else {
-        standardAttributes.push(attribute);
-      }
-    }
-
-    const files = [...new Set(host.files)];
-    const fires = collectFires(files, project);
-    const dispatched = collectDispatchedEvents(files, project);
-    const contractEvents = source.mediaType === 'video' ? videoEvents : audioEvents;
-    const contractSet = new Set(contractEvents);
-    const customNames = new Set(fires.keys());
-
-    if (source.targetTag === 'iframe') {
-      for (const name of dispatched) {
-        if (!contractSet.has(name)) customNames.add(name);
-      }
-    }
-
-    const customEvents: MediaEventDef[] = [...customNames]
-      .sort()
-      .map((name) => ({ name, ...(fires.get(name) ? { description: fires.get(name)! } : {}) }));
-    const customSet = new Set(customEvents.map((event) => event.name));
-    const standardEvents = contractEvents.filter(
-      (name) =>
-        !customSet.has(name) && !customEventNames.has(name) && (source.targetTag !== 'iframe' || dispatched.has(name))
-    );
-    const baseMethodNames =
-      source.targetTag === 'video' ? videoMethods : source.targetTag === 'audio' ? audioMethods : [];
-    const methods = mergeNames(
-      baseMethodNames,
-      extractPublicMethodNames(source.hostFilePath, source.hostClassName, project)
-    );
-    const nativeProperties = Object.entries(baseSurface)
-      .filter(([name, definition]) => definition.overridesNative && !(name in host.properties))
-      .map(([name]) => name)
-      .sort();
-    const react = extractReactReference(monorepoRoot, source, project, publicProperties);
-    const engineOptions = extractEngineOptions(source, project);
-    const cssCustomProperties =
-      source.targetTag === 'video' ? videoCSSVars : source.targetTag === 'audio' ? audioCSSVars : {};
-
-    const reference: MediaReference = {
-      name: source.className,
-      tagName: source.tagName,
-      mediaType: source.mediaType,
-      ...(engineOptions ? { engineOptions } : {}),
-      platforms: {
-        html: {
-          target: source.targetTag,
-          attributes: { standard: standardAttributes.sort(), custom: customAttributes },
-          properties: { definitions: propertyDefinitions, native: nativeProperties },
-          events: { standard: standardEvents, custom: customEvents },
-          methods,
-          cssCustomProperties,
-        },
-        ...(react ? { react } : {}),
-      },
-    };
-
-    results.push({ name: source.className, reference });
+    groups.set(key, [...(groups.get(key) ?? []), source]);
   }
 
-  return results;
+  return [...groups.values()].map((group) => {
+    const flavors = [...group].sort((a, b) => Number(b.primary) - Number(a.primary));
+    const references = flavors.map((source) => ({
+      flavor: source.flavor ?? source.className,
+      reference: buildMediaReference(monorepoRoot, source, project, shared),
+    }));
+
+    return { name: flavors[0]!.className, reference: mergeFlavorReferences(references) };
+  });
+}
+
+function buildMediaReference(
+  monorepoRoot: string,
+  source: MediaElementSource,
+  project: OxcProject,
+  shared: SharedMediaSurface
+): MediaReference {
+  const host = extractHostProperties(source.hostFilePath, source.hostClassName, project, shared.nativeNames);
+  const baseSurface =
+    source.targetTag === 'video'
+      ? shared.videoBaseSurface
+      : source.targetTag === 'audio'
+        ? shared.audioBaseSurface
+        : {};
+  const sourceType = findAccessorType(source.hostFilePath, source.hostClassName, 'source', project);
+  const sourceFields = sourceType ? collectSourceFields(project, nonNullable(sourceType), '', new Set()) : [];
+
+  // With its fields documented row by row, the `source` row names its type rather than spelling the shape out.
+  if (sourceType && sourceFields.length > 0 && host.properties.source) {
+    const { detailedType: _detailedType, ...definition } = host.properties.source;
+
+    host.properties.source = { ...definition, type: formatDetailedType(project, sourceType, false, new Set(), false) };
+  }
+
+  const publicProperties = { ...baseSurface, ...host.properties };
+  const propertyDefinitions: Record<string, HostPropertyDef> = {};
+
+  for (const [name, definition] of Object.entries(baseSurface)) {
+    if (!definition.overridesNative) propertyDefinitions[name] = definition;
+  }
+
+  Object.assign(propertyDefinitions, host.properties);
+
+  const standardAttributes: string[] = [];
+  const customAttributes: Record<string, HostPropertyDef> = {};
+
+  for (const { property, attribute } of shared.staticProperties) {
+    const definition = publicProperties[property];
+
+    if (source.targetTag === 'iframe') {
+      if (definition) customAttributes[attribute] = { ...definition, readonly: false };
+    } else if (definition && !definition.overridesNative) {
+      customAttributes[attribute] = { ...definition, readonly: false };
+    } else {
+      standardAttributes.push(attribute);
+    }
+  }
+
+  for (const [attribute, declared] of collectObservedAttributes(
+    source.defineFilePath,
+    source.elementClassName,
+    project
+  )) {
+    if (standardAttributes.includes(attribute) || customAttributes[attribute]) continue;
+
+    customAttributes[attribute] = {
+      type: declared.type ?? 'string',
+      readonly: false,
+      ...(declared.description ? { description: declared.description } : {}),
+    };
+  }
+
+  const files = [...new Set(host.files)];
+  const fires = collectFires(files, project);
+  const dispatched = collectDispatchedEvents(files, project);
+  const contractEvents = source.mediaType === 'video' ? shared.videoEvents : shared.audioEvents;
+  const contractSet = new Set(contractEvents);
+  const customNames = new Set(fires.keys());
+
+  if (source.targetTag === 'iframe') {
+    for (const name of dispatched) {
+      if (!contractSet.has(name)) customNames.add(name);
+    }
+  }
+
+  const customEvents: MediaEventDef[] = [...customNames]
+    .sort()
+    .map((name) => ({ name, ...(fires.get(name) ? { description: fires.get(name)! } : {}) }));
+  const customSet = new Set(customEvents.map((event) => event.name));
+  const standardEvents = contractEvents.filter(
+    (name) =>
+      !customSet.has(name) &&
+      !shared.customEventNames.has(name) &&
+      (source.targetTag !== 'iframe' || dispatched.has(name))
+  );
+  const baseMethodNames =
+    source.targetTag === 'video' ? shared.videoMethods : source.targetTag === 'audio' ? shared.audioMethods : [];
+  const methods = mergeNames(
+    baseMethodNames,
+    extractPublicMethodNames(source.hostFilePath, source.hostClassName, project)
+  );
+  const nativeProperties = Object.entries(baseSurface)
+    .filter(([name, definition]) => definition.overridesNative && !(name in host.properties))
+    .map(([name]) => name)
+    .sort();
+  const react = extractReactReference(monorepoRoot, source, project, publicProperties);
+  const engineOptions = sourceType ? extractEngineOptions(sourceType, project) : undefined;
+  const cssCustomProperties =
+    source.targetTag === 'video' ? shared.videoCSSVars : source.targetTag === 'audio' ? shared.audioCSSVars : {};
+
+  return {
+    name: source.className,
+    tagName: source.tagName,
+    mediaType: source.mediaType,
+    ...(sourceFields.length > 0 ? { sourceFields } : {}),
+    ...(engineOptions ? { engineOptions } : {}),
+    platforms: {
+      html: {
+        target: source.targetTag,
+        attributes: { standard: standardAttributes.sort(), custom: customAttributes },
+        properties: { definitions: propertyDefinitions, native: nativeProperties },
+        events: { standard: standardEvents, custom: customEvents },
+        methods,
+        cssCustomProperties,
+      },
+      ...(react ? { react } : {}),
+    },
+  };
 }
 
 function discoverMediaElements(monorepoRoot: string, project: OxcProject): MediaElementSource[] {
@@ -260,52 +342,94 @@ function discoverMediaElements(monorepoRoot: string, project: OxcProject): Media
 
   const sources: MediaElementSource[] = [];
 
-  const entryPaths = fs.readdirSync(defineDir, { withFileTypes: true }).flatMap((entry) => {
-    if (entry.isFile() && entry.name.endsWith('.ts')) return [path.join(defineDir, entry.name)];
-
-    const indexPath = path.join(defineDir, entry.name, 'index.ts');
-
-    return entry.isDirectory() && fs.existsSync(indexPath) ? [indexPath] : [];
-  });
-
-  for (const entryPath of entryPaths) {
-    for (const filePath of publicImplementationFiles(entryPath, project, new Set())) {
-      const file = project.source(filePath);
-      if (!file) continue;
-
-      for (const statement of file.program.body) {
-        if (statement.type !== 'ExportNamedDeclaration' || statement.declaration?.type !== 'ClassDeclaration') continue;
-
-        const declaration = statement.declaration;
-        const name = declaration.id?.name;
-        const tagName = staticStringClassProperty(declaration, 'tagName');
-        const base = declaration.superClass;
-        if (!name || !tagName || base?.type !== 'Identifier') continue;
-
-        const mediaDeclaration = project.resolveName(filePath, base.name);
-        if (!mediaDeclaration || mediaDeclaration.declaration.type !== 'ClassDeclaration') continue;
-
-        const composition = findCustomMediaComposition(mediaDeclaration.file, mediaDeclaration.declaration, project);
-        if (!composition) continue;
-
-        const host = project.resolveName(mediaDeclaration.file.filePath, composition.hostClassName);
-        if (!host || host.declaration.type !== 'ClassDeclaration') continue;
-
-        // The composition may name the host through an import alias; property extraction needs the declared name.
-        const hostClassName = host.declaration.id?.name ?? composition.hostClassName;
-
-        sources.push({
-          defineFilePath: filePath,
-          className: stripElementSuffix(name),
-          tagName,
-          mediaFilePath: mediaDeclaration.file.filePath,
-          hostFilePath: host.file.filePath,
-          hostClassName,
-          mediaType: composition.mediaType,
-          targetTag: composition.targetTag,
-        });
+  for (const entry of fs.readdirSync(defineDir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.ts')) {
+      for (const filePath of publicImplementationFiles(path.join(defineDir, entry.name), project, new Set())) {
+        sources.push(...mediaElementsIn(filePath, project, { primary: true }));
       }
+
+      continue;
     }
+
+    const directory = path.join(defineDir, entry.name);
+    const indexPath = path.join(directory, 'index.ts');
+    if (!entry.isDirectory() || !fs.existsSync(indexPath)) continue;
+
+    // The files the index re-exports are the primary flavor; any other define file beside it registers the same
+    // element over another engine.
+    const publicFiles = publicImplementationFiles(indexPath, project, new Set());
+    const siblings = fs
+      .readdirSync(directory)
+      .filter((name) => name.endsWith('.ts') && name !== 'index.ts')
+      .map((name) => path.join(directory, name))
+      .filter((filePath) => !publicFiles.includes(filePath));
+    const primary = publicFiles.flatMap((filePath) =>
+      mediaElementsIn(filePath, project, { primary: true, flavor: flavorName(filePath) })
+    );
+    const alternatives = siblings.flatMap((filePath) =>
+      mediaElementsIn(filePath, project, { primary: false, flavor: flavorName(filePath) }).filter((source) =>
+        primary.some((candidate) => candidate.tagName === source.tagName)
+      )
+    );
+
+    if (alternatives.length === 0) {
+      for (const source of primary) delete source.flavor;
+    }
+
+    sources.push(...primary, ...alternatives);
+  }
+
+  return sources;
+}
+
+function flavorName(filePath: string): string {
+  return path.basename(filePath, path.extname(filePath));
+}
+
+function mediaElementsIn(
+  filePath: string,
+  project: OxcProject,
+  options: { primary: boolean; flavor?: string }
+): MediaElementSource[] {
+  const file = project.source(filePath);
+  if (!file) return [];
+
+  const sources: MediaElementSource[] = [];
+
+  for (const statement of file.program.body) {
+    if (statement.type !== 'ExportNamedDeclaration' || statement.declaration?.type !== 'ClassDeclaration') continue;
+
+    const declaration = statement.declaration;
+    const name = declaration.id?.name;
+    const tagName = staticStringClassProperty(declaration, 'tagName');
+    const base = declaration.superClass;
+    if (!name || !tagName || base?.type !== 'Identifier') continue;
+
+    const mediaDeclaration = project.resolveName(filePath, base.name);
+    if (!mediaDeclaration || mediaDeclaration.declaration.type !== 'ClassDeclaration') continue;
+
+    const composition = findCustomMediaComposition(mediaDeclaration.file, mediaDeclaration.declaration, project);
+    if (!composition) continue;
+
+    const host = project.resolveName(mediaDeclaration.file.filePath, composition.hostClassName);
+    if (!host || host.declaration.type !== 'ClassDeclaration') continue;
+
+    // The composition may name the host through an import alias; property extraction needs the declared name.
+    const hostClassName = host.declaration.id?.name ?? composition.hostClassName;
+
+    sources.push({
+      defineFilePath: filePath,
+      elementClassName: name,
+      className: stripElementSuffix(name),
+      tagName,
+      mediaFilePath: mediaDeclaration.file.filePath,
+      hostFilePath: host.file.filePath,
+      hostClassName,
+      mediaType: composition.mediaType,
+      targetTag: composition.targetTag,
+      primary: options.primary,
+      ...(options.flavor ? { flavor: options.flavor } : {}),
+    });
   }
 
   return sources;
@@ -619,12 +743,9 @@ function inferredExpressionType(expression: Expression): TSType | undefined {
 }
 
 function extractEngineOptions(
-  source: MediaElementSource,
+  sourceType: ResolvedType,
   project: OxcProject
 ): Record<string, EngineOptionDef[]> | undefined {
-  const sourceType = findAccessorType(source.hostFilePath, source.hostClassName, 'source', project);
-  if (!sourceType) return undefined;
-
   const engineType = propertyType(project, nonNullable(sourceType), 'engine');
   if (!engineType) return undefined;
 
@@ -678,6 +799,338 @@ function extractEngineOptions(
   }
 
   return Object.keys(engines).length > 0 ? engines : undefined;
+}
+
+/**
+ * The fields of a structured `source`, flattened in reading order: each level sorted by name, with a field's own fields
+ * right after it under a dotted name. A field typed as an authored interface expands into that interface's fields,
+ * except below `engine`, whose options are documented per engine. A redeclared field replaces the inherited one, and a
+ * field typed `never` (the other half of a discriminated union) is left out.
+ */
+function collectSourceFields(
+  project: OxcProject,
+  type: ResolvedType,
+  prefix: string,
+  visited: Set<string>
+): SourceFieldDef[] {
+  const members = new Map<string, ResolvedMember[]>();
+
+  for (const entry of membersOf(project, type)) {
+    if (entry.member.type !== 'TSPropertySignature' || !entry.member.typeAnnotation) continue;
+
+    const name = staticName(entry.member.key);
+    if (!name || unwrapType(entry.member.typeAnnotation.typeAnnotation).type === 'TSNeverKeyword') continue;
+
+    members.set(name, [...(members.get(name) ?? []), entry]);
+  }
+
+  const fields: SourceFieldDef[] = [];
+
+  for (const [name, declarations] of [...members].sort(([a], [b]) => a.localeCompare(b))) {
+    const entry = declarations.at(-1)!;
+    const documentation = getJSDoc(entry.file, entry.member);
+    if (documentation?.tags.has('internal') || entry.member.type !== 'TSPropertySignature') continue;
+
+    const fieldPath = prefix ? `${prefix}.${name}` : name;
+    const fieldType: ResolvedType = {
+      file: entry.file,
+      type: entry.member.typeAnnotation!.typeAnnotation,
+      ...(entry.substitutions ? { substitutions: entry.substitutions } : {}),
+    };
+    const formatted = formatDetailedType(project, fieldType, true, new Set(), false);
+    const abbreviated = abbreviateType(name, formatted);
+    const field: SourceFieldDef = { name: fieldPath, type: abbreviated ?? formatted };
+    // A redeclaration without JSDoc keeps the description it replaces.
+    const description = declarations
+      .map((declaration) => getJSDocDescription(declaration.file, declaration.member))
+      .filter(Boolean)
+      .at(-1);
+    const defaultValue = documentation?.tags.get('default')?.at(-1);
+
+    if (abbreviated && abbreviated !== formatted) field.detailedType = formatted;
+
+    if (description) field.description = description;
+
+    if (defaultValue) field.default = defaultValue;
+
+    fields.push(field);
+
+    // `engine` lists its engines, whose options have a section of their own.
+    const nested = prefix === 'engine' ? undefined : authoredInterface(project, nonNullable(fieldType));
+    if (!nested || visited.has(nested.key)) continue;
+
+    fields.push(...collectSourceFields(project, nested.type, fieldPath, new Set([...visited, nested.key])));
+  }
+
+  return fields;
+}
+
+/** The type itself when it names an interface declared in the repository, keyed for recursion guards. */
+function authoredInterface(project: OxcProject, type: ResolvedType): { type: ResolvedType; key: string } | undefined {
+  const node = unwrapType(type.type);
+  if (node.type !== 'TSTypeReference') return undefined;
+
+  const declaration = project.resolveTypeDeclaration(type.file.filePath, node.typeName);
+  if (declaration?.declaration.type !== 'TSInterfaceDeclaration') return undefined;
+
+  if (declaration.file.filePath.includes(`${path.sep}node_modules${path.sep}`)) return undefined;
+
+  return { type, key: `${declaration.file.filePath}#${declaration.declaration.id.name}` };
+}
+
+/**
+ * Attributes an element observes beyond the ones its `CustomMediaElement` maps to adapter properties: the string
+ * literals a class in its chain returns from `observedAttributes`. Each is described by an `@attribute {type} name -
+ * description` tag on that getter or its class.
+ */
+function collectObservedAttributes(
+  filePath: string,
+  className: string,
+  project: OxcProject,
+  attributes: Map<string, ObservedAttribute> = new Map(),
+  visited: Set<string> = new Set()
+): Map<string, ObservedAttribute> {
+  const resolved = project.resolveName(filePath, className);
+  if (!resolved || resolved.declaration.type !== 'ClassDeclaration') return attributes;
+
+  const key = `${resolved.file.filePath}#${className}`;
+  if (visited.has(key)) return attributes;
+
+  visited.add(key);
+  readObservedAttributes(resolved.file, resolved.declaration, attributes);
+
+  const superClass = resolved.declaration.superClass
+    ? resolveLocalExpression(resolved.file, resolved.declaration.superClass, project)
+    : undefined;
+
+  if (superClass?.type === 'Identifier') {
+    collectObservedAttributes(resolved.file.filePath, superClass.name, project, attributes, visited);
+  }
+
+  if (superClass?.type === 'CallExpression') {
+    const { mixins, base } = unwindMixinChain(superClass);
+
+    for (const mixinName of mixins) {
+      const mixin = resolveMixin(resolved.file.filePath, mixinName, project);
+
+      if (mixin) readObservedAttributes(mixin.file, mixin.declaration, attributes);
+    }
+
+    if (base.type === 'Identifier') {
+      collectObservedAttributes(resolved.file.filePath, base.name, project, attributes, visited);
+    }
+  }
+
+  return attributes;
+}
+
+function readObservedAttributes(file: SourceFile, declaration: Class, attributes: Map<string, ObservedAttribute>) {
+  const member = declaration.body.body.find(
+    (entry) =>
+      (entry.type === 'MethodDefinition' || entry.type === 'PropertyDefinition') &&
+      entry.static &&
+      staticName(entry.key) === 'observedAttributes'
+  );
+  if (member?.type !== 'MethodDefinition' && member?.type !== 'PropertyDefinition') return;
+
+  const names: string[] = [];
+  const body = member.type === 'MethodDefinition' ? member.value.body : member.value;
+
+  if (body) {
+    walkAst(body, (node) => {
+      if (node.type !== 'ArrayExpression') return;
+
+      for (const element of node.elements) {
+        if (element?.type === 'Literal' && typeof element.value === 'string') names.push(element.value);
+      }
+    });
+  }
+
+  const tags = [
+    ...(getJSDoc(file, declaration)?.tags.get('attribute') ?? []),
+    ...(getJSDoc(file, member)?.tags.get('attribute') ?? []),
+  ];
+  const declared = new Map<string, ObservedAttribute>();
+
+  for (const tag of tags) {
+    const match = tag.match(/^(?:\{([^}]+)\}\s*)?(\S+)\s*(?:-\s*)?([\s\S]*)$/);
+    if (!match?.[2]) continue;
+
+    const description = match[3]?.replace(/\s+/g, ' ').trim();
+
+    declared.set(match[2], { ...(match[1] ? { type: match[1].trim() } : {}), ...(description ? { description } : {}) });
+  }
+
+  for (const name of names) {
+    if (!attributes.has(name)) attributes.set(name, declared.get(name) ?? {});
+  }
+}
+
+interface FlavorReference {
+  flavor: string;
+  reference: MediaReference;
+}
+
+/**
+ * One reference for an element registered over several engines. Every row any flavor documents is kept, the primary
+ * flavor's definition winning, and a row some flavors lack lists the ones that have it under `flavors`.
+ */
+function mergeFlavorReferences(references: readonly FlavorReference[]): MediaReference {
+  const [primary, ...others] = references;
+  if (!primary) throw new Error('mergeFlavorReferences needs at least one reference');
+
+  if (others.length === 0) return primary.reference;
+
+  const all = references.map((entry) => entry.flavor);
+  const html = primary.reference.platforms.html;
+  const react = primary.reference.platforms.react;
+  const reacts = references.flatMap((entry) =>
+    entry.reference.platforms.react ? [{ flavor: entry.flavor, value: entry.reference.platforms.react }] : []
+  );
+  const engineOptions = mergeEngineOptions(references);
+  const engineFlavors: Record<string, string[]> = {};
+
+  for (const engine of Object.keys(engineOptions)) {
+    const flavors = references.filter((entry) => entry.reference.engineOptions?.[engine]).map((entry) => entry.flavor);
+
+    if (flavors.length < all.length) engineFlavors[engine] = flavors;
+  }
+
+  const sourceFields = mergeSourceFields(references, all);
+  const nativeNames = collectNativeMemberNames();
+  const definitions = mergeRecords(
+    references.map(({ flavor, reference: { platforms } }) => ({
+      flavor,
+      value: platforms.html.properties.definitions,
+      has: (name: string) => platforms.html.properties.native.includes(name),
+    })),
+    all
+  );
+
+  return {
+    ...primary.reference,
+    flavors: all,
+    ...(sourceFields.length > 0 ? { sourceFields } : {}),
+    ...(Object.keys(engineOptions).length > 0 ? { engineOptions } : {}),
+    ...(Object.keys(engineFlavors).length > 0 ? { engineFlavors } : {}),
+    platforms: {
+      html: {
+        ...html,
+        attributes: {
+          standard: mergeNames(...references.map((entry) => entry.reference.platforms.html.attributes.standard)),
+          // An attribute one flavor maps to an adapter property and another forwards natively is still on both.
+          custom: mergeRecords(
+            references.map(({ flavor, reference: { platforms } }) => ({
+              flavor,
+              value: platforms.html.attributes.custom,
+              has: (name: string) => platforms.html.attributes.standard.includes(name),
+            })),
+            all
+          ),
+        },
+        properties: {
+          definitions,
+          // A property one flavor documents in full is listed there, not again among the native ones.
+          native: mergeNames(...references.map((entry) => entry.reference.platforms.html.properties.native)).filter(
+            (name) => !definitions[name]
+          ),
+        },
+        events: {
+          standard: [...new Set(references.flatMap((entry) => entry.reference.platforms.html.events.standard))],
+          custom: [
+            ...new Map(
+              references.flatMap((entry) =>
+                entry.reference.platforms.html.events.custom.map((event) => [event.name, event])
+              )
+            ).values(),
+          ].sort((a, b) => a.name.localeCompare(b.name)),
+        },
+        methods: mergeNames(...references.map((entry) => entry.reference.platforms.html.methods)),
+      },
+      ...(react
+        ? {
+            react: {
+              ...react,
+              props: mergeRecords(
+                reacts.map(({ flavor, value }) => ({
+                  flavor,
+                  value: value.props,
+                  has: (name: string) => value.acceptsNativeProps && nativeNames.has(name),
+                })),
+                reacts.map((entry) => entry.flavor)
+              ),
+            },
+          }
+        : {}),
+    },
+  };
+}
+
+function mergeRecords(
+  records: readonly {
+    flavor: string;
+    value: Record<string, HostPropertyDef>;
+    /** Whether the flavor has a name it documents outside `value`, such as natively. */
+    has: (name: string) => boolean;
+  }[],
+  all: readonly string[]
+): Record<string, HostPropertyDef> {
+  const merged: Record<string, HostPropertyDef> = {};
+
+  for (const { value } of records) {
+    for (const [name, definition] of Object.entries(value)) merged[name] ??= definition;
+  }
+
+  for (const [name, definition] of Object.entries(merged)) {
+    const flavors = records.filter((entry) => entry.value[name] || entry.has(name)).map((entry) => entry.flavor);
+
+    if (flavors.length < all.length) merged[name] = { ...definition, flavors };
+  }
+
+  return merged;
+}
+
+function mergeEngineOptions(references: readonly FlavorReference[]): Record<string, EngineOptionDef[]> {
+  const merged: Record<string, EngineOptionDef[]> = {};
+
+  for (const { reference } of references) {
+    for (const [engine, options] of Object.entries(reference.engineOptions ?? {})) merged[engine] ??= options;
+  }
+
+  return merged;
+}
+
+function mergeSourceFields(references: readonly FlavorReference[], all: readonly string[]): SourceFieldDef[] {
+  const merged = new Map<string, SourceFieldDef>();
+
+  for (const { reference } of references) {
+    for (const field of reference.sourceFields ?? []) {
+      if (!merged.has(field.name)) merged.set(field.name, field);
+    }
+  }
+
+  return [...merged.values()]
+    .map((field) => {
+      const flavors = references
+        .filter((entry) => entry.reference.sourceFields?.some((candidate) => candidate.name === field.name))
+        .map((entry) => entry.flavor);
+
+      return flavors.length < all.length ? { ...field, flavors } : field;
+    })
+    .sort((a, b) => compareFieldPaths(a.name, b.name));
+}
+
+/** Parents before their fields, siblings by name. */
+function compareFieldPaths(a: string, b: string): number {
+  const left = a.split('.');
+  const right = b.split('.');
+
+  for (let index = 0; index < Math.min(left.length, right.length); index++) {
+    const order = left[index]!.localeCompare(right[index]!);
+    if (order !== 0) return order;
+  }
+
+  return left.length - right.length;
 }
 
 function findAccessorType(
@@ -1297,8 +1750,8 @@ function syntheticKeyword(
   return { type, start: source.start, end: source.end };
 }
 
-function mergeNames(first: readonly string[], second: readonly string[]): string[] {
-  return [...new Set([...first, ...second])].sort();
+function mergeNames(...lists: readonly (readonly string[])[]): string[] {
+  return [...new Set(lists.flat())].sort();
 }
 
 function cssVarsRecord(extraction: ReturnType<typeof extractCSSVars>): Record<string, { description: string }> {

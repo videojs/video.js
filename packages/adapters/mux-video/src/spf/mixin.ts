@@ -97,9 +97,8 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     /**
-     * Structured Mux source. Setting it derives `src` from the playback ID, custom domain, and `playback` params
-     * (appended as `snake_case` query params). A `playback.token` replaces all other params — signed URLs bake them
-     * into the token.
+     * Structured Mux source. Setting it derives `src` from `playbackId`, `customDomain`, and `playback`, and the
+     * license servers from `drm.token`.
      */
     get source(): MuxSourceBase | null {
       return this.#source;
@@ -138,12 +137,17 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     /**
-     * What `source` says about its content. `poster` and `storyboard` are image URLs it describes rather than plays,
-     * from its `poster` and `storyboard` params. `title` and the rest come from the metadata Mux publishes for the
-     * asset, which loads with the source, so they arrive later than the URLs and are absent until then.
+     * What `source` says about its content. `poster` and `storyboard` are the image URLs built from `playbackId` and
+     * the `poster` and `storyboard` params. Each is absent when its URL can't be built: no playback ID, or signed
+     * playback without a matching image token.
      *
-     * The same object is handed back until something in it changes, and `contentdatachange` announces it when it does.
-     * Nothing here is applied for you.
+     * `title` is the asset's title from the metadata document Mux publishes for it, or its `video_title` entry when the
+     * document names no title. The document's other entries are included under their own keys. They arrive when the
+     * document loads with the source, and are absent until then, without a playback ID, or when the asset has none.
+     *
+     * The same object is returned until something in it changes, and `contentdatachange` fires when it does, including
+     * when the title arrives. A player uses `title` and `poster` when it sets no title or poster of its own, and the
+     * Mux video component adds a thumbnails `<track>` from `storyboard`, except for live streams.
      */
     get contentData(): MuxContentData {
       return this.#contentData;

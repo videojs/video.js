@@ -1,0 +1,28 @@
+---
+import { flavorOnlyLabel } from '@/utils/mediaReferenceModel';
+
+/**
+ * Marks a media reference row that only some of an element's engine flavors support, such as the hls.js-backed and
+ * SPF-backed `<mux-video>`. Renders nothing when every flavor has the row.
+ *
+ * The visually hidden parentheses keep the label apart from the name it follows in screen readers and in the Markdown
+ * export, which reads the text without the styling.
+ */
+interface Props {
+  flavors?: readonly string[] | undefined;
+}
+
+const label = flavorOnlyLabel(Astro.props.flavors);
+---
+
+{
+  label && (
+    <span
+      class="ml-1.5 inline-flex h-4.5 shrink-0 items-center rounded-md corner-squircle bg-accent/12 px-1.5 align-middle text-p4 leading-none font-medium whitespace-nowrap text-accent dark:bg-accent/15"
+    >
+      <span class="sr-only">{" ("}</span>
+      {label}
+      <span class="sr-only">)</span>
+    </span>
+  )
+}

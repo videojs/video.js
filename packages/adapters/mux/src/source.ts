@@ -19,101 +19,152 @@ export type MuxImageExt = 'webp' | 'jpg' | 'png';
 export type MuxPosterFitMode = 'preserve' | 'stretch' | 'crop' | 'smartcrop' | 'pad';
 
 /**
- * Playback modifiers appended to the stream URL as `snake_case` query params (e.g. `assetStartTime` →
- * `asset_start_time`). A signed playback `token` replaces every other param — they must be baked into the signing
- * token.
+ * Stream URL params, appended to the URL as `snake_case` query params (`assetStartTime` → `asset_start_time`). A signed
+ * playback `token` replaces every other param.
  */
 export interface MuxPlaybackParams {
+  /**
+   * Signed playback token: a JWT with the `v` audience, signed for this playback ID. When set, the stream URL carries
+   * the token alone and the other `playback` params are left out of it.
+   */
   token?: string | undefined;
-  /** Maximum resolution of renditions included in the manifest. */
+  /**
+   * Highest rendition resolution Mux puts in the manifest. Applied by Mux's servers: renditions above it are left out
+   * of the manifest, so the player never receives them and can't select them, automatically or by hand.
+   */
   maxResolution?: MuxResolution | undefined;
-  /** Minimum resolution of renditions included in the manifest. */
+  /**
+   * Lowest rendition resolution Mux puts in the manifest. Applied by Mux's servers: renditions below it are left out of
+   * the manifest, so the player never receives them.
+   */
   minResolution?: MuxResolution | undefined;
-  /** Logic to order renditions in the HLS manifest. */
+  /** Order of the renditions in the manifest. `'desc'` lists them from highest to lowest resolution. */
   renditionOrder?: MuxRenditionOrder | undefined;
-  /** Start time for instant-clipping assets, as an epoch integer compared to the stream's program date time. */
+  /** Start of an instant clip of a live stream, as an epoch time compared to the stream's program date time. */
   programStartTime?: number | undefined;
-  /** End time for instant-clipping assets, as an epoch integer compared to the stream's program date time. */
+  /** End of an instant clip of a live stream, as an epoch time compared to the stream's program date time. */
   programEndTime?: number | undefined;
-  /** Relative start time of the asset (in seconds) when using the instant clipping feature. */
+  /** Start of an instant clip, in seconds from the start of the asset. */
   assetStartTime?: number | undefined;
-  /** Relative end time of the asset (in seconds) when using the instant clipping feature. */
+  /** End of an instant clip, in seconds from the start of the asset. */
   assetEndTime?: number | undefined;
-  /** Include HLS redundant streams in the manifest. */
+  /** Includes HLS redundant streams in the manifest. */
   redundantStreams?: boolean | undefined;
-  /** Add support for timeline hover previews on Roku devices. */
+  /** Adds timeline hover preview support for Roku devices to the manifest. */
   rokuTrickPlay?: boolean | undefined;
-  /** Default subtitles/captions language (BCP 47 compliant language code). */
+  /** Language of the subtitle or caption track the manifest marks as default, as a BCP 47 language code. */
   defaultSubtitlesLang?: string | undefined;
-  /** Omit `EXT-X-PROGRAM-DATE-TIME` tags from HLS manifests for assets from live streams. */
+  /** Leaves `EXT-X-PROGRAM-DATE-TIME` tags out of the manifest of an asset recorded from a live stream. */
   excludePdt?: boolean | undefined;
   [param: string]: string | number | boolean | undefined;
 }
 
-/**
- * Modifiers for the poster still, appended to the image URL as `snake_case` query params. Mux serves it from its
- * `thumbnail` image endpoint.
- */
+/** Poster image URL params, appended to the URL as `snake_case` query params. A signed `token` replaces the others. */
 export interface MuxPosterParams {
+  /**
+   * Signed image token: a JWT with the `t` audience, signed for this playback ID. When set, the poster URL carries the
+   * token alone and the other `poster` params are left out of it. A token with another audience builds no poster URL.
+   */
   token?: string | undefined;
-  /** Image format used in the URL path (`thumbnail.<ext>`). Defaults to `webp`. */
+  /**
+   * Image format, in the URL path (`thumbnail.<ext>`).
+   *
+   * @default 'webp'
+   */
   ext?: MuxImageExt | undefined;
-  /** Video time (in seconds) the image is pulled from. Defaults to the middle of the video. */
+  /**
+   * Video time, in seconds, the image is taken from. Without it, Mux takes the image from the middle of the video. On
+   * `<mux-video>`, the `poster-time` attribute sets it.
+   */
   time?: number | undefined;
-  /** Width of the image (in pixels). Defaults to the width of the original video. */
+  /** Image width in pixels. Without it, Mux uses the width of the original video. */
   width?: number | undefined;
-  /** Height of the image (in pixels). Defaults to the height of the original video. */
+  /** Image height in pixels. Without it, Mux uses the height of the original video. */
   height?: number | undefined;
-  /** Rotate the image clockwise by the given number of degrees. */
+  /** Clockwise rotation of the image, in degrees. */
   rotate?: number | undefined;
-  /** How to fit the image within the specified width + height. */
+  /** How the image fits within `width` and `height`. */
   fitMode?: MuxPosterFitMode | undefined;
-  /** Flip the image top-bottom after performing all other transformations. */
+  /** Flips the image top to bottom, after every other transformation. */
   flipV?: boolean | undefined;
-  /** Flip the image left-right after performing all other transformations. */
+  /** Flips the image left to right, after every other transformation. */
   flipH?: boolean | undefined;
-  /** Poster time for instant-clipping assets, as an epoch integer compared to the stream's program date time. */
+  /**
+   * Time the image is taken from in an instant clip of a live stream, as an epoch time compared to the stream's program
+   * date time.
+   */
   programTime?: number | undefined;
-  /** Pull the latest frame from an ongoing live stream. */
+  /** Takes the image from the latest frame of a live stream in progress. */
   latest?: boolean | undefined;
   [param: string]: string | number | boolean | undefined;
 }
 
+/** Storyboard URL params, appended to the URL as `snake_case` query params. A signed `token` replaces the others. */
 export interface MuxStoryboardParams {
+  /**
+   * Signed storyboard token: a JWT with the `s` audience, signed for this playback ID. When set, the storyboard URL
+   * carries the token alone and the other `storyboard` params are left out of it. A token with another audience builds
+   * no storyboard URL.
+   */
   token?: string | undefined;
-  /** Image format of the storyboard tiles referenced by the VTT. Defaults to `webp`. */
+  /**
+   * Image format of the storyboard tiles the VTT file references.
+   *
+   * @default 'webp'
+   */
   format?: MuxImageExt | undefined;
   [param: string]: string | number | undefined;
 }
 
-/**
- * Mux's DRM authoring input: a license token, in place of the license servers `source.drm` normally names. Servers
- * named outright alongside it still win, key by key, for content Mux does not license.
- */
+/** License servers keyed by EME key system, plus a Mux license `token` to derive them from. */
 export interface MuxDrmParams extends DrmSystemsConfig {
   /**
-   * DRM license token: a JWT signed for the playback ID with the DRM (`d`) audience. Mux derives every license server
-   * URL from it, so it is the only thing a caller supplies. DRM playback is always signed, so a matching
-   * `playback.token` is required alongside it.
+   * DRM license token: a JWT with the `d` audience, signed for this playback ID. Derives Mux's FairPlay, Widevine, and
+   * PlayReady license servers on the `license.mux.com` host. A token with another audience derives none. Mux serves
+   * DRM-protected playback IDs only to signed playback, so the stream also takes a `playback.token`.
    */
   token?: string | undefined;
 }
 
 /**
- * What identifies a Mux stream and modifies it, independent of what plays it. `playbackId` and `customDomain` identify
- * the stream and derive the URL; `src` is a fallback for playing a non-Mux URL.
- *
- * Each Mux Media extends this with whatever its own engine takes — see `MuxSource` for the hls.js-backed one.
+ * What identifies a Mux stream and modifies it, independent of what plays it. Each Mux Media extends it with what its
+ * own engine takes; `MuxSource` is the hls.js-backed one.
  */
 export interface MuxSourceBase {
-  /** Manifest URL. Derived from `playbackId` when there is one. */
+  /**
+   * Manifest URL, played when there is no `playbackId`, such as a stream Mux doesn't host. Ignored when `playbackId` is
+   * set.
+   */
   src?: string | undefined;
+  /**
+   * Mux playback ID. Derives the stream URL `https://stream.mux.com/{playbackId}.m3u8`, the poster URL
+   * `https://image.mux.com/{playbackId}/thumbnail.webp` (read through `contentData.poster`), and the storyboard URL
+   * `https://image.mux.com/{playbackId}/storyboard.vtt?format=webp` (read through `contentData.storyboard`). The
+   * `playback`, `poster`, and `storyboard` params are appended to their URLs.
+   */
   playbackId?: string | undefined;
+  /** Domain that replaces `mux.com` in the `stream.`, `image.`, and `license.` hosts the URLs are built on. */
   customDomain?: string | undefined;
+  /**
+   * Params for the stream URL. Mux applies them on its servers, so they change the manifest itself. Params not listed
+   * here are appended the same way.
+   */
   playback?: MuxPlaybackParams | undefined;
+  /**
+   * Params for the poster URL. When `playback.token` is set and `poster.token` is not, no poster URL is built. Params
+   * not listed here are appended the same way.
+   */
   poster?: MuxPosterParams | undefined;
+  /**
+   * Params for the storyboard URL. When `playback.token` is set and `storyboard.token` is not, no storyboard URL is
+   * built. Params not listed here are appended the same way.
+   */
   storyboard?: MuxStoryboardParams | undefined;
-  /** License servers keyed by key system, or a Mux license `token` to derive them from. */
+  /**
+   * License servers for protected content, keyed by EME key system (`com.apple.fps`, `com.widevine.alpha`,
+   * `com.microsoft.playready`, `org.w3.clearkey`), plus a Mux license `token`. A server named here replaces the one
+   * `token` derives for the same key system.
+   */
   drm?: MuxDrmParams | undefined;
 }
 

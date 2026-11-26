@@ -31,6 +31,7 @@ export type {
   MediaReference,
   MediaTargetTag,
   ReactMediaReference,
+  SourceFieldDef,
 } from '../../../src/types/media-reference.js';
 export { MediaReferenceSchema } from '../../../src/types/media-reference.js';
 export type { PresetFeatureRef, PresetReference, PresetSkinDef } from '../../../src/types/preset-reference.js';

@@ -35,6 +35,11 @@ export function MuxVideoMixin<Class extends AnyConstructor<HTMLElement>>(BaseCla
     // Declared here rather than in `static properties` because it does not map to a
     // adapter property of its own: it feeds `source.poster.time`. The generic path
     // would also coerce a removed attribute to `0`, which is a valid poster time.
+    /**
+     * @attribute {number} poster-time - Video time, in seconds, the poster image is taken from. Sets
+     *   `source.poster.time` when the attribute changes and again whenever the source changes. Removing the attribute
+     *   clears `source.poster.time`; a value that is not a number leaves it unchanged.
+     */
     static get observedAttributes(): string[] {
       const inherited = (BaseClass as unknown as { observedAttributes?: string[] }).observedAttributes ?? [];
 
