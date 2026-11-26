@@ -1560,6 +1560,9 @@ importers:
       react:
         specifier: ^19.3.0
         version: 19.3.0
+      react-compiler-runtime:
+        specifier: ^1.0.0
+        version: 1.0.0(react@19.3.0)
       react-dom:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
