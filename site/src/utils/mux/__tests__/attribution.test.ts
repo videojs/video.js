@@ -45,4 +45,9 @@ describe('contentPlacement', () => {
     expect(contentPlacement('/blog/videojs-v10-release-candidate')).toBe('blog-content');
     expect(contentPlacement('/docs/framework/html/guides/mux-data')).toBe('docs-content');
   });
+
+  it('gives standalone pages their own placement', () => {
+    expect(contentPlacement('/help')).toBe('help-page');
+    expect(contentPlacement('/html5-video-support/')).toBe('html5-video-support-page');
+  });
 });
