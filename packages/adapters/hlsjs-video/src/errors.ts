@@ -47,7 +47,10 @@ export function HlsJsErrorsMixin<Base extends Constructor<HlsEngineHost>>(BaseCl
         if (!data.fatal) return;
 
         const code = hlsErrorTypeToCode[data.type] ?? MediaError.MEDIA_ERR_CUSTOM;
-        const error = new MediaError(data.error?.message, code, true, data.details);
+        // A standard code takes its canonical message, which the error dialog can localize
+        // hls.js's own message stays on `error.data` beside `context` for developers.
+        const useCanonicalMessage = code >= MediaError.MEDIA_ERR_ABORTED && code <= MediaError.MEDIA_ERR_ENCRYPTED;
+        const error = new MediaError(useCanonicalMessage ? undefined : data.error?.message, code, true, data.details);
 
         error.data = data;
 
