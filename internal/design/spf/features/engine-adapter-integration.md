@@ -164,7 +164,7 @@ each `set src`).
   - `packages/spf/src/playback/adapters/hls-video/adapter.ts` —
     `HlsVideoAdapter` consumer
 - **Walkthrough:**
-  - `packages/spf/docs/hls-engine.md` Stage 10 — high-level coverage
+  - `packages/spf/docs/build-an-adapter.md` — high-level coverage
     of the pattern
 
 ## Open questions
@@ -226,7 +226,7 @@ each `set src`).
 ## See also
 
 - [clusters.md § Engine lifecycle](./clusters.md#engine-lifecycle)
-- [packages/spf/docs/hls-engine.md § Stage 10](../../../../packages/spf/docs/hls-engine.md)
+- [packages/spf/docs/build-an-adapter.md](../../../../packages/spf/docs/build-an-adapter.md)
   — the adapter pattern walkthrough
 - [conventions/signals.md](../conventions/signals.md) — per-slot
   `Signal<T>` / `ReadonlySignal<T>` intent (relevant for how consumers
