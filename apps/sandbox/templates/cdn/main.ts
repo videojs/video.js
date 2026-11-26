@@ -267,6 +267,9 @@ async function loadCdnMedia(media: MediaId) {
     case 'dailymotion-video':
       await import('@videojs/cdn/media/dailymotion-video');
       break;
+    case 'vidyard-video':
+      await import('@videojs/cdn/media/vidyard-video');
+      break;
     case 'wistia-video':
       await import('@videojs/cdn/media/wistia-video');
       break;

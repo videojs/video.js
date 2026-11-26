@@ -17,10 +17,21 @@ export interface SandboxSource {
   url?: string;
   /**
    * `youtube` is a YouTube page URL for `<youtube-video>`, `playerjs` an embed page URL for `<playerjs-video>`,
-   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, `mixcloud` a Mixcloud URL for `<mixcloud-audio>`, and
-   * `dailymotion` a player embed URL for `<dailymotion-video>`, rather than a media file or manifest.
+   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, `mixcloud` a Mixcloud URL for `<mixcloud-audio>`,
+   * `dailymotion` a player embed URL for `<dailymotion-video>`, and `vidyard` a Vidyard URL for `<vidyard-video>`,
+   * rather than a media file or manifest.
    */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'soundcloud' | 'mixcloud' | 'dailymotion';
+  type:
+    | 'hls'
+    | 'mp4'
+    | 'dash'
+    | 'none'
+    | 'youtube'
+    | 'playerjs'
+    | 'soundcloud'
+    | 'mixcloud'
+    | 'dailymotion'
+    | 'vidyard';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -752,6 +763,39 @@ const SOURCE_MAP = {
     url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&scaleMode=fill',
     type: 'dailymotion',
   },
+  // Public players from Vidyard's own customer stories and help center.
+  'vidyard-video': {
+    label: 'Vidyard - Video',
+    url: 'https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57',
+    type: 'vidyard',
+  },
+  // Five seconds, to reach the end quickly, with an English caption track.
+  'vidyard-short': {
+    label: 'Vidyard - Short video, captions',
+    url: 'https://play.vidyard.com/U9TXHnmU2QDq9f5aKppsXx',
+    type: 'vidyard',
+  },
+  'vidyard-playlist': {
+    label: 'Vidyard - Playlist of 3, captions',
+    url: 'https://share.vidyard.com/watch/BLXgYCDGfwU62vdMWybNVJ',
+    type: 'vidyard',
+  },
+  'vidyard-start-time': {
+    label: 'Vidyard - From 1:00',
+    url: 'https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57?second=60',
+    type: 'vidyard',
+  },
+  'vidyard-controls': {
+    label: "Vidyard - Vidyard's controls",
+    url: 'https://embed.vidyard.com/share/YBvcF2BEfvKdowmfrRwk57',
+    type: 'vidyard',
+    controls: true,
+  },
+  'vidyard-missing': {
+    label: 'Vidyard - Missing video (error)',
+    url: 'https://share.vidyard.com/watch/NoSuchVidyardPlayer0000',
+    type: 'vidyard',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -766,7 +810,8 @@ const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 /**
  * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
  * the player.js services' for `<playerjs-video>`, SoundCloud's for `<soundcloud-audio>`, Mixcloud's for
- * `<mixcloud-audio>`, Dailymotion's for `<dailymotion-video>`, so every list derived from this one stays free of them.
+ * `<mixcloud-audio>`, Dailymotion's for `<dailymotion-video>`, Vidyard's for `<vidyard-video>`, so every list derived
+ * from this one stays free of them.
  */
 export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
   (id) =>
@@ -774,13 +819,15 @@ export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
     !isPlayerJsSource(id) &&
     !isSoundCloudSource(id) &&
     !isMixcloudSource(id) &&
-    !isDailymotionSource(id)
+    !isDailymotionSource(id) &&
+    !isVidyardSource(id)
 );
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
 export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
 export const SOUNDCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isSoundCloudSource);
 export const MIXCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isMixcloudSource);
 export const DAILYMOTION_SOURCE_IDS = ALL_SOURCE_IDS.filter(isDailymotionSource);
+export const VIDYARD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isVidyardSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -821,6 +868,7 @@ export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
 export const DEFAULT_SOUNDCLOUD_SOURCE: SourceId = 'soundcloud-track';
 export const DEFAULT_MIXCLOUD_SOURCE: SourceId = 'mixcloud-show';
 export const DEFAULT_DAILYMOTION_SOURCE: SourceId = 'dailymotion-default';
+export const DEFAULT_VIDYARD_SOURCE: SourceId = 'vidyard-video';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -887,6 +935,10 @@ export function isMixcloudSource(id: SourceId): boolean {
 
 export function isDailymotionSource(id: SourceId): boolean {
   return SOURCES[id].type === 'dailymotion';
+}
+
+export function isVidyardSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'vidyard';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */

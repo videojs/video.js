@@ -44,6 +44,7 @@ export const CDN_MEDIA_SUBPATHS = [
   'spotify-audio',
   'tiktok-video',
   'twitch-video',
+  'vidyard-video',
   'vimeo-video',
   'wistia-video',
   'youtube-video',

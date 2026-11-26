@@ -30,6 +30,7 @@
   "packages/adapters/tiktok-video": "10.7.0",
   "packages/adapters/twitch-video": "10.7.0",
   "packages/utils": "10.7.0",
+  "packages/adapters/vidyard-video": "10.7.0",
   "packages/adapters/vimeo-video": "10.7.0",
   "packages/adapters/wistia-video": "10.7.0",
   "packages/adapters/youtube-video": "10.7.0",

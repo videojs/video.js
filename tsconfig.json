@@ -32,6 +32,7 @@
     { "path": "packages/adapters/spotify-audio" },
     { "path": "packages/adapters/tiktok-video" },
     { "path": "packages/adapters/twitch-video" },
+    { "path": "packages/adapters/vidyard-video" },
     { "path": "packages/adapters/vimeo-video" },
     { "path": "packages/adapters/wistia-video" },
     { "path": "packages/adapters/youtube-video" },

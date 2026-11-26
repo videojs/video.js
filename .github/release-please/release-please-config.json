@@ -43,6 +43,7 @@
         "@videojs/tiktok-video",
         "@videojs/twitch-video",
         "@videojs/utils",
+        "@videojs/vidyard-video",
         "@videojs/vimeo-video",
         "@videojs/wistia-video",
         "@videojs/youtube-video",
@@ -149,6 +150,9 @@
     },
     "packages/utils": {
       "component": "@videojs/utils"
+    },
+    "packages/adapters/vidyard-video": {
+      "component": "@videojs/vidyard-video"
     },
     "packages/adapters/vimeo-video": {
       "component": "@videojs/vimeo-video"

@@ -10,6 +10,7 @@ import {
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
+  DEFAULT_VIDYARD_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
   HLS_SOURCE_IDS,
@@ -29,6 +30,7 @@ import {
   SPOTIFY_AUDIO_SRC,
   TIKTOK_VIDEO_SRC,
   TWITCH_VIDEO_SRC,
+  VIDYARD_SOURCE_IDS,
   VIMEO_VIDEO_SRC,
   WISTIA_VIDEO_SRC,
   YOUTUBE_SOURCE_IDS,
@@ -231,13 +233,14 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube, `<playerjs-video>`, `<soundcloud-audio>`, `<mixcloud-audio>`, and `<dailymotion-video>`
-  // renders one provider page URL rather than the picker's list. YouTube offers a set of page URLs instead, covering the
-  // caption, short, and live cases its adapter handles differently. The CDN page builds elements from attributes alone,
-  // so the entries that need player parameters stay off it. player.js is a protocol many providers speak, so its embed
-  // picks between their embed pages. SoundCloud's and Mixcloud's pickers cover the URL shapes and layouts their adapters
-  // handle differently, and sources that fail on purpose. Dailymotion's picker covers player configurations and URL
-  // parameters.
+  // Each embed but YouTube, `<playerjs-video>`, `<soundcloud-audio>`, `<mixcloud-audio>`, `<dailymotion-video>`, and
+  // `<vidyard-video>` renders one provider page URL rather than the picker's list. YouTube offers a set of page URLs
+  // instead, covering the caption, short, and live cases its adapter handles differently. The CDN page builds elements
+  // from attributes alone, so the entries that need player parameters stay off it. player.js is a protocol many
+  // providers speak, so its embed picks between their embed pages. SoundCloud's and Mixcloud's pickers cover the URL
+  // shapes and layouts their adapters handle differently, and sources that fail on purpose. Dailymotion's picker covers
+  // player configurations and URL parameters. Vidyard's covers URL shapes, playlists, captions, its own controls, and a
+  // missing player.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -323,6 +326,15 @@ const MEDIA_MAP = {
     fallbackSource: DEFAULT_DAILYMOTION_SOURCE,
     entrySource: DEFAULT_DAILYMOTION_SOURCE,
     skinless: true,
+  },
+  'vidyard-video': {
+    label: 'Vidyard Video',
+    player: 'video',
+    tag: 'vidyard-video',
+    embed: true,
+    sources: VIDYARD_SOURCE_IDS,
+    fallbackSource: DEFAULT_VIDYARD_SOURCE,
+    entrySource: DEFAULT_VIDYARD_SOURCE,
   },
   'wistia-video': {
     label: 'Wistia Video',

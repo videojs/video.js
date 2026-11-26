@@ -39,6 +39,7 @@
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
     "@videojs/utils": "workspace:*",
+    "@videojs/vidyard-video": "workspace:*",
     "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",

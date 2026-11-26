@@ -207,6 +207,7 @@
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
+    "@videojs/vidyard-video": "workspace:*",
     "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
@@ -233,6 +234,7 @@
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
+    "@videojs/vidyard-video": "workspace:*",
     "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
@@ -289,6 +291,9 @@
       "optional": true
     },
     "@videojs/twitch-video": {
+      "optional": true
+    },
+    "@videojs/vidyard-video": {
       "optional": true
     },
     "@videojs/vimeo-video": {

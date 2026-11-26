@@ -5,6 +5,7 @@ import { DailymotionVideo } from '../dailymotion-video/adapter';
 import { PlayerJsVideo } from '../playerjs-video/adapter';
 import { TikTokVideo } from '../tiktok-video/adapter';
 import { TwitchVideo } from '../twitch-video/adapter';
+import { VidyardVideo } from '../vidyard-video/adapter';
 import { VimeoVideo } from '../vimeo-video/adapter';
 import { YouTubeVideo } from '../youtube-video/adapter';
 
@@ -20,6 +21,7 @@ describe.each([
   ['CloudflareVideo', CloudflareVideo],
   ['PlayerJsVideo', PlayerJsVideo],
   ['DailymotionVideo', DailymotionVideo],
+  ['VidyardVideo', VidyardVideo],
 ] as const)('%s sizing', (_, Embed) => {
   it('sizes the host like a replaced <video> so a skin can stretch it', () => {
     const host = hostStyles(Embed.getTemplateHTML({}));

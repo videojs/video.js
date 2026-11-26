@@ -127,3 +127,5 @@ export const VJS10_DEMO_TWITCH = INSTALLATION_DEMO_SOURCES.twitch;
 // Dailymotion's player embed URL rather than a video page: it names the player
 // configuration Dailymotion refuses to embed without.
 export const VJS10_DEMO_DAILYMOTION = 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87';
+// A customer story Vidyard shares publicly from its own account.
+export const VJS10_DEMO_VIDYARD = 'https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57';
