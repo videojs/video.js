@@ -94,6 +94,8 @@ pnpm add @videojs/html @videojs/mux-video
 
 Keep the static element import with the component so `<mux-video>` is registered before Svelte assigns the property.
 
+Svelte assigns other values to properties too, so `<media-seek-button seconds="10">` sets `seconds` to the string `"10"`. Numeric properties convert such strings the same way as their attributes, but `seconds={10}` passes a number directly.
+
 ## Use SvelteKit
 
 If you use server rendering, keep the element imports from the installation guide static. SvelteKit renders the custom-element markup on the server, and the browser upgrades it when the page loads. Put code that needs the bound element or browser APIs in `onMount`, as shown above.
