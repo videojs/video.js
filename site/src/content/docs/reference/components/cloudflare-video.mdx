@@ -88,7 +88,7 @@ A few things work differently from a native `<video>` element, because the Strea
 
 <MediaReference media="CloudflareVideo">
   <Fragment slot="engine-cloudflare">
-    Pass [Stream player parameters](https://developers.cloudflare.com/stream/viewing-videos/using-the-stream-player/) under `source.engine.cloudflare`, spelled exactly as Cloudflare spells them, plus anything Cloudflare adds next. They're serialized onto the embed URL untouched, and the embed reads them once, when its URL is built. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+    Pass [Stream player parameters](https://developers.cloudflare.com/stream/viewing-videos/using-the-stream-player/) under `source.engine.cloudflare`, spelled exactly as Cloudflare spells them, plus anything Cloudflare adds next. They're serialized onto the embed URL untouched, and the embed reads them once, when its URL is built.
 
     `controls`, `autoplay`, `loop`, `muted`, `preload`, and `poster` come from the props of the same name, so they have no `engine.cloudflare` spelling.
 

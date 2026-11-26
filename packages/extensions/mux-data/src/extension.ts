@@ -282,7 +282,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
   /**
    * Video metadata reported with the view. Applied on the next sync rather than immediately: when it changes together
    * with the source, it belongs to the incoming video, so it rides the `videochange` instead of relabelling the
-   * outgoing view.
+   * outgoing view. See [Monitor playback with Mux Data](https://videojs.org/docs/guides/mux-data#describe-the-view).
    */
   get metadata() {
     return this.#metadata;

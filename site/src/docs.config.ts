@@ -80,7 +80,6 @@ export const sidebar: Sidebar = [
           { slug: 'guides/presets' },
           { slug: 'guides/ui-components' },
           { slug: 'guides/accessibility' },
-          { slug: 'guides/media-sources' },
         ],
       },
       {
@@ -107,6 +106,10 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Keyboard shortcuts and gestures',
           },
           { slug: 'guides/live-streams', sidebarLabel: 'Live streams' },
+          { slug: 'guides/hls', sidebarLabel: 'HLS streams' },
+          { slug: 'guides/mux', sidebarLabel: 'Mux videos' },
+          { slug: 'guides/drm', sidebarLabel: 'DRM' },
+          { slug: 'guides/cookie-gated-streams', sidebarLabel: 'Cookie-gated streams' },
           { slug: 'guides/quality', sidebarLabel: 'Quality selector' },
           {
             slug: 'guides/fullscreen',
@@ -206,6 +209,7 @@ export const sidebar: Sidebar = [
         sidebarLabel: 'Media',
         llmsDescription: 'API reference for media components that handle streaming protocols and playback.',
         contents: [
+          { slug: 'reference/components/media', sidebarLabel: 'Overview' },
           { slug: 'reference/components/audio' },
           { slug: 'reference/components/background-video' },
           { slug: 'reference/components/cloudflare-video' },

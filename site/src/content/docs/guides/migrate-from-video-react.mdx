@@ -95,7 +95,7 @@ For the Default skin, import `skin.css` and replace `NeutralVideoSkin` with `Vid
 
 **The player** holds state and hands it to everything inside it. It draws nothing and takes no layout. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from. Video-React's internal Redux store, `Manager`, and `actions` are all replaced by this player store.
 
-**The media** plays the video. `Video` renders a plain `<video>` for progressive files. HLS, DASH, YouTube, Vimeo, and Mux each have a <DocsLink slug="guides/media-sources">media component</DocsLink> of their own.
+**The media** plays the video. `Video` renders a plain `<video>` for progressive files. HLS, DASH, YouTube, Vimeo, and Mux each have a <DocsLink slug="reference/components/media">media component</DocsLink> of their own.
 
 **The skin** is the UI. It renders a container that sizes the player, goes fullscreen, and receives gestures and hotkeys. It replaces `ControlBar`, `BigPlayButton`, `LoadingSpinner`, `PosterImage`, `Bezel`, and `Shortcut` at once.
 
@@ -326,7 +326,7 @@ import { NeutralVideoSkin, VideoPlayer } from '@videojs/react/video';
 </VideoPlayer>
 ```
 
-The skins show a quality menu when the stream has renditions. Other `isVideoChild` components that received the `video` prop can read the element from `mediaRef` or `useMedia()` instead. For DASH, YouTube, Vimeo, and Mux sources, see <DocsLink slug="guides/media-sources">Media sources</DocsLink>. For live streams, use the live video preset; see <DocsLink slug="guides/live-streams">Live streams</DocsLink>.
+The skins show a quality menu when the stream has renditions. Other `isVideoChild` components that received the `video` prop can read the element from `mediaRef` or `useMedia()` instead. For DASH, YouTube, Vimeo, and Mux sources, see <DocsLink slug="reference/components/media">Media components</DocsLink>. For live streams, use the live video preset; see <DocsLink slug="guides/live-streams">Live streams</DocsLink>.
 
 ## Captions and thumbnails
 
@@ -433,6 +433,6 @@ These changes don't throw errors, so test for them:
 
 - <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink>
 - <DocsLink slug="guides/features">Features</DocsLink> and <DocsLink slug="guides/presets">Presets</DocsLink>
-- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="reference/components/media">Media components</DocsLink>
 - <DocsLink slug="guides/skins">Skins</DocsLink> and <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>
 - <DocsLink slug="guides/migrate-from-video-js-8">Migrate from Video.js 8</DocsLink>

@@ -53,6 +53,44 @@ const EXCLUDED_METHOD_NAMES = new Set([
   'querySelectorAll',
 ]);
 const LITERAL_IDENTIFIERS = new Set(['NaN', 'Infinity']);
+/**
+ * Events HTML fires on a media element itself. The media event contracts also type track-list events (`addtrack`,
+ * `change`, …) and Video.js events (`streamtypechange`, `contentdatachange`, …); neither belongs in the standard list.
+ */
+const STANDARD_MEDIA_EVENTS = new Set([
+  'abort',
+  'canplay',
+  'canplaythrough',
+  'durationchange',
+  'emptied',
+  'encrypted',
+  'ended',
+  'enterpictureinpicture',
+  'error',
+  'leavepictureinpicture',
+  'loadeddata',
+  'loadedmetadata',
+  'loadstart',
+  'pause',
+  'play',
+  'playing',
+  'progress',
+  'ratechange',
+  'resize',
+  'seeked',
+  'seeking',
+  'stalled',
+  'suspend',
+  'timeupdate',
+  'volumechange',
+  'waiting',
+  'waitingforkey',
+]);
+/**
+ * Members HTML defines only on `<video>`. The shared custom media element observes their attributes for audio elements
+ * too, but they do nothing on an `<audio>`, so audio references leave them out.
+ */
+const VIDEO_ONLY_MEMBERS = new Set(['autoPictureInPicture', 'disablePictureInPicture', 'playsInline', 'poster']);
 const INFERRED_MEDIA_PROPERTY_TYPES: Readonly<Record<string, string>> = {
   audioRenditions: 'AudioRenditionListLike | undefined',
   audioTracks: 'AudioTrackListLike | undefined',
@@ -64,6 +102,7 @@ const INFERRED_MEDIA_PROPERTY_TYPES: Readonly<Record<string, string>> = {
   currentTime: 'number',
   defaultMuted: 'boolean',
   disablePictureInPicture: 'boolean',
+  disableRemotePlayback: 'boolean',
   duration: 'number',
   ended: 'boolean',
   isFullscreen: 'boolean',
@@ -146,10 +185,6 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
   const mediaTypesPath = path.join(monorepoRoot, 'packages/media/src/core/types.ts');
   const videoEvents = extractEventsFromTypes(mediaTypesPath, 'VideoEvents', project);
   const audioEvents = extractEventsFromTypes(mediaTypesPath, 'AudioEvents', project);
-  const customEventNames = new Set([
-    ...extractEventsFromTypes(mediaTypesPath, 'MediaStreamTypeEvents', project),
-    ...extractEventsFromTypes(mediaTypesPath, 'MediaLiveEvents', project),
-  ]);
   const mediaHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-media-adapter/html-media-adapter.ts');
   const videoHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-video-adapter/html-video-adapter.ts');
   const audioHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-audio-adapter/html-audio-adapter.ts');
@@ -179,10 +214,16 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
 
     Object.assign(propertyDefinitions, host.properties);
 
+    for (const name of Object.keys(propertyDefinitions)) {
+      if (!appliesToMediaType(name, source.mediaType)) delete propertyDefinitions[name];
+    }
+
     const standardAttributes: string[] = [];
     const customAttributes: Record<string, HostPropertyDef> = {};
 
     for (const { property, attribute } of staticProperties) {
+      if (!appliesToMediaType(property, source.mediaType)) continue;
+
       const definition = publicProperties[property];
 
       if (source.targetTag === 'iframe') {
@@ -197,7 +238,9 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
     const files = [...new Set(host.files)];
     const fires = collectFires(files, project);
     const dispatched = collectDispatchedEvents(files, project);
-    const contractEvents = source.mediaType === 'video' ? videoEvents : audioEvents;
+    const contractEvents = (source.mediaType === 'video' ? videoEvents : audioEvents).filter((name) =>
+      STANDARD_MEDIA_EVENTS.has(name)
+    );
     const contractSet = new Set(contractEvents);
     const customNames = new Set(fires.keys());
 
@@ -212,8 +255,7 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
       .map((name) => ({ name, ...(fires.get(name) ? { description: fires.get(name)! } : {}) }));
     const customSet = new Set(customEvents.map((event) => event.name));
     const standardEvents = contractEvents.filter(
-      (name) =>
-        !customSet.has(name) && !customEventNames.has(name) && (source.targetTag !== 'iframe' || dispatched.has(name))
+      (name) => !customSet.has(name) && (source.targetTag !== 'iframe' || dispatched.has(name))
     );
     const baseMethodNames =
       source.targetTag === 'video' ? videoMethods : source.targetTag === 'audio' ? audioMethods : [];
@@ -222,7 +264,10 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
       extractPublicMethodNames(source.hostFilePath, source.hostClassName, project)
     );
     const nativeProperties = Object.entries(baseSurface)
-      .filter(([name, definition]) => definition.overridesNative && !(name in host.properties))
+      .filter(
+        ([name, definition]) =>
+          definition.overridesNative && !(name in host.properties) && appliesToMediaType(name, source.mediaType)
+      )
       .map(([name]) => name)
       .sort();
     const react = extractReactReference(monorepoRoot, source, project, publicProperties);
@@ -1131,6 +1176,8 @@ function extractReactReference(
     const defaults = objectEntries(resolved.object, resolved.file, project, new Set());
 
     for (const name of [...objectNames(resolved.object, resolved.file, project, new Set())].sort()) {
+      if (!appliesToMediaType(name, source.mediaType)) continue;
+
       const definition = propertyDefinitions[name];
       const property: HostPropertyDef = definition
         ? { ...definition, readonly: false }
@@ -1295,6 +1342,10 @@ function syntheticKeyword(
   source: { start: number; end: number }
 ): TSType {
   return { type, start: source.start, end: source.end };
+}
+
+function appliesToMediaType(member: string, mediaType: 'video' | 'audio'): boolean {
+  return mediaType === 'video' || !VIDEO_ONLY_MEMBERS.has(member);
 }
 
 function mergeNames(first: readonly string[], second: readonly string[]): string[] {

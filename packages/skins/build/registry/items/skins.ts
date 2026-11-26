@@ -173,7 +173,7 @@ function skinDocs(
     return `Installs editable ${meta.title} source under \`${registryPaths.install}/${directory}\` together with the shared theme stylesheet. Requires \`${packageRequirements.html}\`; import the matching Player and media registrations before using the installed light-DOM template.`;
   }
 
-  return `Requires \`${packageRequirements.react}\`, which is installed with this item. The native media element below handles browser-supported sources; [install a playback adapter](${registryDocsUrl(target, 'concepts/media-sources')}) for HLS, DASH, embeds, or another engine.
+  return `Requires \`${packageRequirements.react}\`, which is installed with this item. The native media element below handles browser-supported sources; [install a playback adapter](${registryDocsUrl(target, 'reference/components/media')}) for HLS, DASH, embeds, or another engine.
 
 \`\`\`tsx
 import { ${media}, ${player} } from '@videojs/react/${preset}';

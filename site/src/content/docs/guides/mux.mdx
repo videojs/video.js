@@ -1,0 +1,264 @@
+---
+title: Play Mux videos
+description: Play Mux-hosted video from a playback ID, with playback options, signed playback, DRM, and a custom domain
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+Give a Mux media component your playback ID, and it plays the stream with the asset's poster and timeline thumbnails.
+
+## Installation
+
+<FrameworkCase frameworks={["react"]}>
+```bash
+pnpm add @videojs/react @videojs/mux-video
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```bash
+pnpm add @videojs/html @videojs/mux-video
+```
+</FrameworkCase>
+
+## Play a playback ID
+
+<FrameworkCase frameworks={["react"]}>
+Put <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink> inside a player and set `source.playbackId`:
+
+```tsx
+'use client';
+
+import '@videojs/react/video/skin.css';
+import { VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { MuxVideo } from '@videojs/react/media/mux-video';
+
+export function MyPlayer() {
+  return (
+    <VideoPlayer>
+      <VideoSkin style={{ aspectRatio: '16 / 9' }}>
+        <MuxVideo
+          source={{ playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM' }}
+          playsInline
+          crossOrigin="anonymous"
+        />
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Put <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> inside a player and point `src` at the playback ID's stream URL:
+
+```html
+<video-player>
+  <video-skin style="aspect-ratio: 16 / 9">
+    <mux-video
+      src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"
+      playsinline
+      crossorigin="anonymous"
+    ></mux-video>
+  </video-skin>
+</video-player>
+
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/video/skin';
+  import '@videojs/html/media/mux-video';
+</script>
+```
+</FrameworkCase>
+
+Keep `crossorigin="anonymous"` (`crossOrigin` in React): the timeline thumbnails don't load without it.
+
+For an audio-only asset, install `@videojs/mux-audio` and use <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> with the audio player. It takes the same `source`.
+
+## Set playback options
+
+Pass [Mux's playback modifiers](https://www.mux.com/docs/api-reference/stream/streaming/get-hls-manifest) on `source.playback`, in camelCase:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{ playbackId, playback: { maxResolution: '720p' } }}
+  playsInline
+  crossOrigin="anonymous"
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Write them into `src` as Mux's own query params:
+
+```html
+<mux-video
+  src="https://stream.mux.com/PLAYBACK_ID.m3u8?max_resolution=720p"
+  playsinline
+  crossorigin="anonymous"
+></mux-video>
+```
+</FrameworkCase>
+
+On a signed asset, sign the modifiers into the playback token instead. Mux ignores them next to a token.
+
+## Play signed assets
+
+For a playback ID with a [signed playback policy](https://www.mux.com/docs/guides/secure-video-playback), sign one token per audience on your server and pass each on its own field:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{
+    playbackId,
+    playback: { token: playbackToken }, // aud: 'v'
+    poster: { token: posterToken }, // aud: 't'
+    storyboard: { token: storyboardToken }, // aud: 's'
+  }}
+  playsInline
+  crossOrigin="anonymous"
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('mux-video')!;
+
+video.source = {
+  playbackId,
+  playback: { token: playbackToken }, // aud: 'v'
+  poster: { token: posterToken }, // aud: 't'
+  storyboard: { token: storyboardToken }, // aud: 's'
+};
+```
+
+To sign the stream from markup alone, put the playback token in `src`. The player then plays without a poster or thumbnails:
+
+```html
+<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8?token=PLAYBACK_TOKEN" playsinline crossorigin="anonymous"></mux-video>
+```
+</FrameworkCase>
+
+A token replaces the other params on its URL, so sign image modifiers such as the poster time into the image tokens too. Skip the poster or storyboard token if you don't need that image.
+
+## Choose the poster frame
+
+Pass [Mux's thumbnail modifiers](https://www.mux.com/docs/guides/get-images-from-a-video) on `source.poster`:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{ playbackId, poster: { time: 12 } }}
+  playsInline
+  crossOrigin="anonymous"
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Set `poster-time`:
+
+```html
+<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" poster-time="12" playsinline crossorigin="anonymous"></mux-video>
+```
+</FrameworkCase>
+
+On a signed asset, sign the time into the poster token instead; the component ignores these modifiers next to a token. To show your own image, see <DocsLink slug="guides/poster">Poster</DocsLink>.
+
+## Play DRM-protected assets
+
+For a playback ID with a [DRM playback policy](https://www.mux.com/docs/guides/protect-videos-with-drm), add the DRM license token on `source.drm.token`, next to the playback token:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{
+    playbackId,
+    playback: { token: playbackToken }, // aud: 'v'
+    drm: { token: drmToken }, // aud: 'd'
+  }}
+  playsInline
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+video.source = {
+  playbackId,
+  playback: { token: playbackToken }, // aud: 'v'
+  drm: { token: drmToken }, // aud: 'd'
+};
+```
+</FrameworkCase>
+
+For browser support and licensing from your own servers, see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>.
+
+## Use a custom domain
+
+If you [stream from your own domain](https://www.mux.com/docs/guides/use-a-custom-domain-for-streaming), name it on `source.customDomain`:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo source={{ playbackId, customDomain: 'media.example.com' }} playsInline crossOrigin="anonymous" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Point `src` at the stream on your domain:
+
+```html
+<mux-video src="https://stream.media.example.com/PLAYBACK_ID.m3u8" playsinline crossorigin="anonymous"></mux-video>
+```
+</FrameworkCase>
+
+## Play live streams
+
+A live stream's playback ID plays the same way. Two Mux settings decide the playback engine:
+
+- **Low-latency live streams** play at low latency on hls.js only.
+- **Live streams without reconnect slates** play on hls.js only. To keep SPF, set `reconnect_window` above 0 and, for standard latency, `use_slate_for_standard_latency` to `true`. See [Handle live stream disconnects](https://www.mux.com/docs/guides/handle-live-stream-disconnects).
+
+For the live player and its controls, see <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
+
+## Choose a playback engine
+
+Mux media components play through SPF, Video.js's own engine, or through hls.js. You choose by import path:
+
+| Import | Engine |
+|---|---|
+| `.../media/mux-video/spf` | SPF |
+| `.../media/mux-video` | hls.js today, SPF in an upcoming release |
+| `.../media/mux-video/hls-js` | hls.js |
+
+SPF is about a quarter of hls.js's size. Use hls.js if any of these applies:
+
+| If you… | Because on SPF… |
+|---|---|
+| Stream low-latency live | Low-latency streams play at standard latency. |
+| Stream live without reconnect slates | Playback stops where the broadcaster reconnected, in the stream and its recording. |
+| Track errors in Mux Data | Mux Data sees views, startup time, and rebuffering, but not playback errors, quality switches, or download speed. |
+| Support iPhones before iOS 17.1 | The stream doesn't play. |
+
+For what each engine supports beyond Mux, see <DocsLink slug="guides/hls">Play HLS streams</DocsLink>.
+
+## Monitor playback with Mux Data
+
+See <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>.
+
+## Troubleshooting
+
+### A signed asset has no poster or thumbnails
+
+The image needs its own token. Check that `source.poster.token` was signed with `aud: 't'` and `source.storyboard.token` with `aud: 's'`.
+
+### A DRM asset doesn't play
+
+Check that `source.drm.token` was signed with `aud: 'd'`, and that `source.playback.token` is set too.
+
+### Thumbnails don't appear on hover
+
+Set `crossorigin="anonymous"` (`crossOrigin` in React) on the media component. Live streams have no thumbnails.

@@ -169,7 +169,7 @@ Adapt the same restore-then-save pattern to the <DocsLink slug="reference/api/fe
 3. Call `selectVideoRendition` with the matching entry's id, or `'auto'` if no match exists. Every entry in `videoRenditionList` has an id; use it directly.
 4. Do not save until restoration finishes; otherwise the source's default selection overwrites the saved choice. After that, save each change the user makes.
 
-To remember a data-saving limit while preserving automatic switching, persist `maxAutoResolution` and pass it on the next source. It needs the hls.js engine; native HLS playback ignores it. See <DocsLink slug="guides/media-sources" anchor="options-videojs-normalizes">Options Video.js normalizes</DocsLink>.
+To remember a data-saving limit while preserving automatic switching, persist `maxAutoResolution` and pass it on the next source. It needs the hls.js engine; native HLS playback ignores it. See the `source` row of the <DocsLink slug="reference/components/hlsjs-video" anchor="api-reference">HlsJsVideo reference</DocsLink>.
 
 ### Persist to your backend
 
