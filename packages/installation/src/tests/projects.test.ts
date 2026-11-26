@@ -170,9 +170,33 @@ describe('installationHtmlPlayerPageCode', () => {
 
 describe('installationStarterFiles', () => {
   it('lists the Vite starter files a replaced starter page leaves unused', () => {
-    expect(installationStarterFiles('html', 'vite')).toContain('src/main.ts');
-    expect(installationStarterFiles('react', 'vite')).toEqual(['src/App.css']);
+    const assets = ['src/assets/hero.png', 'src/assets/vite.svg', 'public/icons.svg'];
+
+    expect(installationStarterFiles('html', 'vite')).toEqual([
+      'src/main.ts',
+      'src/counter.ts',
+      'src/style.css',
+      'src/assets/typescript.svg',
+      ...assets,
+    ]);
+    expect(installationStarterFiles('react', 'vite')).toEqual(['src/App.css', 'src/assets/react.svg', ...assets]);
+    expect(installationStarterFiles('vue', 'vite')).toEqual([
+      'src/components/HelloWorld.vue',
+      'src/assets/vue.svg',
+      ...assets,
+    ]);
+    expect(installationStarterFiles('svelte', 'vite')).toEqual([
+      'src/lib/Counter.svelte',
+      'src/assets/svelte.svg',
+      ...assets,
+    ]);
     expect(installationStarterFiles('react', 'next')).toEqual([]);
+  });
+
+  it('keeps the favicon the starter index.html links to', () => {
+    for (const framework of ['html', 'react', 'vue', 'svelte'] as const) {
+      expect(installationStarterFiles(framework, 'vite')).not.toContain('public/favicon.svg');
+    }
   });
 });
 
