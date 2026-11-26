@@ -315,4 +315,26 @@ describe('getStreamInfoFromSrc', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith('https://example.com/live.m3u8', { signal: controller.signal });
   });
+  it('resolves variant playlist URI when baseUrl is relative', async () => {
+    const multivariant = '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1280000\nvariant.m3u8';
+    const media = '#EXTM3U\n#EXT-X-TARGETDURATION:10\n#EXTINF:10.0,\nseg1.ts\n#EXT-X-ENDLIST';
+
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('playlist.m3u8')) {
+        return new Response(multivariant, {
+          status: 200,
+          headers: { 'Content-Type': 'application/vnd.apple.mpegurl' },
+        });
+      }
+
+      return new Response(media, { status: 200, headers: { 'Content-Type': 'application/vnd.apple.mpegurl' } });
+    });
+
+    const info = await getStreamInfoFromSrc('/media/playlist.m3u8');
+
+    expect(info).toBeDefined();
+    expect(fetchSpy).toHaveBeenCalledWith(new URL('/media/variant.m3u8', document.baseURI).href, {});
+  });
 });
