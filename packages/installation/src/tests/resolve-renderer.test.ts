@@ -84,9 +84,10 @@ describe('resolveRendererCandidates', () => {
     ]);
   });
 
-  it('returns no candidates for Wistia, Dailymotion, SoundCloud, and Mixcloud, which have no renderer yet', () => {
+  it('returns no candidates for Wistia, Dailymotion, Vidyard, SoundCloud, and Mixcloud, which have no renderer yet', () => {
     expect(resolveRendererCandidates('https://fast.wistia.net/embed/iframe/e4a27b971d')).toEqual([]);
     expect(resolveRendererCandidates('https://dai.ly/x84sh87')).toEqual([]);
+    expect(resolveRendererCandidates('https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57')).toEqual([]);
     expect(resolveRendererCandidates('https://soundcloud.com/forss/flickermood')).toEqual([]);
     expect(resolveRendererCandidates('https://www.mixcloud.com/spartacus/lambiance/')).toEqual([]);
   });
