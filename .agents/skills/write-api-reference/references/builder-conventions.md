@@ -79,6 +79,7 @@ export const Value = ...;
 - **Data attribute descriptions**: From JSDoc comments on each property in the data-attrs export object
 - **Part descriptions**: From JSDoc on React component exports in their `.tsx` files
 - **Prop/state descriptions**: From JSDoc on interface properties in the core file
+- **Media element attributes**: Shared ones come from `CustomMediaElement`'s static properties. An attribute an element adds itself needs `@attr {type} name - Description` on a class in its own chain (registered class, media class, or element mixin), typically on `static get observedAttributes()`.
 
 ### Util JSDoc
 
