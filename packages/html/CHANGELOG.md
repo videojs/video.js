@@ -1,5 +1,69 @@
 # Changelog
 
+## [10.7.1](https://github.com/videojs/video.js/compare/@videojs/html@10.7.0...@videojs/html@10.7.1) (2026-11-27)
+
+
+### Miscellaneous Chores
+
+* **@videojs/html:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.7.1
+    * @videojs/element bumped to 10.7.1
+    * @videojs/media bumped to 10.7.1
+    * @videojs/native-hls-video bumped to 10.7.1
+    * @videojs/spf bumped to 10.7.1
+    * @videojs/store bumped to 10.7.1
+    * @videojs/utils bumped to 10.7.1
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.7.1
+    * @videojs/dailymotion-video bumped to 10.7.1
+    * @videojs/dash-video bumped to 10.7.1
+    * @videojs/google-analytics bumped to 10.7.1
+    * @videojs/google-cast bumped to 10.7.1
+    * @videojs/hlsjs-video bumped to 10.7.1
+    * @videojs/hyperframes-video bumped to 10.7.1
+    * @videojs/icons bumped to 10.7.1
+    * @videojs/mixcloud-audio bumped to 10.7.1
+    * @videojs/mux-audio bumped to 10.7.1
+    * @videojs/mux-data bumped to 10.7.1
+    * @videojs/mux-video bumped to 10.7.1
+    * @videojs/playerjs-video bumped to 10.7.1
+    * @videojs/shaka-video bumped to 10.7.1
+    * @videojs/skins bumped to 10.7.1
+    * @videojs/soundcloud-audio bumped to 10.7.1
+    * @videojs/spotify-audio bumped to 10.7.1
+    * @videojs/tiktok-video bumped to 10.7.1
+    * @videojs/twitch-video bumped to 10.7.1
+    * @videojs/vimeo-video bumped to 10.7.1
+    * @videojs/wistia-video bumped to 10.7.1
+    * @videojs/youtube-video bumped to 10.7.1
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.7.1
+    * @videojs/dailymotion-video bumped to 10.7.1
+    * @videojs/dash-video bumped to 10.7.1
+    * @videojs/google-analytics bumped to 10.7.1
+    * @videojs/google-cast bumped to 10.7.1
+    * @videojs/hlsjs-video bumped to 10.7.1
+    * @videojs/hyperframes-video bumped to 10.7.1
+    * @videojs/mixcloud-audio bumped to 10.7.1
+    * @videojs/mux-audio bumped to 10.7.1
+    * @videojs/mux-data bumped to 10.7.1
+    * @videojs/mux-video bumped to 10.7.1
+    * @videojs/playerjs-video bumped to 10.7.1
+    * @videojs/shaka-video bumped to 10.7.1
+    * @videojs/soundcloud-audio bumped to 10.7.1
+    * @videojs/spotify-audio bumped to 10.7.1
+    * @videojs/tiktok-video bumped to 10.7.1
+    * @videojs/twitch-video bumped to 10.7.1
+    * @videojs/vimeo-video bumped to 10.7.1
+    * @videojs/wistia-video bumped to 10.7.1
+    * @videojs/youtube-video bumped to 10.7.1
+
 ## [10.7.0](https://github.com/videojs/video.js/compare/@videojs/html@10.6.0...@videojs/html@10.7.0) (2026-11-24)
 
 

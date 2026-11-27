@@ -1,6 +1,6 @@
 {
   "name": "@videojs/hyperframes-video",
-  "version": "10.7.0",
+  "version": "10.7.1",
   "description": "HyperFrames composition playback adapter for Video.js",
   "keywords": [
     "composition",

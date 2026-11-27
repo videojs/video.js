@@ -1,6 +1,6 @@
 {
   "name": "@videojs/hlsjs-video",
-  "version": "10.7.0",
+  "version": "10.7.1",
   "description": "hls.js playback adapter for Video.js",
   "keywords": [
     "hls",

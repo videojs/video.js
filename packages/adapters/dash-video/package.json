@@ -1,6 +1,6 @@
 {
   "name": "@videojs/dash-video",
-  "version": "10.7.0",
+  "version": "10.7.1",
   "description": "dash.js playback adapter for Video.js",
   "keywords": [
     "dash",

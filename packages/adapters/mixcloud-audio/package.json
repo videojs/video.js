@@ -1,6 +1,6 @@
 {
   "name": "@videojs/mixcloud-audio",
-  "version": "10.7.0",
+  "version": "10.7.1",
   "description": "Mixcloud Widget playback adapter for Video.js",
   "keywords": [
     "audio",

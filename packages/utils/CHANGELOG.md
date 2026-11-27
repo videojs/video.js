@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.7.1](https://github.com/videojs/video.js/compare/@videojs/utils@10.7.0...@videojs/utils@10.7.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* prevent hidden controls from receiving the revealing tap ([#9792](https://github.com/videojs/video.js/issues/9792)) ([c41f3e5](https://github.com/videojs/video.js/commit/c41f3e58ec1110ccb9405cc3de90ea259083210f))
+
 ## [10.7.0](https://github.com/videojs/video.js/compare/@videojs/utils@10.6.0...@videojs/utils@10.7.0) (2026-11-24)
 
 

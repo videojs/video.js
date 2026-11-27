@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.7.1](https://github.com/videojs/video.js/compare/@videojs/skins@10.7.0...@videojs/skins@10.7.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* **skin:** stretch iframe embeds in registry skins ([#9858](https://github.com/videojs/video.js/issues/9858)) ([fe661fd](https://github.com/videojs/video.js/commit/fe661fd6a59019763524015834c40ea335b329d3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.7.1
+    * @videojs/element bumped to 10.7.1
+    * @videojs/icons bumped to 10.7.1
+    * @videojs/installation bumped to 10.7.1
+    * @videojs/utils bumped to 10.7.1
+
 ## [10.7.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.6.0...@videojs/skins@10.7.0) (2026-11-24)
 
 
