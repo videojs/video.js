@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.7.1](https://github.com/videojs/video.js/compare/@videojs/store@10.7.0...@videojs/store@10.7.1) (2026-11-27)
+
+
+### Miscellaneous Chores
+
+* **@videojs/store:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.7.1
+  * devDependencies
+    * @videojs/element bumped to 10.7.1
+  * peerDependencies
+    * @videojs/element bumped to 10.7.1
+
 ## [10.7.0](https://github.com/videojs/video.js/compare/@videojs/store@10.6.0...@videojs/store@10.7.0) (2026-11-24)
 
 
