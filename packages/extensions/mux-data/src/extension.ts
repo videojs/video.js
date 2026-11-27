@@ -284,7 +284,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
    * with the source, it belongs to the incoming video, so it rides the `videochange` instead of relabelling the
    * outgoing view.
    */
-  get metadata() {
+  get metadata(): MuxDataOptions['data'] | undefined {
     return this.#metadata;
   }
 
