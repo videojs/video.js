@@ -8,6 +8,7 @@ import {
   type PlayerTarget,
   volumeFeature,
 } from '@videojs/core/dom';
+import type { Media } from '@videojs/media';
 import { defineSlice } from '@videojs/store';
 import { Activity, Component, type ErrorInfo, type ReactNode, StrictMode, useState } from 'react';
 import { renderToString } from 'react-dom/server';
@@ -16,6 +17,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { I18nProvider, useLocale } from '../../i18n';
 import { Container } from '../../index';
 import { Video } from '../../media/video';
+import { useMediaInstance } from '../../utils/use-media-instance';
 import { usePlayerExtension } from '../../utils/use-player-extension';
 import { useContainer, usePlayerContext } from '../context';
 import { createPlayer } from '../create-player';
@@ -188,6 +190,20 @@ describe('createPlayer', () => {
         }
       }
 
+      /** An element-less playback adapter, like a Mux adapter detached from its `<video>`. */
+      class MediaAdapter extends EventTarget {
+        static instances: MediaAdapter[] = [];
+
+        destroy = vi.fn();
+
+        constructor() {
+          super();
+          MediaAdapter.instances.push(this);
+        }
+      }
+
+      const MediaAdapterClass = MediaAdapter as unknown as new () => Media & MediaAdapter;
+
       function Muted() {
         usePlayerExtension(MutedExtension);
         return null;
@@ -198,9 +214,15 @@ describe('createPlayer', () => {
         return null;
       }
 
+      function Adapter() {
+        useMediaInstance(MediaAdapterClass);
+        return null;
+      }
+
       afterEach(() => {
         MutedExtension.instances.length = 0;
         ObserverExtension.instances.length = 0;
+        MediaAdapter.instances.length = 0;
       });
 
       it('attaches extensions to a plain video and routes store reads through their overrides', () => {
@@ -351,6 +373,153 @@ describe('createPlayer', () => {
         unmount();
 
         expect(extension!.detach).toHaveBeenCalledTimes(1);
+      });
+
+      it('attaches a remounted extension only to the incoming adapter', () => {
+        vi.useFakeTimers();
+
+        const { Player } = createPlayer({ features: [volumeFeature] });
+
+        function App({ version }: { version: number }) {
+          return (
+            <Player>
+              <Adapter key={version} />
+              <Observer key={version} />
+            </Player>
+          );
+        }
+
+        const { rerender } = render(<App version={1} />);
+        const [firstObserver] = ObserverExtension.instances;
+
+        rerender(<App version={2} />);
+        act(() => vi.runAllTimers());
+
+        const [, secondObserver] = ObserverExtension.instances;
+        const [firstMedia, secondMedia] = MediaAdapter.instances;
+
+        // The outgoing extension stays attached to the media it knew until it is released.
+        expect(firstObserver!.attach).toHaveBeenCalledTimes(1);
+        expect(firstObserver!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: firstMedia }));
+        expect(firstObserver!.detach).toHaveBeenCalledTimes(1);
+
+        // The remounted extension never attaches to the outgoing, element-less adapter (#9812).
+        expect(secondObserver!.attach).toHaveBeenCalledTimes(1);
+        expect(secondObserver!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: secondMedia }));
+
+        vi.useRealTimers();
+      });
+
+      it('attaches a remounted extension only to the incoming video element', () => {
+        const { Player } = createPlayer({ features: [volumeFeature] });
+
+        function App({ version }: { version: number }) {
+          return (
+            <Player>
+              <Video key={version} />
+              <Observer key={version} />
+            </Player>
+          );
+        }
+
+        const { container, rerender } = render(<App version={1} />);
+
+        rerender(<App version={2} />);
+
+        const video = container.querySelector('video')!;
+        const [, secondObserver] = ObserverExtension.instances;
+
+        expect(secondObserver!.attach).toHaveBeenCalledTimes(1);
+        expect(secondObserver!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+      });
+
+      it('keeps an extension attached to the same media through StrictMode remounting', () => {
+        const { Player } = createPlayer({ features: [volumeFeature] });
+
+        const { container } = render(
+          <StrictMode>
+            <Player>
+              <Video />
+              <Observer />
+            </Player>
+          </StrictMode>
+        );
+
+        const video = container.querySelector('video')!;
+        const [extension] = ObserverExtension.instances;
+
+        expect(extension!.attach.mock.calls.length).toBeGreaterThan(0);
+
+        for (const [target] of extension!.attach.mock.calls) {
+          expect(target.media).toBe(video);
+        }
+      });
+
+      it('attaches the extension recreated by an Activity reveal to the shown media', () => {
+        vi.useFakeTimers();
+
+        const { Player } = createPlayer({ features: [volumeFeature] });
+
+        function App({ mode }: { mode: 'visible' | 'hidden' }) {
+          return (
+            <Activity mode={mode}>
+              <Player>
+                <Video />
+                <Observer />
+              </Player>
+            </Activity>
+          );
+        }
+
+        const { container, rerender } = render(<App mode="visible" />);
+        const [firstExtension] = ObserverExtension.instances;
+
+        expect(firstExtension!.attach).toHaveBeenCalledTimes(1);
+
+        rerender(<App mode="hidden" />);
+        act(() => vi.runAllTimers());
+
+        expect(firstExtension!.detach).toHaveBeenCalled();
+
+        rerender(<App mode="visible" />);
+
+        const video = container.querySelector('video')!;
+        const [, secondExtension] = ObserverExtension.instances;
+
+        expect(secondExtension!.attach).toHaveBeenCalledTimes(1);
+        expect(secondExtension!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+
+        vi.useRealTimers();
+      });
+
+      it('keeps an extension attached when the media ref changes identity', () => {
+        const { Player } = createPlayer({ features: [volumeFeature] });
+        let forceRender!: () => void;
+
+        function App() {
+          const [, setTick] = useState(0);
+
+          forceRender = () => setTick((tick) => tick + 1);
+
+          return (
+            <Player>
+              <Video ref={() => {}} />
+              <Observer />
+            </Player>
+          );
+        }
+
+        render(<App />);
+
+        const [extension] = ObserverExtension.instances;
+
+        expect(extension!.attach).toHaveBeenCalledTimes(1);
+
+        act(() => forceRender());
+        act(() => forceRender());
+
+        expect(extension!.attach).toHaveBeenCalledTimes(1);
+        expect(extension!.detach).not.toHaveBeenCalled();
       });
     });
 

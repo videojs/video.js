@@ -121,7 +121,21 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     const reattach = useRef<(() => void) | null>(null);
     // Created with the player, so its creation time is the player's init time.
     const [extensions] = useState(() => new PlayerExtensionCoordinator(() => reattach.current?.()));
-    const registerExtension = useCallback((extension: PlayerExtension) => extensions.register(extension), [extensions]);
+    // Bumped by every registration so the attach effect below re-runs for it.
+    const [extensionRevision, setExtensionRevision] = useState(0);
+
+    // Registration never attaches on its own: a media remounting in this same commit hands a new media over while
+    // the coordinator still targets the media being replaced, so an extension only attaches to the media that is
+    // current once the commit settles (#9812). The attach effect below does that for every registration.
+    const registerExtension = useCallback(
+      (extension: PlayerExtension) => {
+        const release = extensions.register(extension, { attach: false });
+
+        setExtensionRevision((revision) => revision + 1);
+        return release;
+      },
+      [extensions]
+    );
 
     // Sync committed configuration props to the existing store.
     useLayoutEffect(() => {
@@ -149,6 +163,14 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
 
       return () => extensions.detach();
     }, [media, extensions]);
+
+    // Attach the extensions registered since the last run, to the media that is current once this commit settled. A
+    // same-media attach only picks up extensions that were not attached yet, so re-running never restarts a session.
+    useEffect(() => {
+      if (!media) return;
+
+      extensions.attach({ media, container });
+    }, [media, container, extensions, extensionRevision]);
 
     useEffect(() => {
       if (!media) return;

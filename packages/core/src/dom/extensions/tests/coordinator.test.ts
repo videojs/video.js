@@ -63,6 +63,58 @@ describe('PlayerExtensionCoordinator', () => {
     expect(extension.attach).toHaveBeenCalledWith(target);
   });
 
+  it('does not attach a registration deferred to its caller', () => {
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+    const extension = new TrackingExtension();
+
+    coordinator.attach(createTarget());
+
+    const release = coordinator.register(extension, { attach: false });
+
+    expect(extension.connect).toHaveBeenCalledTimes(1);
+    expect(extension.attach).not.toHaveBeenCalled();
+
+    // Released without ever attaching: disconnects, never detaches.
+    release();
+
+    expect(extension.attach).not.toHaveBeenCalled();
+    expect(extension.detach).not.toHaveBeenCalled();
+    expect(extension.disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('attaches a deferred registration on the next attach of the same media', () => {
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+    const { media } = createTarget();
+    const extension = new TrackingExtension();
+
+    coordinator.attach({ media, container: null });
+    coordinator.register(extension, { attach: false });
+
+    // The caller attaches once the media it resolved settles; the media is unchanged, so only the extensions
+    // that were never attached are attached.
+    coordinator.attach({ media, container: null });
+
+    expect(extension.attach).toHaveBeenCalledTimes(1);
+    expect(extension.attach).toHaveBeenCalledWith({ media, container: null });
+  });
+
+  it('attaches a deferred registration together with the rest when a new target arrives', () => {
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+    const extension = new TrackingExtension();
+
+    coordinator.attach(createTarget());
+    coordinator.register(extension, { attach: false });
+
+    const target = createTarget();
+
+    coordinator.detach();
+    coordinator.attach(target);
+
+    expect(extension.attach).toHaveBeenCalledTimes(1);
+    expect(extension.attach).toHaveBeenCalledWith(target);
+    expect(extension.detach).not.toHaveBeenCalled();
+  });
+
   it('connects extensions to the player on register, before they attach', () => {
     const coordinator = new PlayerExtensionCoordinator(() => {});
     const extension = new TrackingExtension();
