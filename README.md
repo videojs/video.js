@@ -9,6 +9,8 @@ Modern, modular, and composable media player framework for Web and React.
 
 Video.js v10 is stable. Build with it and share your feedback 🙏.
 
+Looking for Video.js 8? It now lives in [videojs/videojs-v8](https://github.com/videojs/videojs-v8). Please open v8 issues and pull requests there.
+
 - Read our [design documents][rfcs].
 - Read the [v10 discussion topic][v10-discussion].
 - Watch [Heff's recent presentation][heff-presentation].
