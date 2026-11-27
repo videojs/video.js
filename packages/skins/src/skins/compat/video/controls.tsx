@@ -1,6 +1,7 @@
 import * as $ from '@videojs/core/vjsc';
 
 import controlsStyles from '../shared/controls.styles';
+import { PlaybackRateMenu } from '../shared/playback-rate-menu';
 import { SeekButton } from '../shared/seek-button';
 import { SettingsMenu } from '../shared/settings-menu';
 import type { ThumbnailSlot } from '../shared/time-slider';
@@ -11,7 +12,7 @@ export function VideoControls({ renderThumbnail }: ThumbnailSlot = {}) {
     <$.Controls.Root>
       <VideoControlsContent
         center
-        menu={<SettingsMenu />}
+        menu={<SettingsMenu rate={<PlaybackRateMenu />} />}
         renderThumbnail={renderThumbnail}
         seekBackward={
           <SeekButton
