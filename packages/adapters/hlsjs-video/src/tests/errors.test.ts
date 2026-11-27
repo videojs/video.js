@@ -234,7 +234,28 @@ describe('HlsJsErrorsMixin', () => {
     expect(host.error).toBeNull();
   });
 
-  it('preserves the original hls.js error as the message source', () => {
+  it('gives a standard code its canonical message and keeps the hls.js one on data', () => {
+    const { engine, host } = setup();
+
+    const handler = vi.fn();
+
+    host.addEventListener('error', handler);
+
+    (engine as any).emit(Hls.Events.ERROR, {
+      type: Hls.ErrorTypes.NETWORK_ERROR,
+      details: Hls.ErrorDetails.FRAG_LOAD_TIMEOUT,
+      fatal: true,
+      error: new Error('Timeout after 10000ms'),
+    });
+
+    const event = handler.mock.calls[0]![0] as ErrorEvent;
+
+    expect(event.error.message).toBe(MediaError.defaultMessages[MediaError.MEDIA_ERR_NETWORK]);
+    expect(event.message).toBe(event.error.message);
+    expect(event.error.data.error.message).toBe('Timeout after 10000ms');
+  });
+
+  it('keeps the hls.js message for a custom code', () => {
     const { engine, host } = setup();
 
     const handler = vi.fn();
