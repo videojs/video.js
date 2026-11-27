@@ -9,6 +9,18 @@ function overridesMedia(extension: PlayerExtension | undefined): boolean {
   return !!extension && 'mediaOverride' in extension;
 }
 
+/** Options for {@link PlayerExtensionCoordinator.register}. */
+export interface RegisterExtensionOptions {
+  /**
+   * Attach the extension to the current target right away. Pass `false` when the caller resolves the media itself and
+   * attaches once it settles: a React remount hands a new media over in the same commit the extension registers in,
+   * while the target still points at the media being replaced, so attaching now would hand the extension that media.
+   *
+   * @default true
+   */
+  attach?: boolean;
+}
+
 /**
  * Holds one extension per class for a player and keeps them attached to the player's current media.
  *
@@ -23,6 +35,8 @@ export class PlayerExtensionCoordinator {
   readonly #extensions = new Map<PlayerExtensionConstructor, PlayerExtension>();
   // One facade per media, so `store.target.media` stays the same object across store re-attaches.
   readonly #facades = new WeakMap<Media, Media>();
+  // The extensions attached to the current target: a registration deferred by its caller is not in it yet.
+  readonly #attached = new Set<PlayerExtension>();
   readonly #player: ExtensionPlayer = { initTime: Date.now() };
   readonly #onChange: () => void;
   #target: PlayerTarget | null = null;
@@ -41,10 +55,11 @@ export class PlayerExtensionCoordinator {
   }
 
   /**
-   * Register `extension`, replacing any earlier instance of the same class: connect it to the player and attach it to
-   * the current target. Returns a release callback that only removes this exact instance.
+   * Register `extension`, replacing any earlier instance of the same class: connect it to the player and, unless
+   * {@link RegisterExtensionOptions.attach} is `false`, attach it to the current target. Returns a release callback that
+   * only removes this exact instance.
    */
-  register(extension: PlayerExtension): () => void {
+  register(extension: PlayerExtension, { attach = true }: RegisterExtensionOptions = {}): () => void {
     const Extension = extension.constructor as PlayerExtensionConstructor;
     const previous = this.#extensions.get(Extension);
 
@@ -54,7 +69,7 @@ export class PlayerExtensionCoordinator {
       this.#extensions.set(Extension, extension);
       extension.connect?.(this.#player);
 
-      if (this.#target) extension.attach?.(this.#target);
+      if (attach && this.#target) this.#attachToTarget(extension, this.#target);
 
       if (overridesMedia(previous) || overridesMedia(extension)) this.#onChange();
     }
@@ -64,11 +79,17 @@ export class PlayerExtensionCoordinator {
 
   /**
    * Attach every extension to `target`. Extensions follow the media: a target with the same media is recorded without
-   * re-attaching them, so a container change never restarts an extension's session.
+   * re-attaching the extensions already on it, so a container change never restarts an extension's session, and one
+   * registered since the last attach only now attaches.
    */
   attach(target: PlayerTarget): void {
     if (this.#target?.media === target.media) {
       this.#target = target;
+
+      for (const extension of this.#extensions.values()) {
+        if (!this.#attached.has(extension)) this.#attachToTarget(extension, target);
+      }
+
       return;
     }
 
@@ -76,17 +97,18 @@ export class PlayerExtensionCoordinator {
     this.#target = target;
 
     for (const extension of this.#extensions.values()) {
-      extension.attach?.(target);
+      this.#attachToTarget(extension, target);
     }
   }
 
   detach(): void {
     if (!this.#target) return;
 
-    for (const extension of this.#extensions.values()) {
+    for (const extension of this.#attached) {
       extension.detach?.();
     }
 
+    this.#attached.clear();
     this.#target = null;
   }
 
@@ -139,8 +161,14 @@ export class PlayerExtensionCoordinator {
 
   /** Undo `register` for an extension that is no longer registered: detach it from the media, then disconnect it. */
   #leave(extension: PlayerExtension): void {
-    if (this.#target) extension.detach?.();
+    if (this.#attached.delete(extension)) extension.detach?.();
 
     extension.disconnect?.();
+  }
+
+  /** Attach `extension` to `target` and record it as attached. */
+  #attachToTarget(extension: PlayerExtension, target: PlayerTarget): void {
+    extension.attach?.(target);
+    this.#attached.add(extension);
   }
 }
