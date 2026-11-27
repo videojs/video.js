@@ -57,12 +57,14 @@ export function getShowingSubtitlesTrackFromMedia(mediaElement: HTMLMediaElement
 
 /**
  * Remove every SPF-owned `<track>` child from `mediaElement` (those tagged with `data-src-track` by
- * `addSubtitlesTracksToMedia`). `<track>` elements the host page added directly are left in place.
+ * `addSubtitlesTracksToMedia`). Each slot is disabled before removal so Chrome does not keep painting its cues.
+ * `<track>` elements the host page added directly are left in place.
  */
 export function removeAllSubtitlesTracksFromMedia(mediaElement: HTMLMediaElement): void {
   const elements = mediaElement.querySelectorAll<HTMLTrackElement>(SPF_TRACK_SELECTOR);
 
   for (const el of elements) {
+    el.track.mode = 'disabled';
     el.remove();
   }
 }
