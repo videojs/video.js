@@ -28,16 +28,20 @@ export type Options = string extends keyof typeof Loaded ? Bundled.Options : Loa
  * reason.
  */
 function writeMuxEmbedDeclarations(outDir: string) {
-  const declarations = readFileSync('node_modules/mux-embed/dist/types/mux-embed.d.ts', 'utf8')
+  const muxEmbedDir = join(import.meta.dirname, 'node_modules/mux-embed');
+  const declarations = readFileSync(join(muxEmbedDir, 'dist/types/mux-embed.d.ts'), 'utf8')
     .replace(/^declare module 'mux-embed' \{\n([\s\S]*)\n\}\n?$/, '$1\n')
     .replace(/\n {2}global \{\n[\s\S]*?\n {2}\}\n/, '\n')
     .replace(/^ {2}(function|const) /gm, '  declare $1 ');
 
-  if (/declare module|^ {2}global /m.test(declarations)) {
+  // Every top-level declaration of a module `.d.ts` needs `declare` or `export` (TS1046), types excepted.
+  const undeclared = /^ {2}(?!type |interface |export |declare |\/\/|\/\*|[}\])>])\S/m;
+
+  if (/declare module|^ {2}global /m.test(declarations) || undeclared.test(declarations)) {
     throw new Error('Unexpected mux-embed declaration layout; update writeMuxEmbedDeclarations.');
   }
 
-  const license = readFileSync('node_modules/mux-embed/LICENSE', 'utf8')
+  const license = readFileSync(join(muxEmbedDir, 'LICENSE'), 'utf8')
     .trim()
     .split('\n')
     .map((line) => ` * ${line}`.trimEnd())

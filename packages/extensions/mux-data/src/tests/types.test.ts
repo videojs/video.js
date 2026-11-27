@@ -2,7 +2,7 @@
 /// <reference types="node" />
 
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -39,6 +39,10 @@ function typecheck(file: string, skipLibCheck: boolean) {
 }
 
 beforeAll(() => {
+  if (!existsSync(join(packageDir, 'dist/dev/index.d.ts'))) {
+    throw new Error('Missing dist: run `pnpm -F @videojs/mux-data build` first.');
+  }
+
   consumerDir = mkdtempSync(join(tmpdir(), 'mux-data-consumer-'));
   mkdirSync(join(consumerDir, 'node_modules/@videojs'), { recursive: true });
   symlinkSync(packageDir, join(consumerDir, 'node_modules/@videojs/mux-data'), 'junction');
