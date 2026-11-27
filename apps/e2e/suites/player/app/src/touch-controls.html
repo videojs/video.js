@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Touch controls</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      media-container {
+        position: relative;
+        display: block;
+      }
+      video {
+        display: block;
+        width: 100%;
+      }
+      media-controls-content {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
+      media-controls-content:not([data-visible]) {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #custom-control,
+      #plain-control,
+      shadow-control {
+        display: block;
+        padding: 16px 24px;
+        background: white;
+        color: black;
+      }
+      media-play-button {
+        padding: 24px 32px;
+        background: white;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <video-player>
+      <media-container class="media-skin">
+        <video muted playsinline loop></video>
+        <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+        <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
+        <media-controls>
+          <media-controls-content>
+            <media-play-button>Play / pause</media-play-button>
+            <div id="custom-control" data-interactive>Skip intro</div>
+            <div id="plain-control">Plain overlay</div>
+            <shadow-control id="shadow-control" role="button">Shadow</shadow-control>
+          </media-controls-content>
+        </media-controls>
+      </media-container>
+    </video-player>
+    <script type="module">
+      import '@videojs/html/video/player';
+      import '@videojs/html/ui/container';
+      import '@videojs/html/ui/gesture';
+      import '@videojs/html/ui/controls';
+      import '@videojs/html/ui/controls-content';
+      import '@videojs/html/ui/play-button';
+
+      class ShadowControl extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML = '<span>Shadow control</span>';
+        }
+      }
+      customElements.define('shadow-control', ShadowControl);
+
+      for (const id of ['custom-control', 'plain-control', 'shadow-control']) {
+        const el = document.getElementById(id);
+        el.dataset.clicks = '0';
+        el.addEventListener('click', () => {
+          el.dataset.clicks = String(Number(el.dataset.clicks) + 1);
+        });
+      }
+
+      document.querySelector('video').src = new URLSearchParams(location.search).get('src');
+    </script>
+  </body>
+</html>

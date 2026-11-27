@@ -44,7 +44,7 @@ export class GestureCoordinator {
   claimsTap(event: PointerEvent, action: string): boolean {
     if (isInteractionLocked(this.#target)) return true;
 
-    if (isInteractiveTarget(event)) return false;
+    if (isInteractiveTarget(event, this.#target)) return false;
 
     return this.#bindings.some(
       (b) => b.type === 'tap' && b.action === action && (!b.pointer || b.pointer === event.pointerType)
@@ -109,11 +109,14 @@ export class GestureCoordinator {
     const { signal } = this.#disconnect;
 
     let pointerDownTime = 0;
+    let claimedTouchTap = false;
 
     listen(
       this.#target,
       'pointerdown',
       (event) => {
+        claimedTouchTap = false;
+
         if (isInteractionLocked(this.#target)) {
           pointerDownTime = 0;
           return;
@@ -141,7 +144,7 @@ export class GestureCoordinator {
 
         if (Date.now() - pointerDownTime > TAP_THRESHOLD) return;
 
-        if (isInteractiveTarget(event)) return;
+        if (isInteractiveTarget(event, this.#target)) return;
 
         const pointerType = event.pointerType;
         const clientX = event.clientX;
@@ -152,11 +155,30 @@ export class GestureCoordinator {
           resolve: (type) => matchBindings(bindings, type, pointerType, clientX, target),
         };
 
+        claimedTouchTap =
+          pointerType === 'touch' &&
+          event.isPrimary &&
+          isMediaSurfaceTarget(event, this.#target) &&
+          matches.resolve('tap').length > 0;
+
         for (const recognizer of this.#recognizers) {
           recognizer.handleUp(matches, event);
         }
       },
       { signal }
+    );
+
+    // Cancelling pointerup does not prevent click. Cancel the touchend for a claimed tap so controls revealed by the
+    // gesture cannot also receive that touch's browser-generated click. Taps starting on controls remain native.
+    listen(
+      this.#target,
+      'touchend',
+      (event) => {
+        if (claimedTouchTap && event.touches.length === 0) event.preventDefault();
+
+        claimedTouchTap = false;
+      },
+      { signal, passive: false }
     );
   }
 
@@ -171,6 +193,23 @@ export class GestureCoordinator {
     this.#disconnect?.abort();
     this.#disconnect = null;
   }
+}
+
+/**
+ * Whether a touch fell through to the media or the bare container, the only targets a hidden control (which has
+ * `pointer-events: none`) can sit over. Anything else under the finger is visible UI that should keep its click.
+ */
+function isMediaSurfaceTarget(event: Event, boundary: HTMLElement): boolean {
+  const path = event.composedPath();
+  if (path[0] === boundary) return true;
+
+  for (const node of path) {
+    if (node === boundary) return false;
+
+    if (node instanceof HTMLMediaElement) return true;
+  }
+
+  return false;
 }
 
 const coordinators = new WeakMap<HTMLElement, GestureCoordinator>();

@@ -48,7 +48,21 @@ export function isEditableTarget(event: KeyboardEvent): boolean {
  *
  * @internal
  */
-export function isInteractiveTarget(event: Event): boolean {
+export function isInteractiveTarget(event: Event, boundary?: Element): boolean {
+  // Walk the composed path so a control's role on a shadow host is seen even when the event target is inside its
+  // shadow root, where `closest()` stops. The walk stops at `boundary` so ancestors of the player are not considered.
+  const path = event.composedPath();
+
+  if (path.length > 0) {
+    for (const node of path) {
+      if (node === boundary) return false;
+
+      if (node instanceof Element && node.matches(INTERACTIVE_SELECTOR)) return true;
+    }
+
+    return false;
+  }
+
   const target = resolveEventTarget(event);
   if (!(target instanceof Element)) return false;
 

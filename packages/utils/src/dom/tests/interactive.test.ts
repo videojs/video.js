@@ -235,6 +235,46 @@ describe('isInteractiveTarget', () => {
     expect(isInteractiveTarget(pointerup(child))).toBe(true);
     surface.remove();
   });
+
+  it('returns true when the control role is on a shadow host and the target is inside its shadow root', () => {
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    const inner = document.createElement('span');
+    let result: boolean | undefined;
+
+    host.setAttribute('role', 'button');
+    root.append(inner);
+    document.body.append(host);
+    host.addEventListener('pointerup', (event) => {
+      result = isInteractiveTarget(event);
+    });
+    inner.dispatchEvent(new Event('pointerup', { bubbles: true, composed: true }));
+    expect(result).toBe(true);
+    host.remove();
+  });
+
+  it('ignores interactive ancestors of the boundary element', () => {
+    const outer = document.createElement('div');
+    const root = outer.attachShadow({ mode: 'open' });
+    const boundary = document.createElement('div');
+    const inner = document.createElement('span');
+    let bounded: boolean | undefined;
+    let unbounded: boolean | undefined;
+
+    outer.setAttribute('role', 'button');
+    boundary.append(inner);
+    root.append(boundary);
+    document.body.append(outer);
+    outer.addEventListener('pointerup', (event) => {
+      bounded = isInteractiveTarget(event, boundary);
+      unbounded = isInteractiveTarget(event);
+    });
+    inner.dispatchEvent(new Event('pointerup', { bubbles: true, composed: true }));
+    expect(bounded).toBe(false);
+    expect(unbounded).toBe(true);
+    outer.remove();
+  });
+
   it('returns true for menu item radio targets', () => {
     const item = document.createElement('div');
 
