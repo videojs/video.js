@@ -6,6 +6,7 @@ import {
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_KALTURA_SOURCE,
   DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
@@ -14,6 +15,7 @@ import {
   getYouTubeSource,
   HLS_SOURCE_IDS,
   HYPERFRAMES_VIDEO_SRC,
+  KALTURA_SOURCE_IDS,
   MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
@@ -162,6 +164,16 @@ const MEDIA_MAP = {
     live: true,
     sources: MUX_SPF_SOURCE_IDS,
     cdnSources: SPF_HLS_SOURCE_IDS,
+  },
+  // `<kaltura-video>` resolves Kaltura entries to the HLS stream it plays, so its picker covers the URL shapes it
+  // reads an entry from, and entries that fail on purpose.
+  'kaltura-video': {
+    label: 'Kaltura Video',
+    player: 'video',
+    tag: 'kaltura-video',
+    sources: KALTURA_SOURCE_IDS,
+    fallbackSource: DEFAULT_KALTURA_SOURCE,
+    entrySource: DEFAULT_KALTURA_SOURCE,
   },
   'mux-audio': {
     label: 'Mux Audio',

@@ -227,6 +227,7 @@
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/hyperframes-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/kaltura-video": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
@@ -252,6 +253,7 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/hyperframes-video": "workspace:*",
+    "@videojs/kaltura-video": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
@@ -286,6 +288,9 @@
       "optional": true
     },
     "@videojs/hyperframes-video": {
+      "optional": true
+    },
+    "@videojs/kaltura-video": {
       "optional": true
     },
     "@videojs/mixcloud-audio": {

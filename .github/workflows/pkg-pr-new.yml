@@ -130,6 +130,7 @@ jobs:
           './packages/media'
           './packages/adapters/cloudflare-video'
           './packages/adapters/dailymotion-video'
+          './packages/adapters/kaltura-video'
           './packages/adapters/mixcloud-audio'
           './packages/adapters/playerjs-video'
           './packages/adapters/soundcloud-audio'

@@ -10,6 +10,16 @@ import { ContentTypes, Hls, HlsJsAdapter, type HlsSource } from '../index';
 // the HTML binding delivers it.
 customElements.define('test-airplay-video', CustomMediaElement('video', HlsJsAdapter as never));
 
+const STREAM = 'https://example.com/video.m3u8';
+
+// jsdom implements no media loading, so a source that empties the element is
+// only observed. It does send real requests, so hls.js must never reach the
+// network from here.
+beforeEach(() => {
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
+  vi.spyOn(XMLHttpRequest.prototype, 'send').mockImplementation(() => {});
+});
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
@@ -42,7 +52,7 @@ function setup() {
 
   media.addEventListener('error', handler);
 
-  media.source = { type: ContentTypes.M3U8, preferPlayback: 'native' };
+  media.source = { src: STREAM, type: ContentTypes.M3U8, preferPlayback: 'native' };
   media.load();
 
   return { media, video, handler };
@@ -102,7 +112,7 @@ describe('HlsJsAdapter', () => {
 
       media.addEventListener('pause', pauseHandler);
 
-      media.source = { type: ContentTypes.M3U8, preferPlayback: 'native' };
+      media.source = { src: STREAM, type: ContentTypes.M3U8, preferPlayback: 'native' };
       media.load();
 
       video.dispatchEvent(new Event('pause'));
@@ -125,6 +135,7 @@ describe('HlsJsAdapter', () => {
 
       media.addEventListener('loadstart', handler);
 
+      media.source = { src: STREAM };
       media.load();
 
       expect(handler).toHaveBeenCalledOnce();
@@ -156,6 +167,7 @@ describe('HlsJsAdapter', () => {
 
       // New hls.js option values must recreate the engine to take effect.
       media.source = {
+        src: STREAM,
         type: ContentTypes.M3U8,
         preferPlayback: 'native',
         engine: { hlsJs: { maxBufferLength: 60 } },
@@ -171,6 +183,7 @@ describe('HlsJsAdapter', () => {
       const { media, video } = setup();
 
       const source = {
+        src: STREAM,
         type: ContentTypes.M3U8,
         preferPlayback: 'native',
         engine: { hlsJs: { maxBufferLength: 60 } },
@@ -251,6 +264,59 @@ describe('HlsJsAdapter', () => {
       // A new source object signals a fresh start: options set in `setup()` are
       // dropped rather than merged.
       expect(media.source).toEqual({ engine: { hlsJs: { maxBufferLength: 60 } } });
+    });
+  });
+
+  describe('empty source', () => {
+    // Assigning a source requests a load on a microtask, as the element does.
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    it('drops hls.js rather than having it load the page as a manifest', async () => {
+      vi.spyOn(Hls, 'isSupported').mockReturnValue(true);
+
+      const video = document.createElement('video');
+      const media = new HlsJsAdapter();
+
+      document.body.appendChild(video);
+      media.attach(video);
+      media.src = STREAM;
+      await settle();
+
+      const loadSource = vi.spyOn(media.engine!, 'loadSource');
+      const loadstart = vi.fn();
+
+      media.addEventListener('loadstart', loadstart);
+      media.src = '';
+      await settle();
+
+      expect(media.engine).toBeNull();
+      expect(loadSource).not.toHaveBeenCalled();
+      expect(loadstart).not.toHaveBeenCalled();
+    });
+
+    it('empties the element a native delegate played on, without an error', async () => {
+      const { media, video, handler } = setup();
+
+      expect(video.getAttribute('src')).toBe(STREAM);
+
+      media.src = '';
+      await settle();
+
+      expect(video.hasAttribute('src')).toBe(false);
+      expect(HTMLMediaElement.prototype.load).toHaveBeenCalledOnce();
+      expect(media.error).toBeNull();
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('plays the next source on a new engine', async () => {
+      const { media, video } = setup();
+
+      media.src = '';
+      await settle();
+      media.src = 'https://example.com/next.m3u8';
+      await settle();
+
+      expect(video.getAttribute('src')).toBe('https://example.com/next.m3u8');
     });
   });
 
@@ -1024,7 +1090,12 @@ describe('HlsJsAdapter', () => {
       });
 
       // Recreates the native delegate; duration would otherwise sync-detect as `on-demand`.
-      media.source = { type: ContentTypes.M3U8, preferPlayback: 'native', engine: { hlsJs: { debug: true } } };
+      media.source = {
+        src: STREAM,
+        type: ContentTypes.M3U8,
+        preferPlayback: 'native',
+        engine: { hlsJs: { debug: true } },
+      };
       media.load();
 
       expect(seen).not.toContain('on-demand');
@@ -1096,7 +1167,7 @@ describe('HlsJsAdapter', () => {
       media.streamType = 'live';
       expect(media.streamType).toBe('live');
 
-      media.source = { type: ContentTypes.M3U8, preferPlayback: 'mse' };
+      media.source = { src: STREAM, type: ContentTypes.M3U8, preferPlayback: 'mse' };
       media.load();
 
       expect(media.streamType).toBe('live');
@@ -1110,7 +1181,7 @@ describe('HlsJsAdapter', () => {
       media.streamType = 'unknown';
       expect(media.streamType).toBe('on-demand');
 
-      media.source = { type: ContentTypes.M3U8, preferPlayback: 'mse' };
+      media.source = { src: STREAM, type: ContentTypes.M3U8, preferPlayback: 'mse' };
       media.load();
 
       fireDurationChange(video, Infinity);

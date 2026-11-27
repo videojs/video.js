@@ -154,8 +154,8 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 <FrameworkCase frameworks={["react"]}>
 | Key | Elements that read it | It holds |
 |---|---|---|
-| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
-| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
+| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink>, <DocsLink slug="reference/components/kaltura-video">KalturaVideo</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
+| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the four above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
@@ -173,8 +173,8 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 <FrameworkCase frameworks={["html"]}>
 | Key | Elements that read it | It holds |
 |---|---|---|
-| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
-| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
+| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink>, <DocsLink slug="reference/components/kaltura-video">`<kaltura-video>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
+| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the four above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
@@ -266,11 +266,11 @@ video.source = { src: 'https://example.com/stream.m3u8', preferPlayback: 'native
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `HlsJsVideo`, `MuxVideo`, and `MuxAudio` accept it; DASH and Vimeo have no second playback path.
+It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `HlsJsVideo`, `MuxVideo`, `MuxAudio`, and `KalturaVideo` accept it; DASH and Vimeo have no second playback path.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `<hlsjs-video>`, `<mux-video>`, and `<mux-audio>` accept it; DASH and Vimeo have no second playback path.
+It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `<hlsjs-video>`, `<mux-video>`, `<mux-audio>`, and `<kaltura-video>` accept it; DASH and Vimeo have no second playback path.
 </FrameworkCase>
 
 `maxAutoResolution` caps the highest rendition adaptive bitrate selection reaches for on its own:

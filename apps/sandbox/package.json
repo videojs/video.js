@@ -23,6 +23,7 @@
     "@videojs/html": "workspace:*",
     "@videojs/hyperframes-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/kaltura-video": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",

@@ -2,6 +2,7 @@ import { isString } from '@videojs/utils/predicate';
 
 import { parseCloudflareSource } from './cloudflare';
 import { parseDailymotionSource } from './dailymotion';
+import { parseKalturaSource } from './kaltura';
 import { parseMixcloudSource } from './mixcloud';
 import { parseSoundCloudSource } from './soundcloud';
 import { parseSpotifySource } from './spotify';
@@ -18,6 +19,7 @@ export type AdapterType =
   | 'wistia'
   | 'mux'
   | 'cloudflare'
+  | 'kaltura'
   | 'spotify'
   | 'soundcloud'
   | 'mixcloud'
@@ -32,16 +34,17 @@ export type AdapterType =
 
 /**
  * Resolve which type of adapter plays a source URL, so you can render the media component for it and pass it the same
- * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, Twitch, and
- * Dailymotion URLs; player.js embeds marked with a `playerjs` query parameter; HLS and DASH manifests; and video and
- * audio files, by MIME type when you pass one and by file extension otherwise.
+ * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Kaltura, Spotify, SoundCloud, Mixcloud, TikTok,
+ * Twitch, and Dailymotion URLs; player.js embeds marked with a `playerjs` query parameter; HLS and DASH manifests; and
+ * video and audio files, by MIME type when you pass one and by file extension otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
- * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>` and `vimeo/<id>` shorthands.
+ * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>`, `vimeo/<id>`, and
+ * `kaltura/<partnerId>/<entryId>` shorthands.
  *
  * `hls` covers every HLS adapter, and `dash` every DASH adapter. Choosing between them is up to you.
  *
- * @param src - The source URL, or a `youtube/<id>` or `vimeo/<id>` shorthand.
+ * @param src - The source URL, or a `youtube/<id>`, `vimeo/<id>`, or `kaltura/<partnerId>/<entryId>` shorthand.
  * @param type - The source's MIME type, when known. It takes precedence over the file extension, so manifests and files
  *   without one can still be resolved. Parameters such as `codecs` are ignored.
  * @public
@@ -90,6 +93,7 @@ const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
   wistia: parseWistiaMediaId,
   mux: () => true,
   cloudflare: parseCloudflareSource,
+  kaltura: parseKalturaSource,
   spotify: parseSpotifySource,
   soundcloud: parseSoundCloudSource,
   mixcloud: parseMixcloudSource,
@@ -105,6 +109,8 @@ function fromService(src: string): AdapterType | null {
   if (src.startsWith('youtube/')) return parseYouTubeSource(src) ? 'youtube' : null;
 
   if (src.startsWith('vimeo/')) return parseVimeoSource(src) ? 'vimeo' : null;
+
+  if (src.startsWith('kaltura/')) return parseKalturaSource(src) ? 'kaltura' : null;
 
   if (SPOTIFY_URI.test(src)) return parseSpotifySource(src) ? 'spotify' : null;
 
@@ -193,6 +199,9 @@ const SERVICE_HOSTS = {
   // `player.mux.com` page URLs aren't matched: Mux media plays stream URLs, with or without the `.m3u8` extension.
   mux: /^stream\.mux\.com\/[^/.]+(\.m3u8)?$/,
   cloudflare: /^([^/]+\.)?(cloudflarestream\.com|videodelivery\.net)\//,
+  // A `playManifest` URL is a manifest too, but resolves to Kaltura the way a Mux stream does. Self-hosted Kaltura
+  // deployments live on their own hosts, which no URL pattern can tell apart.
+  kaltura: /^([^/]+\.)?kaltura\.com\//,
   spotify: /^open\.spotify\.com\//,
   soundcloud: /^([^/]+\.)?soundcloud\.com\//,
   mixcloud: /^([^/]+\.)?mixcloud\.com\//,

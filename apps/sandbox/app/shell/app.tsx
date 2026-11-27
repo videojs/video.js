@@ -41,6 +41,7 @@ import { skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '@app/s
 import {
   DAILYMOTION_SOURCE_IDS,
   DEFAULT_SOURCE,
+  KALTURA_SOURCE_IDS,
   MIXCLOUD_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
   SOUNDCLOUD_SOURCE_IDS,
@@ -75,6 +76,7 @@ const LINKABLE_SOURCE_IDS = [
   ...SOUNDCLOUD_SOURCE_IDS,
   ...MIXCLOUD_SOURCE_IDS,
   ...DAILYMOTION_SOURCE_IDS,
+  ...KALTURA_SOURCE_IDS,
 ];
 
 function readOption<T extends string, const Fallback>(

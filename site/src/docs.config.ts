@@ -215,6 +215,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/hls-background-video' },
           { slug: 'reference/components/hls-video' },
           { slug: 'reference/components/hlsjs-video' },
+          { slug: 'reference/components/kaltura-video' },
           { slug: 'reference/components/lazy-audio' },
           { slug: 'reference/components/lazy-video' },
           { slug: 'reference/components/mixcloud-audio' },

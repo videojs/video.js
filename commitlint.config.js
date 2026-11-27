@@ -35,6 +35,7 @@ export default {
         'cloudflare-video',
         'dailymotion-video',
         'hyperframes-video',
+        'kaltura-video',
         'mixcloud-audio',
         'playerjs-video',
         'soundcloud-audio',

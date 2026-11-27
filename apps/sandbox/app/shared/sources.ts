@@ -17,10 +17,21 @@ export interface SandboxSource {
   url?: string;
   /**
    * `youtube` is a YouTube page URL for `<youtube-video>`, `playerjs` an embed page URL for `<playerjs-video>`,
-   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, `mixcloud` a Mixcloud URL for `<mixcloud-audio>`, and
-   * `dailymotion` a player embed URL for `<dailymotion-video>`, rather than a media file or manifest.
+   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, `mixcloud` a Mixcloud URL for `<mixcloud-audio>`,
+   * `dailymotion` a player embed URL for `<dailymotion-video>`, and `kaltura` a Kaltura URL or shorthand for
+   * `<kaltura-video>`, rather than a media file or manifest.
    */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'soundcloud' | 'mixcloud' | 'dailymotion';
+  type:
+    | 'hls'
+    | 'mp4'
+    | 'dash'
+    | 'none'
+    | 'youtube'
+    | 'playerjs'
+    | 'soundcloud'
+    | 'mixcloud'
+    | 'dailymotion'
+    | 'kaltura';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -752,6 +763,52 @@ const SOURCE_MAP = {
     url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&scaleMode=fill',
     type: 'dailymotion',
   },
+  // Kaltura's own demo partner keeps these entries public: the first carries seven
+  // caption languages in its HLS manifest, French on by default. The URL shapes
+  // resolve to the same API request, except the HLS playManifest URL, which plays
+  // as written. The last three fail on purpose: an entry that does not exist, the
+  // V7 example from Kaltura's embed docs, which moderation rejected, and a live
+  // entry that is not broadcasting.
+  'kaltura-captions': {
+    label: 'Kaltura - Entry with captions',
+    url: 'kaltura/243342/0_uka1msg4',
+    type: 'kaltura',
+  },
+  'kaltura-v2-embed': {
+    label: 'Kaltura - V2 embed URL',
+    url: 'https://cdnapisec.kaltura.com/p/243342/sp/24334200/embedIframeJs/uiconf_id/28685261/partner_id/243342?iframeembed=true&entry_id=1_sf5ovm7u',
+    type: 'kaltura',
+  },
+  'kaltura-preview': {
+    label: 'Kaltura - Preview page URL',
+    url: 'https://www.kaltura.com/index.php/extwidget/preview/partner_id/243342/uiconf_id/28685261/entry_id/1_sf5ovm7u/embed/dynamic',
+    type: 'kaltura',
+  },
+  'kaltura-manifest': {
+    label: 'Kaltura - HLS playManifest URL',
+    url: 'https://cdnapisec.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/format/applehttp/protocol/https/a.m3u8',
+    type: 'kaltura',
+  },
+  'kaltura-dash-manifest': {
+    label: 'Kaltura - DASH playManifest URL',
+    url: 'https://cdnapisec.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/format/mpegdash/protocol/https/a.mpd',
+    type: 'kaltura',
+  },
+  'kaltura-missing': {
+    label: 'Kaltura - Missing entry (error)',
+    url: 'kaltura/243342/0_missing0',
+    type: 'kaltura',
+  },
+  'kaltura-rejected': {
+    label: 'Kaltura - Rejected entry (error)',
+    url: 'https://cdnapisec.kaltura.com/p/4834032/embedPlaykitJs/uiconf_id/50952692?iframeembed=true&entry_id=1_fwzaeesq',
+    type: 'kaltura',
+  },
+  'kaltura-live-offline': {
+    label: 'Kaltura - Offline live entry (error)',
+    url: 'kaltura/1878761/1_9u6tpaco',
+    type: 'kaltura',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -766,7 +823,8 @@ const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 /**
  * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
  * the player.js services' for `<playerjs-video>`, SoundCloud's for `<soundcloud-audio>`, Mixcloud's for
- * `<mixcloud-audio>`, Dailymotion's for `<dailymotion-video>`, so every list derived from this one stays free of them.
+ * `<mixcloud-audio>`, Dailymotion's for `<dailymotion-video>`, and Kaltura's for `<kaltura-video>`, so every list
+ * derived from this one stays free of them.
  */
 export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
   (id) =>
@@ -774,13 +832,15 @@ export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
     !isPlayerJsSource(id) &&
     !isSoundCloudSource(id) &&
     !isMixcloudSource(id) &&
-    !isDailymotionSource(id)
+    !isDailymotionSource(id) &&
+    !isKalturaSource(id)
 );
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
 export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
 export const SOUNDCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isSoundCloudSource);
 export const MIXCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isMixcloudSource);
 export const DAILYMOTION_SOURCE_IDS = ALL_SOURCE_IDS.filter(isDailymotionSource);
+export const KALTURA_SOURCE_IDS = ALL_SOURCE_IDS.filter(isKalturaSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -821,6 +881,7 @@ export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
 export const DEFAULT_SOUNDCLOUD_SOURCE: SourceId = 'soundcloud-track';
 export const DEFAULT_MIXCLOUD_SOURCE: SourceId = 'mixcloud-show';
 export const DEFAULT_DAILYMOTION_SOURCE: SourceId = 'dailymotion-default';
+export const DEFAULT_KALTURA_SOURCE: SourceId = 'kaltura-captions';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -887,6 +948,10 @@ export function isMixcloudSource(id: SourceId): boolean {
 
 export function isDailymotionSource(id: SourceId): boolean {
   return SOURCES[id].type === 'dailymotion';
+}
+
+export function isKalturaSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'kaltura';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */

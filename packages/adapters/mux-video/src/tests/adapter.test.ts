@@ -5,12 +5,14 @@ import { MuxVideoAdapter, type MuxSource } from '..';
 
 // Every Mux source fetches its metadata, and native playback fetches the
 // manifest alongside; neither should reach the network from here. Tests that
-// care about a response stub their own.
+// care about a response stub their own. jsdom implements no media loading, so
+// dropping a source that played natively only empties the element.
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => new Response('', { status: 404 }))
   );
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
 });
 
 afterEach(() => {

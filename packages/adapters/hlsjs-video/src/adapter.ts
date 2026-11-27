@@ -399,17 +399,27 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
       return super.load();
     }
 
+    // hls.js resolves an empty URL against the page and loads the page as a
+    // manifest, and an empty native `src` fails, so no source unloads instead,
+    // the way removing a `<video>`'s `src` does.
+    if (!this.#src) {
+      this.#engineDestroy();
+      this.#emptyTarget();
+      return;
+    }
+
     if (this.#shouldEngineUpdate(this.#engineConfigKey())) {
       this.#engineDestroy();
       this.#prevEngineConfigKey = this.#engineConfigKey();
 
-      // Read the stored source, not the `source` getter: subclasses override the
-      // getter to return what was assigned to them, while the fields below come
-      // from what they resolved and handed down (Mux fills in the DRM options).
+      // Read the stored source and URL, not the `source` and `src` getters:
+      // subclasses override the getters to return what was assigned to them,
+      // while what plays is what they resolved and handed down (Mux fills in the
+      // DRM options, Kaltura the stream URL).
       const { type, preferPlayback, drm, engine, maxAutoResolution, capRenditionToPlayerSize, minAutoResolution } =
         this.#source ?? {};
       const { hlsJs, nativeHls } = engine ?? {};
-      const contentType = resolveContentType(type, this.src);
+      const contentType = resolveContentType(type, this.#src);
       const useMse = Hls.isSupported() && contentType === ContentTypes.M3U8 && preferPlayback !== PlaybackTypes.NATIVE;
 
       if (__DEV__ && type && !contentType) {
@@ -459,7 +469,7 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
 
     if (this.#delegate) {
       this.dispatchEvent(new HlsMediaEvent('loadstart'));
-      this.#delegate.src = this.src;
+      this.#delegate.src = this.#src;
     }
   }
 
@@ -509,6 +519,15 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
     }
   }
 
+  /** Hls.js empties the element as it detaches; a native delegate leaves its URL behind. */
+  #emptyTarget() {
+    const target = this.#mediaElement;
+    if (!target?.hasAttribute('src')) return;
+
+    target.removeAttribute('src');
+    target.load();
+  }
+
   #stopTargetLoadStartEvent = (event: Event) => {
     if (!(event instanceof HlsMediaEvent)) event.stopImmediatePropagation();
   };
@@ -533,7 +552,7 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
   #engineConfigKey() {
     const { type, preferPlayback, drm, engine } = this.#source ?? {};
 
-    return { drm, engine, preferPlayback, contentType: resolveContentType(type, this.src) };
+    return { drm, engine, preferPlayback, contentType: resolveContentType(type, this.#src) };
   }
 
   #engineDestroy() {

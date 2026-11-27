@@ -420,6 +420,9 @@ importers:
       '@videojs/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@videojs/kaltura-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/kaltura-video
       '@videojs/media':
         specifier: workspace:*
         version: link:../../packages/media
@@ -632,6 +635,25 @@ importers:
 
   packages/adapters/hyperframes-video:
     dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
+      '@videojs/utils':
+        specifier: workspace:*
+        version: link:../../utils
+    devDependencies:
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(supports-color@8.1.1)
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
+
+  packages/adapters/kaltura-video:
+    dependencies:
+      '@videojs/hlsjs-video':
+        specifier: workspace:*
+        version: link:../hlsjs-video
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media
@@ -920,6 +942,9 @@ importers:
       '@videojs/html':
         specifier: workspace:*
         version: link:../html
+      '@videojs/kaltura-video':
+        specifier: workspace:*
+        version: link:../adapters/kaltura-video
       '@videojs/mixcloud-audio':
         specifier: workspace:*
         version: link:../adapters/mixcloud-audio
@@ -1160,6 +1185,9 @@ importers:
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/kaltura-video':
+        specifier: workspace:*
+        version: link:../adapters/kaltura-video
       '@videojs/mixcloud-audio':
         specifier: workspace:*
         version: link:../adapters/mixcloud-audio
@@ -1335,6 +1363,9 @@ importers:
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/kaltura-video':
+        specifier: workspace:*
+        version: link:../adapters/kaltura-video
       '@videojs/mixcloud-audio':
         specifier: workspace:*
         version: link:../adapters/mixcloud-audio

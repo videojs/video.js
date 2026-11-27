@@ -10,6 +10,9 @@
 import { MediaStreamTypes } from '../../core/types';
 import { HTMLVideoAdapter } from '../simple';
 
+/**
+ * @fires sourcechange - Fired when the source changes.
+ */
 export class ComplexHost extends HTMLVideoAdapter {
   static readonly defaultProps = {
     src: '',
