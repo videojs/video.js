@@ -40,7 +40,7 @@ function typecheck(file: string, skipLibCheck: boolean) {
 
 beforeAll(() => {
   if (!existsSync(join(packageDir, 'dist/dev/index.d.ts'))) {
-    throw new Error('Missing dist: run `pnpm -F @videojs/mux-data build` first.');
+    throw new Error('Missing dist: run `pnpm exec vp run @videojs/mux-data#build` first.');
   }
 
   consumerDir = mkdtempSync(join(tmpdir(), 'mux-data-consumer-'));
@@ -75,7 +75,7 @@ export const token = (sdk: MuxDataSdk): string => sdk.extensionToken;
 });
 
 afterAll(() => {
-  rmSync(consumerDir, { recursive: true, force: true });
+  if (consumerDir) rmSync(consumerDir, { recursive: true, force: true });
 });
 
 describe('MuxDataSdk', () => {
