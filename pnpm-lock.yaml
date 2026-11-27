@@ -411,12 +411,12 @@ importers:
       '@videojs/hlsjs-video':
         specifier: workspace:*
         version: link:../../packages/adapters/hlsjs-video
-      '@videojs/hyperframes-video':
-        specifier: workspace:*
-        version: link:../../packages/adapters/hyperframes-video
       '@videojs/html':
         specifier: workspace:*
         version: link:../../packages/html
+      '@videojs/hyperframes-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/hyperframes-video
       '@videojs/icons':
         specifier: workspace:*
         version: link:../../packages/icons
@@ -468,6 +468,9 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@videojs/vidyard-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/vidyard-video
       '@videojs/vimeo-video':
         specifier: workspace:*
         version: link:../../packages/adapters/vimeo-video
@@ -840,6 +843,22 @@ importers:
         specifier: 'catalog:'
         version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.19.15)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
 
+  packages/adapters/vidyard-video:
+    dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
+      '@videojs/utils':
+        specifier: workspace:*
+        version: link:../../utils
+    devDependencies:
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(supports-color@8.1.1)
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)
+
   packages/adapters/vimeo-video:
     dependencies:
       '@videojs/media':
@@ -914,12 +933,12 @@ importers:
       '@videojs/hlsjs-video':
         specifier: workspace:*
         version: link:../adapters/hlsjs-video
-      '@videojs/hyperframes-video':
-        specifier: workspace:*
-        version: link:../adapters/hyperframes-video
       '@videojs/html':
         specifier: workspace:*
         version: link:../html
+      '@videojs/hyperframes-video':
+        specifier: workspace:*
+        version: link:../adapters/hyperframes-video
       '@videojs/mixcloud-audio':
         specifier: workspace:*
         version: link:../adapters/mixcloud-audio
@@ -956,6 +975,9 @@ importers:
       '@videojs/twitch-video':
         specifier: workspace:*
         version: link:../adapters/twitch-video
+      '@videojs/vidyard-video':
+        specifier: workspace:*
+        version: link:../adapters/vidyard-video
       '@videojs/vimeo-video':
         specifier: workspace:*
         version: link:../adapters/vimeo-video
@@ -1193,6 +1215,9 @@ importers:
       '@videojs/twitch-video':
         specifier: workspace:*
         version: link:../adapters/twitch-video
+      '@videojs/vidyard-video':
+        specifier: workspace:*
+        version: link:../adapters/vidyard-video
       '@videojs/vimeo-video':
         specifier: workspace:*
         version: link:../adapters/vimeo-video
@@ -1365,6 +1390,9 @@ importers:
       '@videojs/twitch-video':
         specifier: workspace:*
         version: link:../adapters/twitch-video
+      '@videojs/vidyard-video':
+        specifier: workspace:*
+        version: link:../adapters/vidyard-video
       '@videojs/vimeo-video':
         specifier: workspace:*
         version: link:../adapters/vimeo-video
@@ -8772,6 +8800,7 @@ packages:
   image-size@2.0.2:
     resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
     engines: {node: '>=16.x'}
+    deprecated: Use latest 2.x please
     hasBin: true
 
   immediate@3.0.6:
@@ -12084,12 +12113,15 @@ packages:
 
   yuku-ast@0.9.5:
     resolution: {integrity: sha512-Q8qW8WwQnN5Cm0ZZivdRIfv0sRLTjUq0YumXJkw8CYN1aCdICH9rk4C47/4n6kA5EqDtlj+F608twoTSV2MwdQ==}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-codegen@0.9.5:
     resolution: {integrity: sha512-zGUVyDpSK4b6c9B0yyxi2P0wujn1XZTbG9dCb7d6gyAoP63EMgyLzUwPUvwxPG5jgYqhlI7w+S3oCyapqGr4PA==}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.9.5:
     resolution: {integrity: sha512-IBnAdNVMswWbJcM7woPluOudectJzFjJ1N8jVRxP9Uq4CIv5hZdBIcdmtRbFDYF/Ph2j2gVup4YJ4N9mh0jYFA==}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zip-stream@7.0.5:
     resolution: {integrity: sha512-dSvYKdvLsAHCDqPOhIwk/q5CvuWtTB3Dgpoe0uVEFjTzIOAmsQpprX25InCvrvJsirEbu1OHyy67n/kAj1Sw/w==}
@@ -14260,17 +14292,17 @@ snapshots:
       nanostores: 1.1.1
       react: 19.3.0
 
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
-    dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -15693,7 +15725,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.17':
@@ -16607,7 +16639,7 @@ snapshots:
 
   '@typescript/typescript6@6.0.0':
     dependencies:
-      typescript: 6.0.2
+      typescript: 6.0.3
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -17757,7 +17789,7 @@ snapshots:
 
   babel-plugin-react-compiler@1.0.0:
     dependencies:
-      '@babel/types': 7.29.8
+      '@babel/types': 7.29.11
     optional: true
 
   babel-plugin-syntax-hermes-parser@0.34.0:
@@ -21016,6 +21048,31 @@ snapshots:
       '@oxfmt/binding-win32-x64-msvc': 0.72.0
       vite-plus: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
 
+  oxfmt@0.72.0(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)):
+    dependencies:
+      tinypool: 2.2.0
+    optionalDependencies:
+      '@oxfmt/binding-android-arm-eabi': 0.72.0
+      '@oxfmt/binding-android-arm64': 0.72.0
+      '@oxfmt/binding-darwin-arm64': 0.72.0
+      '@oxfmt/binding-darwin-x64': 0.72.0
+      '@oxfmt/binding-freebsd-x64': 0.72.0
+      '@oxfmt/binding-linux-arm-gnueabihf': 0.72.0
+      '@oxfmt/binding-linux-arm-musleabihf': 0.72.0
+      '@oxfmt/binding-linux-arm64-gnu': 0.72.0
+      '@oxfmt/binding-linux-arm64-musl': 0.72.0
+      '@oxfmt/binding-linux-ppc64-gnu': 0.72.0
+      '@oxfmt/binding-linux-riscv64-gnu': 0.72.0
+      '@oxfmt/binding-linux-riscv64-musl': 0.72.0
+      '@oxfmt/binding-linux-s390x-gnu': 0.72.0
+      '@oxfmt/binding-linux-x64-gnu': 0.72.0
+      '@oxfmt/binding-linux-x64-musl': 0.72.0
+      '@oxfmt/binding-openharmony-arm64': 0.72.0
+      '@oxfmt/binding-win32-arm64-msvc': 0.72.0
+      '@oxfmt/binding-win32-ia32-msvc': 0.72.0
+      '@oxfmt/binding-win32-x64-msvc': 0.72.0
+      vite-plus: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)
+
   oxfmt@0.72.0(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)):
     dependencies:
       tinypool: 2.2.0
@@ -21169,6 +21226,30 @@ snapshots:
       '@oxlint/binding-win32-x64-msvc': 1.87.0
       oxlint-tsgolint: 7.0.2003
       vite-plus: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
+
+  oxlint@1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)):
+    optionalDependencies:
+      '@oxlint/binding-android-arm-eabi': 1.87.0
+      '@oxlint/binding-android-arm64': 1.87.0
+      '@oxlint/binding-darwin-arm64': 1.87.0
+      '@oxlint/binding-darwin-x64': 1.87.0
+      '@oxlint/binding-freebsd-x64': 1.87.0
+      '@oxlint/binding-linux-arm-gnueabihf': 1.87.0
+      '@oxlint/binding-linux-arm-musleabihf': 1.87.0
+      '@oxlint/binding-linux-arm64-gnu': 1.87.0
+      '@oxlint/binding-linux-arm64-musl': 1.87.0
+      '@oxlint/binding-linux-ppc64-gnu': 1.87.0
+      '@oxlint/binding-linux-riscv64-gnu': 1.87.0
+      '@oxlint/binding-linux-riscv64-musl': 1.87.0
+      '@oxlint/binding-linux-s390x-gnu': 1.87.0
+      '@oxlint/binding-linux-x64-gnu': 1.87.0
+      '@oxlint/binding-linux-x64-musl': 1.87.0
+      '@oxlint/binding-openharmony-arm64': 1.87.0
+      '@oxlint/binding-win32-arm64-msvc': 1.87.0
+      '@oxlint/binding-win32-ia32-msvc': 1.87.0
+      '@oxlint/binding-win32-x64-msvc': 1.87.0
+      oxlint-tsgolint: 7.0.2003
+      vite-plus: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)
 
   oxlint@1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)):
     optionalDependencies:
@@ -23153,6 +23234,67 @@ snapshots:
       oxlint-tsgolint: 7.0.2003
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)'
       vitest: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/browser-playwright@5.0.3)(@vitest/browser-preview@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(happy-dom@20.11.1)(jsdom@27.4.0(supports-color@8.1.1))
+    optionalDependencies:
+      '@vitest/browser-playwright': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(playwright@1.59.1)(vitest@5.0.3)
+      '@voidzero-dev/vite-plus-darwin-arm64': 1.1.0
+      '@voidzero-dev/vite-plus-darwin-x64': 1.1.0
+      '@voidzero-dev/vite-plus-linux-arm64-gnu': 1.1.0
+      '@voidzero-dev/vite-plus-linux-arm64-musl': 1.1.0
+      '@voidzero-dev/vite-plus-linux-x64-gnu': 1.1.0
+      '@voidzero-dev/vite-plus-linux-x64-musl': 1.1.0
+      '@voidzero-dev/vite-plus-win32-arm64-msvc': 1.1.0
+      '@voidzero-dev/vite-plus-win32-x64-msvc': 1.1.0
+      playwright: 1.59.1
+    transitivePeerDependencies:
+      - '@arethetypeswrong/core'
+      - '@edge-runtime/vm'
+      - '@opentelemetry/api'
+      - '@types/node'
+      - '@typescript/native-preview'
+      - '@vitejs/devtools'
+      - '@vitest/coverage-istanbul'
+      - '@vitest/coverage-v8'
+      - '@vitest/ui'
+      - '@volar/typescript'
+      - '@vue/language-core'
+      - bufferutil
+      - esbuild
+      - happy-dom
+      - jiti
+      - jsdom
+      - less
+      - msw
+      - publint
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - svelte
+      - terser
+      - tsx
+      - typescript
+      - unplugin-unused
+      - unrun
+      - utf-8-validate
+      - vue-tsc
+      - yaml
+
+  vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0):
+    dependencies:
+      '@oxc-project/types': 0.153.0
+      '@oxlint/plugins': 1.79.0
+      '@vitest/browser': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(vitest@5.0.3)
+      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(vitest@5.0.3)
+      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))
+      '@vitest/pretty-format': 5.0.3
+      '@vitest/snapshot': 5.0.3
+      '@vitest/spy': 5.0.3
+      '@vitest/utils': 5.0.3
+      oxfmt: 0.72.0(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))
+      oxlint: 1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))
+      oxlint-tsgolint: 7.0.2003
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0)'
+      vitest: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/browser-playwright@5.0.3)(@vitest/browser-preview@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(happy-dom@20.11.1)(jsdom@26.1.0(supports-color@8.1.1))
     optionalDependencies:
       '@vitest/browser-playwright': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@volar/typescript@2.4.28(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.3)(unrun@0.2.39)(yaml@2.9.0))(playwright@1.59.1)(vitest@5.0.3)
       '@voidzero-dev/vite-plus-darwin-arm64': 1.1.0

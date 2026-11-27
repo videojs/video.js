@@ -136,6 +136,7 @@ jobs:
           './packages/adapters/spotify-audio'
           './packages/adapters/tiktok-video'
           './packages/adapters/twitch-video'
+          './packages/adapters/vidyard-video'
           './packages/adapters/youtube-video'
           './packages/adapters/native-hls-video'
           './packages/adapters/dash-video'

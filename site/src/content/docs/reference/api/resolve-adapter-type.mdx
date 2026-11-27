@@ -97,6 +97,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `tiktok` | `tiktok.com` video URLs | `TikTokVideo` |
 | `twitch` | `twitch.tv` video and channel URLs, and `player.twitch.tv` embed URLs | `TwitchVideo` |
 | `dailymotion` | `dailymotion.com` video and embed URLs, `dai.ly` short links, and `geo.dailymotion.com` player embed URLs | `DailymotionVideo` |
+| `vidyard` | `vidyard.com` sharing page URLs (`/watch/<uuid>`), `play.vidyard.com/<uuid>` player URLs, and `embed.vidyard.com/share/<uuid>` URLs | `VidyardVideo` |
 | `playerjs` | URLs with a `playerjs` query parameter | `PlayerJsVideo` |
 | `hls` | `.m3u8` files and HLS MIME types | `HlsVideo`, `HlsJsVideo`, or `NativeHlsVideo` |
 | `dash` | `.mpd` files and `application/dash+xml` | `DashVideo` or `ShakaVideo` |
@@ -118,6 +119,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `tiktok` | `tiktok.com` video URLs | `<tiktok-video>` |
 | `twitch` | `twitch.tv` video and channel URLs, and `player.twitch.tv` embed URLs | `<twitch-video>` |
 | `dailymotion` | `dailymotion.com` video and embed URLs, `dai.ly` short links, and `geo.dailymotion.com` player embed URLs | `<dailymotion-video>` |
+| `vidyard` | `vidyard.com` sharing page URLs (`/watch/<uuid>`), `play.vidyard.com/<uuid>` player URLs, and `embed.vidyard.com/share/<uuid>` URLs | `<vidyard-video>` |
 | `playerjs` | URLs with a `playerjs` query parameter | `<playerjs-video>` |
 | `hls` | `.m3u8` files and HLS MIME types | `<hls-video>`, `<hlsjs-video>`, or `<native-hls-video>` |
 | `dash` | `.mpd` files and `application/dash+xml` | `<dash-video>` or `<shaka-video>` |
@@ -145,12 +147,13 @@ A bare id returns `null`. An 11-character YouTube id and a 10-character Wistia i
 
 ### Shorthands
 
-`resolveAdapterType` recognizes these shorthands, and the YouTube and Vimeo media accept them as `src`:
+`resolveAdapterType` recognizes these shorthands, and the YouTube, Vimeo, and Vidyard media accept them as `src`:
 
 | Shorthand | Plays |
 |---|---|
 | `youtube/<id>`, `youtube/shorts/<id>` | The YouTube video, from the privacy-enhanced `youtube-nocookie.com` host |
 | `vimeo/<id>` | The Vimeo video |
 | `vimeo/<id>?hash=<hash>`, `vimeo/<id>?h=<hash>`, `vimeo/<id>/<hash>` | The unlisted Vimeo video |
+| `vidyard/<uuid>` | The Vidyard player |
 
 <UtilReference util="resolveAdapterType" />

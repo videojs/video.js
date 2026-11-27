@@ -22,6 +22,7 @@ import {
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
+  DEFAULT_VIDYARD_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
@@ -30,6 +31,7 @@ import {
   SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   SOURCES,
+  VIDYARD_SOURCE_IDS,
   YOUTUBE_SOURCE_IDS,
 } from '../shared/sources';
 
@@ -51,14 +53,21 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, Mixcloud, and Dailymotion, the native background video, and HyperFrames only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, Mixcloud, Dailymotion, and Vidyard, the native background video, and HyperFrames only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
-    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio', 'mixcloud-audio', 'dailymotion-video'];
+    const picked = [
+      'youtube-video',
+      'playerjs-video',
+      'soundcloud-audio',
+      'mixcloud-audio',
+      'dailymotion-video',
+      'vidyard-video',
+    ];
 
     // player.js is a protocol many providers speak, so its embed picks between their pages instead, and SoundCloud
     // and Mixcloud between the URL shapes and layouts their adapters handle differently. Dailymotion picks between
-    // player configurations and URL parameters.
+    // player configurations and URL parameters, and Vidyard between URL shapes, playlists, and a missing player.
     // HyperFrames plays a composition rather than a stream, so it plays the one file the sandbox serves.
     expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id)), 'hyperframes-video']);
     expect(embeds).toEqual([
@@ -72,6 +81,7 @@ describe('MEDIA', () => {
       'tiktok-video',
       'twitch-video',
       'dailymotion-video',
+      'vidyard-video',
       'wistia-video',
     ]);
   });
@@ -88,6 +98,7 @@ describe('MEDIA', () => {
       'soundcloud-audio',
       'mixcloud-audio',
       'dailymotion-video',
+      'vidyard-video',
     ]);
   });
 
@@ -214,6 +225,20 @@ describe('mediaSources', () => {
 
     for (const media of MEDIA_IDS.filter((id) => id !== 'dailymotion-video')) {
       for (const id of DAILYMOTION_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('offers the Vidyard embed its own URLs, and nothing else those URLs', () => {
+    expect(MEDIA['vidyard-video'].entrySource).toBe(DEFAULT_VIDYARD_SOURCE);
+    expect(MEDIA['vidyard-video'].fallbackSource).toBe(DEFAULT_VIDYARD_SOURCE);
+    expect(VIDYARD_SOURCE_IDS).toContain(DEFAULT_VIDYARD_SOURCE);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('vidyard-video', platform)).toEqual(VIDYARD_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'vidyard-video')) {
+      for (const id of VIDYARD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
   });
 

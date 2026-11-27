@@ -41,6 +41,7 @@ export default {
         'spotify-audio',
         'tiktok-video',
         'twitch-video',
+        'vidyard-video',
         'youtube-video',
         'native-hls-video',
         'dash-video',

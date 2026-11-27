@@ -37,6 +37,12 @@ describe('resolveAdapterType', () => {
     ['https://www.dailymotion.com/embed/video/x84sh87', 'dailymotion'],
     ['https://dai.ly/x84sh87', 'dailymotion'],
     ['https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87', 'dailymotion'],
+    ['https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57', 'vidyard'],
+    ['https://video.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57?second=30', 'vidyard'],
+    ['https://play.vidyard.com/YBvcF2BEfvKdowmfrRwk57', 'vidyard'],
+    ['https://play.vidyard.com/YBvcF2BEfvKdowmfrRwk57.html?v=3.1.1', 'vidyard'],
+    ['https://embed.vidyard.com/share/YBvcF2BEfvKdowmfrRwk57', 'vidyard'],
+    ['share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57', 'vidyard'],
     ['https://streamable.com/e/moo?playerjs', 'playerjs'],
     ['https://embed.example.com/e/moo?autoplay=1&playerjs=1', 'playerjs'],
   ])('resolves the service URL %s to %s', (src, expected) => {
@@ -46,6 +52,7 @@ describe('resolveAdapterType', () => {
   it.each<[string, AdapterType]>([
     ['youtube/aqz-KE-bpKQ', 'youtube'],
     ['vimeo/76979871', 'vimeo'],
+    ['vidyard/YBvcF2BEfvKdowmfrRwk57', 'vidyard'],
   ])('resolves the %s shorthand', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
@@ -108,6 +115,7 @@ describe('resolveAdapterType', () => {
     ['a bare Wistia id', 'e4a27b971d'],
     ['a bare Mux playback id', 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
     ['a malformed shorthand', 'youtube/not-an-id'],
+    ['a malformed Vidyard shorthand', 'vidyard/not a uuid'],
     ['a Mux player page', 'https://player.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
     ['a player.js embed without the marker', 'https://streamable.com/e/moo'],
     ['a player.js marker in the hash', 'https://streamable.com/e/moo#playerjs'],
@@ -119,6 +127,11 @@ describe('resolveAdapterType', () => {
     ['a Twitch embed without a video or channel', 'https://player.twitch.tv/?parent=example.com'],
     ['a bare Dailymotion id', 'x84sh87'],
     ['a Dailymotion playlist', 'https://www.dailymotion.com/playlist/x6hynp'],
+    ['a bare Vidyard UUID', 'YBvcF2BEfvKdowmfrRwk57'],
+    ['the Vidyard embed script', 'https://play.vidyard.com/embed/v4.js'],
+    ['a Vidyard thumbnail', 'https://play.vidyard.com/YBvcF2BEfvKdowmfrRwk57.jpg'],
+    ['a Vidyard page without a video', 'https://www.vidyard.com/pricing/'],
+    ['a Vidyard lookalike host', 'https://share.notvidyard.com/watch/YBvcF2BEfvKdowmfrRwk57'],
     ['a SoundCloud profile', 'https://soundcloud.com/forss'],
     ['a SoundCloud short link', 'https://on.soundcloud.com/9zRpu'],
     ['a Mixcloud profile', 'https://www.mixcloud.com/spartacus/'],

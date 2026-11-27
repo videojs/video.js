@@ -47,6 +47,7 @@ import {
   SOURCE_IDS,
   SOURCES,
   type SourceId,
+  VIDYARD_SOURCE_IDS,
   YOUTUBE_SOURCE_IDS,
 } from '@app/shared/sources';
 import type { Platform, SkinSource, Styling } from '@app/types';
@@ -75,6 +76,7 @@ const LINKABLE_SOURCE_IDS = [
   ...SOUNDCLOUD_SOURCE_IDS,
   ...MIXCLOUD_SOURCE_IDS,
   ...DAILYMOTION_SOURCE_IDS,
+  ...VIDYARD_SOURCE_IDS,
 ];
 
 function readOption<T extends string, const Fallback>(

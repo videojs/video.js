@@ -229,6 +229,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/tiktok-video' },
           { slug: 'reference/components/twitch-video' },
           { slug: 'reference/components/video' },
+          { slug: 'reference/components/vidyard-video' },
           { slug: 'reference/components/vimeo-video' },
           { slug: 'reference/components/wistia-video' },
           { slug: 'reference/components/youtube-video' },

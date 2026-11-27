@@ -18,8 +18,9 @@ const ADAPTER_TYPE_RENDERERS: Record<AdapterType, readonly Renderer[]> = {
   spotify: ['spotify'],
   tiktok: ['tiktok'],
   twitch: ['twitch'],
-  // No Dailymotion renderer is offered yet.
+  // No Dailymotion or Vidyard renderer is offered yet.
   dailymotion: [],
+  vidyard: [],
   // No player.js renderer is offered yet.
   playerjs: [],
   hls: ['hls', 'hls-background-video'],

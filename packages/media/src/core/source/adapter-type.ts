@@ -7,6 +7,7 @@ import { parseSoundCloudSource } from './soundcloud';
 import { parseSpotifySource } from './spotify';
 import { parseTikTokSource } from './tiktok';
 import { parseTwitchSource } from './twitch';
+import { parseVidyardSource } from './vidyard';
 import { parseVimeoSource } from './vimeo';
 import { parseWistiaMediaId } from './wistia';
 import { parseYouTubeSource } from './youtube';
@@ -24,6 +25,7 @@ export type AdapterType =
   | 'tiktok'
   | 'twitch'
   | 'dailymotion'
+  | 'vidyard'
   | 'playerjs'
   | 'hls'
   | 'dash'
@@ -32,16 +34,17 @@ export type AdapterType =
 
 /**
  * Resolve which type of adapter plays a source URL, so you can render the media component for it and pass it the same
- * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, Twitch, and
- * Dailymotion URLs; player.js embeds marked with a `playerjs` query parameter; HLS and DASH manifests; and video and
- * audio files, by MIME type when you pass one and by file extension otherwise.
+ * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, Twitch,
+ * Dailymotion, and Vidyard URLs; player.js embeds marked with a `playerjs` query parameter; HLS and DASH manifests; and
+ * video and audio files, by MIME type when you pass one and by file extension otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
- * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>` and `vimeo/<id>` shorthands.
+ * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>`, `vimeo/<id>`, and `vidyard/<uuid>`
+ * shorthands.
  *
  * `hls` covers every HLS adapter, and `dash` every DASH adapter. Choosing between them is up to you.
  *
- * @param src - The source URL, or a `youtube/<id>` or `vimeo/<id>` shorthand.
+ * @param src - The source URL, or a `youtube/<id>`, `vimeo/<id>`, or `vidyard/<uuid>` shorthand.
  * @param type - The source's MIME type, when known. It takes precedence over the file extension, so manifests and files
  *   without one can still be resolved. Parameters such as `codecs` are ignored.
  * @public
@@ -96,15 +99,19 @@ const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
   tiktok: parseTikTokSource,
   twitch: parseTwitchSource,
   dailymotion: parseDailymotionSource,
+  vidyard: parseVidyardSource,
   // The marker is the author's word that the embed speaks player.js; only the embed can confirm it.
   playerjs: () => true,
 };
 
 function fromService(src: string): AdapterType | null {
-  // Shorthands go through the same parsers the YouTube and Vimeo media use, so the media accepts what matches here.
+  // Shorthands go through the same parsers the YouTube, Vimeo, and Vidyard media use, so the media accepts what matches
+  // here.
   if (src.startsWith('youtube/')) return parseYouTubeSource(src) ? 'youtube' : null;
 
   if (src.startsWith('vimeo/')) return parseVimeoSource(src) ? 'vimeo' : null;
+
+  if (src.startsWith('vidyard/')) return parseVidyardSource(src) ? 'vidyard' : null;
 
   if (SPOTIFY_URI.test(src)) return parseSpotifySource(src) ? 'spotify' : null;
 
@@ -201,6 +208,7 @@ const SERVICE_HOSTS = {
   // `clips.twitch.tv` is a different embed the Twitch media can't play.
   twitch: /^((www|go|player)\.)?twitch\.tv\//,
   dailymotion: /^((www|geo)\.)?dailymotion\.com\/|^dai\.ly\//,
+  vidyard: /^([^/]+\.)?vidyard\.com\//,
 } satisfies Record<HostedServiceType, RegExp>;
 
 // The field of a structured `source` that names the media by an id alone, in order of precedence. Each mirrors the

@@ -1,0 +1,146 @@
+---
+title: VidyardVideo
+frameworkTitle:
+  html: vidyard-video
+description: Video component that plays Vidyard players through the Vidyard Player API
+---
+
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/vidyard-video/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/vidyard-video/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/vidyard-video/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/vidyard-video/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/vidyard-video/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/vidyard-video/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/vidyard-video/html/css/BasicUsage.ts?raw";
+
+The Vidyard player plays the videos of a Vidyard player UUID, and this component drives it through the [Vidyard Player API](https://knowledge.vidyard.com/hc/en-us/articles/360019034753-Using-the-Vidyard-Player-API). Vidyard's own controls stay hidden by default, so it drops into a <DocsLink slug="guides/skins">player skin</DocsLink> like any other media component; set `controls` to use Vidyard's UI instead.
+
+## Import
+
+<MediaImports media="vidyard-video" package="@videojs/vidyard-video" react="VidyardVideo" />
+
+## Load a source
+
+`src` takes any of these, each naming a player by its UUID:
+
+- Sharing page URLs: `share.vidyard.com/watch/<uuid>`, and `/watch/<uuid>` on any other `vidyard.com` host
+- Player URLs: `play.vidyard.com/<uuid>`, with or without `.html`
+- Embed sharing URLs: `embed.vidyard.com/share/<uuid>`
+- The `vidyard/<uuid>` shorthand, or a bare UUID
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<VidyardVideo src="https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<vidyard-video src="https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57"></vidyard-video>
+```
+</FrameworkCase>
+
+### Player parameters
+
+The query of a source URL is passed to the player as [player parameters](https://knowledge.vidyard.com/hc/en-us/articles/360009879754), such as `second` to start at a position. `engine.vidyard` takes the same parameters and wins over the URL's query:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<VidyardVideo
+  source={{
+    src: 'https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57',
+    engine: { vidyard: { second: 30, quality: '720p' } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('vidyard-video');
+video.source = {
+  src: 'https://share.vidyard.com/watch/YBvcF2BEfvKdowmfrRwk57',
+  engine: { vidyard: { second: 30, quality: '720p' } },
+};
+```
+</FrameworkCase>
+
+Without `controls`, the component also turns off Vidyard's calls to action (`disable_ctas`) and its share button (`viral_sharing`), which a skin covers. Set either in `engine.vidyard` to turn it back on.
+
+## Playlists
+
+A player UUID can hold a playlist of several videos, which the player plays through. `duration`, `currentTime`, and `textTracks` follow the video on screen, and `ended` waits for the end of the last video. To start at another video, set `video` under `engine.vidyard`, counting from `1`.
+
+## Captions
+
+`textTracks` lists the caption tracks of the video on screen. Vidyard draws the cues inside its player, so the tracks hold no cues, and setting a track to `showing` shows it in the player. Vidyard turns on a video's default caption track by itself, so that track starts as `showing`.
+
+Vidyard draws captions at the bottom of its player, where a skin's controls cover them while the controls show.
+
+## Secured videos and consent
+
+A video restricted to secure sites needs a JSON Web Token, which [your server signs](https://knowledge.vidyard.com/hc/en-us/articles/360009997733) with the API token of the video's folder. Pass it as `engine.vidyard.jwt`. Don't sign it in the browser, which would expose the API token.
+
+Vidyard sends only anonymized analytics until the viewer gives GDPR consent. The component loads Vidyard's embed script, which installs the `VidyardV4` global. Once your consent banner has an answer and the media has loaded (from `loadedmetadata` on), pass the answer to Vidyard as its [Player API](https://knowledge.vidyard.com/hc/en-us/articles/360019034753-Using-the-Vidyard-Player-API) documents. Vidyard remembers a consent of `true` for later players:
+
+```ts
+window.VidyardV4?.api.GDPR.consent(true);
+```
+
+The embed script and the player load from `play.vidyard.com`; under a <DocsLink slug="guides/content-security-policy">Content Security Policy</DocsLink>, allow that origin.
+
+## Behavior
+
+- Volume and mute both work, like a native `<video>`. The Player API has no mute, so muting sets Vidyard's volume to `0` and unmuting restores the previous level. iOS doesn't let pages set the volume, so there muting has no effect.
+- `playbackRate` takes rates from `0.5` to `2`, and a skin's rate menu offers only those. Vidyard reports no rate change, so a rate picked in Vidyard's own controls isn't reported.
+- `autoplay` without `muted` starts the video only if the browser allows sound, and otherwise leaves it paused, as a `<video>` does. With `muted`, the component mutes the player and plays it.
+- `loop` restarts playback at the end, from the first video of a playlist.
+- `controls` is read when the player is built. Changing it applies at the next load; call `load()` to apply it right away.
+- A missing or deleted video reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, with Vidyard's message in `error.context`.
+- Vidyard reports no buffered range, so `buffered` ends at the furthest point played.
+- Fullscreen targets the element the player is built in.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="VidyardVideo">
+  <Fragment slot="engine-vidyard">
+    Pass [Vidyard player parameters](https://knowledge.vidyard.com/hc/en-us/articles/360009879754) under `source.engine.vidyard`, spelled exactly as Vidyard spells them, plus anything Vidyard adds next. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+
+    `autoplay`, `muted`, and `loop` come from the props of the same name, `hidden_controls` from `controls`, and the player from `src`, so none of those has an `engine.vidyard` spelling. `type`, `aspect`, `width`, and `height` are set by the component, which sizes the player to fill it.
+  </Fragment>
+</MediaReference>
