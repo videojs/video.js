@@ -476,6 +476,63 @@ describe('createSegmentLoaderActor', () => {
     await committed(fixture, 'track-1', ['s60', 's70', 's80']);
   });
 
+  it('finishes the in-flight segment when the playhead crosses its end mid-download (#9802)', async () => {
+    const track = makeVideoTrack('track-1', [
+      segment('s1', 0),
+      segment('s2', 10),
+      segment('s3', 20),
+      segment('s4', 30),
+    ]);
+    const network = makeControllableFetch();
+
+    vi.mocked(fetch).mockImplementation(network.fetch);
+    const fixture = makeLoaderFixture();
+
+    fixture.loader.send({ type: 'load', track, range: { start: 0, end: 30 } });
+    await vi.waitFor(() => expect(network.fetchedUrls).toContain(track.initialization.url));
+    network.resolve(track.initialization.url);
+    await vi.waitFor(() => expect(network.fetchedUrls).toContain('http://example.com/s1.m4s'));
+    const inFlight = network.signals.get('http://example.com/s1.m4s')!;
+
+    // Audio buffered ahead carried the playhead past the end of s1 while s1 was still downloading.
+    fixture.loader.send({ type: 'load', track, range: { start: 10.2, end: 40.2 } });
+    expect(inFlight.aborted).toBe(false);
+    expect(fixture.sourceBuffer.abort).not.toHaveBeenCalled();
+
+    for (const id of ['s1', 's2', 's3', 's4']) {
+      const url = `http://example.com/${id}.m4s`;
+
+      await vi.waitFor(() => expect(network.fetchedUrls).toContain(url));
+      network.resolve(url);
+    }
+
+    await committed(fixture, 'track-1', ['s1', 's2', 's3', 's4']);
+    expect(network.fetchedUrls.filter((url) => url === 'http://example.com/s1.m4s')).toHaveLength(1);
+  });
+
+  it('still aborts the in-flight segment when the load start skips past the segment after it', async () => {
+    const track = makeVideoTrack('track-1', [
+      segment('s1', 0),
+      segment('s2', 10),
+      segment('s3', 20),
+      segment('s4', 30),
+    ]);
+    const network = makeControllableFetch();
+
+    vi.mocked(fetch).mockImplementation(network.fetch);
+    const fixture = makeLoaderFixture();
+
+    fixture.loader.send({ type: 'load', track, range: { start: 0, end: 30 } });
+    await vi.waitFor(() => expect(network.fetchedUrls).toContain(track.initialization.url));
+    network.resolve(track.initialization.url);
+    await vi.waitFor(() => expect(network.fetchedUrls).toContain('http://example.com/s1.m4s'));
+    const obsolete = network.signals.get('http://example.com/s1.m4s')!;
+
+    fixture.loader.send({ type: 'load', track, range: { start: 25, end: 40 } });
+    await vi.waitFor(() => expect(network.fetchedUrls).toContain('http://example.com/s3.m4s'));
+    expect(obsolete.aborted).toBe(true);
+  });
+
   it('uses only the latest pending state when multiple seeks occur during loading', async () => {
     const track = makeVideoTrack('track-1', [
       segment('s1', 0),
