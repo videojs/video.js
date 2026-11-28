@@ -149,6 +149,28 @@ function makeLoadTask(op: LoadTask, { getContext, setContext, pipelines, deps }:
   });
 }
 
+/**
+ * Whether the in-flight segment is the one right before the segment at the load start, on the same track.
+ *
+ * The playhead can cross the end of a segment that is still streaming in: when audio is buffered ahead, the element
+ * keeps advancing `currentTime` for a while after video underflows. The replan then no longer contains that segment
+ * (`getSegmentsToLoad` only plans segments that end after the playhead), but aborting it would leave its unappended
+ * tail as a permanent hole right behind the playhead, since nothing plans segments behind it. A seek that moves the
+ * load start further away still aborts it.
+ */
+function isInFlightSegmentJustPassed(
+  inFlight: SegmentLoaderActorContext['inFlightSegment'],
+  { track, range }: SegmentLoaderMessage
+): boolean {
+  if (inFlight === null || !range || inFlight.trackId !== track.id) return false;
+
+  const index = track.segments.findIndex((s) => s.id === inFlight.id);
+  const next = index === -1 ? undefined : track.segments[index + 1];
+  if (!next) return false;
+
+  return next.startTime <= range.start + SEGMENT_TIME_EPSILON && range.start < next.startTime + next.duration;
+}
+
 // ============================================================================
 // IMPLEMENTATION
 // ============================================================================
@@ -419,6 +441,7 @@ export function createSegmentLoaderActor(
               t.meta.trackId === inFlight.trackId;
             const inFlightStillNeeded =
               (inFlight !== null && allTasks.some(segmentInFlightStillNeeded)) ||
+              isInFlightSegmentJustPassed(inFlight, msg) ||
               (context.inFlightInitTrackId !== null &&
                 allTasks.some((t) => t.type === 'append-init' && t.meta.trackId === context.inFlightInitTrackId));
 
