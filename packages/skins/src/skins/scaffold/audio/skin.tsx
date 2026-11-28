@@ -3,8 +3,8 @@ import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import type { SkinDescription } from '../../../meta';
 import { PlaybackHotkeys } from '../../shared/behaviors/playback-hotkeys';
+import { AudioErrorDialog } from '../shared/audio-error-dialog';
 import containerStyles from '../shared/container.styles';
-import { ErrorDialog } from '../shared/error-dialog';
 import { StatusAnnouncer } from '../shared/status-announcer';
 import { AudioControls } from './controls';
 
@@ -22,7 +22,7 @@ export function AudioSkin({ children, className, renderThumbnail, ...props }: Au
       {...props}
     >
       <Slot>{children}</Slot>
-      <ErrorDialog />
+      <AudioErrorDialog />
       <AudioControls renderThumbnail={renderThumbnail} />
 
       <PlaybackHotkeys />

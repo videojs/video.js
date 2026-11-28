@@ -7,16 +7,20 @@ import styles from './error-dialog.styles';
 export function AudioErrorDialog() {
   return (
     <$.ErrorDialog.Root className={styles.root}>
-      <$.ErrorDialog.Backdrop className={styles.backdrop} />
-      <$.ErrorDialog.Popup className={styles.popup}>
-        <Box className={styles.content}>
-          <$.ErrorDialog.Title className={styles.title} />
-          <$.ErrorDialog.Description className={styles.description} />
+      <Box className={styles.frame}>
+        <Box className={styles.region}>
+          <$.ErrorDialog.Backdrop className={styles.backdrop} />
+          <$.ErrorDialog.Popup className={styles.popup}>
+            <Box className={styles.content}>
+              <$.ErrorDialog.Title className={styles.title} />
+              <$.ErrorDialog.Description className={styles.description} />
+            </Box>
+            <Box className={styles.actions}>
+              <$.ErrorDialog.Close $render={Button} className={styles.close} />
+            </Box>
+          </$.ErrorDialog.Popup>
         </Box>
-        <Box className={styles.actions}>
-          <$.ErrorDialog.Close $render={Button} className={styles.close} />
-        </Box>
-      </$.ErrorDialog.Popup>
+      </Box>
     </$.ErrorDialog.Root>
   );
 }

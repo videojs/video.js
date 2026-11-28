@@ -103,6 +103,137 @@ for (const variant of CASES) {
     expect(contracts[1]!).toEqual(contracts[0]!);
   });
 
+  test(`${variant.framework} ${variant.skin} keeps a long error message in two scrolling lines over the bar`, async ({
+    page,
+  }) => {
+    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+    const contracts: { lines: number; scrolls: boolean }[] = [];
+
+    for (const panel of comparison.panels) {
+      await test.step(panel.style, async () => {
+        const dialog = panel.root.getByRole('alertdialog');
+        const description = dialog.locator('[id*="error-dialog-desc"]');
+
+        await expect(dialog).toBeVisible({ timeout: 20_000 });
+        await waitForStableText(dialog);
+        await normalizeErrorDialogCopy(dialog);
+        await description.evaluate((element) => {
+          element.textContent = 'This media could not be loaded. '.repeat(12);
+        });
+
+        const rootRect = await frameRect(panel.root);
+        const dialogRect = await frameRect(dialog);
+        const text = await description.evaluate((element) => {
+          const content = element.parentElement!;
+          const lineHeight = Number.parseFloat(getComputedStyle(content).lineHeight);
+
+          return {
+            lines: Math.round(content.clientHeight / lineHeight),
+            scrolls: content.scrollHeight > content.clientHeight,
+          };
+        });
+
+        expect(Math.abs(dialogRect.y - rootRect.y)).toBeLessThan(1);
+        expect(Math.abs(dialogRect.height - rootRect.height)).toBeLessThan(1);
+        expect(text).toEqual({ lines: 2, scrolls: true });
+        contracts.push(text);
+      });
+    }
+
+    expect(contracts[1]!).toEqual(contracts[0]!);
+  });
+
+  test(`${variant.framework} ${variant.skin} switches the error-dialog layout at 11rem of media above the bar`, async ({
+    page,
+  }) => {
+    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+
+    for (const panel of comparison.panels) {
+      await test.step(panel.style, async () => {
+        const dialog = panel.root.getByRole('alertdialog');
+
+        await expect(dialog).toBeVisible({ timeout: 20_000 });
+        await waitForStableText(dialog);
+        await normalizeErrorDialogCopy(dialog);
+
+        // Stands in for visible media above the control bar.
+        const setMediaHeight = (offset: number) =>
+          panel.root.evaluate((element: HTMLElement, offset) => {
+            const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+            let media = element.querySelector<HTMLElement>(':scope > [data-test-media]');
+
+            if (!media) {
+              media = document.createElement('div');
+              media.dataset.testMedia = '';
+              element.prepend(media);
+            }
+
+            media.style.height = `${11 * rem + offset}px`;
+          }, offset);
+
+        await setMediaHeight(-1);
+        await expect
+          .poll(async () => (await frameRect(dialog)).width)
+          .toBeCloseTo((await frameRect(panel.root)).width, 0);
+
+        await setMediaHeight(0);
+        await expect
+          .poll(async () => (await frameRect(dialog)).width)
+          .toBeLessThan((await frameRect(panel.root)).width / 2);
+      });
+    }
+  });
+
+  test(`${variant.framework} ${variant.skin} shows the error-dialog card over tall media like video`, async ({
+    page,
+  }) => {
+    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+    const contracts: Awaited<ReturnType<typeof popupContract>>[] = [];
+
+    for (const panel of comparison.panels) {
+      await test.step(panel.style, async () => {
+        // Stands in for visible media, such as an embed with its own controls, above the control bar.
+        await panel.root.evaluate((element: HTMLElement) => {
+          const media = document.createElement('div');
+
+          media.style.height = '17rem';
+          element.prepend(media);
+        });
+
+        const dialog = panel.root.getByRole('alertdialog');
+
+        await expect(dialog).toBeVisible({ timeout: 20_000 });
+        await waitForStableText(dialog);
+        await normalizeErrorDialogCopy(dialog);
+
+        const controls = panel.root.locator('.audio-controls').first();
+
+        await expect.poll(() => controls.evaluate((element) => getComputedStyle(element).visibility)).toBe('hidden');
+
+        const rootRect = await frameRect(panel.root);
+        const controlsRect = await frameRect(controls);
+        const mediaRect = await dialog.evaluate((element) => {
+          let region = element.parentElement!;
+
+          while (getComputedStyle(region).display === 'contents') region = region.parentElement!;
+
+          const rect = region.getBoundingClientRect();
+
+          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+        });
+        const dialogRect = await frameRect(dialog);
+
+        expect(Math.abs(mediaRect.y - rootRect.y)).toBeLessThan(1);
+        expect(Math.abs(mediaRect.y + mediaRect.height - controlsRect.y)).toBeLessThan(1);
+        expect(Math.abs(mediaRect.y + mediaRect.height / 2 - (dialogRect.y + dialogRect.height / 2))).toBeLessThan(1);
+        expect(dialogRect.width).toBeLessThan(rootRect.width / 2);
+        contracts.push(await popupContract(dialog));
+      });
+    }
+
+    expect(contracts[1]!).toEqual(contracts[0]!);
+  });
+
   test(`${variant.framework} ${variant.skin} keeps seek preview and dragging in sync`, async ({ page }) => {
     const comparison = await openVariants(page, variant, 672);
     const contracts: Awaited<ReturnType<typeof audioSeekContract>>[] = [];

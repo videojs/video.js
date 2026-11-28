@@ -83,6 +83,7 @@
   --duration-media-indicator: var(--media-duration-indicator);
   --duration-media-slider: var(--media-duration-slider);
   --delay-media-dialog: var(--media-delay-dialog);
+  --delay-media-slower: var(--media-duration-slower);
   --scale-media-hidden: var(--media-hidden-scale);
   --scale-media-hidden-indicator: var(--media-hidden-indicator-scale);
   --scale-media-hidden-playback: var(--media-hidden-playback-scale);
@@ -279,6 +280,21 @@
 /* Player below the 2xl breakpoint. */
 @custom-variant media-max-2xl {
   @container media-root (width < theme(--container-media-2xl)) {
+    @slot;
+  }
+}
+
+/* A `media-dialog` size container too short for the dialog card, such as the room above an audio control bar with
+   little or no visible media. */
+@custom-variant media-dialog-bar {
+  @container media-dialog (height < 11rem) {
+    @slot;
+  }
+}
+
+/* A `media-dialog` size container tall enough for the dialog card. */
+@custom-variant media-dialog-card {
+  @container media-dialog (height >= 11rem) {
     @slot;
   }
 }
